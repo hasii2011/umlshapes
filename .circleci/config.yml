@@ -1,0 +1,30 @@
+
+version: '2.1'
+orbs:
+  python: circleci/python@2.1.1
+
+workflows:
+  main:
+    jobs:
+      - build:
+          filters:
+            tags:
+              only: /.*/
+
+jobs:
+  build:
+    docker:
+      - image: cimg/python:3.12-browsers
+    executor: python/default
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies from pyproject.toml
+          command: |
+            pip install .
+            pip install .[test]
+      - run:
+            name: run tests
+            command: | 
+              pip install buildlackey
+              unittests
