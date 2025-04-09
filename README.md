@@ -1,6 +1,5 @@
-
-[![CircleCI](https://dl.circleci.com/status-badge/img/gh/hasii2011/oglv2/tree/master.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/hasii2011/oglv2/tree/master)
-[![PyPI version](https://badge.fury.io/py/oglv2.svg)](https://badge.fury.io/py/oglv2)
+[![CircleCI](https://dl.circleci.com/status-badge/img/gh/hasii2011/umlshapes/tree/master.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/hasii2011/umlshape/tree/master)
+[![PyPI version](https://badge.fury.io/py/umlshapes.svg)](https://badge.fury.io/py/oglv2)
 [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://GitHub.com/Naereen/StrapDown.js/graphs/commit-activity)
 [![forthebadge made-with-python](http://ForTheBadge.com/images/badges/made-with-python.svg)](https://www.python.org/)
 
