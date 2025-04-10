@@ -7,15 +7,15 @@ name='umlshapes'
 dynamic = ["version"]
 description = 'Pyut Ogl without homegrown miniogl'
 readme = "README.md"
-license = {text = 'GNU AFFERO GENERAL PUBLIC LICENSE'}
 authors = [{name = 'Humberto A. Sanchez II', email = 'Humberto.A.Sanchez.II@gmail.com'}]
 maintainers = [{name = 'Humberto A. Sanchez II', email = 'Humberto.A.Sanchez.II@gmail.com'}]
 keywords = ['pyut,graphical shapes,python']
+license = 'AGPL-1.0-or-later'
 
 classifiers = [
   "Programming Language :: Python",
   "Intended Audience :: Developers",
-  "License :: OSI Approved :: GNU Affero General Public License v3",
+  "License AGPL-1.0-or-later",
   "Operating System :: MacOS :: MacOS X",
   "Topic :: Software Development :: Libraries :: Python Modules",
 ]
