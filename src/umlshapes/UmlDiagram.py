@@ -1,13 +1,23 @@
 
+from typing import List
+from typing import NewType
+
 from logging import Logger
 from logging import getLogger
 
+from collections.abc import Iterable
 from wx.lib.ogl import Diagram
+from wx.lib.ogl import Shape
 
 from umlshapes.DiagramFrame import DiagramFrame
 
+Shapes = NewType('Shapes', List[Shape])
+
 
 class UmlDiagram(Diagram):
+    """
+    Modernity wrapper
+    """
     def __init__(self, diagramFrame: DiagramFrame):
         """
         Set the frame at instantiation
@@ -20,3 +30,7 @@ class UmlDiagram(Diagram):
         super().__init__()
 
         self.SetCanvas(diagramFrame)
+
+    @property
+    def shapes(self) -> Iterable:
+        return self.GetShapeList()

@@ -31,6 +31,9 @@ DEFAULT_CLASS_BACKGROUND_COLOR: str = UmlColor.MINT_CREAM.value
 DEFAULT_CLASS_TEXT_COLOR:       str = UmlColor.BLACK.value
 DEFAULT_GRID_LINE_STYLE:        str = UmlPenStyle.DOT.value
 
+# When the text value is selected
+DEFAULT_TEXT_BACKGROUND_COLOR:  str = UmlColor.WHITE.value
+
 
 OGL_PROPERTIES: ValueDescriptions = ValueDescriptions(
     {
@@ -42,6 +45,8 @@ OGL_PROPERTIES: ValueDescriptions = ValueDescriptions(
         KeyName('textItalicize'):        ValueDescription(defaultValue='False',                     deserializer=SecureConversions.secureBoolean),
         KeyName('textFontFamily'):       ValueDescription(defaultValue='Swiss',                     deserializer=UmlFontFamily.deSerialize),
         KeyName('textFontSize'):         ValueDescription(defaultValue='14',                        deserializer=SecureConversions.secureInteger),
+        KeyName('textBackGroundColor'):   ValueDescription(defaultValue=DEFAULT_TEXT_BACKGROUND_COLOR, enumUseValue=True, deserializer=UmlColor),
+
         KeyName('displayConstructor'):   ValueDescription(defaultValue='True',                      deserializer=SecureConversions.secureBoolean),
         KeyName('displayDunderMethods'): ValueDescription(defaultValue='True',                      deserializer=SecureConversions.secureBoolean),
         KeyName('classDimensions'):      ValueDescription(defaultValue=str(UmlDimensions(150, 75)), deserializer=UmlDimensions.deSerialize),

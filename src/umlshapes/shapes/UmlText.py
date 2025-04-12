@@ -4,6 +4,7 @@ from typing import cast
 from logging import Logger
 from logging import getLogger
 
+from wx import Brush
 from wx import ColourDatabase
 from wx import FONTSTYLE_ITALIC
 from wx import FONTWEIGHT_BOLD
@@ -13,16 +14,19 @@ from wx import FONTWEIGHT_NORMAL
 
 from wx import Colour
 from wx import Font
+from wx import MemoryDC
 from wx import Menu
 
 from wx.lib.ogl import CONTROL_POINT_DIAGONAL
 from wx.lib.ogl import CONTROL_POINT_HORIZONTAL
 from wx.lib.ogl import CONTROL_POINT_VERTICAL
+
 from wx.lib.ogl import TextShape
 
 from pyutmodelv2.PyutText import PyutText
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
+from umlshapes.types.UmlColor import UmlColor
 
 from umlshapes.types.UmlFontFamily import UmlFontFamily
 from umlshapes.UmlUtils import UmlUtils
@@ -38,6 +42,8 @@ class UmlText(TextShape):
 
     def __init__(self, pyutText: PyutText, width: int = 0, height: int = 0):    # TODO make default text size a preference):
 
+        self.logger: Logger = getLogger(__name__)
+
         w: int = width
         h: int = height
 
@@ -52,7 +58,9 @@ class UmlText(TextShape):
         self._pyutText: PyutText = pyutText
 
         super().__init__(width=w, height=h)
-        self.logger: Logger = getLogger(__name__)
+
+        self.shadowOffsetX = 0      #
+        self.shadowOffsetY = 0      #
 
         self._textFontFamily: UmlFontFamily = preferences.textFontFamily
         self._textSize:       int  = preferences.textFontSize
@@ -70,7 +78,63 @@ class UmlText(TextShape):
         self._initializeTextFont()
         self._menu: Menu = cast(Menu, None)
 
+        umlBackgroundColor: UmlColor = preferences.textBackGroundColor
+        backgroundColor:    Colour   = Colour(UmlColor.toWxColor(umlBackgroundColor))
+
+        self._brush: Brush = Brush(backgroundColor)
         self.SetDraggable(drag=True)
+
+    def OnDraw(self, dc: MemoryDC):
+
+        # debugText: str = (
+        #     f'{self._pyutText.content} Pen Color: {self.GetPen().GetColour()} "'
+        #     f'Brush Color: {self.GetBrush().GetColour()} '
+        #     f'Background Brush: {self.GetBackgroundBrush().GetColour()} '
+        #     f'Background Pen: {self.GetBackgroundPen().GetColour()} '
+        # )
+        dc.SetBrush(self._brush)
+        # debugText: str = (
+        #     f'{self._pyutText.content} '
+        #     f'Brush Color: {dc.GetBrush().GetColour()}'
+        # )
+        # self.logger.info(debugText)
+        if self.Selected() is True:
+            dc.SetPen(UmlUtils.redDashedPen())
+            sx = self.GetX()
+            sy = self.GetY()
+
+            width  = self.GetWidth() + 3
+            height = self.GetHeight() + 3
+
+            x1 = round(sx - width  // 2)
+            y1 = round(sy - height // 2)
+
+            dc.DrawRectangle(x1, y1, round(width), round(height))
+
+    def OnDrawContents(self, dc):
+
+        if self.Selected() is True:
+            self.SetTextColour('Red')
+        else:
+            self.SetTextColour('Black')
+
+        super().OnDrawContents(dc=dc)
+
+    @property
+    def shadowOffsetX(self):
+        return self._shadowOffsetX
+
+    @shadowOffsetX.setter
+    def shadowOffsetX(self, value):
+        self._shadowOffsetX = value
+
+    @property
+    def shadowOffsetY(self):
+        return self._shadowOffsetY
+
+    @shadowOffsetY.setter
+    def shadowOffsetY(self, value):
+        self._shadowOffsetY = value
 
     @property
     def moveColor(self) -> Colour:

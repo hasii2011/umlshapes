@@ -7,16 +7,18 @@ from logging import Logger
 from logging import getLogger
 from logging import DEBUG
 
-from wx import DC
 from wx import FONTFAMILY_DEFAULT
 from wx import FONTFAMILY_MODERN
 from wx import FONTFAMILY_ROMAN
 from wx import FONTFAMILY_SCRIPT
 from wx import FONTFAMILY_SWISS
 from wx import FONTFAMILY_TELETYPE
+from wx import PENSTYLE_SHORT_DASH
 from wx import PENSTYLE_SOLID
-from wx import Pen
 from wx import RED
+
+from wx import DC
+from wx import Pen
 
 from wx import NewIdRef as wxNewIdRef
 
@@ -28,7 +30,8 @@ class UmlUtils:
 
     clsLogger: Logger = getLogger(__name__)
 
-    RED_FOREGROUND_PEN: Pen = cast(Pen, None)
+    RED_SOLID_PEN:  Pen = cast(Pen, None)
+    RED_DASHED_PEN: Pen = cast(Pen, None)
 
     @staticmethod
     def snapCoordinatesToGrid(x: int, y: int, gridInterval: int) -> Tuple[int, int]:
@@ -44,10 +47,17 @@ class UmlUtils:
     @classmethod
     def redSolidPen(cls):
 
-        if UmlUtils.RED_FOREGROUND_PEN is None:
-            UmlUtils.RED_FOREGROUND_PEN = Pen(RED, 1, PENSTYLE_SOLID)
+        if UmlUtils.RED_SOLID_PEN is None:
+            UmlUtils.RED_SOLID_PEN = Pen(RED, 1, PENSTYLE_SOLID)
 
-        return UmlUtils.RED_FOREGROUND_PEN
+        return UmlUtils.RED_SOLID_PEN
+
+    @classmethod
+    def redDashedPen(cls):
+        if UmlUtils.RED_DASHED_PEN is None:
+            UmlUtils.RED_DASHED_PEN = Pen(RED, 1, PENSTYLE_SHORT_DASH)
+
+        return UmlUtils.RED_DASHED_PEN
 
     @classmethod
     def computeMidPoint(cls, srcPosition: UmlPosition, dstPosition: UmlPosition) -> UmlPosition:

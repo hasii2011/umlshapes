@@ -30,7 +30,7 @@ from umlshapes.preferences.UmlPreferences import UmlPreferences
 
 from umlshapes.UmlDiagram import UmlDiagram
 
-from umlshapes.frames.UmlFrame import DemoUmlFrame
+from umlshapes.frames.UmlFrame import UmlFrame
 
 from umlshapes.shapes.UmlText import UmlText
 from umlshapes.shapes.UmlTextEventHandler import UmlTextEventHandler
@@ -59,7 +59,8 @@ class DemoUmlElements(App):
         # It should be called after the app object has been created,
         # but before OGL is used.
         OGLInitialize()
-        self._ID_DISPLAY_UML_TEXT:            int = wxNewIdRef()
+        self._ID_DISPLAY_UML_TEXT:  int = wxNewIdRef()
+        self._textCounter:          int = 0
 
         self._preferences: UmlPreferences = UmlPreferences()
         self._frame:       SizedFrame     = SizedFrame(parent=None, title="Test UML Elements", size=(FRAME_WIDTH, FRAME_HEIGHT), style=DEFAULT_FRAME_STYLE | FRAME_FLOAT_ON_PARENT)
@@ -69,7 +70,7 @@ class DemoUmlElements(App):
         sizedPanel: SizedPanel = self._frame.GetContentsPane()
         sizedPanel.SetSizerProps(expand=True, proportion=1)
         # self._diagramFrame = DemoUmlFrame(parent=sizedPanel, demoEventEngine=self._demoEventEngine)
-        self._diagramFrame = DemoUmlFrame(parent=sizedPanel)
+        self._diagramFrame = UmlFrame(parent=sizedPanel)
         # noinspection PyUnresolvedReferences
         self._diagramFrame.SetSizerProps(expand=True, proportion=1)
 
@@ -141,7 +142,9 @@ class DemoUmlElements(App):
 
     def _displayOglText(self):
 
-        pyutText:       PyutText      = PyutText(content=self._preferences.textValue)
+        content:        str           = f'{self._preferences.textValue} {self._textCounter}'
+        self._textCounter += 1
+        pyutText:       PyutText      = PyutText(content=content)
         textDimensions: UmlDimensions = self._preferences.textDimensions
         umlPosition:    UmlPosition   = self._computePosition()
 

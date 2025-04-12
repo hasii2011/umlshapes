@@ -8,6 +8,7 @@ from logging import getLogger
 from wx import ClientDC
 
 from wx import DC
+from wx import MOD_CMD
 from wx import PENSTYLE_SOLID
 
 from wx import Colour
@@ -41,6 +42,21 @@ class UmlTextEventHandler(ShapeEvtHandler):
     def OnRightClick(self, *doNotCare):
         self.logger.info(f'{self.GetShape()}')
 
+    def OnLeftClick(self, x: int, y: int, keys=0, attachment=0):
+
+        self.logger.info(f'({x},{y}), {keys=} {attachment=}')
+        shape:  Shape       = self.GetShape()
+        canvas: ShapeCanvas = shape.GetCanvas()
+        dc:     ClientDC    = ClientDC(canvas)
+
+        canvas.PrepareDC(dc)
+
+        if keys == MOD_CMD:
+            pass
+        else:
+            self._unSelectAllShapesOnCanvas(shape, canvas, dc)
+        shape.Select(True, dc)
+
     def OnDrawOutline(self, dc: ClientDC, x: float, y: float, w: int, h: int):
         """
         Called when shape is moving
@@ -54,22 +70,16 @@ class UmlTextEventHandler(ShapeEvtHandler):
         self.logger.debug(f'Position: ({x},{y}) Size: ({w},{h})')
 
         shape: Shape  = self.GetShape()
-        shape.SetX(x)
-        shape.SetY(y)
+        shape.Move(dc=dc, x=x, y=y, display=True)
 
-    def OnLeftClick(self, x: int, y: int, keys=0, attachment=0):
+    def _unSelectAllShapesOnCanvas(self, shape: Shape, canvas: ShapeCanvas, dc: ClientDC):
 
-        shape:  Shape       = self.GetShape()
-        canvas: ShapeCanvas = shape.GetCanvas()
-        dc:     ClientDC    = ClientDC(canvas)
-
-        canvas.PrepareDC(dc)
-
-        if shape.Selected():
+        # Unselect if already selected
+        if shape.Selected() is True:
             shape.Select(False, dc)
             canvas.Refresh(False)
         else:
-            shapeList:  ShapeList = canvas.GetDiagram().GetShapeList()
+            shapeList: ShapeList = canvas.GetDiagram().GetShapeList()
             toUnselect: ShapeList = ShapeList([])
 
             for s in shapeList:
@@ -78,8 +88,6 @@ class UmlTextEventHandler(ShapeEvtHandler):
                     # shapeList will become invalid (the control points are
                     # shapes too!) and bad things will happen...
                     toUnselect.append(s)
-
-            shape.Select(True, dc)
 
             if len(toUnselect) > 0:
                 for s in toUnselect:

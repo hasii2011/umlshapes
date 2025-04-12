@@ -40,18 +40,13 @@ class UmlControlPoint(RectangleShape):
         self._shape:   Shape       = shape
         self._xOffSet: float = xOffSet
         self._yOffSet: float = yOffSet
-        self._type:    int = controlPointType      # old name to keep compatibility with Shape
+        self._type:    int   = controlPointType      # old name to keep compatibility with Shape
 
         self.SetPen(UmlUtils.redSolidPen())
-        # self.SetBrush(RED_BRUSH)
+
         self._oldCursor = None
         self._visible:     bool = True
         self._eraseObject: bool = True
-
-    # Don't even attempt to draw any text - waste of time
-    def OnDrawContents(self, dc):
-        """not implemented???"""
-        pass
 
     def OnDraw(self, dc):
         """The draw handler."""
@@ -75,6 +70,11 @@ class UmlControlPoint(RectangleShape):
     def OnEndDragLeft(self, x, y, keys=0, attachment=0):
         """The end drag left handler."""
         self._shape.GetEventHandler().OnSizingEndDragLeft(self, x, y, keys, attachment)
+
+    def OnSizingBeginDragLeft(self, pt, x, y, keys=0, attachment=0):
+
+        super().OnSizingBeginDragLeft(pt, x, y, keys, attachment)
+        self.logger.info(f'New position: ({x},{y})')
 
     def GetNumberOfAttachments(self):
         """Get the number of attachments."""
