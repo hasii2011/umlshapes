@@ -1,32 +1,31 @@
 
+from typing import Union
+
 from logging import Logger
 from logging import getLogger
 
-from pyutmodelv2.PyutObject import PyutObject
-from wx.lib.ogl import RectangleShape
+from pyutmodelv2.PyutText import PyutText
+
+ModelObject = Union[PyutText, None]
 
 
-class UmlObject(RectangleShape):
+class UmlObject:
 
-    def __init__(self, pyutObject: PyutObject = None, width: int = 0, height: int = 0):
+    def __init__(self, modelObject: ModelObject = None):
         """
 
         Args:
-            pyutObject:  The data model object
-            width:       width of the UML Shape
-            height:      height of the UML Shape
+            modelObject:  The data model object
         """
 
         self.logger: Logger = getLogger(__name__)
 
-        super().__init__(w=width, h=height)
-
-        self._pyutObject: PyutObject | None = pyutObject
+        self._modelObject: ModelObject = modelObject
 
     @property
-    def pyutObject(self):
-        return self._pyutObject
+    def modelObject(self) -> ModelObject:
+        return self._modelObject
 
-    @pyutObject.setter
-    def pyutObject(self, pyutObject: PyutObject):
-        self._pyutObject = pyutObject
+    @modelObject.setter
+    def modelObject(self, pyutObject: ModelObject):
+        self._modelObject = pyutObject

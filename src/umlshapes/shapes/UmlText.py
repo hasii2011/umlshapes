@@ -191,6 +191,14 @@ class UmlText(TextShape):
         self._textFontFamily = newValue
 
     @property
+    def textFont(self) -> Font:
+        return self._textFont
+
+    @textFont.setter
+    def textFont(self, newFont: Font):
+        self._textFont = newFont
+
+    @property
     def topLeft(self) -> LeftCoordinate:
 
         x = self.GetX()                 # These point to the center of the rectangle
