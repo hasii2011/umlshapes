@@ -203,17 +203,6 @@ class UmlText(TextShape):
 
         x = self.GetX()                 # These point to the center of the rectangle
         y = self.GetY()                 # These point to the center of the rectangle
-        # width  = self.GetWidth()
-        # height = self.GetHeight()
-        #
-        # originX = x - width // 2
-        # originY = y - height // 2
-        # x -= originX
-        # y -= originY
-        # if width < 0:
-        #     x += width
-        # if height < 0:
-        #     y += height
 
         return LeftCoordinate(x=x, y=y)
 

@@ -227,7 +227,7 @@ class UmlTextEventHandler(ShapeEvtHandler):
 
     def __updateDisplay(self):
 
-        self.umlText.R()
+        # self.umlText.autoResize()     TODO implement this
 
         canvas: UmlFrame = self.umlText.GetCanvas()
         canvas.refresh()
