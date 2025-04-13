@@ -59,7 +59,7 @@ class UmlTextEventHandler(ShapeEvtHandler):
 
     def OnDrawOutline(self, dc: ClientDC, x: float, y: float, w: int, h: int):
         """
-        Called when shape is moving
+        Called when shape is moving or is resized
         Args:
             dc:  This is a client DC; It won't draw on OS X
             x:
@@ -71,6 +71,8 @@ class UmlTextEventHandler(ShapeEvtHandler):
 
         shape: Shape  = self.GetShape()
         shape.Move(dc=dc, x=x, y=y, display=True)
+        # Hmm, weird how SetSize namex width and height
+        shape.SetSize(x=w, y=h)
 
     def _unSelectAllShapesOnCanvas(self, shape: Shape, canvas: ShapeCanvas, dc: ClientDC):
 

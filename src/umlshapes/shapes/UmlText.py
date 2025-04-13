@@ -4,6 +4,8 @@ from typing import cast
 from logging import Logger
 from logging import getLogger
 
+from dataclasses import dataclass
+
 from wx import Brush
 from wx import ColourDatabase
 from wx import FONTSTYLE_ITALIC
@@ -20,12 +22,14 @@ from wx import Menu
 from wx.lib.ogl import CONTROL_POINT_DIAGONAL
 from wx.lib.ogl import CONTROL_POINT_HORIZONTAL
 from wx.lib.ogl import CONTROL_POINT_VERTICAL
+from wx.lib.ogl import Shape
 
 from wx.lib.ogl import TextShape
 
 from pyutmodelv2.PyutText import PyutText
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
+from umlshapes.shapes.UmlControlPointEventHandler import UmlControlPointEventHandler
 from umlshapes.types.UmlColor import UmlColor
 
 from umlshapes.types.UmlFontFamily import UmlFontFamily
@@ -33,8 +37,14 @@ from umlshapes.UmlUtils import UmlUtils
 
 from umlshapes.shapes.UmlControlPoint import UmlControlPoint
 
-DEFAULT_FONT_SIZE:  int = 10
-CONTROL_POINT_SIZE: int = 4
+DEFAULT_FONT_SIZE:  int = 10        # Make this a preference
+CONTROL_POINT_SIZE: int = 4         # Make this a preference
+
+
+@dataclass
+class LeftCoordinate:
+    x: int = 0
+    y: int = 0
 
 
 class UmlText(TextShape):
@@ -180,6 +190,33 @@ class UmlText(TextShape):
     def textFontFamily(self, newValue: UmlFontFamily):
         self._textFontFamily = newValue
 
+    @property
+    def topLeft(self) -> LeftCoordinate:
+
+        x = self.GetX()                 # These point to the center of the rectangle
+        y = self.GetY()                 # These point to the center of the rectangle
+        # width  = self.GetWidth()
+        # height = self.GetHeight()
+        #
+        # originX = x - width // 2
+        # originY = y - height // 2
+        # x -= originX
+        # y -= originY
+        # if width < 0:
+        #     x += width
+        # if height < 0:
+        #     y += height
+
+        return LeftCoordinate(x=x, y=y)
+
+    def addChild(self, shape: Shape):
+        """
+        The event handler for UML Control Points wants to know who its` parent is
+        Args:
+            shape:
+        """
+        self._children.append(shape)
+
     def MakeControlPoints(self):
         """
         Make a list of control points (draggable handles) appropriate to
@@ -198,36 +235,44 @@ class UmlText(TextShape):
         right = widthMin / 2.0 + (maxX - minX)
 
         control: UmlControlPoint = UmlControlPoint(self._canvas, self, CONTROL_POINT_SIZE, left, top, CONTROL_POINT_DIAGONAL)
-        self._canvas.AddShape(control)
-        self._controlPoints.append(control)
+        self._setupControlPoint(umlControlPoint=control)
 
         control = UmlControlPoint(self._canvas, self, CONTROL_POINT_SIZE, 0, top, CONTROL_POINT_VERTICAL)
-        self._canvas.AddShape(control)
-        self._controlPoints.append(control)
+        self._setupControlPoint(umlControlPoint=control)
 
         control = UmlControlPoint(self._canvas, self, CONTROL_POINT_SIZE, right, top, CONTROL_POINT_DIAGONAL)
-        self._canvas.AddShape(control)
-        self._controlPoints.append(control)
+        self._setupControlPoint(umlControlPoint=control)
 
         control = UmlControlPoint(self._canvas, self, CONTROL_POINT_SIZE, right, 0, CONTROL_POINT_HORIZONTAL)
-        self._canvas.AddShape(control)
-        self._controlPoints.append(control)
+        self._setupControlPoint(umlControlPoint=control)
 
         control = UmlControlPoint(self._canvas, self, CONTROL_POINT_SIZE, right, bottom, CONTROL_POINT_DIAGONAL)
-        self._canvas.AddShape(control)
-        self._controlPoints.append(control)
+        self._setupControlPoint(umlControlPoint=control)
 
         control = UmlControlPoint(self._canvas, self, CONTROL_POINT_SIZE, 0, bottom, CONTROL_POINT_VERTICAL)
-        self._canvas.AddShape(control)
-        self._controlPoints.append(control)
+        self._setupControlPoint(umlControlPoint=control)
 
         control = UmlControlPoint(self._canvas, self, CONTROL_POINT_SIZE, left, bottom, CONTROL_POINT_DIAGONAL)
-        self._canvas.AddShape(control)
-        self._controlPoints.append(control)
+        self._setupControlPoint(umlControlPoint=control)
 
         control = UmlControlPoint(self._canvas, self, CONTROL_POINT_SIZE, left, 0, CONTROL_POINT_HORIZONTAL)
-        self._canvas.AddShape(control)
-        self._controlPoints.append(control)
+        self._setupControlPoint(umlControlPoint=control)
+
+    def _setupControlPoint(self, umlControlPoint: UmlControlPoint):
+
+        umlControlPoint.SetParent(self)
+        self.addChild(umlControlPoint)
+        self._canvas.AddShape(umlControlPoint)
+        self._controlPoints.append(umlControlPoint)
+        self._addEventHandler(umlControlPoint=umlControlPoint)
+
+    def _addEventHandler(self, umlControlPoint: UmlControlPoint):
+
+        eventHandler: UmlControlPointEventHandler = UmlControlPointEventHandler()
+        eventHandler.SetShape(umlControlPoint)
+        eventHandler.SetPreviousHandler(umlControlPoint.GetEventHandler())
+
+        umlControlPoint.SetEventHandler(eventHandler)
 
     def _initializeTextFont(self):
         """

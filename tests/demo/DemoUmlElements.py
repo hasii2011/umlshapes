@@ -38,11 +38,11 @@ from umlshapes.shapes.UmlTextEventHandler import UmlTextEventHandler
 FRAME_WIDTH:  int = 800
 FRAME_HEIGHT: int = 600
 
-INITIAL_X:   int = 50
-INITIAL_Y:   int = 50
+INITIAL_X:   int = 100
+INITIAL_Y:   int = 100
 
-INCREMENT_X: int = INITIAL_X + 10
-INCREMENT_Y: int = INITIAL_Y + 10
+INCREMENT_X: int = 25
+INCREMENT_Y: int = 25
 
 
 class DemoUmlElements(App):

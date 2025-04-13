@@ -7,12 +7,16 @@
         },
         "testSimple": {
             "format": "%(levelname)s: %(module)s: %(message)s"
+        },
+         "functionNames": {
+            "format": "%(asctime)s.%(msecs)03d %(levelname)s %(module)s.%(funcName)s() %(message)s",
+            "datefmt" : "%H:%M:%S"
         }
     },
     "handlers": {
         "consoleHandler": {
             "class": "logging.StreamHandler",
-            "formatter": "testSimple",
+            "formatter": "functionNames",
             "stream": "ext://sys.stdout"
         }
     },

@@ -47,19 +47,14 @@ class UmlFrame(DiagramFrame):
     def OnLeftClick(self, x, y, keys=0):
         """
         Maybe this belongs in DiagramFrame
+
         Args:
             x:
             y:
             keys:
-
-        Returns:
-
         """
-        self.logger.info(f'You clicked on the Uml Frame')
-
         diagram: UmlDiagram = self.umlDiagram
-
-        shapes: Iterable = diagram.GetShapeList()
+        shapes:  Iterable = diagram.GetShapeList()
 
         for shape in shapes:
             umlShape: Shape = cast(Shape, shape)
