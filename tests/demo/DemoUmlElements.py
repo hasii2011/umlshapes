@@ -22,7 +22,10 @@ from wx.lib.sized_controls import SizedPanel
 from codeallybasic.UnitTestBase import UnitTestBase
 
 from pyutmodelv2.PyutText import PyutText
+from pyutmodelv2.PyutNote import PyutNote
 
+from umlshapes.shapes.UmlNote import UmlNote
+from umlshapes.shapes.UmlNoteEventHandler import UmlNoteEventHandler
 from umlshapes.types.UmlDimensions import UmlDimensions
 from umlshapes.types.UmlPosition import UmlPosition
 
@@ -60,7 +63,9 @@ class DemoUmlElements(App):
         # but before OGL is used.
         OGLInitialize()
         self._ID_DISPLAY_UML_TEXT:  int = wxNewIdRef()
+        self._ID_DISPLAY_UML_NOTE:  int = wxNewIdRef()
         self._textCounter:          int = 0
+        self._noteCounter:          int = 0
 
         self._preferences: UmlPreferences = UmlPreferences()
         self._frame:       SizedFrame     = SizedFrame(parent=None, title="Test UML Elements", size=(FRAME_WIDTH, FRAME_HEIGHT), style=DEFAULT_FRAME_STYLE | FRAME_FLOAT_ON_PARENT)
@@ -82,7 +87,6 @@ class DemoUmlElements(App):
         self._frame.Show(True)
 
     def OnInit(self):
-
         return True
 
     def _createApplicationMenuBar(self):
@@ -99,6 +103,7 @@ class DemoUmlElements(App):
         # viewMenu.Append(id=self._ID_DISPLAY_SEQUENCE_DIAGRAM,    item='Sequence Diagram', helpString='Display Sequence Diagram')
         # viewMenu.Append(id=self._ID_DISPLAY_OGL_CLASS,           item='Ogl Class',        helpString='Display an Ogl Class')
         viewMenu.Append(id=self._ID_DISPLAY_UML_TEXT, item='Uml Text', helpString='Display Uml Text')
+        viewMenu.Append(id=self._ID_DISPLAY_UML_NOTE, item='Uml Note', helpString='Display Uml Note')
         # viewMenu.Append(id=self._ID_DISPLAY_OGL_COMPOSITION,     item='Ogl Composition',  helpString='Display an Composition Link')
         # viewMenu.Append(id=self._ID_DISPLAY_OGL_INTERFACE,       item='Ogl Interface',    helpString='Display Lollipop Interface')
         # viewMenu.Append(id=self._ID_DISPLAY_OGL_USE_CASE,        item='Ogl Use Case',     helpString='Display Ogl Use Case')
@@ -115,6 +120,7 @@ class DemoUmlElements(App):
         # self.Bind(EVT_MENU, self._onDisplayElement, id=self._ID_DISPLAY_SEQUENCE_DIAGRAM)
         # self.Bind(EVT_MENU, self._onDisplayElement, id=self._ID_DISPLAY_OGL_CLASS)
         self.Bind(EVT_MENU, self._onDisplayElement, id=self._ID_DISPLAY_UML_TEXT)
+        self.Bind(EVT_MENU, self._onDisplayElement, id=self._ID_DISPLAY_UML_NOTE)
         # self.Bind(EVT_MENU, self._onDisplayElement, id=self._ID_DISPLAY_OGL_COMPOSITION)
         # self.Bind(EVT_MENU, self._onDisplayElement, id=self._ID_DISPLAY_OGL_INTERFACE)
         # self.Bind(EVT_MENU, self._onDisplayElement, id=self._ID_DISPLAY_OGL_USE_CASE)
@@ -128,7 +134,9 @@ class DemoUmlElements(App):
             # case self._ID_DISPLAY_OGL_CLASS:
             #     self._displayOglClass()
             case self._ID_DISPLAY_UML_TEXT:
-                self._displayOglText()
+                self._displayUmlText()
+            case self._ID_DISPLAY_UML_NOTE:
+                self._displayUmlNote()
             # case self._ID_DISPLAY_OGL_COMPOSITION:
             #     self._displayOglComposition()
             # case self._ID_DISPLAY_OGL_INTERFACE:
@@ -140,7 +148,7 @@ class DemoUmlElements(App):
             case _:
                 self.logger.error(f'WTH!  I am not handling that menu item')
 
-    def _displayOglText(self):
+    def _displayUmlText(self):
 
         content:        str           = f'{self._preferences.textValue} {self._textCounter}'
         self._textCounter += 1
@@ -164,6 +172,32 @@ class DemoUmlElements(App):
         eventHandler.SetPreviousHandler(umlText.GetEventHandler())
 
         umlText.SetEventHandler(eventHandler)
+
+        self._diagramFrame.refresh()
+
+    def _displayUmlNote(self):
+        content:        str           = f'{self._preferences.noteText} {self._noteCounter}'
+        self._noteCounter += 1
+        pyutNote: PyutNote = PyutNote(content=content)
+
+        noteDimensions: UmlDimensions = self._preferences.noteDimensions
+        umlPosition:    UmlPosition   = self._computePosition()
+
+        umlNote: UmlNote = UmlNote(pyutNote=pyutNote, width=noteDimensions.width, height=noteDimensions.height)
+        umlNote.SetCanvas(self._diagramFrame)
+        umlNote.SetX(x=umlPosition.x)
+        umlNote.SetY(y=umlPosition.y)
+
+        diagram: UmlDiagram = self._diagramFrame.umlDiagram
+
+        diagram.AddShape(umlNote)
+        umlNote.Show(show=True)
+
+        eventHandler: UmlNoteEventHandler = UmlNoteEventHandler()
+        eventHandler.SetShape(umlNote)
+        eventHandler.SetPreviousHandler(umlNote.GetEventHandler())
+
+        umlNote.SetEventHandler(eventHandler)
 
         self._diagramFrame.refresh()
 

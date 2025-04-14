@@ -19,23 +19,20 @@ from wx import Font
 from wx import MemoryDC
 from wx import Menu
 
-from wx.lib.ogl import CONTROL_POINT_DIAGONAL
-from wx.lib.ogl import CONTROL_POINT_HORIZONTAL
-from wx.lib.ogl import CONTROL_POINT_VERTICAL
 from wx.lib.ogl import Shape
-
 from wx.lib.ogl import TextShape
 
 from pyutmodelv2.PyutText import PyutText
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
-from umlshapes.shapes.UmlControlPointEventHandler import UmlControlPointEventHandler
-from umlshapes.types.UmlColor import UmlColor
 
+from umlshapes.shapes.ControlPointMixin import ControlPointMixin
+
+from umlshapes.types.UmlColor import UmlColor
 from umlshapes.types.UmlFontFamily import UmlFontFamily
+
 from umlshapes.UmlUtils import UmlUtils
 
-from umlshapes.shapes.UmlControlPoint import UmlControlPoint
 
 DEFAULT_FONT_SIZE:  int = 10        # Make this a preference
 CONTROL_POINT_SIZE: int = 4         # Make this a preference
@@ -47,7 +44,7 @@ class LeftCoordinate:
     y: int = 0
 
 
-class UmlText(TextShape):
+class UmlText(ControlPointMixin, TextShape):
     MARGIN: int = 5
 
     def __init__(self, pyutText: PyutText, width: int = 0, height: int = 0):    # TODO make default text size a preference):
@@ -67,7 +64,8 @@ class UmlText(TextShape):
 
         self._pyutText: PyutText = pyutText
 
-        super().__init__(width=w, height=h)
+        super().__init__(shape=self)
+        TextShape.__init__(self, width=w, height=h)
 
         self.shadowOffsetX = 0      #
         self.shadowOffsetY = 0      #
@@ -213,63 +211,6 @@ class UmlText(TextShape):
             shape:
         """
         self._children.append(shape)
-
-    def MakeControlPoints(self):
-        """
-        Make a list of control points (draggable handles) appropriate to
-        the shape.
-        """
-        maxX, maxY = self.GetBoundingBoxMax()
-        minX, minY = self.GetBoundingBoxMin()
-
-        widthMin = minX + CONTROL_POINT_SIZE + 2
-        heightMin = minY + CONTROL_POINT_SIZE + 2
-
-        # Offsets from main object
-        top = -heightMin / 2.0
-        bottom = heightMin / 2.0 + (maxY - minY)
-        left = -widthMin / 2.0
-        right = widthMin / 2.0 + (maxX - minX)
-
-        control: UmlControlPoint = UmlControlPoint(self._canvas, self, CONTROL_POINT_SIZE, left, top, CONTROL_POINT_DIAGONAL)
-        self._setupControlPoint(umlControlPoint=control)
-
-        control = UmlControlPoint(self._canvas, self, CONTROL_POINT_SIZE, 0, top, CONTROL_POINT_VERTICAL)
-        self._setupControlPoint(umlControlPoint=control)
-
-        control = UmlControlPoint(self._canvas, self, CONTROL_POINT_SIZE, right, top, CONTROL_POINT_DIAGONAL)
-        self._setupControlPoint(umlControlPoint=control)
-
-        control = UmlControlPoint(self._canvas, self, CONTROL_POINT_SIZE, right, 0, CONTROL_POINT_HORIZONTAL)
-        self._setupControlPoint(umlControlPoint=control)
-
-        control = UmlControlPoint(self._canvas, self, CONTROL_POINT_SIZE, right, bottom, CONTROL_POINT_DIAGONAL)
-        self._setupControlPoint(umlControlPoint=control)
-
-        control = UmlControlPoint(self._canvas, self, CONTROL_POINT_SIZE, 0, bottom, CONTROL_POINT_VERTICAL)
-        self._setupControlPoint(umlControlPoint=control)
-
-        control = UmlControlPoint(self._canvas, self, CONTROL_POINT_SIZE, left, bottom, CONTROL_POINT_DIAGONAL)
-        self._setupControlPoint(umlControlPoint=control)
-
-        control = UmlControlPoint(self._canvas, self, CONTROL_POINT_SIZE, left, 0, CONTROL_POINT_HORIZONTAL)
-        self._setupControlPoint(umlControlPoint=control)
-
-    def _setupControlPoint(self, umlControlPoint: UmlControlPoint):
-
-        umlControlPoint.SetParent(self)
-        self.addChild(umlControlPoint)
-        self._canvas.AddShape(umlControlPoint)
-        self._controlPoints.append(umlControlPoint)
-        self._addEventHandler(umlControlPoint=umlControlPoint)
-
-    def _addEventHandler(self, umlControlPoint: UmlControlPoint):
-
-        eventHandler: UmlControlPointEventHandler = UmlControlPointEventHandler()
-        eventHandler.SetShape(umlControlPoint)
-        eventHandler.SetPreviousHandler(umlControlPoint.GetEventHandler())
-
-        umlControlPoint.SetEventHandler(eventHandler)
 
     def _initializeTextFont(self):
         """
