@@ -7,7 +7,6 @@ from logging import Logger
 from logging import getLogger
 
 from wx import Bitmap
-from wx import ClientDC
 from wx import CommandEvent
 
 from wx import EVT_MENU
@@ -15,7 +14,6 @@ from wx import FONTSTYLE_ITALIC
 from wx import FONTSTYLE_NORMAL
 from wx import FONTWEIGHT_BOLD
 from wx import FONTWEIGHT_NORMAL
-from wx import MOD_CMD
 from wx import PENSTYLE_SOLID
 
 from wx import DC

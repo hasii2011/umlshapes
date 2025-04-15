@@ -10,7 +10,6 @@ from wx import Brush
 from wx import ColourDatabase
 from wx import FONTSTYLE_ITALIC
 from wx import FONTWEIGHT_BOLD
-from wx import FONTFAMILY_SWISS
 from wx import FONTSTYLE_NORMAL
 from wx import FONTWEIGHT_NORMAL
 
@@ -33,8 +32,6 @@ from umlshapes.types.UmlFontFamily import UmlFontFamily
 
 from umlshapes.UmlUtils import UmlUtils
 
-
-DEFAULT_FONT_SIZE:  int = 10        # Make this a preference
 CONTROL_POINT_SIZE: int = 4         # Make this a preference
 
 
@@ -75,7 +72,7 @@ class UmlText(ControlPointMixin, TextShape):
         self._isBold:         bool = preferences.textBold
         self._isItalicized:   bool = preferences.textItalicize
 
-        self._defaultFont: Font = Font(DEFAULT_FONT_SIZE, FONTFAMILY_SWISS, FONTSTYLE_NORMAL, FONTWEIGHT_NORMAL)
+        self._defaultFont: Font = UmlUtils.defaultFont()
         self._textFont:    Font = self._defaultFont.GetBaseFont()
 
         self._redColor:   Colour = ColourDatabase().Find('Red')
@@ -94,30 +91,10 @@ class UmlText(ControlPointMixin, TextShape):
 
     def OnDraw(self, dc: MemoryDC):
 
-        # debugText: str = (
-        #     f'{self._pyutText.content} Pen Color: {self.GetPen().GetColour()} "'
-        #     f'Brush Color: {self.GetBrush().GetColour()} '
-        #     f'Background Brush: {self.GetBackgroundBrush().GetColour()} '
-        #     f'Background Pen: {self.GetBackgroundPen().GetColour()} '
-        # )
         dc.SetBrush(self._brush)
-        # debugText: str = (
-        #     f'{self._pyutText.content} '
-        #     f'Brush Color: {dc.GetBrush().GetColour()}'
-        # )
-        # self.logger.info(debugText)
+
         if self.Selected() is True:
-            dc.SetPen(UmlUtils.redDashedPen())
-            sx = self.GetX()
-            sy = self.GetY()
-
-            width  = self.GetWidth() + 3
-            height = self.GetHeight() + 3
-
-            x1 = round(sx - width  // 2)
-            y1 = round(sy - height // 2)
-
-            dc.DrawRectangle(x1, y1, round(width), round(height))
+            UmlUtils.drawSelectedRectangle(dc=dc, shape=self)
 
     def OnDrawContents(self, dc):
 

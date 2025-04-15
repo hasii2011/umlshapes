@@ -51,9 +51,9 @@ class UmlBaseEventHandler(ShapeEvtHandler):
         self._baseLogger.debug(f'Position: ({x},{y}) UmlSize: ({w},{h})')
 
         shape: Shape  = self.GetShape()
-        shape.Move(dc=dc, x=x, y=y, display=True)
+        shape.Move(dc=dc, x=round(x), y=round(y), display=True)
         # Hmm, weird how SetSize namex width and height
-        shape.SetSize(x=w, y=h)
+        shape.SetSize(x=round(w), y=round(h))
 
     def _unSelectAllShapesOnCanvas(self, shape: Shape, canvas: ShapeCanvas, dc: ClientDC):
 

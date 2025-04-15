@@ -13,6 +13,10 @@ from wx import FONTFAMILY_ROMAN
 from wx import FONTFAMILY_SCRIPT
 from wx import FONTFAMILY_SWISS
 from wx import FONTFAMILY_TELETYPE
+from wx import FONTSTYLE_NORMAL
+from wx import FONTWEIGHT_NORMAL
+from wx import Font
+from wx import MemoryDC
 from wx import PENSTYLE_SHORT_DASH
 from wx import PENSTYLE_SOLID
 from wx import RED
@@ -22,16 +26,21 @@ from wx import Pen
 
 from wx import NewIdRef as wxNewIdRef
 
+from wx.lib.ogl import RectangleShape
+
 from umlshapes.types.UmlFontFamily import UmlFontFamily
 from umlshapes.types.UmlPosition import UmlPosition
+
+DEFAULT_FONT_SIZE:  int = 10        # Make this a preference
 
 
 class UmlUtils:
 
     clsLogger: Logger = getLogger(__name__)
 
-    RED_SOLID_PEN:  Pen = cast(Pen, None)
-    RED_DASHED_PEN: Pen = cast(Pen, None)
+    RED_SOLID_PEN:  Pen  = cast(Pen, None)
+    RED_DASHED_PEN: Pen  = cast(Pen, None)
+    DEFAULT_FONT:   Font = cast(Font, None)
 
     @staticmethod
     def snapCoordinatesToGrid(x: int, y: int, gridInterval: int) -> Tuple[int, int]:
@@ -43,6 +52,21 @@ class UmlUtils:
         snappedY: int = round(y - yDiff)
 
         return snappedX, snappedY
+
+    @classmethod
+    def drawSelectedRectangle(cls, dc: MemoryDC, shape: RectangleShape):
+
+        dc.SetPen(UmlUtils.redDashedPen())
+        sx = shape.GetX()
+        sy = shape.GetY()
+
+        width = shape.GetWidth() + 3
+        height = shape.GetHeight() + 3
+
+        x1 = round(sx - width // 2)
+        y1 = round(sy - height // 2)
+
+        dc.DrawRectangle(x1, y1, round(width), round(height))
 
     @classmethod
     def redSolidPen(cls):
@@ -58,6 +82,13 @@ class UmlUtils:
             UmlUtils.RED_DASHED_PEN = Pen(RED, 1, PENSTYLE_SHORT_DASH)
 
         return UmlUtils.RED_DASHED_PEN
+
+    @classmethod
+    def defaultFont(cls) -> Font:
+        if UmlUtils.DEFAULT_FONT is None:
+            UmlUtils.DEFAULT_FONT = Font(DEFAULT_FONT_SIZE, FONTFAMILY_SWISS, FONTSTYLE_NORMAL, FONTWEIGHT_NORMAL)
+
+        return
 
     @classmethod
     def computeMidPoint(cls, srcPosition: UmlPosition, dstPosition: UmlPosition) -> UmlPosition:
