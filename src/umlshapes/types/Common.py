@@ -9,3 +9,5 @@ ModelObject = Union[PyutText, PyutNote, None]
 
 
 NOT_SET_INT:     int   = cast(int, None)
+
+UML_CONTROL_POINT_SIZE: int = 4         # Make this a preference

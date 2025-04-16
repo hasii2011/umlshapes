@@ -28,7 +28,7 @@ from wx.lib.ogl import Shape
 from wx.lib.ogl import ShapeCanvas
 
 from umlshapes.frames.UmlFrame import UmlFrame
-from umlshapes.shapes.UmlBaseEventHandler import UmlBaseEventHandler
+from umlshapes.shapes.eventhandlers.UmlBaseEventHandler import UmlBaseEventHandler
 from umlshapes.shapes.UmlText import UmlText
 
 from umlshapes.resources.images.textdetails.DecreaseTextSize import embeddedImage as DecreaseTextSize

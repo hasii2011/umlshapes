@@ -15,18 +15,22 @@ from wx import FONTFAMILY_SWISS
 from wx import FONTFAMILY_TELETYPE
 from wx import FONTSTYLE_NORMAL
 from wx import FONTWEIGHT_NORMAL
-from wx import Font
-from wx import MemoryDC
 from wx import PENSTYLE_SHORT_DASH
 from wx import PENSTYLE_SOLID
 from wx import RED
 
+from wx import Font
+from wx import MemoryDC
 from wx import DC
 from wx import Pen
+from wx import Size
 
 from wx import NewIdRef as wxNewIdRef
 
+from wx.lib.ogl import EllipseShape
 from wx.lib.ogl import RectangleShape
+
+from umlshapes.preferences.UmlPreferences import UmlPreferences
 
 from umlshapes.types.UmlFontFamily import UmlFontFamily
 from umlshapes.types.UmlPosition import UmlPosition
@@ -69,6 +73,13 @@ class UmlUtils:
         dc.DrawRectangle(x1, y1, round(width), round(height))
 
     @classmethod
+    def drawSelectedEllipse(cls, dc: MemoryDC, shape: EllipseShape):
+
+        dc.SetPen(UmlUtils.redDashedPen())
+
+        dc.DrawEllipse(int(shape.GetX() - shape.GetWidth() / 2.0), int(shape.GetY() - shape.GetHeight() / 2.0), shape.GetWidth(), shape.GetHeight())
+
+    @classmethod
     def redSolidPen(cls):
 
         if UmlUtils.RED_SOLID_PEN is None:
@@ -86,9 +97,13 @@ class UmlUtils:
     @classmethod
     def defaultFont(cls) -> Font:
         if UmlUtils.DEFAULT_FONT is None:
-            UmlUtils.DEFAULT_FONT = Font(DEFAULT_FONT_SIZE, FONTFAMILY_SWISS, FONTSTYLE_NORMAL, FONTWEIGHT_NORMAL)
+            fontSize:      int           = UmlPreferences().textFontSize
+            fontFamilyStr: UmlFontFamily = UmlPreferences().textFontFamily
+            fontFamily:    int           = UmlUtils.umlFontFamilyToWxFontFamily(fontFamilyStr)
 
-        return
+            UmlUtils.DEFAULT_FONT = Font(fontSize, fontFamily, FONTSTYLE_NORMAL, FONTWEIGHT_NORMAL)
+
+        return UmlUtils.DEFAULT_FONT
 
     @classmethod
     def computeMidPoint(cls, srcPosition: UmlPosition, dstPosition: UmlPosition) -> UmlPosition:
@@ -156,8 +171,9 @@ class UmlUtils:
             for wordX in words:
                 word: str = f'{wordX} '
 
-                extentSize: Tuple[int, int] = dc.GetTextExtent(word)        # width, height
-                wordWidth:  int             = extentSize[0]
+                # extentSize: Tuple[int, int] = dc.GetTextExtent(word)        # wxPython 4.2.3 update
+                extentSize: Size = dc.GetTextExtent(word)
+                wordWidth:  int  = extentSize.width
                 if lineWidth + wordWidth <= textWidth:
                     newLine = f'{newLine}{word}'
                     lineWidth += wordWidth

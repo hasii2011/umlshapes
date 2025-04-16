@@ -123,3 +123,13 @@ class UmlNote(ControlPointMixin, RectangleShape):
 
         # self.logger.info(f'Position: ({baseX},{baseY})  {w=} {x1=} {y1=} {x2=} {y2=}')
         dc.DrawLine(x1, y1, x2, y2)
+
+    def __str__(self) -> str:
+        return f'OglNote -  modelId: {self.pyutNote.id}'
+
+    def __repr__(self):
+        pyutNote: PyutNote = self._pyutNote
+        if pyutNote is None:
+            return f'Anonymous Note'
+        else:
+            return f'{pyutNote.content}'

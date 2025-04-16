@@ -23,9 +23,13 @@ from codeallybasic.UnitTestBase import UnitTestBase
 
 from pyutmodelv2.PyutText import PyutText
 from pyutmodelv2.PyutNote import PyutNote
+from pyutmodelv2.PyutUseCase import PyutUseCase
 
+from umlshapes.shapes.UmlUseCase import UmlUseCase
 from umlshapes.shapes.UmlNote import UmlNote
 from umlshapes.shapes.UmlNoteEventHandler import UmlNoteEventHandler
+from umlshapes.shapes.eventhandlers.UmlUseCaseEventHandler import UmlUseCaseEventHandler
+
 from umlshapes.types.UmlDimensions import UmlDimensions
 from umlshapes.types.UmlPosition import UmlPosition
 
@@ -62,10 +66,13 @@ class DemoUmlElements(App):
         # It should be called after the app object has been created,
         # but before OGL is used.
         OGLInitialize()
-        self._ID_DISPLAY_UML_TEXT:  int = wxNewIdRef()
-        self._ID_DISPLAY_UML_NOTE:  int = wxNewIdRef()
+        self._ID_DISPLAY_UML_TEXT:     int = wxNewIdRef()
+        self._ID_DISPLAY_UML_NOTE:     int = wxNewIdRef()
+        self._ID_DISPLAY_OGL_USE_CASE: int = wxNewIdRef()
+
         self._textCounter:          int = 0
         self._noteCounter:          int = 0
+        self._useCaseCounter:       int = 0
 
         self._preferences: UmlPreferences = UmlPreferences()
         self._frame:       SizedFrame     = SizedFrame(parent=None, title="Test UML Elements", size=(FRAME_WIDTH, FRAME_HEIGHT), style=DEFAULT_FRAME_STYLE | FRAME_FLOAT_ON_PARENT)
@@ -106,7 +113,7 @@ class DemoUmlElements(App):
         viewMenu.Append(id=self._ID_DISPLAY_UML_NOTE, item='Uml Note', helpString='Display Uml Note')
         # viewMenu.Append(id=self._ID_DISPLAY_OGL_COMPOSITION,     item='Ogl Composition',  helpString='Display an Composition Link')
         # viewMenu.Append(id=self._ID_DISPLAY_OGL_INTERFACE,       item='Ogl Interface',    helpString='Display Lollipop Interface')
-        # viewMenu.Append(id=self._ID_DISPLAY_OGL_USE_CASE,        item='Ogl Use Case',     helpString='Display Ogl Use Case')
+        viewMenu.Append(id=self._ID_DISPLAY_OGL_USE_CASE,        item='Ogl Use Case',     helpString='Display Ogl Use Case')
         # viewMenu.Append(id=self._ID_DISPLAY_OGL_ACTOR,           item='Ogl Actor',        helpString='Display Ogl Actor')
 
         viewMenu.AppendSeparator()
@@ -123,7 +130,7 @@ class DemoUmlElements(App):
         self.Bind(EVT_MENU, self._onDisplayElement, id=self._ID_DISPLAY_UML_NOTE)
         # self.Bind(EVT_MENU, self._onDisplayElement, id=self._ID_DISPLAY_OGL_COMPOSITION)
         # self.Bind(EVT_MENU, self._onDisplayElement, id=self._ID_DISPLAY_OGL_INTERFACE)
-        # self.Bind(EVT_MENU, self._onDisplayElement, id=self._ID_DISPLAY_OGL_USE_CASE)
+        self.Bind(EVT_MENU, self._onDisplayElement, id=self._ID_DISPLAY_OGL_USE_CASE)
         # self.Bind(EVT_MENU, self._onDisplayElement, id=self._ID_DISPLAY_OGL_ACTOR)
 
     def _onDisplayElement(self, event: CommandEvent):
@@ -141,8 +148,8 @@ class DemoUmlElements(App):
             #     self._displayOglComposition()
             # case self._ID_DISPLAY_OGL_INTERFACE:
             #     self._displayOglInterface()
-            # case self._ID_DISPLAY_OGL_USE_CASE:
-            #     self._displayOglUseCase()
+            case self._ID_DISPLAY_OGL_USE_CASE:
+                self._displayOglUseCase()
             # case self._ID_DISPLAY_OGL_ACTOR:
             #     self._displayOglActor()
             case _:
@@ -176,7 +183,7 @@ class DemoUmlElements(App):
         self._diagramFrame.refresh()
 
     def _displayUmlNote(self):
-        content:        str           = f'{self._preferences.noteText} {self._noteCounter}'
+        content: str = f'{self._preferences.noteText} {self._noteCounter}'
         self._noteCounter += 1
         pyutNote: PyutNote = PyutNote(content=content)
 
@@ -201,15 +208,38 @@ class DemoUmlElements(App):
 
         self._diagramFrame.refresh()
 
+    def _displayOglUseCase(self):
+        useCaseName: str = f'{self._preferences.defaultNameUsecase} {self._useCaseCounter}'
+        self._useCaseCounter += 1
+        pyutUseCase: PyutUseCase = PyutUseCase(name=useCaseName)
+        umlPosition: UmlPosition = self._computePosition()
+
+        umlUseCase: UmlUseCase = UmlUseCase(pyutUseCase=pyutUseCase)
+        umlUseCase.SetCanvas(self._diagramFrame)
+        umlUseCase.SetX(x=umlPosition.x)
+        umlUseCase.SetY(y=umlPosition.y)
+
+        diagram: UmlDiagram = self._diagramFrame.umlDiagram
+
+        diagram.AddShape(umlUseCase)
+        umlUseCase.Show(show=True)
+
+        eventHandler: UmlUseCaseEventHandler = UmlUseCaseEventHandler()
+        eventHandler.SetShape(umlUseCase)
+        eventHandler.SetPreviousHandler(umlUseCase.GetEventHandler())
+
+        umlUseCase.SetEventHandler(eventHandler)
+
+        self._diagramFrame.refresh()
+
     def _computePosition(self) -> UmlPosition:
+
+        currentPosition: UmlPosition = UmlPosition(x=self._currentPosition.x, y=self._currentPosition.y)
 
         self._currentPosition.x += INCREMENT_X
         self._currentPosition.y += INCREMENT_Y
 
-        return UmlPosition(
-            x=self._currentPosition.x,
-            y=self._currentPosition.y
-        )
+        return currentPosition
 
 
 if __name__ == '__main__':
