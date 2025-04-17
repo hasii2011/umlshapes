@@ -14,7 +14,7 @@ from wx.lib.ogl import Shape
 from umlshapes.frames.UmlFrame import UmlFrame
 
 from umlshapes.shapes.UmlControlPoint import UmlControlPoint
-from umlshapes.shapes.UmlControlPointEventHandler import UmlControlPointEventHandler
+from umlshapes.shapes.eventhandlers.UmlControlPointEventHandler import UmlControlPointEventHandler
 from umlshapes.types.Common import UML_CONTROL_POINT_SIZE
 
 
