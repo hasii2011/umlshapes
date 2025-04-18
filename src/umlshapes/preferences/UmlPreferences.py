@@ -35,6 +35,7 @@ DEFAULT_GRID_LINE_STYLE:        str = UmlPenStyle.DOT.value
 DEFAULT_TEXT_BACKGROUND_COLOR:  str = UmlColor.WHITE.value
 
 DEFAULT_USE_CASE_SIZE: str = str(UmlDimensions(width=100, height=60))
+DEFAULT_ACTOR_SIZE:    str = str(UmlDimensions(width=80, height=100))
 
 
 OGL_PROPERTIES: ValueDescriptions = ValueDescriptions(
@@ -55,6 +56,7 @@ OGL_PROPERTIES: ValueDescriptions = ValueDescriptions(
         KeyName('classDimensions'):      ValueDescription(defaultValue=str(UmlDimensions(150, 75)), deserializer=UmlDimensions.deSerialize),
         KeyName('classBackGroundColor'): ValueDescription(defaultValue=DEFAULT_CLASS_BACKGROUND_COLOR, enumUseValue=True, deserializer=UmlColor),
         KeyName('useCaseSize'):          ValueDescription(defaultValue=DEFAULT_USE_CASE_SIZE,       deserializer=UmlDimensions.deSerialize),
+        KeyName('actorSize'):            ValueDescription(defaultValue=DEFAULT_ACTOR_SIZE,          deserializer=UmlDimensions.deSerialize),
     }
 )
 DIAGRAM_PROPERTIES: ValueDescriptions = ValueDescriptions(

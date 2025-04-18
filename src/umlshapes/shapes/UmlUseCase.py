@@ -22,8 +22,7 @@ class UmlUseCase(ControlPointMixin,  EllipseShape):
 
     def __init__(self, pyutUseCase: PyutUseCase = None, size: UmlDimensions = None):
 
-        self.logger: Logger = getLogger(__name__)
-
+        self.logger:       Logger         = getLogger(__name__)
         self._preferences: UmlPreferences = UmlPreferences()
 
         if pyutUseCase is None:

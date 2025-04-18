@@ -2,6 +2,7 @@
 from logging import Logger
 from logging import getLogger
 
+from pyutmodelv2.PyutActor import PyutActor
 from wx import EVT_MENU
 from wx import ID_EXIT
 from wx import DEFAULT_FRAME_STYLE
@@ -25,6 +26,7 @@ from pyutmodelv2.PyutText import PyutText
 from pyutmodelv2.PyutNote import PyutNote
 from pyutmodelv2.PyutUseCase import PyutUseCase
 
+from umlshapes.shapes.UmlActor import UmlActor
 from umlshapes.shapes.UmlUseCase import UmlUseCase
 from umlshapes.shapes.UmlNote import UmlNote
 from umlshapes.shapes.UmlNoteEventHandler import UmlNoteEventHandler
@@ -69,10 +71,12 @@ class DemoUmlElements(App):
         self._ID_DISPLAY_UML_TEXT:     int = wxNewIdRef()
         self._ID_DISPLAY_UML_NOTE:     int = wxNewIdRef()
         self._ID_DISPLAY_OGL_USE_CASE: int = wxNewIdRef()
+        self._ID_DISPLAY_OGL_ACTOR:    int = wxNewIdRef()
 
-        self._textCounter:          int = 0
-        self._noteCounter:          int = 0
-        self._useCaseCounter:       int = 0
+        self._textCounter:      int = 0
+        self._noteCounter:      int = 0
+        self._useCaseCounter:   int = 0
+        self._actorCounter:     int = 0
 
         self._preferences: UmlPreferences = UmlPreferences()
         self._frame:       SizedFrame     = SizedFrame(parent=None, title="Test UML Elements", size=(FRAME_WIDTH, FRAME_HEIGHT), style=DEFAULT_FRAME_STYLE | FRAME_FLOAT_ON_PARENT)
@@ -114,7 +118,7 @@ class DemoUmlElements(App):
         # viewMenu.Append(id=self._ID_DISPLAY_OGL_COMPOSITION,     item='Ogl Composition',  helpString='Display an Composition Link')
         # viewMenu.Append(id=self._ID_DISPLAY_OGL_INTERFACE,       item='Ogl Interface',    helpString='Display Lollipop Interface')
         viewMenu.Append(id=self._ID_DISPLAY_OGL_USE_CASE,        item='Ogl Use Case',     helpString='Display Ogl Use Case')
-        # viewMenu.Append(id=self._ID_DISPLAY_OGL_ACTOR,           item='Ogl Actor',        helpString='Display Ogl Actor')
+        viewMenu.Append(id=self._ID_DISPLAY_OGL_ACTOR,           item='Ogl Actor',        helpString='Display Ogl Actor')
 
         viewMenu.AppendSeparator()
         menuBar.Append(fileMenu, 'File')
@@ -131,7 +135,7 @@ class DemoUmlElements(App):
         # self.Bind(EVT_MENU, self._onDisplayElement, id=self._ID_DISPLAY_OGL_COMPOSITION)
         # self.Bind(EVT_MENU, self._onDisplayElement, id=self._ID_DISPLAY_OGL_INTERFACE)
         self.Bind(EVT_MENU, self._onDisplayElement, id=self._ID_DISPLAY_OGL_USE_CASE)
-        # self.Bind(EVT_MENU, self._onDisplayElement, id=self._ID_DISPLAY_OGL_ACTOR)
+        self.Bind(EVT_MENU, self._onDisplayElement, id=self._ID_DISPLAY_OGL_ACTOR)
 
     def _onDisplayElement(self, event: CommandEvent):
         menuId: int = event.GetId()
@@ -150,8 +154,8 @@ class DemoUmlElements(App):
             #     self._displayOglInterface()
             case self._ID_DISPLAY_OGL_USE_CASE:
                 self._displayOglUseCase()
-            # case self._ID_DISPLAY_OGL_ACTOR:
-            #     self._displayOglActor()
+            case self._ID_DISPLAY_OGL_ACTOR:
+                self._displayOglActor()
             case _:
                 self.logger.error(f'WTH!  I am not handling that menu item')
 
@@ -229,6 +233,32 @@ class DemoUmlElements(App):
         eventHandler.SetPreviousHandler(umlUseCase.GetEventHandler())
 
         umlUseCase.SetEventHandler(eventHandler)
+
+        self._diagramFrame.refresh()
+
+    def _displayOglActor(self):
+
+        actorName: str = f'{self._preferences.defaultNameActor} {self._actorCounter}'
+        self._actorCounter += 1
+        pyutActor:   PyutActor   = PyutActor(actorName=actorName)
+        umlPosition: UmlPosition = self._computePosition()
+
+        umlActor: UmlActor = UmlActor(pyutActor=pyutActor)
+        umlActor.SetCanvas(self._diagramFrame)
+        umlActor.Create(umlPosition=umlPosition)
+        # umlActor.SetX(umlPosition.x)
+        # umlActor.SetY(umlPosition.y)
+
+        diagram: UmlDiagram = self._diagramFrame.umlDiagram
+
+        diagram.AddShape(umlActor)
+        umlActor.Show(show=True)
+
+        # eventHandler: UmlActorEventHandler = UmlActorEventHandler()
+        # eventHandler.SetShape(umlActor)
+        # eventHandler.SetPreviousHandler(umlActor.GetEventHandler())
+        #
+        # umlActor.SetEventHandler(eventHandler)
 
         self._diagramFrame.refresh()
 

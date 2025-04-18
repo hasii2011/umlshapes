@@ -7,6 +7,7 @@ from logging import Logger
 from logging import getLogger
 from logging import DEBUG
 
+from wx import Brush
 from wx import FONTFAMILY_DEFAULT
 from wx import FONTFAMILY_MODERN
 from wx import FONTFAMILY_ROMAN
@@ -31,6 +32,7 @@ from wx.lib.ogl import EllipseShape
 from wx.lib.ogl import RectangleShape
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
+from umlshapes.types.UmlColor import UmlColor
 
 from umlshapes.types.UmlFontFamily import UmlFontFamily
 from umlshapes.types.UmlPosition import UmlPosition
@@ -45,6 +47,8 @@ class UmlUtils:
     RED_SOLID_PEN:  Pen  = cast(Pen, None)
     RED_DASHED_PEN: Pen  = cast(Pen, None)
     DEFAULT_FONT:   Font = cast(Font, None)
+
+    DEFAULT_BACKGROUND_BRUSH: Brush = cast(Brush, None)
 
     @staticmethod
     def snapCoordinatesToGrid(x: int, y: int, gridInterval: int) -> Tuple[int, int]:
@@ -102,8 +106,20 @@ class UmlUtils:
             fontFamily:    int           = UmlUtils.umlFontFamilyToWxFontFamily(fontFamilyStr)
 
             UmlUtils.DEFAULT_FONT = Font(fontSize, fontFamily, FONTSTYLE_NORMAL, FONTWEIGHT_NORMAL)
+            UmlUtils.clsLogger.info(f'{UmlUtils.DEFAULT_FONT=}')
 
         return UmlUtils.DEFAULT_FONT
+
+    @classmethod
+    def backGroundBrush(cls) -> Brush:
+        if UmlUtils.DEFAULT_BACKGROUND_BRUSH is None:
+            backGroundColor: UmlColor = UmlPreferences().backGroundColor
+            brush:           Brush    = Brush()
+            brush.SetColour(UmlColor.toWxColor(backGroundColor))
+
+            UmlUtils.DEFAULT_BACKGROUND_BRUSH = brush
+
+        return UmlUtils.DEFAULT_BACKGROUND_BRUSH
 
     @classmethod
     def computeMidPoint(cls, srcPosition: UmlPosition, dstPosition: UmlPosition) -> UmlPosition:
