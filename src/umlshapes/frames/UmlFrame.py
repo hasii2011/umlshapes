@@ -6,6 +6,7 @@ from logging import getLogger
 
 from collections.abc import Iterable
 
+from wx import MouseEvent
 from wx import Window
 from wx.lib.ogl import Shape
 
@@ -61,3 +62,16 @@ class UmlFrame(DiagramFrame):
             umlShape.Select(select=False)
 
         self.refresh()
+
+    def OnMouseEvent(self, mouseEvent: MouseEvent):
+        """
+        Debug hook
+        TODO:  Update the UI via an event
+        Args:
+            mouseEvent:
+
+        """
+        super().OnMouseEvent(mouseEvent)
+        # x, y = self.CalcUnscrolledPosition(mouseEvent.GetPosition())
+        #
+        # self.logger.info(f'({x},{y})')

@@ -1,0 +1,16 @@
+
+from logging import Logger
+from logging import getLogger
+
+from umlshapes.shapes.eventhandlers.UmlBaseEventHandler import UmlBaseEventHandler
+
+
+class UmlActorEventHandler(UmlBaseEventHandler):
+    """
+    Nothing special here;  Just some syntactic sugar
+    """
+
+    def __init__(self):
+        self.logger: Logger = getLogger(__name__)
+
+        super().__init__()

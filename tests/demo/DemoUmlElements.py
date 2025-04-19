@@ -30,6 +30,7 @@ from umlshapes.shapes.UmlActor import UmlActor
 from umlshapes.shapes.UmlUseCase import UmlUseCase
 from umlshapes.shapes.UmlNote import UmlNote
 from umlshapes.shapes.UmlNoteEventHandler import UmlNoteEventHandler
+from umlshapes.shapes.eventhandlers.UmlActorEventHandler import UmlActorEventHandler
 from umlshapes.shapes.eventhandlers.UmlUseCaseEventHandler import UmlUseCaseEventHandler
 
 from umlshapes.types.UmlDimensions import UmlDimensions
@@ -115,7 +116,7 @@ class DemoUmlElements(App):
         # viewMenu.Append(id=self._ID_DISPLAY_OGL_CLASS,           item='Ogl Class',        helpString='Display an Ogl Class')
         viewMenu.Append(id=self._ID_DISPLAY_UML_TEXT, item='Uml Text', helpString='Display Uml Text')
         viewMenu.Append(id=self._ID_DISPLAY_UML_NOTE, item='Uml Note', helpString='Display Uml Note')
-        # viewMenu.Append(id=self._ID_DISPLAY_OGL_COMPOSITION,     item='Ogl Composition',  helpString='Display an Composition Link')
+        # viewMenu.Append(id=self._ID_DISPLAY_OGL_COMPOSITION,     item='Ogl Composition',  helpString='Display a Composition Link')
         # viewMenu.Append(id=self._ID_DISPLAY_OGL_INTERFACE,       item='Ogl Interface',    helpString='Display Lollipop Interface')
         viewMenu.Append(id=self._ID_DISPLAY_OGL_USE_CASE,        item='Ogl Use Case',     helpString='Display Ogl Use Case')
         viewMenu.Append(id=self._ID_DISPLAY_OGL_ACTOR,           item='Ogl Actor',        helpString='Display Ogl Actor')
@@ -245,20 +246,20 @@ class DemoUmlElements(App):
 
         umlActor: UmlActor = UmlActor(pyutActor=pyutActor)
         umlActor.SetCanvas(self._diagramFrame)
-        umlActor.Create(umlPosition=umlPosition)
-        # umlActor.SetX(umlPosition.x)
-        # umlActor.SetY(umlPosition.y)
+
+        umlActor.SetX(umlPosition.x)
+        umlActor.SetY(umlPosition.y)
 
         diagram: UmlDiagram = self._diagramFrame.umlDiagram
 
         diagram.AddShape(umlActor)
         umlActor.Show(show=True)
 
-        # eventHandler: UmlActorEventHandler = UmlActorEventHandler()
-        # eventHandler.SetShape(umlActor)
-        # eventHandler.SetPreviousHandler(umlActor.GetEventHandler())
-        #
-        # umlActor.SetEventHandler(eventHandler)
+        eventHandler: UmlActorEventHandler = UmlActorEventHandler()
+        eventHandler.SetShape(umlActor)
+        eventHandler.SetPreviousHandler(umlActor.GetEventHandler())
+
+        umlActor.SetEventHandler(eventHandler)
 
         self._diagramFrame.refresh()
 

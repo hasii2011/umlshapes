@@ -141,10 +141,11 @@ class DiagramFrame(ShapeCanvas):
 
     def OnPaint(self, event: PaintEvent):
         """
-        Override the parent method because when initially adding shapes
-        to the diagram they do not show up unless the canvas is moved.
+        Override the parent method because, when initially adding shapes
+        to the diagram, they do not show up unless the canvas is moved.
 
         I copied this from the legacy pyut miniogl.
+
         Args:
             event:
         """

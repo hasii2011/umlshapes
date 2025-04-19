@@ -25,7 +25,7 @@ class UmlBaseEventHandler(ShapeEvtHandler):
 
     def OnLeftClick(self, x: int, y: int, keys=0, attachment=0):
 
-        self._baseLogger.info(f'({x},{y}), {keys=} {attachment=}')
+        # self._baseLogger.debug(f'({x},{y}), {keys=} {attachment=}')
         shape:  Shape       = self.GetShape()
         canvas: ShapeCanvas = shape.GetCanvas()
         dc:     ClientDC    = ClientDC(canvas)
@@ -52,8 +52,9 @@ class UmlBaseEventHandler(ShapeEvtHandler):
 
         shape: Shape  = self.GetShape()
         shape.Move(dc=dc, x=round(x), y=round(y), display=True)
-        # Hmm, weird how SetSize namex width and height
-        shape.SetSize(x=round(w), y=round(h))
+        # Hmm, weird how SetSize names x width and y height
+        # shape.SetSize(x=round(w), y=round(h))     # Shape
+        shape.SetSize(round(w), round(h))           # DrawnShape is correct
 
     def _unSelectAllShapesOnCanvas(self, shape: Shape, canvas: ShapeCanvas, dc: ClientDC):
 
@@ -67,7 +68,7 @@ class UmlBaseEventHandler(ShapeEvtHandler):
 
             for s in shapeList:
                 if s.Selected() is True:
-                    # If we unselect it now then some of the objects in
+                    # If we unselect it, then some objects in
                     # shapeList will become invalid (the control points are
                     # shapes too!) and bad things will happen...
                     toUnselect.append(s)

@@ -39,7 +39,7 @@ class ControlPointMixin:
         widthMin  = minX + UML_CONTROL_POINT_SIZE + 2
         heightMin = minY + UML_CONTROL_POINT_SIZE + 2
 
-        # Offsets from main object
+        # Offsets from the main object
         top = -heightMin / 2.0
         bottom = heightMin / 2.0 + (maxY - minY)
         left = -widthMin / 2.0
@@ -53,7 +53,7 @@ class ControlPointMixin:
             shapeIsCircle = True
 
         #
-        # Oh boy,  These have to be created in this exact order because of the Shape.ResetControlPoints() method
+        # Bad implementation;  These have to be created in this exact order because of the Shape.ResetControlPoints() method
         #
         if shapeIsCircle is False:
             control: UmlControlPoint = UmlControlPoint(canvas, self._shape, UML_CONTROL_POINT_SIZE, left, top, CONTROL_POINT_DIAGONAL)
