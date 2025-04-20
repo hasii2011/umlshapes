@@ -29,7 +29,7 @@ from pyutmodelv2.PyutUseCase import PyutUseCase
 from umlshapes.shapes.UmlActor import UmlActor
 from umlshapes.shapes.UmlUseCase import UmlUseCase
 from umlshapes.shapes.UmlNote import UmlNote
-from umlshapes.shapes.UmlNoteEventHandler import UmlNoteEventHandler
+from umlshapes.shapes.eventhandlers.UmlNoteEventHandler import UmlNoteEventHandler
 from umlshapes.shapes.eventhandlers.UmlActorEventHandler import UmlActorEventHandler
 from umlshapes.shapes.eventhandlers.UmlUseCaseEventHandler import UmlUseCaseEventHandler
 
@@ -43,7 +43,7 @@ from umlshapes.UmlDiagram import UmlDiagram
 from umlshapes.frames.UmlFrame import UmlFrame
 
 from umlshapes.shapes.UmlText import UmlText
-from umlshapes.shapes.UmlTextEventHandler import UmlTextEventHandler
+from umlshapes.shapes.eventhandlers.UmlTextEventHandler import UmlTextEventHandler
 
 FRAME_WIDTH:  int = 800
 FRAME_HEIGHT: int = 600
