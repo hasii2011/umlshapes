@@ -4,8 +4,6 @@ from typing import cast
 from logging import Logger
 from logging import getLogger
 
-from dataclasses import dataclass
-
 from wx import Brush
 from wx import ColourDatabase
 from wx import FONTSTYLE_ITALIC
@@ -33,12 +31,6 @@ from umlshapes.types.UmlFontFamily import UmlFontFamily
 from umlshapes.UmlUtils import UmlUtils
 
 CONTROL_POINT_SIZE: int = 4         # Make this a preference
-
-
-@dataclass
-class LeftCoordinate:
-    x: int = 0
-    y: int = 0
 
 
 class UmlText(ControlPointMixin, TextShape):
@@ -88,6 +80,7 @@ class UmlText(ControlPointMixin, TextShape):
 
         self._brush: Brush = Brush(backgroundColor)
         self.SetDraggable(drag=True)
+        self.SetCentreResize(False)
 
     def OnDraw(self, dc: MemoryDC):
 
@@ -172,14 +165,6 @@ class UmlText(ControlPointMixin, TextShape):
     @textFont.setter
     def textFont(self, newFont: Font):
         self._textFont = newFont
-
-    @property
-    def topLeft(self) -> LeftCoordinate:
-
-        x = self.GetX()                 # These point to the center of the rectangle
-        y = self.GetY()                 # These point to the center of the rectangle
-
-        return LeftCoordinate(x=x, y=y)
 
     def addChild(self, shape: Shape):
         """

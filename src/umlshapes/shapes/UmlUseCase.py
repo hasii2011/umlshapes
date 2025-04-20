@@ -14,7 +14,6 @@ from umlshapes.preferences.UmlPreferences import UmlPreferences
 
 from umlshapes.shapes.ControlPointMixin import ControlPointMixin
 
-from umlshapes.types.Common import UML_CONTROL_POINT_SIZE
 from umlshapes.types.UmlDimensions import UmlDimensions
 
 
@@ -62,7 +61,7 @@ class UmlUseCase(ControlPointMixin,  EllipseShape):
         try:
             super().OnDraw(dc)
         except (ValueError, Exception) as e:
-            # Work around a bug where width & height sometimes become a float
+            # Work around a bug where width and height sometimes become a float
             self.logger.warning(f'Bug workaround !!! {e}')
 
             self.SetWidth(round(self.GetWidth()))
@@ -78,7 +77,7 @@ class UmlUseCase(ControlPointMixin,  EllipseShape):
     # noinspection SpellCheckingInspection
     def ResetControlPoints(self):
         """
-        Reset the positions of the control points (for instance when the
+        Reset the positions of the control points (for instance, when the
         shape's shape has changed).
 
         Circles only have 4 control points HORIZONTAL and VERTICAL
@@ -94,10 +93,12 @@ class UmlUseCase(ControlPointMixin,  EllipseShape):
         maxX, maxY = self.GetBoundingBoxMax()
         minX, minY = self.GetBoundingBoxMin()
 
-        widthMin  = minX + UML_CONTROL_POINT_SIZE + 2
-        heightMin = minY + UML_CONTROL_POINT_SIZE + 2
+        # widthMin  = minX + UML_CONTROL_POINT_SIZE + 2
+        # heightMin = minY + UML_CONTROL_POINT_SIZE + 2
+        widthMin  = minX
+        heightMin = minY
 
-        # Offsets from main object
+        # Offsets from the main object
         top = -heightMin / 2.0
         bottom = heightMin / 2.0 + (maxY - minY)
         left = -widthMin / 2.0

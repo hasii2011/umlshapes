@@ -38,14 +38,14 @@ class UmlControlPointEventHandler(ShapeEvtHandler):
 
     def OnBeginDragLeft(self, x, y, keys=0, attachment=0):
         """
-        The begin drag left handler.
+        The drag left started handler.
         """
         self.logger.info(f'({x},{y})')
         super().OnBeginDragLeft(x, y, keys, attachment)
 
     def OnEndDragLeft(self, x, y, keys=0, attachment=0):
         """
-        The end drag left handler.
+        The drag left ended handler.
         """
         super().OnEndDragLeft(x, y, keys, attachment)
 
@@ -58,14 +58,14 @@ class UmlControlPointEventHandler(ShapeEvtHandler):
 
     def OnBeginDragRight(self, x, y, keys=0, attachment=0):
         """
-        The begin drag right handler.
+        The drag right start handler.
         """
         self.logger.info(f'({x},{y})')
         super().OnBeginDragRight(x, y, keys, attachment)
 
     def OnEndDragRight(self, x, y, keys=0, attachment=0):
         """
-        The end drag right handler.
+        The drag right ended handler.
         """
         self.logger.info(f'({x},{y})')
         super().OnEndDragRight(x, y, keys, attachment)

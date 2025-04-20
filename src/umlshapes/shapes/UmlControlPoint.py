@@ -12,7 +12,7 @@ from umlshapes.UmlUtils import UmlUtils
 
 class UmlControlPoint(ControlPoint):
     """
-    Subclassed so I can
+    Subclassed, So I can
         * Change the control point color and size
         * Implement resizing of its parent.
     """

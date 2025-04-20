@@ -55,6 +55,7 @@ class UmlNote(ControlPointMixin, RectangleShape):
         self.SetBrush(Brush(Colour(255, 255, 230)))
 
         self.SetDraggable(drag=True)
+        self.SetCentreResize(False)
 
         self.SetFont(UmlUtils.defaultFont())
 
@@ -75,7 +76,7 @@ class UmlNote(ControlPointMixin, RectangleShape):
         try:
             super().OnDraw(dc)
         except (ValueError, Exception) as e:
-            # Work around a bug where width & height sometimes become a float
+            # Work around a bug where width and height sometimes become a float
             self.logger.warning(f'Bug workaround !!! {e}')
 
             self.SetWidth(round(self.GetWidth()))
