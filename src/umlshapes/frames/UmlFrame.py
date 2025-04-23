@@ -12,6 +12,7 @@ from wx.lib.ogl import Shape
 
 from umlshapes.DiagramFrame import DiagramFrame
 from umlshapes.UmlDiagram import UmlDiagram
+from umlshapes.types.Common import UmlShapes
 
 DEFAULT_WIDTH: int   = 3000
 A4_FACTOR:     float = 1.41
@@ -26,7 +27,7 @@ class UmlFrame(DiagramFrame):
     # def __init__(self, parent: Window, demoEventEngine: DemoEventEngine):
     def __init__(self, parent: Window):
 
-        self.logger: Logger          = getLogger(__name__)
+        self.ufLogger: Logger          = getLogger(__name__)
         # self._demoEventEngine: DemoEventEngine = demoEventEngine
 
         super().__init__(parent=parent)
@@ -47,6 +48,12 @@ class UmlFrame(DiagramFrame):
         # self._oglEventEngine.registerListener(event=EVT_CREATE_LOLLIPOP_INTERFACE, callback=self._onCreateLollipopInterface)
         # self._oglEventEngine.registerListener(event=EVT_DIAGRAM_FRAME_MODIFIED,    callback=self._onDiagramModified)
         # self._oglEventEngine.registerListener(event=EVT_CUT_OGL_CLASS,             callback=self._onCutClass)
+
+    @property
+    def umlShapes(self) -> UmlShapes:
+
+        diagram: UmlDiagram = self.GetDiagram()
+        return diagram.GetShapeList()
 
     def OnLeftClick(self, x, y, keys=0):
         """

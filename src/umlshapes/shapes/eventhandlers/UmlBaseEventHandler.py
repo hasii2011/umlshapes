@@ -38,7 +38,7 @@ class UmlBaseEventHandler(ShapeEvtHandler):
             self._unSelectAllShapesOnCanvas(shape, canvas, dc)
         shape.Select(True, dc)
 
-    def OnDrawOutline(self, dc: ClientDC, x: float, y: float, w: int, h: int):
+    def OnDrawOutline(self, dc: ClientDC, x: int, y: int, w: int, h: int):
         """
         Called when shape is moving or is resized
         Args:
@@ -54,6 +54,7 @@ class UmlBaseEventHandler(ShapeEvtHandler):
         shape.Move(dc=dc, x=round(x), y=round(y), display=True)
         # Hmm, weird how SetSize names x width and y height
         # shape.SetSize(x=round(w), y=round(h))     # Shape
+
         shape.SetSize(round(w), round(h))           # DrawnShape is correct
 
     def _unSelectAllShapesOnCanvas(self, shape: Shape, canvas: ShapeCanvas, dc: ClientDC):
