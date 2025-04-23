@@ -318,7 +318,7 @@ class DemoUmlElements(App):
         pyutClass.stereotype  = PyutStereotype.IMPLEMENTATION_CLASS
         pyutClass.showFields  = True
         pyutClass.showMethods = True
-        pyutClass.displayParameters = PyutDisplayParameters.WITHOUT_PARAMETERS
+        pyutClass.displayParameters = PyutDisplayParameters.WITH_PARAMETERS
 
         pyutField1: PyutField = PyutField(
             name='DemoField1',
