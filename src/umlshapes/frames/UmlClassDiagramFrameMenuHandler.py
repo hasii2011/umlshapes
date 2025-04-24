@@ -80,7 +80,7 @@ class UmlClassDiagramFrameMenuHandler:
             if isinstance(umlObject, UmlClass):
                 oglClass: UmlClass = cast(UmlClass, umlObject)
 
-                oglClass.autoResize()
+                oglClass.autoSize()
 
     # def _arrangeLinks(self):
     #

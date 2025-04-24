@@ -1,12 +1,10 @@
 
-from typing import ClassVar
-from typing import Generator
 from typing import cast
 
 from logging import Logger
 from logging import getLogger
 
-from pyutmodelv2.PyutObject import PyutObject
+from pyutmodelv2.PyutMethod import PyutMethods
 from wx import Brush
 from wx import ClientDC
 from wx import Colour
@@ -22,12 +20,16 @@ from pyutmodelv2.PyutMethod import PyutMethod
 from pyutmodelv2.enumerations.PyutStereotype import PyutStereotype
 from pyutmodelv2.enumerations.PyutDisplayParameters import PyutDisplayParameters
 from pyutmodelv2.enumerations.PyutDisplayMethods import PyutDisplayMethods
+from pyutmodelv2.PyutField import PyutField
+from pyutmodelv2.PyutField import PyutFields
 
 from umlshapes.UmlUtils import UmlUtils
+from umlshapes.frames.UmlFrame import UmlFrame
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
 from umlshapes.shapes.ControlPointMixin import ControlPointMixin
+
 from umlshapes.types.Common import LeftCoordinate
 
 from umlshapes.types.UmlColor import UmlColor
@@ -40,19 +42,10 @@ CONSTRUCTOR_NAME:        str = '__init__'
 MARGIN: int = 10
 
 
-def infiniteSequence() -> Generator[int, None, None]:
-    num = 0
-    while True:
-        yield num
-        num += 1
-
-
 class UmlClass(ControlPointMixin, RectangleShape):
     """
 
     """
-    idGenerator: ClassVar = infiniteSequence()
-
     def __init__(self, pyutClass: PyutClass = None, size: UmlDimensions = None):
         """]
         Args:
@@ -85,7 +78,7 @@ class UmlClass(ControlPointMixin, RectangleShape):
         umlTextColor:       UmlColor = self._preferences.classTextColor
         self._textColor:    Colour   = Colour(UmlColor.toWxColor(umlTextColor))
         self._defaultFont:  Font     = UmlUtils.defaultFont()
-        self._id:           int      = next(UmlClass.idGenerator)     # unique ID number
+        self._textHeight:   int      = cast(int, None)
 
         self.SetDraggable(drag=True)
         self.SetCentreResize(False)
@@ -100,11 +93,11 @@ class UmlClass(ControlPointMixin, RectangleShape):
 
     @property
     def id(self) -> int:
-        return self._id
+        return self.GetId()
 
     @id.setter
     def id(self, newValue: int):
-        self._id = newValue
+        self.SetId(newValue)
 
     @property
     def size(self) -> UmlDimensions:
@@ -161,15 +154,16 @@ class UmlClass(ControlPointMixin, RectangleShape):
             self.SetHeight(round(self.GetHeight()))
             super().OnDraw(dc)
 
-        # drawing is restricted in the specified region of the device
-        w: int = self.size.width        # round(self.GetWidth())
-        # h: int = self.size.height       # round(self.GetHeight())
+        w: int = self.size.width
         x: int = self.topLeft.x
         y: int = self.topLeft.y
 
         dc.SetFont(self._defaultFont)
         dc.SetTextForeground(self._textColor)
+        if self._textHeight is None:
+            self._textHeight = self.textHeight(dc, '*')    # Define the space between the text and the line
 
+        # drawing is restricted in the specified region of the device
         self._startClipping(dc=dc)
         drawingYOffset = self._drawClassHeader(dc=dc, shapeWidth=w)
 
@@ -242,63 +236,26 @@ class UmlClass(ControlPointMixin, RectangleShape):
         self._controlPoints[7]._xoffset = left
         self._controlPoints[7]._yoffset = 0
 
-    def autoResize(self):
-        pass
-    #     """
-    #     Auto-resize the class
-    #
-    #     WARNING: Every change here must be reported in the OnDraw method
-    #     """
-    #     pyutObject: PyutClass = self.pyutClass
-    #     umlFrame = self.GetCanvas()
-    #     dc: ClientDC = ClientDC(umlFrame)
-    #
-    #     self._startClipping(dc)
-    #
-    #     y: int = self.position.y
-    #     # Get header size
-    #     # (headerX, headerY, headerW, headerH) = self._drawClassHeader(dc, False, calcWidth=True)
-    #     headerY, headerW, = self._drawClassHeader(dc, False, calculateWidth=True)
-    #     y += headerY
-    #
-    #     # Get the size of the field's portion of the display
-    #     if pyutObject.showFields is True:
-    #         (fieldsX, fieldsY, fieldsW, fieldsH) = self._drawClassFields(dc, False, initialY=y)
-    #         y = fieldsY + fieldsH
-    #     else:
-    #         fieldsW, fieldsH = 0, 0
-    #
-    #     # Get method's size
-    #     if pyutObject.showMethods is True:
-    #         (methodX, methodY, methodW, methodH) = self._drawClassMethods(dc=dc, initialY=y)
-    #         y = methodY + methodH
-    #     else:
-    #         methodW, methodH = 0, 0
-    #
-    #     w = max(headerW, fieldsW, methodW)
-    #     h = y - headerY
-    #     w += 2 * MARGIN
-    #
-    #     minDimensions: UmlDimensions = self._preferences.classDimensions
-    #     if w < minDimensions.width:
-    #         w = minDimensions.width
-    #     if h < minDimensions.height:
-    #         h = minDimensions.height
-    #
-    #     # if HACK_FIX_AUTO_RESIZE is True:
-    #     #     w = w - 20      # Hack keeps growing
-    #     self.SetSize(w, h)
-    #
-    #     # to automatically replace the sizer objects at a correct place
-    #     if self.Selected() is True:
-    #         self.Select(False)
-    #     self.Select(True)
-    #
-    #     self._endClipping(dc)
-    #     # self.eventEngine.sendEvent(OglEventType.DiagramFrameModified)
-    #
+    def autoSize(self):
+        """
+        Adjust the shape to a width and height accommodates the widest displayable method
+        and the height to accommodate all the displayable fields and methods
+        """
 
-    def textWidth(self, dc: MemoryDC, text: str):
+        umlFrame:    UmlFrame = self.GetCanvas()
+        dc:          ClientDC = ClientDC(umlFrame)
+        shapeHeight: int      = self._calculateMaxShapeHeight(dc)
+        shapeWidth:  int      = self._calculateMaxShapeWidth(dc)
+
+        shapeSize:   UmlDimensions = UmlDimensions(
+            width=shapeWidth,
+            height=shapeHeight
+        )
+        self.size = shapeSize
+
+        umlFrame.refresh()
+
+    def textWidth(self, dc: DC, text: str):
         """
 
         Args:
@@ -309,9 +266,10 @@ class UmlClass(ControlPointMixin, RectangleShape):
         """
 
         size: Size = dc.GetTextExtent(text)
+
         return round(size.width)
 
-    def textHeight(self, dc: MemoryDC, text: str):
+    def textHeight(self, dc: DC, text: str):
         """
 
         Args:
@@ -338,7 +296,7 @@ class UmlClass(ControlPointMixin, RectangleShape):
         x: int = self.topLeft.x
         y: int = self.topLeft.y
 
-        headerMargin:   int = self.textHeight(dc, '*')   # The margin we want above and below the text in the class header
+        headerMargin:   int = self._textHeight
         drawingYOffset: int = headerMargin
 
         self._drawClassName(dc, drawingYOffset, shapeWidth, x, y)
@@ -381,14 +339,9 @@ class UmlClass(ControlPointMixin, RectangleShape):
         """
         x: int = self.topLeft.x
         y: int = self.topLeft.y
-        stereotype: PyutStereotype = self.pyutClass.stereotype
 
-        if self.pyutClass.displayStereoType is True and stereotype is not None and stereotype != PyutStereotype.NO_STEREOTYPE:
-            stereoTypeValue: str = f'<<{stereotype.value}>>'
-        else:
-            stereoTypeValue = ''
-        # Draw the stereotype
-        stereoTypeValueWidth = self.textWidth(dc, stereoTypeValue)
+        stereoTypeValue:      str = self._getStereoTypeValue()
+        stereoTypeValueWidth: int = self.textWidth(dc, stereoTypeValue)
 
         dc.DrawText(stereoTypeValue, x + (shapeWidth - stereoTypeValueWidth) // 2, y + drawingYOffset)
 
@@ -411,12 +364,12 @@ class UmlClass(ControlPointMixin, RectangleShape):
         y:       int = self.topLeft.y
         yOffset: int = startYOffset
 
-        textHeightMargin: int       = self.textHeight(dc, '*')      # Define the space between the text and the line
-        pyutClass:        PyutClass = self.pyutClass
+        textHeight: int       = self._textHeight
+        pyutClass:  PyutClass = self.pyutClass
 
         # Add space above
         if len(pyutClass.fields) > 0:
-            yOffset += textHeightMargin
+            yOffset += textHeight
 
         # This code depends on excellent string representations of fields
         # Provided by the fields __str__() methods
@@ -425,11 +378,12 @@ class UmlClass(ControlPointMixin, RectangleShape):
             for field in pyutClass.fields:
                 fieldStr: str = str(field)      # Must be good __str__()
                 dc.DrawText(fieldStr, x + MARGIN, y + yOffset)
-                yOffset += self.textHeight(dc, fieldStr)
+                # yOffset += self.textHeight(dc, fieldStr)
+                yOffset += textHeight
 
         # Add space below
         if len(pyutClass.fields) > 0:
-            yOffset += textHeightMargin
+            yOffset += textHeight
 
         return yOffset
 
@@ -441,13 +395,13 @@ class UmlClass(ControlPointMixin, RectangleShape):
             dc:
             startYOffset:
         """
-        yOffset:          int = startYOffset
-        textHeightMargin: int = self.textHeight(dc, '*')    # Define the space between the text and the line
+        yOffset:    int = startYOffset
+        textHeight: int = self._textHeight
 
         # Add space above
         pyutClass: PyutClass = self.pyutClass
         if len(pyutClass.methods) > 0:
-            yOffset += textHeightMargin
+            yOffset += textHeight
 
         for method in pyutClass.methods:
             if self._eligibleToDraw(pyutClass=pyutClass, pyutMethod=method) is True:
@@ -455,16 +409,7 @@ class UmlClass(ControlPointMixin, RectangleShape):
                 displayParameters: PyutDisplayParameters = pyutClass.displayParameters
                 self._drawMethod(dc, method, displayParameters, yOffset)
 
-                pyutMethod: PyutMethod = cast(PyutMethod, method)
-
-                if pyutClass.displayParameters == PyutDisplayParameters.WITH_PARAMETERS or self._preferences.showParameters is True:
-                    methodStr: str = str(pyutMethod.methodWithParameters())
-                    self.textWidth(dc, methodStr)
-                    yOffset += self.textHeight(dc, methodStr)
-                else:
-                    methodStr = str(pyutMethod.methodWithoutParameters())
-                    self.textWidth(dc, methodStr)
-                    yOffset += self.textHeight(dc, methodStr)
+                yOffset += textHeight
 
     def _drawMethod(self, dc: MemoryDC, pyutMethod: PyutMethod, displayParameters: PyutDisplayParameters, startYOffset: int):
         """
@@ -480,21 +425,9 @@ class UmlClass(ControlPointMixin, RectangleShape):
         x: int = self.topLeft.x
         y: int = self.topLeft.y
 
-        self.logger.debug(f'{displayParameters=} - {self._preferences.showParameters=}')
-        if displayParameters == PyutDisplayParameters.UNSPECIFIED:
-            if self._preferences.showParameters is True:
-                dc.DrawText(pyutMethod.methodWithParameters(), x + MARGIN, y + startYOffset)
-            else:
-                dc.DrawText(pyutMethod.methodWithoutParameters(), x + MARGIN, y + startYOffset)
+        methodStr: str = self._getMethodRepresentation(pyutMethod, displayParameters)
 
-        elif displayParameters == PyutDisplayParameters.WITH_PARAMETERS:
-            dc.DrawText(pyutMethod.methodWithParameters(), x + MARGIN, y + startYOffset)
-
-        elif displayParameters == PyutDisplayParameters.WITHOUT_PARAMETERS:
-            dc.DrawText(pyutMethod.methodWithoutParameters(), x + MARGIN, y + startYOffset)
-
-        else:
-            assert False, 'Internal error unknown pyutMethod parameter display type'
+        dc.DrawText(methodStr, x + MARGIN, y + startYOffset)
 
     def _eligibleToDraw(self, pyutClass: PyutClass, pyutMethod: PyutMethod):
         """
@@ -560,10 +493,10 @@ class UmlClass(ControlPointMixin, RectangleShape):
     def _isSameName(self, other) -> bool:
 
         ans: bool = False
-        selfPyutObj:  PyutObject = self.pyutClass
-        otherPyutObj: PyutObject = other.pyutClass
+        selfPyutClass:  PyutClass = self.pyutClass
+        otherPyutClass: PyutClass = other.pyutClass
 
-        if selfPyutObj.name == otherPyutObj.name:
+        if selfPyutClass.name == otherPyutClass.name:
             ans = True
         return ans
 
@@ -598,6 +531,120 @@ class UmlClass(ControlPointMixin, RectangleShape):
         """
         dc.DestroyClippingRegion()
 
+    def _getStereoTypeValue(self):
+
+        stereotype: PyutStereotype = self.pyutClass.stereotype
+
+        if self.pyutClass.displayStereoType is True and stereotype is not None and stereotype != PyutStereotype.NO_STEREOTYPE:
+            stereoTypeValue: str = f'<<{stereotype.value}>>'
+        else:
+            stereoTypeValue = ''
+
+        return stereoTypeValue
+
+    def _calculateMaxShapeHeight(self, dc: ClientDC) -> int:
+
+        pyutClass:        PyutClass = self.pyutClass
+        singleLineHeight: int       = self.textHeight(dc, '*')
+        """
+        Account for 
+            Margin above class name
+            Class Name
+            Stereotype Name or place holder
+            Margin below class name
+        """
+        currentHeight: int = singleLineHeight * 4
+
+        if len(pyutClass.fields) > 0 and pyutClass.showFields is True:
+            currentHeight += singleLineHeight * 2   # Above and below margins
+            currentHeight += singleLineHeight * len(pyutClass.fields)
+
+        if len(pyutClass.methods) > 0 and pyutClass.showMethods is True:
+            currentHeight += singleLineHeight * len(pyutClass.methods)
+
+        adjustedHeight: int = currentHeight - round(currentHeight * self._preferences.autoSizeHeightAdjustment)
+        return adjustedHeight
+
+    def _calculateMaxShapeWidth(self, dc: DC) -> int:
+
+        headerWidth:  int = self._calculateMaxHeaderWidth(dc)
+        fieldsWidth:  int = self._calculateMaxFieldWidth(dc)
+        methodsWidth: int = self._calculateMaxMethodWidth(dc)
+
+        currentMaxWidth: int = headerWidth
+
+        currentMaxWidth = max(currentMaxWidth, fieldsWidth)
+        currentMaxWidth = max(currentMaxWidth, methodsWidth)
+
+        adjustedMaxWidth: int = currentMaxWidth - round(currentMaxWidth * self._preferences.autoSizeWidthAdjustment)
+        return adjustedMaxWidth
+
+    def _calculateMaxHeaderWidth(self, dc: DC) -> int:
+
+        pyutClass:       PyutClass = self.pyutClass
+        stereoTypeValue: str       = self._getStereoTypeValue()
+
+        maxWidth:        int       = 0
+        classNameWidth: int = self.textWidth(dc, pyutClass.name)
+        stereoTypeWidth: int = self.textWidth(dc, stereoTypeValue)
+
+        maxWidth = max(maxWidth, classNameWidth)
+        maxWidth = max(maxWidth, stereoTypeWidth)
+
+        return maxWidth
+
+    def _calculateMaxFieldWidth(self, dc: DC) -> int:
+
+        pyutClass:  PyutClass  = self.pyutClass
+        pyutFields: PyutFields = pyutClass.fields
+
+        maxWidth: int = 0
+        if len(pyutFields) > 0 and pyutClass.showFields is True:
+            for pf in pyutFields:
+                pyutField: PyutField = cast(PyutField, pf)
+                fieldStr: str = str(pyutField)
+                fieldWidth: int = self.textWidth(dc, fieldStr)
+                maxWidth = max(maxWidth, fieldWidth)
+
+        return maxWidth
+
+    def _calculateMaxMethodWidth(self, dc: DC) -> int:
+
+        pyutClass:   PyutClass   = self.pyutClass
+        pyutMethods: PyutMethods = pyutClass.methods
+
+        maxWidth: int = 0
+        if pyutClass.showMethods is True:
+            for pyutMethod in pyutMethods:
+                if self._eligibleToDraw(pyutClass=pyutClass, pyutMethod=pyutMethod) is True:
+                    methodStr:   str = self._getMethodRepresentation(pyutMethod=pyutMethod, displayParameters=pyutClass.displayParameters)
+                    self.logger.debug(f'{methodStr=}')
+                    methodWidth: int = self.textWidth(dc=dc, text=methodStr)
+                    maxWidth = max(maxWidth, methodWidth)
+
+        return maxWidth
+
+    def _getMethodRepresentation(self, pyutMethod: PyutMethod, displayParameters: PyutDisplayParameters) -> str:
+
+        self.logger.debug(f'{displayParameters=} - {self._preferences.showParameters=}')
+
+        if displayParameters == PyutDisplayParameters.UNSPECIFIED:
+
+            if self._preferences.showParameters is True:
+                methodStr: str = pyutMethod.methodWithParameters()
+            else:
+                methodStr = pyutMethod.methodWithoutParameters()
+
+        elif displayParameters == PyutDisplayParameters.WITH_PARAMETERS:
+            methodStr = pyutMethod.methodWithParameters()
+
+        elif displayParameters == PyutDisplayParameters.WITHOUT_PARAMETERS:
+            methodStr = pyutMethod.methodWithoutParameters()
+        else:
+            assert False, 'Internal error unknown pyutMethod parameter display type'
+
+        return methodStr
+
     def __str__(self) -> str:
         return self.__repr__()
 
@@ -618,6 +665,6 @@ class UmlClass(ControlPointMixin, RectangleShape):
 
     def __hash__(self):
 
-        selfPyutObj:  PyutObject = self.pyutClass
+        selfPyutClass: PyutClass = self.pyutClass
 
-        return hash(selfPyutObj.name) + hash(self.id)
+        return hash(selfPyutClass.name) + hash(self.id)

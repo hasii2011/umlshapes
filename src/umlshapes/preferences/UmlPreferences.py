@@ -74,6 +74,10 @@ DIAGRAM_PROPERTIES: ValueDescriptions = ValueDescriptions(
         KeyName('darkModeBackGroundColor'): ValueDescription(defaultValue=DEFAULT_DARK_MODE_BACKGROUND_COLOR, enumUseValue=True, deserializer=UmlColor),
         KeyName('gridLineColor'):           ValueDescription(defaultValue=DEFAULT_GRID_LINE_COLOR, enumUseValue=True, deserializer=UmlColor),
         KeyName('darkModeGridLineColor'):   ValueDescription(defaultValue=DEFAULT_DARK_MODE_GRID_LINE_COLOR, enumUseValue=True, deserializer=UmlColor),
+
+        KeyName('autoSizeHeightAdjustment'): ValueDescription(defaultValue='0.20', deserializer=SecureConversions.secureFloat),
+        KeyName('autoSizeWidthAdjustment'):  ValueDescription(defaultValue='0.20', deserializer=SecureConversions.secureFloat),
+
     }
 )
 

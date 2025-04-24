@@ -285,6 +285,7 @@ class DemoUmlElements(App):
         umlClass: UmlClass = UmlClass(pyutClass=pyutClass, size=UmlDimensions(width=250, height=300))
         umlClass.SetCanvas(self._diagramFrame)
 
+        self.logger.info(f'{umlClass.id=}')
         # umlPosition: UmlPosition = self._computePosition()
         umlPosition: UmlPosition = UmlPosition(x=250, y=250)
         umlClass.position = umlPosition
@@ -315,10 +316,10 @@ class DemoUmlElements(App):
         className: str = f'{self._preferences.defaultClassName} {self._classCounter}'
         self._classCounter += 1
         pyutClass: PyutClass  = PyutClass(name=className)
-        pyutClass.stereotype  = PyutStereotype.IMPLEMENTATION_CLASS
+        pyutClass.stereotype  = PyutStereotype.METACLASS
         pyutClass.showFields  = True
         pyutClass.showMethods = True
-        pyutClass.displayParameters = PyutDisplayParameters.WITH_PARAMETERS
+        pyutClass.displayParameters = PyutDisplayParameters.UNSPECIFIED
 
         pyutField1: PyutField = PyutField(
             name='DemoField1',
