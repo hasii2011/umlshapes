@@ -15,7 +15,6 @@ license = 'AGPL-1.0-or-later'
 classifiers = [
   "Programming Language :: Python",
   "Intended Audience :: Developers",
-  "License AGPL-1.0-or-later",
   "Operating System :: MacOS :: MacOS X",
   "Topic :: Software Development :: Libraries :: Python Modules",
 ]

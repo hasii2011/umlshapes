@@ -5,7 +5,7 @@ __pycache__/
 .DS_Store
 build/
 dist/
-/umlshapes.egg-info/
+/src/umlshapes.egg-info/
 /pyenv-3.12.9/
 .python-version
 .envrc
