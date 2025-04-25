@@ -11,8 +11,10 @@ from wx import Window
 from wx.lib.ogl import Shape
 
 from umlshapes.frames.DiagramFrame import DiagramFrame
+
 from umlshapes.UmlDiagram import UmlDiagram
-from umlshapes.types.Common import UmlShapes
+from umlshapes.types.Common import UmlShapeList
+
 
 DEFAULT_WIDTH: int   = 3000
 A4_FACTOR:     float = 1.41
@@ -50,7 +52,7 @@ class UmlFrame(DiagramFrame):
         # self._oglEventEngine.registerListener(event=EVT_CUT_OGL_CLASS,             callback=self._onCutClass)
 
     @property
-    def umlShapes(self) -> UmlShapes:
+    def umlShapes(self) -> UmlShapeList:
 
         diagram: UmlDiagram = self.GetDiagram()
         return diagram.GetShapeList()

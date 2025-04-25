@@ -41,7 +41,6 @@ class DiagramFrame(ShapeCanvas):
     A frame to draw UML diagrams.
 
     """
-    DEFAULT_FONT_SIZE: int = 12
 
     def __init__(self, parent: Window):
         """

@@ -10,6 +10,7 @@ from wx import ClientDC
 from wx import Colour
 from wx import DC
 from wx import Font
+from wx import ID_OK
 from wx import MemoryDC
 from wx import Size
 
@@ -26,6 +27,7 @@ from pyutmodelv2.enumerations.PyutDisplayMethods import PyutDisplayMethods
 from pyutmodelv2.enumerations.PyutDisplayParameters import PyutDisplayParameters
 
 from umlshapes.UmlUtils import UmlUtils
+
 
 from umlshapes.frames.UmlFrame import UmlFrame
 from umlshapes.shapes.UmlClassMenuHandler import UmlClassMenuHandler
@@ -234,6 +236,16 @@ class UmlClass(ControlPointMixin, RectangleShape):
             self._menuHandler = UmlClassMenuHandler(umlClass=self)
 
         self._menuHandler.popupMenu(x=round(x), y=round(y))
+
+    def OnLeftDoubleClick(self, x: int, y: int, keys: int = 0, attachment: int = 0):
+
+        from umlshapes.dialogs.DlgEditClass import DlgEditClass
+
+        super().OnLeftDoubleClick(x=x, y=y, keys=keys, attachment=attachment)
+
+        with DlgEditClass(self.umlFrame, self.pyutClass) as dlg:
+            if dlg.ShowModal() == ID_OK:
+                self.umlFrame.refresh()
 
     # This is dangerous, accessing internal stuff
     # noinspection PyProtectedMember

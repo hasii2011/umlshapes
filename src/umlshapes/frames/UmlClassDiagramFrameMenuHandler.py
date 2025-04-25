@@ -12,7 +12,7 @@ from wx import CommandEvent
 
 from wx import NewIdRef as wxNewIdRef
 
-from umlshapes.types.Common import UmlShapes
+from umlshapes.types.Common import UmlShapeList
 
 if TYPE_CHECKING:
     from umlshapes.frames.UmlClassDiagramFrame import UmlClassDiagramFrame
@@ -74,7 +74,7 @@ class UmlClassDiagramFrameMenuHandler:
     def _autoSize(self):
 
         umlFrame:  UmlClassDiagramFrame = self._frame
-        umlShapes: UmlShapes            = umlFrame.umlShapes
+        umlShapes: UmlShapeList        = umlFrame.umlShapes
 
         for umlObject in umlShapes:
             if isinstance(umlObject, UmlClass):

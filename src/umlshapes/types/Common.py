@@ -1,6 +1,6 @@
-
 from typing import List
 from typing import NewType
+from typing import TYPE_CHECKING
 from typing import Union
 from typing import cast
 
@@ -12,7 +12,13 @@ from pyutmodelv2.PyutNote import PyutNote
 from pyutmodelv2.PyutText import PyutText
 from pyutmodelv2.PyutUseCase import PyutUseCase
 
-from wx.lib.ogl import Shape
+
+if TYPE_CHECKING:
+    from umlshapes.shapes.UmlActor import UmlActor          # noqa
+    from umlshapes.shapes.UmlClass import UmlClass          # noqa
+    from umlshapes.shapes.UmlNote import UmlNote            # noqa
+    from umlshapes.shapes.UmlText import UmlText            # noqa
+    from umlshapes.shapes.UmlUseCase import UmlUseCase      # noqa
 
 ModelObject = Union[PyutText, PyutNote, PyutActor, PyutClass, PyutUseCase, None]
 
@@ -28,4 +34,5 @@ class LeftCoordinate:
     y: int = 0
 
 
-UmlShapes = NewType('UmlShapes', List[Shape])
+UmlShapes    = Union['UmlActor', 'UmlClass', 'UmlNote', 'UmlText', 'UmlUseCase']
+UmlShapeList = NewType('UmlShapeList', List[UmlShapes])

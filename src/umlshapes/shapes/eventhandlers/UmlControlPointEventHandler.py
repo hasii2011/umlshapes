@@ -40,7 +40,7 @@ class UmlControlPointEventHandler(ShapeEvtHandler):
         """
         The drag left started handler.
         """
-        self.logger.info(f'({x},{y})')
+        self.logger.debug(f'({x},{y})')
         super().OnBeginDragLeft(x, y, keys, attachment)
 
     def OnEndDragLeft(self, x, y, keys=0, attachment=0):

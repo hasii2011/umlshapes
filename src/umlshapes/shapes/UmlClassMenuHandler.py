@@ -19,7 +19,6 @@ from wx import MenuItem
 
 from wx import NewIdRef as wxNewIdRef
 
-
 from pyutmodelv2.PyutClass import PyutClass
 
 from pyutmodelv2.enumerations.PyutDisplayParameters import PyutDisplayParameters
@@ -47,7 +46,7 @@ if TYPE_CHECKING:
     ID_IMPLEMENT_INTERFACE
 ]  = wxNewIdRef(9)
 
-HELP_STEREOTYPE:    str = 'Set stereotype display on or off'
+HELP_STEREOTYPE:     str = 'Set stereotype display on or off'
 HELP_FIELDS:         str = 'Set fields display on or off'
 HELP_METHODS:        str = 'Set methods display on or off'
 HELP_PARAMETERS:     str = 'Set parameter display Unspecified, On or Off'

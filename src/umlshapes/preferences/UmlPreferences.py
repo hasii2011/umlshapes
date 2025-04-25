@@ -59,6 +59,12 @@ OGL_PROPERTIES: ValueDescriptions = ValueDescriptions(
         KeyName('classTextMargin'):      ValueDescription(defaultValue='10',                        deserializer=SecureConversions.secureInteger),
         KeyName('useCaseSize'):          ValueDescription(defaultValue=DEFAULT_USE_CASE_SIZE,       deserializer=UmlDimensions.deSerialize),
         KeyName('actorSize'):            ValueDescription(defaultValue=DEFAULT_ACTOR_SIZE,          deserializer=UmlDimensions.deSerialize),
+
+        KeyName('autoSizeHeightAdjustment'): ValueDescription(defaultValue='0.20', deserializer=SecureConversions.secureFloat),
+        KeyName('autoSizeWidthAdjustment'):  ValueDescription(defaultValue='0.20', deserializer=SecureConversions.secureFloat),
+        KeyName('lineHeightAdjustment'):     ValueDescription(defaultValue='1',    deserializer=SecureConversions.secureInteger),
+        KeyName('autoResizeShapesOnEdit'):   ValueDescription(defaultValue='True', deserializer=SecureConversions.secureBoolean),
+
     }
 )
 DIAGRAM_PROPERTIES: ValueDescriptions = ValueDescriptions(
@@ -75,10 +81,6 @@ DIAGRAM_PROPERTIES: ValueDescriptions = ValueDescriptions(
         KeyName('darkModeBackGroundColor'): ValueDescription(defaultValue=DEFAULT_DARK_MODE_BACKGROUND_COLOR, enumUseValue=True, deserializer=UmlColor),
         KeyName('gridLineColor'):           ValueDescription(defaultValue=DEFAULT_GRID_LINE_COLOR, enumUseValue=True, deserializer=UmlColor),
         KeyName('darkModeGridLineColor'):   ValueDescription(defaultValue=DEFAULT_DARK_MODE_GRID_LINE_COLOR, enumUseValue=True, deserializer=UmlColor),
-
-        KeyName('autoSizeHeightAdjustment'): ValueDescription(defaultValue='0.20', deserializer=SecureConversions.secureFloat),
-        KeyName('autoSizeWidthAdjustment'):  ValueDescription(defaultValue='0.20', deserializer=SecureConversions.secureFloat),
-        KeyName('lineHeightAdjustment'):     ValueDescription(defaultValue='1',    deserializer=SecureConversions.secureInteger),
     }
 )
 

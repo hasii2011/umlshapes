@@ -20,7 +20,7 @@ class UmlClassDiagramFrame(UmlFrame):
         self._menuHandler:  UmlClassDiagramFrameMenuHandler = cast(UmlClassDiagramFrameMenuHandler, None)
 
     def OnRightClick(self, x: int, y: int, keys: int = 0):
-        self.ucdLogger.info('Ouch, you right-clicked me !!')
+        self.ucdLogger.debug('Ouch, you right-clicked me !!')
 
         if self._areWeOverAShape(x=x, y=y) is False:
             self.ucdLogger.info('You missed the shape')
