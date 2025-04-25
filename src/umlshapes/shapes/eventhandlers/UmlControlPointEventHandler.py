@@ -5,7 +5,7 @@ from logging import getLogger
 from wx.lib.ogl import Shape
 from wx.lib.ogl import ShapeEvtHandler
 
-from umlshapes.DiagramFrame import DiagramFrame
+from umlshapes.frames.DiagramFrame import DiagramFrame
 
 
 class UmlControlPointEventHandler(ShapeEvtHandler):

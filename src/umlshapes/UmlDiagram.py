@@ -9,7 +9,7 @@ from collections.abc import Iterable
 from wx.lib.ogl import Diagram
 from wx.lib.ogl import Shape
 
-from umlshapes.DiagramFrame import DiagramFrame
+from umlshapes.frames.DiagramFrame import DiagramFrame
 
 Shapes = NewType('Shapes', List[Shape])
 

@@ -48,14 +48,15 @@ OGL_PROPERTIES: ValueDescriptions = ValueDescriptions(
         KeyName('textItalicize'):        ValueDescription(defaultValue='False',                     deserializer=SecureConversions.secureBoolean),
         KeyName('textFontFamily'):       ValueDescription(defaultValue='Swiss',                     deserializer=UmlFontFamily.deSerialize),
         KeyName('textFontSize'):         ValueDescription(defaultValue='14',                        deserializer=SecureConversions.secureInteger),
-        KeyName('textBackGroundColor'):   ValueDescription(defaultValue=DEFAULT_TEXT_BACKGROUND_COLOR, enumUseValue=True, deserializer=UmlColor),
-        KeyName('textBackGroundColor'): ValueDescription(defaultValue=DEFAULT_TEXT_BACKGROUND_COLOR, enumUseValue=True, deserializer=UmlColor),
+        KeyName('textBackGroundColor'):  ValueDescription(defaultValue=DEFAULT_TEXT_BACKGROUND_COLOR, enumUseValue=True, deserializer=UmlColor),
+        KeyName('textBackGroundColor'):  ValueDescription(defaultValue=DEFAULT_TEXT_BACKGROUND_COLOR, enumUseValue=True, deserializer=UmlColor),
 
         KeyName('displayConstructor'):   ValueDescription(defaultValue='True',                      deserializer=SecureConversions.secureBoolean),
         KeyName('displayDunderMethods'): ValueDescription(defaultValue='True',                      deserializer=SecureConversions.secureBoolean),
         KeyName('classDimensions'):      ValueDescription(defaultValue=str(UmlDimensions(150, 75)), deserializer=UmlDimensions.deSerialize),
         KeyName('classBackGroundColor'): ValueDescription(defaultValue=DEFAULT_CLASS_BACKGROUND_COLOR, enumUseValue=True, deserializer=UmlColor),
         KeyName('classTextColor'):       ValueDescription(defaultValue=DEFAULT_CLASS_TEXT_COLOR,       enumUseValue=True, deserializer=UmlColor),
+        KeyName('classTextMargin'):      ValueDescription(defaultValue='10',                        deserializer=SecureConversions.secureInteger),
         KeyName('useCaseSize'):          ValueDescription(defaultValue=DEFAULT_USE_CASE_SIZE,       deserializer=UmlDimensions.deSerialize),
         KeyName('actorSize'):            ValueDescription(defaultValue=DEFAULT_ACTOR_SIZE,          deserializer=UmlDimensions.deSerialize),
     }
@@ -77,7 +78,7 @@ DIAGRAM_PROPERTIES: ValueDescriptions = ValueDescriptions(
 
         KeyName('autoSizeHeightAdjustment'): ValueDescription(defaultValue='0.20', deserializer=SecureConversions.secureFloat),
         KeyName('autoSizeWidthAdjustment'):  ValueDescription(defaultValue='0.20', deserializer=SecureConversions.secureFloat),
-
+        KeyName('lineHeightAdjustment'):     ValueDescription(defaultValue='1',    deserializer=SecureConversions.secureInteger),
     }
 )
 

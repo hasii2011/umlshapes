@@ -10,7 +10,7 @@ from wx import MouseEvent
 from wx import Window
 from wx.lib.ogl import Shape
 
-from umlshapes.DiagramFrame import DiagramFrame
+from umlshapes.frames.DiagramFrame import DiagramFrame
 from umlshapes.UmlDiagram import UmlDiagram
 from umlshapes.types.Common import UmlShapes
 
