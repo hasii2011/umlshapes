@@ -1,5 +1,6 @@
 
 from typing import cast
+from typing import TYPE_CHECKING
 
 from logging import Logger
 from logging import getLogger
@@ -27,6 +28,10 @@ from pyutmodelv2.enumerations.PyutDisplayParameters import PyutDisplayParameters
 from umlshapes.UmlUtils import UmlUtils
 
 from umlshapes.frames.UmlFrame import UmlFrame
+from umlshapes.shapes.UmlClassMenuHandler import UmlClassMenuHandler
+
+if TYPE_CHECKING:
+    from umlshapes.frames.UmlClassDiagramFrame import UmlClassDiagramFrame
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
@@ -80,6 +85,8 @@ class UmlClass(ControlPointMixin, RectangleShape):
         self._textHeight:   int      = cast(int, None)
         self._margin:       int      = self._preferences.classTextMargin
 
+        self._menuHandler: UmlClassMenuHandler = cast(UmlClassMenuHandler, None)
+
         self.SetDraggable(drag=True)
         self.SetCentreResize(False)
 
@@ -107,6 +114,14 @@ class UmlClass(ControlPointMixin, RectangleShape):
     @id.setter
     def id(self, newValue: int):
         self.SetId(newValue)
+
+    @property
+    def umlFrame(self) -> 'UmlClassDiagramFrame':
+        return self.GetCanvas()
+
+    @umlFrame.setter
+    def umlFrame(self, frame: 'UmlClassDiagramFrame'):
+        self.SetCanvas(frame)
 
     @property
     def size(self) -> UmlDimensions:
@@ -212,11 +227,13 @@ class UmlClass(ControlPointMixin, RectangleShape):
             y:
             keys:
             attachment:
-
         """
-        super().OnRightClick(x=x, y=y, keys=keys, attachment=attachment)
+        super().OnRightClick(x=round(x), y=round(y), keys=keys, attachment=attachment)
 
-        self.logger.info(f'You clicked on class: {str(self)}')
+        if self._menuHandler is None:
+            self._menuHandler = UmlClassMenuHandler(umlClass=self)
+
+        self._menuHandler.popupMenu(x=round(x), y=round(y))
 
     # This is dangerous, accessing internal stuff
     # noinspection PyProtectedMember

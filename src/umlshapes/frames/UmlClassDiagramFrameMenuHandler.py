@@ -38,7 +38,7 @@ class UmlClassDiagramFrameMenuHandler:
 
         self.logger.debug(f'UmlClassDiagramFrameMenuHandler - x,y: {x},{y}')
 
-        self._frame.PopupMenu(self._contextMenu, x, y)
+        self._frame.PopupMenu(self._contextMenu, round(x), round(y))
 
     def _createContextMenu(self):
 

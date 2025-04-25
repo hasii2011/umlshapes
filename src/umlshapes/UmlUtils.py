@@ -7,6 +7,7 @@ from logging import Logger
 from logging import getLogger
 from logging import DEBUG
 
+from wx import Bitmap
 from wx import Brush
 from wx import FONTFAMILY_DEFAULT
 from wx import FONTFAMILY_MODERN
@@ -26,18 +27,18 @@ from wx import DC
 from wx import Pen
 from wx import Size
 
-from wx import NewIdRef as wxNewIdRef
-
 from wx.lib.ogl import EllipseShape
 from wx.lib.ogl import RectangleShape
+
+from umlshapes.resources.images.Display import embeddedImage as displayImage
+from umlshapes.resources.images.DoNotDisplay import embeddedImage as doNotDisplayImage
+from umlshapes.resources.images.UnSpecified import embeddedImage as unSpecifiedImage
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 from umlshapes.types.UmlColor import UmlColor
 
 from umlshapes.types.UmlFontFamily import UmlFontFamily
 from umlshapes.types.UmlPosition import UmlPosition
-
-DEFAULT_FONT_SIZE:  int = 10        # Make this a preference
 
 
 class UmlUtils:
@@ -167,7 +168,7 @@ class UmlUtils:
         """
         Split the `text` into lines that fit into `textWidth` pixels.
 
-        Note:  This is a copy of the one in Pyut.  Duplicated here in order to remove the LineSplitter dependency.
+        Note:  This is a copy of the one in Pyut.  Duplicated here to remove the LineSplitter dependency.
 
         Args:
             text:       The text to split
@@ -203,22 +204,16 @@ class UmlUtils:
         return newLines
 
     @classmethod
-    def assignID(cls, numberOfIds: int) -> List[wxNewIdRef]:
-        """
-        Assign and return numberOfIds
+    def displayIcon(cls) -> Bitmap:
+        bmp: Bitmap = displayImage.GetBitmap()
+        return bmp
 
-        Sample use        : [Unique_Id1, Unique_Id2, Unique_Id3] = assignID(3)
+    @classmethod
+    def doNotDisplayIcon(cls) -> Bitmap:
+        bmp: Bitmap = doNotDisplayImage.GetBitmap()
+        return bmp
 
-        Note:  This is a copy of the one in Pyut.  Duplicated here in order to remove the PyutUtils dependency.
-
-        Args:
-            numberOfIds: number of unique IDs to return
-
-        Returns:  List of numbers which contain <numberOfIds> unique IDs
-        """
-        retList: List[wxNewIdRef] = []
-        x: int = 0
-        while x < numberOfIds:
-            retList.append(wxNewIdRef())
-            x += 1
-        return retList
+    @classmethod
+    def unspecifiedDisplayIcon(cls) -> Bitmap:
+        bmp: Bitmap = unSpecifiedImage.GetBitmap()
+        return bmp
