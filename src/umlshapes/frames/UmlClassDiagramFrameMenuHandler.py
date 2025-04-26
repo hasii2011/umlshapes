@@ -12,6 +12,7 @@ from wx import CommandEvent
 
 from wx import NewIdRef as wxNewIdRef
 
+from umlshapes.preferences.UmlPreferences import UmlPreferences
 from umlshapes.types.Common import UmlShapeList
 
 if TYPE_CHECKING:
@@ -29,8 +30,9 @@ class UmlClassDiagramFrameMenuHandler:
         self._frame:       UmlClassDiagramFrame = frame
         self._contextMenu: Menu                 = cast(Menu, None)
 
-        self._autoSizeID:    int = wxNewIdRef()
-        self.arrangeLinksID: int = wxNewIdRef()
+        self._autoSizeID:     int = wxNewIdRef()
+        self._arrangeLinksID: int = wxNewIdRef()
+        self._createClassID:  int = wxNewIdRef()
 
         self._createContextMenu()
 
@@ -38,18 +40,30 @@ class UmlClassDiagramFrameMenuHandler:
 
         self.logger.debug(f'UmlClassDiagramFrameMenuHandler - x,y: {x},{y}')
 
+        autoSizeMenuItem     = self._contextMenu.FindItemById(id=self._autoSizeID)
+        arrangeLinksMenuItem = self._contextMenu.FindItemById(id=self._arrangeLinksID)
+        if len(self._frame.umlShapes) == 0:
+            autoSizeMenuItem.Enable(False)
+            arrangeLinksMenuItem.Enable(False)
+        else:
+            autoSizeMenuItem.Enable(True)
+            arrangeLinksMenuItem.Enable(True)
+
         self._frame.PopupMenu(self._contextMenu, round(x), round(y))
 
     def _createContextMenu(self):
 
         menu: Menu = Menu()
 
-        menu.Append(self._autoSizeID, 'Auto Size Classes', 'Auto size all class objects on diagram')
-        menu.Append(self.arrangeLinksID, 'Arrange Links', 'Auto arrange links')
+        menu.Append(self._autoSizeID,     'Auto Size Classes', 'Auto size all class objects on diagram')
+        menu.Append(self._arrangeLinksID, 'Arrange Links',      'Auto arrange links')
+        if UmlPreferences().classDiagramFromCtxMenu is True:
+            menu.Append(self._createClassID, 'Create Class', 'Create New Class')
+            menu.Bind(EVT_MENU, self._onMenuClick, id=self._createClassID)
 
         # Callbacks
         menu.Bind(EVT_MENU, self._onMenuClick, id=self._autoSizeID)
-        menu.Bind(EVT_MENU, self._onMenuClick, id=self.arrangeLinksID)
+        menu.Bind(EVT_MENU, self._onMenuClick, id=self._arrangeLinksID)
 
         self._contextMenu = menu
 
@@ -65,7 +79,7 @@ class UmlClassDiagramFrameMenuHandler:
         match eventId:
             case self._autoSizeID:
                 self._autoSize()
-            case self.arrangeLinksID:
+            case self._arrangeLinksID:
                 # self._arrangeLinks()
                 pass
             case _:

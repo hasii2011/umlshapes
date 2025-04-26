@@ -28,7 +28,6 @@ from pyutmodelv2.enumerations.PyutDisplayParameters import PyutDisplayParameters
 
 from umlshapes.UmlUtils import UmlUtils
 
-
 from umlshapes.frames.UmlFrame import UmlFrame
 from umlshapes.shapes.UmlClassMenuHandler import UmlClassMenuHandler
 
