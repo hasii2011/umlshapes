@@ -9,7 +9,7 @@ from wx import DC
 from wx import MemoryDC
 from wx import RED
 
-from wx.lib.ogl import Shape
+from wx.lib.ogl import RectangleShape
 
 from pyutmodelv2.PyutActor import PyutActor
 
@@ -39,7 +39,7 @@ class HeadComputations:
     adjustedY: int = 0
 
 
-class UmlActor(ControlPointMixin, Shape):
+class UmlActor(ControlPointMixin, RectangleShape):
 
     def __init__(self, pyutActor: PyutActor = None, size: UmlDimensions = None):
         """
@@ -62,7 +62,7 @@ class UmlActor(ControlPointMixin, Shape):
             self._actorSize = size
 
         super().__init__(shape=self)
-        Shape.__init__(self)
+        RectangleShape.__init__(self)
 
         self.SetDraggable(drag=True)
         self.SetCentreResize(False)
@@ -104,7 +104,8 @@ class UmlActor(ControlPointMixin, Shape):
     def SetSize(self, x, y, recursive=True):
         """
         Override because our BaseEventHandler changes a shape's size via this method
-        Our Draw method use our internal ._actorSize
+        Our Draw method uses the .size property
+        Update the property via the protected method
         Args:
             x:
             y:
@@ -183,6 +184,8 @@ class UmlActor(ControlPointMixin, Shape):
 
     def OnDraw(self, dc: MemoryDC):
         """
+        Don't call parent OnDraw;  Do not need the borders drawn
+
         x, y are the center of the shape
         Args:
             dc:
@@ -201,8 +204,8 @@ class UmlActor(ControlPointMixin, Shape):
         dc.SetBrush(UmlUtils.backGroundBrush())
         dc.SetFont(UmlUtils.defaultFont())
         # Gets the minimum bounding box for the shape
-        width:  int = self._actorSize.width
-        height: int = self._actorSize.height
+        width:  int = self.size.width
+        height: int = self.size.height
         # Calculate the top and left of the shape
         x: int = round(self.GetX())
         y: int = round(self.GetY())
