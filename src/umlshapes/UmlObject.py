@@ -99,13 +99,30 @@ class UmlObject(RectangleShape):
 
     @property
     def position(self) -> UmlPosition:
-        return UmlPosition(x=self.GetX(), y=self.GetY())
+        """
+        This method returns the top left position
+
+        Returns:  The shape position
+        """
+        return UmlPosition(x=self.topLeft.x, y=self.topLeft.y)
 
     @position.setter
     def position(self, position: UmlPosition):
+        """
+        Use this method to position the shape where its top left is at the input
+        position.
 
-        self.SetX(round(position.x))
-        self.SetY(round(position.y))
+        Args:
+            position:
+        """
+        width:  int = self.size.width
+        height: int = self.size.height
+
+        centerX: int = position.x + (width // 2)
+        centerY: int = position.y + (height // 2)
+
+        self.SetX(centerX)
+        self.SetY(centerY)
 
     @property
     def topLeft(self) -> LeftCoordinate:

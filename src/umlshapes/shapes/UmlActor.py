@@ -1,9 +1,10 @@
 
+from typing import Tuple
+
 from logging import Logger
 from logging import getLogger
 
 from dataclasses import dataclass
-from typing import Tuple
 
 from wx import DC
 from wx import MemoryDC
@@ -16,9 +17,9 @@ from pyutmodelv2.PyutActor import PyutActor
 from umlshapes.UmlUtils import UmlUtils
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 from umlshapes.shapes.ControlPointMixin import ControlPointMixin
+from umlshapes.shapes.TopLeftMixin import TopLeftMixin
 
 from umlshapes.types.UmlDimensions import UmlDimensions
-from umlshapes.types.Common import LeftCoordinate
 
 MARGIN: int = 5
 ACTOR_HEIGHT_ADJUSTMENT:    float = 0.8
@@ -39,14 +40,14 @@ class HeadComputations:
     adjustedY: int = 0
 
 
-class UmlActor(ControlPointMixin, RectangleShape):
+class UmlActor(ControlPointMixin, RectangleShape, TopLeftMixin):
 
     def __init__(self, pyutActor: PyutActor = None, size: UmlDimensions = None):
         """
 
         Args:
             pyutActor:
-            size:
+            size:       An initial size that overrides the default
         """
         self.logger: Logger = getLogger(__name__)
 
@@ -57,18 +58,17 @@ class UmlActor(ControlPointMixin, RectangleShape):
             self._pyutActor = pyutActor
 
         if size is None:
-            self._actorSize: UmlDimensions = self._preferences.actorSize
+            actorSize: UmlDimensions = self._preferences.actorSize
         else:
-            self._actorSize = size
+            actorSize = size
 
         super().__init__(shape=self)
-        RectangleShape.__init__(self)
+        RectangleShape.__init__(self, w=actorSize.width, h=actorSize.height)
+        TopLeftMixin.__init__(self, umlShape=self, width=actorSize.width, height=actorSize.height)
 
         self.SetDraggable(drag=True)
         self.SetCentreResize(False)
         self.SetMaintainAspectRatio(True)
-
-        self.SetSize(self._actorSize.width, self._actorSize.height, recursive=True)
 
     @property
     def pyutActor(self) -> PyutActor:
@@ -78,53 +78,13 @@ class UmlActor(ControlPointMixin, RectangleShape):
     def pyutActor(self, value: PyutActor):
         self._pyutActor = value
 
-    @property
-    def size(self) -> UmlDimensions:
-        return self._actorSize
-
-    @size.setter
-    def size(self, newSize: UmlDimensions):
-        self._actorSize = newSize
-        self.SetSize(newSize.width, newSize.height, True)
-
-    @property
-    def topLeft(self) -> LeftCoordinate:
-
-        x = self.GetX()                 # This points to the center of the rectangle
-        y = self.GetY()                 # This points to the center of the rectangle
-
-        width:  int = self.size.width
-        height: int = self.size.height
-
-        left: int = x - (width // 2)
-        top:  int = y - (height // 2)
-
-        return LeftCoordinate(x=left, y=top)
-
-    def SetSize(self, x, y, recursive=True):
-        """
-        Override because our BaseEventHandler changes a shape's size via this method
-        Our Draw method uses the .size property
-        Update the property via the protected method
-        Args:
-            x:
-            y:
-            recursive:
-
-        Returns:
-
-        """
-        super().SetSize(x, y, recursive)
-
-        self._actorSize = UmlDimensions(width=round(x), height=round(y))
-
-    def GetBoundingBoxMin(self):
-        """
-        Get the minimum bounding box for the shape, that defines the area
-        available for drawing the contents (such as text).
-
-        """
-        return self._actorSize.width, self._actorSize.height
+    # def GetBoundingBoxMin(self):
+    #     """
+    #     Get the minimum bounding box for the shape, that defines the area
+    #     available for drawing the contents (such as text).
+    #
+    #     """
+    #     return self.size.width, self.size.height
 
     # This is dangerous, accessing internal stuff
     # noinspection PyProtectedMember
@@ -216,8 +176,9 @@ class UmlActor(ControlPointMixin, RectangleShape):
         # drawing is restricted in the specified region of the device
         dc.SetClippingRegion(leftX, topY, width, height)
         if self.Selected() is True:
-            dc.SetPen(UmlUtils.redSolidPen())
-            self._drawSelectionRectangle(dc=dc)
+            # dc.SetPen(UmlUtils.redSolidPen())
+            # self._drawSelectionRectangle(dc=dc)
+            UmlUtils.drawSelectedRectangle(dc=dc, shape=self)
 
         self._drawActor(dc=dc, x=x, y=y, width=width, height=height)
 
@@ -329,20 +290,3 @@ class UmlActor(ControlPointMixin, RectangleShape):
             dc.SetTextForeground(RED)
 
         dc.DrawText(self.pyutActor.name, round(x - 0.5 * textWidth), y)
-
-    def _drawSelectionRectangle(self, dc: DC):
-
-        dc.SetPen(UmlUtils.redDashedPen())
-        sx: int = self.GetX()
-        sy: int = self.GetY()
-
-        # width = shape.GetWidth() + 3
-        # height = shape.GetHeight() + 3
-
-        width:  int = self.size.width
-        height: int = self.size.height
-
-        x1 = round(sx - width // 2)
-        y1 = round(sy - height // 2)
-
-        dc.DrawRectangle(x1, y1, round(width), round(height))

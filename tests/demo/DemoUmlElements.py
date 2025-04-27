@@ -52,7 +52,6 @@ from umlshapes.shapes.eventhandlers.UmlActorEventHandler import UmlActorEventHan
 from umlshapes.shapes.eventhandlers.UmlUseCaseEventHandler import UmlUseCaseEventHandler
 from umlshapes.shapes.eventhandlers.UmlTextEventHandler import UmlTextEventHandler
 
-from umlshapes.types.UmlDimensions import UmlDimensions
 from umlshapes.types.UmlPosition import UmlPosition
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
@@ -179,15 +178,13 @@ class DemoUmlElements(App):
 
         content:        str           = f'{self._preferences.textValue} {self._textCounter}'
         self._textCounter += 1
-        pyutText:       PyutText      = PyutText(content=content)
-        textDimensions: UmlDimensions = self._preferences.textDimensions
-        umlPosition:    UmlPosition   = self._computePosition()
 
-        umlText:  UmlText  = UmlText(pyutText=pyutText, width=textDimensions.width, height=textDimensions.height)
+        pyutText:    PyutText    = PyutText(content=content)
+        umlPosition: UmlPosition = self._computePosition()
+        umlText:     UmlText     = UmlText(pyutText=pyutText)
 
         umlText.SetCanvas(self._diagramFrame)
-        umlText.SetX(x=umlPosition.x)
-        umlText.SetY(y=umlPosition.y)
+        umlText.position = umlPosition
 
         diagram: UmlDiagram = self._diagramFrame.umlDiagram
 
@@ -207,14 +204,11 @@ class DemoUmlElements(App):
         self._noteCounter += 1
         pyutNote: PyutNote = PyutNote(content=content)
 
-        noteDimensions: UmlDimensions = self._preferences.noteDimensions
         umlPosition:    UmlPosition   = self._computePosition()
 
-        umlNote: UmlNote = UmlNote(pyutNote=pyutNote, width=noteDimensions.width, height=noteDimensions.height)
+        umlNote: UmlNote = UmlNote(pyutNote=pyutNote)
         umlNote.SetCanvas(self._diagramFrame)
-        umlNote.SetX(x=umlPosition.x)
-        umlNote.SetY(y=umlPosition.y)
-
+        umlNote.position = umlPosition
         diagram: UmlDiagram = self._diagramFrame.umlDiagram
 
         diagram.AddShape(umlNote)
@@ -236,8 +230,7 @@ class DemoUmlElements(App):
 
         umlUseCase: UmlUseCase = UmlUseCase(pyutUseCase=pyutUseCase)
         umlUseCase.SetCanvas(self._diagramFrame)
-        umlUseCase.SetX(x=umlPosition.x)
-        umlUseCase.SetY(y=umlPosition.y)
+        umlUseCase.position = umlPosition
 
         diagram: UmlDiagram = self._diagramFrame.umlDiagram
 
@@ -261,9 +254,7 @@ class DemoUmlElements(App):
 
         umlActor: UmlActor = UmlActor(pyutActor=pyutActor)
         umlActor.SetCanvas(self._diagramFrame)
-
-        umlActor.SetX(umlPosition.x)
-        umlActor.SetY(umlPosition.y)
+        umlActor.position = umlPosition
 
         diagram: UmlDiagram = self._diagramFrame.umlDiagram
 
@@ -282,12 +273,11 @@ class DemoUmlElements(App):
 
         pyutClass: PyutClass  = self._createDemoPyutClass()
 
-        umlClass: UmlClass = UmlClass(pyutClass=pyutClass, size=UmlDimensions(width=250, height=300))
+        umlClass: UmlClass = UmlClass(pyutClass=pyutClass)
         umlClass.SetCanvas(self._diagramFrame)
 
         self.logger.info(f'{umlClass.id=}')
-        # umlPosition: UmlPosition = self._computePosition()
-        umlPosition: UmlPosition = UmlPosition(x=250, y=250)
+        umlPosition: UmlPosition = self._computePosition()
         umlClass.position = umlPosition
         diagram: UmlDiagram = self._diagramFrame.umlDiagram
 

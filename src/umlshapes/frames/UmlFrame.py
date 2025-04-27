@@ -13,6 +13,7 @@ from wx.lib.ogl import Shape
 from umlshapes.frames.DiagramFrame import DiagramFrame
 
 from umlshapes.UmlDiagram import UmlDiagram
+from umlshapes.preferences.UmlPreferences import UmlPreferences
 from umlshapes.types.Common import UmlShapeList
 
 
@@ -22,14 +23,13 @@ A4_FACTOR:     float = 1.41
 PIXELS_PER_UNIT_X: int = 20
 PIXELS_PER_UNIT_Y: int = 20
 
-REPORT_INTERVAL: int = 10
-
 
 class UmlFrame(DiagramFrame):
     # def __init__(self, parent: Window, demoEventEngine: DemoEventEngine):
     def __init__(self, parent: Window):
 
-        self.ufLogger: Logger          = getLogger(__name__)
+        self.ufLogger:     Logger         = getLogger(__name__)
+        self._preferences: UmlPreferences = UmlPreferences()
         # self._demoEventEngine: DemoEventEngine = demoEventEngine
 
         super().__init__(parent=parent)
@@ -44,7 +44,7 @@ class UmlFrame(DiagramFrame):
         self.SetScrollbars(PIXELS_PER_UNIT_X, PIXELS_PER_UNIT_Y, nbrUnitsX, nbrUnitsY, initPosX, initPosY, False)
 
         self.setInfinite(True)
-        self._currentReportInterval: int = REPORT_INTERVAL
+        self._currentReportInterval: int = self._preferences.trackMouseInterval
 
         # self._oglEventEngine.registerListener(event=EVT_REQUEST_LOLLIPOP_LOCATION, callback=self._onRequestLollipopLocation)
         # self._oglEventEngine.registerListener(event=EVT_CREATE_LOLLIPOP_INTERFACE, callback=self._onCreateLollipopInterface)
@@ -85,9 +85,10 @@ class UmlFrame(DiagramFrame):
         """
         super().OnMouseEvent(mouseEvent)
 
-        # if self._currentReportInterval == 0:
-        #     x, y = self.CalcUnscrolledPosition(mouseEvent.GetPosition())
-        #     self.logger.info(f'({x},{y})')
-        #     self._currentReportInterval = REPORT_INTERVAL
-        # else:
-        #     self._currentReportInterval -= 1
+        if self._preferences.trackMouse is True:
+            if self._currentReportInterval == 0:
+                x, y = self.CalcUnscrolledPosition(mouseEvent.GetPosition())
+                self.ufLogger.info(f'({x},{y})')
+                self._currentReportInterval = self._preferences.trackMouseInterval
+            else:
+                self._currentReportInterval -= 1

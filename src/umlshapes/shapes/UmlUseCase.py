@@ -13,11 +13,12 @@ from umlshapes.UmlUtils import UmlUtils
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
 from umlshapes.shapes.ControlPointMixin import ControlPointMixin
+from umlshapes.shapes.TopLeftMixin import TopLeftMixin
 
 from umlshapes.types.UmlDimensions import UmlDimensions
 
 
-class UmlUseCase(ControlPointMixin,  EllipseShape):
+class UmlUseCase(ControlPointMixin,  EllipseShape, TopLeftMixin):
 
     def __init__(self, pyutUseCase: PyutUseCase = None, size: UmlDimensions = None):
 
@@ -36,6 +37,7 @@ class UmlUseCase(ControlPointMixin,  EllipseShape):
             useCaseSize = size
 
         EllipseShape.__init__(self, w=useCaseSize.width, h=useCaseSize.height)
+        TopLeftMixin.__init__(self, umlShape=self, width=useCaseSize.width, height=useCaseSize.height)
 
         self.SetDraggable(drag=True)
 

@@ -24,8 +24,10 @@ from pyutmodelv2.PyutText import PyutText
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
 from umlshapes.shapes.ControlPointMixin import ControlPointMixin
+from umlshapes.shapes.TopLeftMixin import TopLeftMixin
 
 from umlshapes.types.UmlColor import UmlColor
+from umlshapes.types.UmlDimensions import UmlDimensions
 from umlshapes.types.UmlFontFamily import UmlFontFamily
 
 from umlshapes.UmlUtils import UmlUtils
@@ -33,36 +35,40 @@ from umlshapes.UmlUtils import UmlUtils
 CONTROL_POINT_SIZE: int = 4         # Make this a preference
 
 
-class UmlText(ControlPointMixin, TextShape):
+class UmlText(ControlPointMixin, TextShape, TopLeftMixin):
     MARGIN: int = 5
 
-    def __init__(self, pyutText: PyutText, width: int = 0, height: int = 0):    # TODO make default text size a preference):
+    def __init__(self, pyutText: PyutText, size: UmlDimensions = None):
+        """
+
+        Args:
+            pyutText:
+            size:       An initial size that overrides the default
+        """
 
         self.logger: Logger = getLogger(__name__)
 
-        w: int = width
-        h: int = height
-
         # Use preferences to get initial size if not specified
-        preferences: UmlPreferences = UmlPreferences()
+        self._preferences: UmlPreferences = UmlPreferences()
 
-        if width == 0:
-            w = preferences.textDimensions.width
-        if height == 0:
-            h = preferences.textDimensions.height
+        if size is None:
+            textSize: UmlDimensions = self._preferences.useCaseSize
+        else:
+            textSize = size
 
         self._pyutText: PyutText = pyutText
 
         super().__init__(shape=self)
-        TextShape.__init__(self, width=w, height=h)
+        TextShape.__init__(self, width=textSize.width, height=textSize.height)
+        TopLeftMixin.__init__(self, umlShape=self, width=textSize.width, height=textSize.height)
 
         self.shadowOffsetX = 0      #
         self.shadowOffsetY = 0      #
 
-        self._textFontFamily: UmlFontFamily = preferences.textFontFamily
-        self._textSize:       int  = preferences.textFontSize
-        self._isBold:         bool = preferences.textBold
-        self._isItalicized:   bool = preferences.textItalicize
+        self._textFontFamily: UmlFontFamily = self._preferences.textFontFamily
+        self._textSize:       int  = self._preferences.textFontSize
+        self._isBold:         bool = self._preferences.textBold
+        self._isItalicized:   bool = self._preferences.textItalicize
 
         self._defaultFont: Font = UmlUtils.defaultFont()
         self._textFont:    Font = self._defaultFont.GetBaseFont()
@@ -75,7 +81,7 @@ class UmlText(ControlPointMixin, TextShape):
         self._initializeTextFont()
         self._menu: Menu = cast(Menu, None)
 
-        umlBackgroundColor: UmlColor = preferences.textBackGroundColor
+        umlBackgroundColor: UmlColor = self._preferences.textBackGroundColor
         backgroundColor:    Colour   = Colour(UmlColor.toWxColor(umlBackgroundColor))
 
         self._brush: Brush = Brush(backgroundColor)

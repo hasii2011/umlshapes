@@ -13,9 +13,11 @@ from pyutmodelv2.PyutNote import PyutNote
 from umlshapes.UmlUtils import UmlUtils
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 from umlshapes.shapes.ControlPointMixin import ControlPointMixin
+from umlshapes.shapes.TopLeftMixin import TopLeftMixin
+from umlshapes.types.UmlDimensions import UmlDimensions
 
 
-class UmlNote(ControlPointMixin, RectangleShape):
+class UmlNote(ControlPointMixin, RectangleShape, TopLeftMixin):
     """
     This is an UML object that represents a UML note in diagrams.
     A note may be linked only with a basic link
@@ -23,13 +25,12 @@ class UmlNote(ControlPointMixin, RectangleShape):
 
     MARGIN: int = 10
 
-    def __init__(self, pyutNote: PyutNote = None, width: int = 0, height: int = 0):
+    def __init__(self, pyutNote: PyutNote = None, size: UmlDimensions = None):
         """
 
         Args:
             pyutNote:   A PyutNote Object
-            width:      Default width override
-            height:     Default height override
+            size:       An initial size that overrides the default
         """
         self._preferences: UmlPreferences = UmlPreferences()
 
@@ -39,17 +40,14 @@ class UmlNote(ControlPointMixin, RectangleShape):
             self._pyutNote = pyutNote
 
         super().__init__(shape=self)
-        RectangleShape.__init__(self, w=width, h=height)
 
-        if width == 0:
-            self._width: int = self._preferences.noteDimensions.width
+        if size is None:
+            noteSize: UmlDimensions = self._preferences.useCaseSize
         else:
-            self._width = width
+            noteSize = size
 
-        if height == 0:
-            self._height: int = self._preferences.noteDimensions.height
-        else:
-            self._height = height
+        RectangleShape.__init__(self, w=noteSize.width, h=noteSize.height)
+        TopLeftMixin.__init__(self, umlShape=self, width=noteSize.width, height=noteSize.height)
 
         self.logger: Logger = getLogger(__name__)
         self.SetBrush(Brush(Colour(255, 255, 230)))
@@ -79,8 +77,10 @@ class UmlNote(ControlPointMixin, RectangleShape):
             # Work around a bug where width and height sometimes become a float
             self.logger.warning(f'Bug workaround !!! {e}')
 
-            self.SetWidth(round(self.GetWidth()))
-            self.SetHeight(round(self.GetHeight()))
+            # self.SetWidth(round(self.GetWidth()))
+            # self.SetHeight(round(self.GetHeight()))
+            self.size = UmlDimensions(width=round(self.GetWidth()), height=round(self.GetHeight()))
+
             super().OnDraw(dc)
 
         if self.Selected() is True:

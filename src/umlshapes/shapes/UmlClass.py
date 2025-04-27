@@ -29,25 +29,25 @@ from pyutmodelv2.enumerations.PyutDisplayParameters import PyutDisplayParameters
 from umlshapes.UmlUtils import UmlUtils
 
 from umlshapes.frames.UmlFrame import UmlFrame
-from umlshapes.shapes.UmlClassMenuHandler import UmlClassMenuHandler
+from umlshapes.types.UmlPosition import UmlPosition
 
 if TYPE_CHECKING:
     from umlshapes.frames.UmlClassDiagramFrame import UmlClassDiagramFrame
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
+from umlshapes.shapes.TopLeftMixin import TopLeftMixin
 from umlshapes.shapes.ControlPointMixin import ControlPointMixin
+from umlshapes.shapes.UmlClassMenuHandler import UmlClassMenuHandler
 
-from umlshapes.types.Common import LeftCoordinate
 from umlshapes.types.UmlColor import UmlColor
 from umlshapes.types.UmlDimensions import UmlDimensions
-from umlshapes.types.UmlPosition import UmlPosition
 
 DUNDER_METHOD_INDICATOR: str = '__'
 CONSTRUCTOR_NAME:        str = '__init__'
 
 
-class UmlClass(ControlPointMixin, RectangleShape):
+class UmlClass(ControlPointMixin, RectangleShape, TopLeftMixin):
     """
 
     """
@@ -55,7 +55,7 @@ class UmlClass(ControlPointMixin, RectangleShape):
         """]
         Args:
             pyutClass:   A PyutClass Object
-            size:        An initial size
+            size:       An initial size that overrides the default
         """
         self._preferences: UmlPreferences = UmlPreferences()
 
@@ -71,6 +71,7 @@ class UmlClass(ControlPointMixin, RectangleShape):
 
         super().__init__(shape=self)
         RectangleShape.__init__(self, w=classSize.width, h=classSize.height)
+        TopLeftMixin.__init__(self, umlShape=self, width=classSize.width, height=classSize.height)
 
         self.logger: Logger = getLogger(__name__)
 
@@ -124,62 +125,6 @@ class UmlClass(ControlPointMixin, RectangleShape):
     def umlFrame(self, frame: 'UmlClassDiagramFrame'):
         self.SetCanvas(frame)
 
-    @property
-    def size(self) -> UmlDimensions:
-        """
-        Syntactic sugar for external consumers;  Hide the underlying implementation
-
-        Returns:  The UmlClass Size
-
-        """
-        return UmlDimensions(
-            width=round(self.GetWidth()),
-            height=round(self.GetHeight())
-        )
-
-    @size.setter
-    def size(self, newSize: UmlDimensions):
-
-        self.SetWidth(round(newSize.width))
-        self.SetHeight(round(newSize.height))
-
-    @property
-    def position(self) -> UmlPosition:
-        """
-        Syntactic sugar for external consumers;  Hide the underlying implementation;
-
-        REMEMBER: This is the position of the shape CENTER
-
-        Returns:  The shape position
-        """
-        return UmlPosition(x=round(self.GetX()), y=round(self.GetY()))
-
-    @position.setter
-    def position(self, position: UmlPosition):
-
-        self.SetX(round(position.x))
-        self.SetY(round(position.y))
-
-    @property
-    def topLeft(self) -> LeftCoordinate:
-        """
-        This method necessary because ogl reports positions from the center of the shape
-        Calculates the left top coordinate
-
-        Returns:  An adjusted coordinate
-        """
-
-        x = self.GetX()                 # This points to the center of the rectangle
-        y = self.GetY()                 # This points to the center of the rectangle
-
-        width:  int = self.size.width
-        height: int = self.size.height
-
-        left: int = x - (width // 2)
-        top:  int = y - (height // 2)
-
-        return LeftCoordinate(x=round(left), y=round(top))
-
     def OnDraw(self, dc: MemoryDC):
 
         try:
@@ -193,8 +138,8 @@ class UmlClass(ControlPointMixin, RectangleShape):
             super().OnDraw(dc)
 
         w: int = self.size.width
-        x: int = self.topLeft.x
-        y: int = self.topLeft.y
+        x: int = self._topLeft.x
+        y: int = self._topLeft.y
 
         dc.SetFont(self._defaultFont)
         dc.SetTextForeground(self._textColor)
@@ -304,6 +249,7 @@ class UmlClass(ControlPointMixin, RectangleShape):
         Adjust the shape to a width and height accommodates the widest displayable method
         and the height to accommodate all the displayable fields and methods
         """
+        savePosition: UmlPosition = self.position
 
         umlFrame:    UmlFrame = self.GetCanvas()
         dc:          ClientDC = ClientDC(umlFrame)
@@ -314,8 +260,8 @@ class UmlClass(ControlPointMixin, RectangleShape):
             width=shapeWidth,
             height=shapeHeight
         )
-        self.size = shapeSize
-
+        self.size     = shapeSize
+        self.position = savePosition
         umlFrame.refresh()
 
     def textWidth(self, dc: DC, text: str):
@@ -342,8 +288,8 @@ class UmlClass(ControlPointMixin, RectangleShape):
 
         Returns:  The updated y drawing position
         """
-        x: int = self.topLeft.x
-        y: int = self.topLeft.y
+        x: int = self._topLeft.x
+        y: int = self._topLeft.y
 
         headerMargin:   int = self._textHeight
         drawingYOffset: int = headerMargin
@@ -386,8 +332,8 @@ class UmlClass(ControlPointMixin, RectangleShape):
 
         Returns:    Updated Y offset
         """
-        x: int = self.topLeft.x
-        y: int = self.topLeft.y
+        x: int = self._topLeft.x
+        y: int = self._topLeft.y
 
         stereoTypeValue:      str = self._getStereoTypeValue()
         stereoTypeValueWidth: int = self.textWidth(dc, stereoTypeValue)
@@ -409,8 +355,8 @@ class UmlClass(ControlPointMixin, RectangleShape):
 
         Returns:  The updated y drawing position
         """
-        x:       int = self.topLeft.x
-        y:       int = self.topLeft.y
+        x:       int = self._topLeft.x
+        y:       int = self._topLeft.y
         yOffset: int = startYOffset
 
         textHeight: int       = self._textHeight
@@ -470,8 +416,8 @@ class UmlClass(ControlPointMixin, RectangleShape):
             displayParameters:
             startYOffset:
         """
-        x: int = self.topLeft.x
-        y: int = self.topLeft.y
+        x: int = self._topLeft.x
+        y: int = self._topLeft.y
 
         methodStr: str = self._getMethodRepresentation(pyutMethod, displayParameters)
 
@@ -565,8 +511,8 @@ class UmlClass(ControlPointMixin, RectangleShape):
 
         w: int = round(self.GetWidth())
         h: int = round(self.GetHeight())
-        x: int = self.topLeft.x
-        y: int = self.topLeft.y
+        x: int = self._topLeft.x
+        y: int = self._topLeft.y
 
         dc.SetClippingRegion(x, y, w, h)
 
