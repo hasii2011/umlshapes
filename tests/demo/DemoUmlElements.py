@@ -34,12 +34,18 @@ from pyutmodelv2.PyutMethod import PyutMethods
 from pyutmodelv2.PyutMethod import PyutParameters
 from pyutmodelv2.PyutParameter import PyutParameter
 from pyutmodelv2.enumerations.PyutDisplayParameters import PyutDisplayParameters
+from pyutmodelv2.PyutLink import PyutLink
 
+from pyutmodelv2.enumerations.PyutLinkType import PyutLinkType
 from pyutmodelv2.enumerations.PyutStereotype import PyutStereotype
 from pyutmodelv2.enumerations.PyutVisibility import PyutVisibility
 
 from umlshapes.UmlDiagram import UmlDiagram
 from umlshapes.frames.UmlClassDiagramFrame import UmlClassDiagramFrame
+
+from umlshapes.links.UmlAssociation import UmlAssociation
+from umlshapes.links.UmlLinkEventHandler import UmlLinkEventHandler
+
 from umlshapes.shapes.UmlActor import UmlActor
 from umlshapes.shapes.UmlClass import UmlClass
 from umlshapes.shapes.UmlUseCase import UmlUseCase
@@ -51,6 +57,7 @@ from umlshapes.shapes.eventhandlers.UmlNoteEventHandler import UmlNoteEventHandl
 from umlshapes.shapes.eventhandlers.UmlActorEventHandler import UmlActorEventHandler
 from umlshapes.shapes.eventhandlers.UmlUseCaseEventHandler import UmlUseCaseEventHandler
 from umlshapes.shapes.eventhandlers.UmlTextEventHandler import UmlTextEventHandler
+from umlshapes.types.Common import UmlShape
 
 from umlshapes.types.UmlPosition import UmlPosition
 
@@ -83,15 +90,17 @@ class DemoUmlElements(App):
         OGLInitialize()
         self._ID_DISPLAY_UML_TEXT:     int = wxNewIdRef()
         self._ID_DISPLAY_UML_NOTE:     int = wxNewIdRef()
-        self._ID_DISPLAY_OGL_USE_CASE: int = wxNewIdRef()
-        self._ID_DISPLAY_OGL_ACTOR:    int = wxNewIdRef()
-        self._ID_DISPLAY_OGL_CLASS:    int = wxNewIdRef()
+        self._ID_DISPLAY_UML_USE_CASE: int = wxNewIdRef()
+        self._ID_DISPLAY_UML_ACTOR:    int = wxNewIdRef()
+        self._ID_DISPLAY_UML_CLASS:    int = wxNewIdRef()
+        self._ID_DISPLAY_ASSOCIATION:  int = wxNewIdRef()
 
-        self._textCounter:      int = 0
-        self._noteCounter:      int = 0
-        self._useCaseCounter:   int = 0
-        self._actorCounter:     int = 0
-        self._classCounter:     int = 0
+        self._textCounter:        int = 0
+        self._noteCounter:        int = 0
+        self._useCaseCounter:     int = 0
+        self._actorCounter:       int = 0
+        self._classCounter:       int = 0
+        self._associationCounter: int = 0
 
         self._preferences: UmlPreferences = UmlPreferences()
         self._frame:       SizedFrame     = SizedFrame(parent=None, title="Test UML Shapes", size=(FRAME_WIDTH, FRAME_HEIGHT), style=DEFAULT_FRAME_STYLE | FRAME_FLOAT_ON_PARENT)
@@ -126,11 +135,12 @@ class DemoUmlElements(App):
         fileMenu.AppendSeparator()
         # fileMenu.Append(ID_PREFERENCES, "P&references", "Ogl preferences")
 
-        viewMenu.Append(id=self._ID_DISPLAY_OGL_CLASS,    item='Uml Class',    helpString='Display an Uml Class')
-        viewMenu.Append(id=self._ID_DISPLAY_UML_TEXT,     item='Uml Text',     helpString='Display Uml Text')
-        viewMenu.Append(id=self._ID_DISPLAY_UML_NOTE,     item='Uml Note',     helpString='Display Uml Note')
-        viewMenu.Append(id=self._ID_DISPLAY_OGL_USE_CASE, item='Uml Use Case', helpString='Display Uml Use Case')
-        viewMenu.Append(id=self._ID_DISPLAY_OGL_ACTOR,    item='Uml Actor',    helpString='Display Uml Actor')
+        viewMenu.Append(id=self._ID_DISPLAY_ASSOCIATION,  item='Uml Association', helpString='Display Bare Association')
+        viewMenu.Append(id=self._ID_DISPLAY_UML_CLASS,    item='Uml Class',       helpString='Display an Uml Class')
+        viewMenu.Append(id=self._ID_DISPLAY_UML_TEXT,     item='Uml Text',        helpString='Display Uml Text')
+        viewMenu.Append(id=self._ID_DISPLAY_UML_NOTE,     item='Uml Note',        helpString='Display Uml Note')
+        viewMenu.Append(id=self._ID_DISPLAY_UML_USE_CASE, item='Uml Use Case',    helpString='Display Uml Use Case')
+        viewMenu.Append(id=self._ID_DISPLAY_UML_ACTOR,    item='Uml Actor',       helpString='Display Uml Actor')
         # viewMenu.Append(id=self._ID_DISPLAY_OGL_COMPOSITION,     item='Ogl Composition',  helpString='Display a Composition Link')
         # viewMenu.Append(id=self._ID_DISPLAY_OGL_INTERFACE,       item='Ogl Interface',    helpString='Display Lollipop Interface')
         # viewMenu.Append(id=self._ID_DISPLAY_SEQUENCE_DIAGRAM,    item='Sequence Diagram', helpString='Display Sequence Diagram')
@@ -145,9 +155,10 @@ class DemoUmlElements(App):
 
         self.Bind(EVT_MENU, self._onDisplayElement, id=self._ID_DISPLAY_UML_TEXT)
         self.Bind(EVT_MENU, self._onDisplayElement, id=self._ID_DISPLAY_UML_NOTE)
-        self.Bind(EVT_MENU, self._onDisplayElement, id=self._ID_DISPLAY_OGL_USE_CASE)
-        self.Bind(EVT_MENU, self._onDisplayElement, id=self._ID_DISPLAY_OGL_ACTOR)
-        self.Bind(EVT_MENU, self._onDisplayElement, id=self._ID_DISPLAY_OGL_CLASS)
+        self.Bind(EVT_MENU, self._onDisplayElement, id=self._ID_DISPLAY_UML_USE_CASE)
+        self.Bind(EVT_MENU, self._onDisplayElement, id=self._ID_DISPLAY_UML_ACTOR)
+        self.Bind(EVT_MENU, self._onDisplayElement, id=self._ID_DISPLAY_UML_CLASS)
+        self.Bind(EVT_MENU, self._onDisplayElement, id=self._ID_DISPLAY_ASSOCIATION)
         # self.Bind(EVT_MENU, self._onDisplayElement, id=self._ID_DISPLAY_OGL_COMPOSITION)
         # self.Bind(EVT_MENU, self._onDisplayElement, id=self._ID_DISPLAY_OGL_INTERFACE)
         # self.Bind(EVT_MENU, self._onDisplayElement, id=self._ID_DISPLAY_SEQUENCE_DIAGRAM)
@@ -155,16 +166,18 @@ class DemoUmlElements(App):
     def _onDisplayElement(self, event: CommandEvent):
         menuId: int = event.GetId()
         match menuId:
-            case self._ID_DISPLAY_OGL_CLASS:
-                self._displayOglClass()
+            case self._ID_DISPLAY_UML_CLASS:
+                self._displayUmlClass()
             case self._ID_DISPLAY_UML_TEXT:
                 self._displayUmlText()
             case self._ID_DISPLAY_UML_NOTE:
                 self._displayUmlNote()
-            case self._ID_DISPLAY_OGL_USE_CASE:
-                self._displayOglUseCase()
-            case self._ID_DISPLAY_OGL_ACTOR:
-                self._displayOglActor()
+            case self._ID_DISPLAY_UML_USE_CASE:
+                self._displayUmlUseCase()
+            case self._ID_DISPLAY_UML_ACTOR:
+                self._displayUmlActor()
+            case self._ID_DISPLAY_ASSOCIATION:
+                self._displayBareAssociation()
             # case self._ID_DISPLAY_SEQUENCE_DIAGRAM:
             #     self._displaySequenceDiagram()
             # case self._ID_DISPLAY_OGL_COMPOSITION:
@@ -222,7 +235,7 @@ class DemoUmlElements(App):
 
         self._diagramFrame.refresh()
 
-    def _displayOglUseCase(self):
+    def _displayUmlUseCase(self):
         useCaseName: str = f'{self._preferences.defaultNameUsecase} {self._useCaseCounter}'
         self._useCaseCounter += 1
         pyutUseCase: PyutUseCase = PyutUseCase(name=useCaseName)
@@ -245,7 +258,7 @@ class DemoUmlElements(App):
 
         self._diagramFrame.refresh()
 
-    def _displayOglActor(self):
+    def _displayUmlActor(self):
 
         actorName: str = f'{self._preferences.defaultNameActor} {self._actorCounter}'
         self._actorCounter += 1
@@ -269,7 +282,7 @@ class DemoUmlElements(App):
 
         self._diagramFrame.refresh()
 
-    def _displayOglClass(self):
+    def _displayUmlClass(self):
 
         pyutClass: PyutClass  = self._createDemoPyutClass()
 
@@ -292,6 +305,57 @@ class DemoUmlElements(App):
 
         self._diagramFrame.refresh()
 
+    def _displayBareAssociation(self):
+
+        sourcePosition:       UmlPosition = UmlPosition(x=100, y=100)
+        destinationPosition:  UmlPosition = UmlPosition(x=200, y=300)
+
+        sourcePyutClass:      PyutClass   = self._createSimplePyutClass()
+        destinationPyutClass: PyutClass   = self._createSimplePyutClass()
+
+        sourceUmlClass:      UmlClass = UmlClass(pyutClass=sourcePyutClass)
+        destinationUmlClass: UmlClass = UmlClass(pyutClass=destinationPyutClass)
+
+        self.logger.info(f'{sourceUmlClass.id=} {destinationUmlClass.id=}')
+
+        self._associateClassEventHandler(umlClass=sourceUmlClass)
+        self._associateClassEventHandler(umlClass=destinationUmlClass)
+
+        self._displayShape(umlShape=sourceUmlClass, umlPosition=sourcePosition)
+        self._displayShape(umlShape=destinationUmlClass, umlPosition=destinationPosition)
+
+        umlAssociation: UmlAssociation = UmlAssociation(pyutLink=self._createAssociationPyutLink())
+        umlAssociation.SetCanvas(self)
+        umlAssociation.MakeLineControlPoints(2)
+
+        eventHandler: UmlLinkEventHandler = UmlLinkEventHandler(umlLink=umlAssociation)
+        eventHandler.SetPreviousHandler(umlAssociation.GetEventHandler())
+        umlAssociation.SetEventHandler(eventHandler)
+
+        sourceUmlClass.AddLine(umlAssociation, destinationUmlClass)
+        self._diagramFrame.umlDiagram.AddShape(umlAssociation)
+        umlAssociation.Show(True)
+
+    def _displayShape(self, umlShape: UmlShape, umlPosition: UmlPosition):
+
+        diagram: UmlDiagram = self._diagramFrame.umlDiagram
+
+        umlShape.position = umlPosition
+        umlShape.SetCanvas(self._diagramFrame)
+
+        diagram.AddShape(umlShape)
+        umlShape.Show(show=True)
+
+        self._diagramFrame.refresh()
+
+    def _associateClassEventHandler(self, umlClass: UmlClass):
+
+        eventHandler: UmlClassEventHandler = UmlClassEventHandler()
+        eventHandler.SetShape(umlClass)
+        eventHandler.SetPreviousHandler(umlClass.GetEventHandler())
+
+        umlClass.SetEventHandler(eventHandler)
+
     def _computePosition(self) -> UmlPosition:
 
         currentPosition: UmlPosition = UmlPosition(x=self._currentPosition.x, y=self._currentPosition.y)
@@ -300,6 +364,14 @@ class DemoUmlElements(App):
         self._currentPosition.y += INCREMENT_Y
 
         return currentPosition
+
+    def _createSimplePyutClass(self) -> PyutClass:
+
+        className: str = f'{self._preferences.defaultClassName} {self._classCounter}'
+        self._classCounter += 1
+        pyutClass: PyutClass  = PyutClass(name=className)
+
+        return pyutClass
 
     def _createDemoPyutClass(self) -> PyutClass:
 
@@ -353,6 +425,15 @@ class DemoUmlElements(App):
         pyutParameters.append(pyutParameter3)
 
         return pyutParameters
+
+    def _createAssociationPyutLink(self) -> PyutLink:
+
+        name: str = f'{self._preferences.defaultAssociationName} {self._associationCounter}'
+        self._associationCounter += 1
+
+        pyutLink: PyutLink = PyutLink(name=name, linkType=PyutLinkType.ASSOCIATION)
+
+        return pyutLink
 
 
 if __name__ == '__main__':

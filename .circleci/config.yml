@@ -35,6 +35,7 @@ jobs:
             pip install six==1.16.0
             pip install attrdict3
             pip install wxPython
+            pip install hrid==0.2.4
       - run:
             name: run tests
             command: | 

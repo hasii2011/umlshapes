@@ -6,14 +6,19 @@ from logging import getLogger
 
 from collections.abc import Iterable
 
+from wx import ClientDC
 from wx import MouseEvent
 from wx import Window
+
 from wx.lib.ogl import Shape
+from wx.lib.ogl import ShapeCanvas
 
 from umlshapes.frames.DiagramFrame import DiagramFrame
 
 from umlshapes.UmlDiagram import UmlDiagram
+
 from umlshapes.preferences.UmlPreferences import UmlPreferences
+
 from umlshapes.types.Common import UmlShapeList
 
 
@@ -70,8 +75,12 @@ class UmlFrame(DiagramFrame):
         shapes:  Iterable = diagram.GetShapeList()
 
         for shape in shapes:
-            umlShape: Shape = cast(Shape, shape)
-            umlShape.Select(select=False)
+            umlShape: Shape     = cast(Shape, shape)
+            canvas: ShapeCanvas = umlShape.GetCanvas()
+            dc:     ClientDC    = ClientDC(canvas)
+            canvas.PrepareDC(dc)
+
+            umlShape.Select(select=False, dc=dc)
 
         self.refresh()
 

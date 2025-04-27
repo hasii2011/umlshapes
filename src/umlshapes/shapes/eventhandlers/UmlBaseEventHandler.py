@@ -1,4 +1,5 @@
 
+from typing import cast
 from typing import List
 from typing import NewType
 
@@ -11,6 +12,9 @@ from wx import MOD_CMD
 from wx.lib.ogl import Shape
 from wx.lib.ogl import ShapeCanvas
 from wx.lib.ogl import ShapeEvtHandler
+
+from umlshapes.types.Common import UmlShape
+from umlshapes.types.UmlDimensions import UmlDimensions
 
 ShapeList = NewType('ShapeList', List[Shape])
 
@@ -52,10 +56,9 @@ class UmlBaseEventHandler(ShapeEvtHandler):
 
         shape: Shape  = self.GetShape()
         shape.Move(dc=dc, x=round(x), y=round(y), display=True)
-        # Hmm, weird how SetSize names x width and y height
-        # shape.SetSize(x=round(w), y=round(h))     # Shape
 
-        shape.SetSize(round(w), round(h))           # DrawnShape is correct
+        umlShape: UmlShape = cast(UmlShape, shape)
+        umlShape.size = UmlDimensions(width=round(w), height=round(h))
 
     def _unSelectAllShapesOnCanvas(self, shape: Shape, canvas: ShapeCanvas, dc: ClientDC):
 

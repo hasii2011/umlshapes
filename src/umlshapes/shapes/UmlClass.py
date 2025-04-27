@@ -89,6 +89,7 @@ class UmlClass(ControlPointMixin, RectangleShape, TopLeftMixin):
 
         self._menuHandler: UmlClassMenuHandler = cast(UmlClassMenuHandler, None)
 
+        self.SetId(UmlUtils.getID())
         self.SetDraggable(drag=True)
         self.SetCentreResize(False)
 
@@ -338,9 +339,10 @@ class UmlClass(ControlPointMixin, RectangleShape, TopLeftMixin):
         stereoTypeValue:      str = self._getStereoTypeValue()
         stereoTypeValueWidth: int = self.textWidth(dc, stereoTypeValue)
 
-        dc.DrawText(stereoTypeValue, x + (shapeWidth - stereoTypeValueWidth) // 2, y + drawingYOffset)
+        if len(stereoTypeValue) != 0:
+            dc.DrawText(stereoTypeValue, x + (shapeWidth - stereoTypeValueWidth) // 2, y + drawingYOffset)
 
-        drawingYOffset += self._textHeight
+            drawingYOffset += self._textHeight
 
         updatedYOffset = drawingYOffset + headerMargin
 

@@ -86,13 +86,14 @@ DIAGRAM_PROPERTIES: ValueDescriptions = ValueDescriptions(
 
 namePreferences: ValueDescriptions = ValueDescriptions(
     {
-        KeyName('defaultClassName'):     ValueDescription(defaultValue='ClassName'),
-        KeyName('defaultNameInterface'): ValueDescription(defaultValue='IClassInterface'),
-        KeyName('defaultNameUsecase'):   ValueDescription(defaultValue='UseCaseName'),
-        KeyName('defaultNameActor'):     ValueDescription(defaultValue='ActorName'),
-        KeyName('defaultNameMethod'):    ValueDescription(defaultValue='MethodName'),
-        KeyName('defaultNameField'):     ValueDescription(defaultValue='FieldName'),
-        KeyName('defaultNameParameter'): ValueDescription(defaultValue='ParameterName'),
+        KeyName('defaultClassName'):       ValueDescription(defaultValue='ClassName'),
+        KeyName('defaultNameInterface'):   ValueDescription(defaultValue='IClassInterface'),
+        KeyName('defaultNameUsecase'):     ValueDescription(defaultValue='UseCaseName'),
+        KeyName('defaultNameActor'):       ValueDescription(defaultValue='ActorName'),
+        KeyName('defaultNameMethod'):      ValueDescription(defaultValue='MethodName'),
+        KeyName('defaultNameField'):       ValueDescription(defaultValue='FieldName'),
+        KeyName('defaultNameParameter'):   ValueDescription(defaultValue='ParameterName'),
+        KeyName('defaultAssociationName'): ValueDescription(defaultValue='Association'),
     }
 )
 sequenceDiagramPreferences: ValueDescriptions = ValueDescriptions(

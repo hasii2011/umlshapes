@@ -34,5 +34,5 @@ class LeftCoordinate:
     y: int = 0
 
 
-UmlShapes    = Union['UmlActor', 'UmlClass', 'UmlNote', 'UmlText', 'UmlUseCase']
-UmlShapeList = NewType('UmlShapeList', List[UmlShapes])
+UmlShape     = Union['UmlActor', 'UmlClass', 'UmlNote', 'UmlText', 'UmlUseCase']
+UmlShapeList = NewType('UmlShapeList', List[UmlShape])

@@ -7,6 +7,8 @@ from logging import Logger
 from logging import getLogger
 from logging import DEBUG
 
+from time import time as pyTime
+
 from wx import Bitmap
 from wx import Brush
 from wx import FONTFAMILY_DEFAULT
@@ -30,6 +32,8 @@ from wx import Size
 from wx.lib.ogl import EllipseShape
 from wx.lib.ogl import RectangleShape
 
+from hrid import HRID
+
 from umlshapes.resources.images.Display import embeddedImage as displayImage
 from umlshapes.resources.images.DoNotDisplay import embeddedImage as doNotDisplayImage
 from umlshapes.resources.images.UnSpecified import embeddedImage as unSpecifiedImage
@@ -50,6 +54,16 @@ class UmlUtils:
     DEFAULT_FONT:   Font = cast(Font, None)
 
     DEFAULT_BACKGROUND_BRUSH: Brush = cast(Brush, None)
+
+    ID_GENERATOR: HRID = cast(HRID, None)
+
+    @classmethod
+    def getID(cls) -> str:
+        if UmlUtils.ID_GENERATOR is None:
+            UmlUtils.ID_GENERATOR = HRID(delimeter='.', seed=round(pyTime() * 1000))
+        uuid = UmlUtils.ID_GENERATOR.generate()
+
+        return uuid
 
     @staticmethod
     def snapCoordinatesToGrid(x: int, y: int, gridInterval: int) -> Tuple[int, int]:
