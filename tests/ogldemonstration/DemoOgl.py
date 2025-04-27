@@ -136,7 +136,7 @@ class CompositeDivisionShape(OglCompositeShape):
         self.GetDivisions()[0].Divide(HORIZONTAL)
 
         # and add a shape to the second division (and move it to the
-        # centre of the division)
+        # center of the division)
         shape3 = CircleShape(40)
         shape3.SetBrush(CYAN_BRUSH)
         self.GetDivisions()[1].AddChild(shape3)
@@ -174,7 +174,7 @@ class CompositeShape(OglCompositeShape):
         constrained_shape1.SetDraggable(False)
         constrained_shape2.SetDraggable(False)
 
-        # If we don't do this the shape will take all left-clicks for itself
+        # If we don't do this, the shape will take all left-clicks for itself
         constraining_shape.SetSensitivityFilter(0)
 
 
@@ -352,7 +352,7 @@ class TestWindow(ShapeCanvas):
         self.log.write("OnBeginDragLeft: %s, %s, %s\n" % (x, y, keys))
 
     def OnEndDragLeft(self, x, y, keys=0):
-        self.log.write("OnEndDragLeft: %s, %s, %s\n" % (x, y, keys))
+        self.log.info("OnEndDragLeft: %s, %s, %s\n" % (x, y, keys))
 
 
 class OglApp(App):
