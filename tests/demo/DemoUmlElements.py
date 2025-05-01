@@ -325,14 +325,14 @@ class DemoUmlElements(App):
         self._displayShape(umlShape=destinationUmlClass, umlPosition=destinationPosition)
 
         umlAssociation: UmlAssociation = UmlAssociation(pyutLink=self._createAssociationPyutLink())
-        umlAssociation.SetCanvas(self)
-        umlAssociation.MakeLineControlPoints(2)
+        umlAssociation.SetCanvas(self._diagramFrame)
+        umlAssociation.MakeLineControlPoints(n=4)
 
         eventHandler: UmlLinkEventHandler = UmlLinkEventHandler(umlLink=umlAssociation)
         eventHandler.SetPreviousHandler(umlAssociation.GetEventHandler())
         umlAssociation.SetEventHandler(eventHandler)
 
-        sourceUmlClass.AddLine(umlAssociation, destinationUmlClass)
+        sourceUmlClass.addLink(umlLink=umlAssociation, destinationClass=destinationUmlClass)
         self._diagramFrame.umlDiagram.AddShape(umlAssociation)
         umlAssociation.Show(True)
 
@@ -432,6 +432,9 @@ class DemoUmlElements(App):
         self._associationCounter += 1
 
         pyutLink: PyutLink = PyutLink(name=name, linkType=PyutLinkType.ASSOCIATION)
+
+        pyutLink.sourceCardinality      = 'src Card'
+        pyutLink.destinationCardinality = 'dst Card'
 
         return pyutLink
 

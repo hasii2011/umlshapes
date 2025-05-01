@@ -3,6 +3,7 @@ from logging import Logger
 from logging import getLogger
 
 from wx import ClientDC
+
 from wx.lib.ogl import ShapeCanvas
 from wx.lib.ogl import ShapeEvtHandler
 
@@ -29,3 +30,14 @@ class UmlLinkEventHandler(ShapeEvtHandler):
         canvas.PrepareDC(dc)
 
         umlLink.Select(select=True, dc=dc)
+
+        middle = umlLink.GetLabelPosition(0)
+        start  = umlLink.GetLabelPosition(1)
+        end    = umlLink.GetLabelPosition(2)
+
+        self.logger.info(f'{middle=} {start=} {end=}')
+
+        controlPoints = umlLink.GetLineControlPoints()
+        self.logger.info(f'{controlPoints=}')
+
+        self.logger.info(f'{umlLink.GetNumberOfTextRegions()=}')

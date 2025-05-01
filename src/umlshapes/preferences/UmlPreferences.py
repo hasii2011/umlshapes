@@ -34,8 +34,9 @@ DEFAULT_GRID_LINE_STYLE:        str = UmlPenStyle.DOT.value
 # When the text value is selected
 DEFAULT_TEXT_BACKGROUND_COLOR:  str = UmlColor.WHITE.value
 
-DEFAULT_USE_CASE_SIZE: str = str(UmlDimensions(width=100, height=60))
-DEFAULT_ACTOR_SIZE:    str = str(UmlDimensions(width=80, height=100))
+DEFAULT_USE_CASE_SIZE:          str = str(UmlDimensions(width=100, height=60))
+DEFAULT_ACTOR_SIZE:             str = str(UmlDimensions(width=80, height=100))
+DEFAULT_ASSOCIATION_LABEL_SIZE: str = str(UmlDimensions(width=20, height=14))
 
 
 OGL_PROPERTIES: ValueDescriptions = ValueDescriptions(
@@ -106,6 +107,7 @@ associationsPreferences: ValueDescriptions = ValueDescriptions(
     {
         KeyName('associationTextFontSize'): ValueDescription(defaultValue='12', deserializer=SecureConversions.secureInteger),
         KeyName('diamondSize'):             ValueDescription(defaultValue='7',  deserializer=SecureConversions.secureInteger),
+        KeyName('associationLabelSize'):    ValueDescription(defaultValue=DEFAULT_ASSOCIATION_LABEL_SIZE, deserializer=UmlDimensions.deSerialize),
     }
 )
 debugPreferences: ValueDescriptions = ValueDescriptions(

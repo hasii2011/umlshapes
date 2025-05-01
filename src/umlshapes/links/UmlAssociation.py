@@ -1,9 +1,12 @@
 
+from typing import cast
+
 from logging import Logger
 from logging import getLogger
 
 from pyutmodelv2.PyutLink import PyutLink
 
+from umlshapes.links.UmlAssociationLabel import UmlAssociationLabel
 from umlshapes.links.UmlLink import UmlLink
 
 

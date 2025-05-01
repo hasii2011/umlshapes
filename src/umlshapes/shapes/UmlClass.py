@@ -25,10 +25,12 @@ from pyutmodelv2.PyutField import PyutFields
 from pyutmodelv2.enumerations.PyutStereotype import PyutStereotype
 from pyutmodelv2.enumerations.PyutDisplayMethods import PyutDisplayMethods
 from pyutmodelv2.enumerations.PyutDisplayParameters import PyutDisplayParameters
+from wx.lib.ogl import ShapeCanvas
 
 from umlshapes.UmlUtils import UmlUtils
 
 from umlshapes.frames.UmlFrame import UmlFrame
+from umlshapes.links.UmlLink import UmlLink
 from umlshapes.types.UmlPosition import UmlPosition
 
 if TYPE_CHECKING:
@@ -125,6 +127,14 @@ class UmlClass(ControlPointMixin, RectangleShape, TopLeftMixin):
     @umlFrame.setter
     def umlFrame(self, frame: 'UmlClassDiagramFrame'):
         self.SetCanvas(frame)
+
+    def addLink(self, umlLink: UmlLink, destinationClass: 'UmlClass'):
+
+        self.AddLine(line=umlLink, other=destinationClass)
+
+        x1, y1, x2, y2 = umlLink.FindLineEndPoints()
+        self.logger.info(f'start: ({x1},{y1}) - end: ({x2},{y2})')
+        umlLink.createAssociationLabels()
 
     def OnDraw(self, dc: MemoryDC):
 

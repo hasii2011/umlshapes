@@ -71,7 +71,7 @@ class UmlTextEventHandler(UmlBaseEventHandler):
 
     def OnRightClick(self, x: int, y: int, keys: int = 0, attachment: int = 0):
         """
-        Use this to pop up menu
+        Use this to pop up a menu
 
         Args:
             x:
@@ -121,7 +121,7 @@ class UmlTextEventHandler(UmlBaseEventHandler):
 
     def _onChangeTextSize(self, event: CommandEvent):
         """
-        Callback for popup menu on UmlText object
+        Callback for the popup menu on UmlText object
 
         Args:
             event:
