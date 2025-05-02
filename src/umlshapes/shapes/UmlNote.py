@@ -71,26 +71,16 @@ class UmlNote(ControlPointMixin, RectangleShape, TopLeftMixin):
         Args:
             dc:
         """
-        try:
-            super().OnDraw(dc)
-        except (ValueError, Exception) as e:
-            # Work around a bug where width and height sometimes become a float
-            self.logger.warning(f'Bug workaround !!! {e}')
-
-            # self.SetWidth(round(self.GetWidth()))
-            # self.SetHeight(round(self.GetHeight()))
-            self.size = UmlDimensions(width=round(self.GetWidth()), height=round(self.GetHeight()))
-
-            super().OnDraw(dc)
+        super().OnDraw(dc)
 
         if self.Selected() is True:
             if self.Selected() is True:
                 UmlUtils.drawSelectedRectangle(dc=dc, shape=self)
 
-        w:     int = round(self.GetWidth())
-        h:     int = round(self.GetHeight())
-        baseX: int = round(self.GetX()) - (w // 2)
-        baseY: int = round(self.GetY()) - (h // 2)
+        w:     int = self.GetWidth()
+        h:     int = self.GetHeight()
+        baseX: int = self.GetX() - (w // 2)
+        baseY: int = self.GetY() - (h // 2)
 
         self._drawNoteNotch(dc, w=w, baseX=baseX, baseY=baseY)
 
@@ -113,10 +103,7 @@ class UmlNote(ControlPointMixin, RectangleShape, TopLeftMixin):
         Args:
             dc:
         """
-        # w:     int = round(self.GetWidth())
-        # h:     int = round(self.GetHeight())
-        # baseX: int = round(self.GetX()) - (w // 2)
-        # baseY: int = round(self.GetY()) - (h // 2)
+
         x1:    int = baseX + w - UmlNote.MARGIN
         y1:    int = baseY
         x2:    int = baseX + w

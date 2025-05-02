@@ -13,7 +13,7 @@ from umlshapes.types.UmlPosition import UmlPosition
 class TopLeftMixin:
     """
     This mixin adjusts the reported position so that it is effectively top left
-    It also provides syntactic sugar round the size of the shape.  It caches
+    It also provides syntactic sugar for the size of the shape.  It caches
     the size but always reports it to the parent shape
     """
 
@@ -32,8 +32,8 @@ class TopLeftMixin:
 
         """
         return UmlDimensions(
-            width=round(self._size.GetWidth()),
-            height=round(self._size.GetHeight())
+            width=self._size.GetWidth(),
+            height=self._size.GetHeight()
         )
 
     @size.setter
@@ -88,4 +88,4 @@ class TopLeftMixin:
         left: int = x - (width // 2)
         top:  int = y - (height // 2)
 
-        return LeftCoordinate(x=round(left), y=round(top))
+        return LeftCoordinate(x=left, y=top)

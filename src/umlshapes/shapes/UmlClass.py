@@ -25,7 +25,6 @@ from pyutmodelv2.PyutField import PyutFields
 from pyutmodelv2.enumerations.PyutStereotype import PyutStereotype
 from pyutmodelv2.enumerations.PyutDisplayMethods import PyutDisplayMethods
 from pyutmodelv2.enumerations.PyutDisplayParameters import PyutDisplayParameters
-from wx.lib.ogl import ShapeCanvas
 
 from umlshapes.UmlUtils import UmlUtils
 
@@ -138,15 +137,7 @@ class UmlClass(ControlPointMixin, RectangleShape, TopLeftMixin):
 
     def OnDraw(self, dc: MemoryDC):
 
-        try:
-            super().OnDraw(dc)
-        except (ValueError, Exception) as e:
-            # Work around a bug where width and height sometimes become a float
-            self.logger.warning(f'Bug workaround !!! {e}')
-
-            self.SetWidth(round(self.GetWidth()))
-            self.SetHeight(round(self.GetHeight()))
-            super().OnDraw(dc)
+        super().OnDraw(dc)
 
         w: int = self.size.width
         x: int = self._topLeft.x
@@ -185,12 +176,12 @@ class UmlClass(ControlPointMixin, RectangleShape, TopLeftMixin):
             keys:
             attachment:
         """
-        super().OnRightClick(x=round(x), y=round(y), keys=keys, attachment=attachment)
+        super().OnRightClick(x=x, y=y, keys=keys, attachment=attachment)
 
         if self._menuHandler is None:
             self._menuHandler = UmlClassMenuHandler(umlClass=self)
 
-        self._menuHandler.popupMenu(x=round(x), y=round(y))
+        self._menuHandler.popupMenu(x=x, y=y)
 
     def OnLeftDoubleClick(self, x: int, y: int, keys: int = 0, attachment: int = 0):
 
@@ -287,7 +278,7 @@ class UmlClass(ControlPointMixin, RectangleShape, TopLeftMixin):
 
         size: Size = dc.GetTextExtent(text)
 
-        return round(size.width)
+        return size.width
 
     def _drawClassHeader(self, dc: MemoryDC | ClientDC, shapeWidth: int) -> int:
         """
@@ -521,8 +512,8 @@ class UmlClass(ControlPointMixin, RectangleShape, TopLeftMixin):
             dc:
         """
 
-        w: int = round(self.GetWidth())
-        h: int = round(self.GetHeight())
+        w: int = self.GetWidth()
+        h: int = self.GetHeight()
         x: int = self._topLeft.x
         y: int = self._topLeft.y
 

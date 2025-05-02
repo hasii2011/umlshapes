@@ -60,7 +60,7 @@ class UmlUtils:
     @classmethod
     def getID(cls) -> str:
         if UmlUtils.ID_GENERATOR is None:
-            UmlUtils.ID_GENERATOR = HRID(delimeter='.', seed=round(pyTime() * 1000))
+            UmlUtils.ID_GENERATOR = HRID(delimiter='.', seed=round(pyTime() * 1000))
         uuid = UmlUtils.ID_GENERATOR.generate()
 
         return uuid
@@ -86,10 +86,10 @@ class UmlUtils:
         width = shape.GetWidth() + 3
         height = shape.GetHeight() + 3
 
-        x1 = round(sx - width // 2)
-        y1 = round(sy - height // 2)
+        x1 = sx - width // 2
+        y1 = sy - height // 2
 
-        dc.DrawRectangle(x1, y1, round(width), round(height))
+        dc.DrawRectangle(x1, y1, width, height)
 
     @classmethod
     def drawSelectedEllipse(cls, dc: MemoryDC, shape: EllipseShape):
@@ -156,8 +156,8 @@ class UmlUtils:
         x2 = dstPosition.x
         y2 = dstPosition.y
 
-        midPointX = round(abs(x1 + x2) / 2)
-        midPointY = round(abs(y1 + y2) / 2)
+        midPointX = abs(x1 + x2) // 2
+        midPointY = abs(y1 + y2) // 2
 
         return UmlPosition(x=midPointX, y=midPointY)
 

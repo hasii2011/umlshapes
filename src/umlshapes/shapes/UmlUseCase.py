@@ -60,15 +60,7 @@ class UmlUseCase(ControlPointMixin,  EllipseShape, TopLeftMixin):
         Args:
             dc:
         """
-        try:
-            super().OnDraw(dc)
-        except (ValueError, Exception) as e:
-            # Work around a bug where width and height sometimes become a float
-            self.logger.warning(f'Bug workaround !!! {e}')
-
-            self.SetWidth(round(self.GetWidth()))
-            self.SetHeight(round(self.GetHeight()))
-            super().OnDraw(dc)
+        super().OnDraw(dc)
 
         if self.Selected() is True:
             if self.Selected() is True:

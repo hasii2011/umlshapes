@@ -49,7 +49,7 @@ class UmlClassDiagramFrameMenuHandler:
             autoSizeMenuItem.Enable(True)
             arrangeLinksMenuItem.Enable(True)
 
-        self._frame.PopupMenu(self._contextMenu, round(x), round(y))
+        self._frame.PopupMenu(self._contextMenu, x, y)
 
     def _createContextMenu(self):
 

@@ -38,17 +38,15 @@ class ControlPointMixin:
         maxX, maxY = self._shape.GetBoundingBoxMax()
         minX, minY = self._shape.GetBoundingBoxMin()
 
-        # widthMin  = minX + UML_CONTROL_POINT_SIZE + 2
-        # heightMin = minY + UML_CONTROL_POINT_SIZE + 2
-
         widthMin  = minX
         heightMin = minY
 
         # Offsets from the main object
-        top:    int = round(-heightMin // 2.0)
-        bottom: int = heightMin // 2.0 + (maxY - minY)
-        left:   int = round(-widthMin // 2.0)
-        right:  int = widthMin // 2.0 + (maxX - minX)
+        top:    int = -heightMin // 2
+        bottom: int = heightMin // 2 + (maxY - minY)
+
+        left:   int = -widthMin // 2
+        right:  int = widthMin // 2 + (maxX - minX)
 
         canvas: UmlFrame = self._shape.GetCanvas()
         assert isinstance(canvas, UmlFrame), 'I only support this'

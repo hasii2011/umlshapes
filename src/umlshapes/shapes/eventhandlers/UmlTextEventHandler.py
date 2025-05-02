@@ -101,7 +101,9 @@ class UmlTextEventHandler(UmlBaseEventHandler):
         incBmp: Bitmap = IncreaseTextSize.GetBitmap()
         decBmp: Bitmap = DecreaseTextSize.GetBitmap()
 
+        # noinspection PyTypeChecker
         increaseItem.SetBitmap(incBmp)
+        # noinspection PyTypeChecker
         decreaseItem.SetBitmap(decBmp)
 
         boldItem:       MenuItem = menu.AppendCheckItem(ID_MENU_BOLD_TEXT,   item='Bold Text',      help='Set text to bold')

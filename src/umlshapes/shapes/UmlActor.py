@@ -66,6 +66,7 @@ class UmlActor(ControlPointMixin, RectangleShape, TopLeftMixin):
         RectangleShape.__init__(self, w=actorSize.width, h=actorSize.height)
         TopLeftMixin.__init__(self, umlShape=self, width=actorSize.width, height=actorSize.height)
 
+        self.SetFixedSize(actorSize.width, actorSize.height)
         self.SetDraggable(drag=True)
         self.SetCentreResize(False)
         self.SetMaintainAspectRatio(True)
@@ -150,25 +151,17 @@ class UmlActor(ControlPointMixin, RectangleShape, TopLeftMixin):
         Args:
             dc:
         """
-
-        # try:
-        #     super().OnDraw(dc)
-        # except (ValueError, Exception) as e:
-        #     # Work around a bug where width and height sometimes become a float
-        #     self.logger.warning(f'Bug workaround !!! {e}')
-        #
-        #     self.size = UmlDimensions(width=round(self.size.width), height=round(self.size.height))
-        #
-        #     super().OnDraw(dc)
-
         dc.SetBrush(UmlUtils.backGroundBrush())
         dc.SetFont(UmlUtils.defaultFont())
         # Gets the minimum bounding box for the shape
         width:  int = self.size.width
         height: int = self.size.height
+
         # Calculate the top and left of the shape
-        x: int = round(self.GetX())
-        y: int = round(self.GetY())
+        # x: int = round(self.GetX())
+        # y: int = round(self.GetY())
+        x: int = self.GetX()
+        y: int = self.GetY()
 
         leftX: int = x - (width // 2)
         topY:  int = y - (height // 2)
@@ -176,8 +169,6 @@ class UmlActor(ControlPointMixin, RectangleShape, TopLeftMixin):
         # drawing is restricted in the specified region of the device
         dc.SetClippingRegion(leftX, topY, width, height)
         if self.Selected() is True:
-            # dc.SetPen(UmlUtils.redSolidPen())
-            # self._drawSelectionRectangle(dc=dc)
             UmlUtils.drawSelectedRectangle(dc=dc, shape=self)
 
         self._drawActor(dc=dc, x=x, y=y, width=width, height=height)

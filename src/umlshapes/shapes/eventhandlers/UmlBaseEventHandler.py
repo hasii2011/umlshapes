@@ -52,13 +52,11 @@ class UmlBaseEventHandler(ShapeEvtHandler):
             w:
             h:
         """
-        self._baseLogger.debug(f'Position: ({x},{y}) UmlSize: ({w},{h})')
-
         shape: Shape  = self.GetShape()
-        shape.Move(dc=dc, x=round(x), y=round(y), display=True)
+        shape.Move(dc=dc, x=x, y=y, display=True)
 
         umlShape: UmlShape = cast(UmlShape, shape)
-        umlShape.size = UmlDimensions(width=round(w), height=round(h))
+        umlShape.size = UmlDimensions(width=w, height=h)
 
     def _unSelectAllShapesOnCanvas(self, shape: Shape, canvas: ShapeCanvas, dc: ClientDC):
 
@@ -81,5 +79,4 @@ class UmlBaseEventHandler(ShapeEvtHandler):
                 for s in toUnselect:
                     s.Select(False, dc)
 
-                # #canvas.Redraw(dc)
                 canvas.Refresh(False)
