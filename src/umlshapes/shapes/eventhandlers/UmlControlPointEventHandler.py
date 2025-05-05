@@ -9,6 +9,10 @@ from umlshapes.frames.DiagramFrame import DiagramFrame
 
 
 class UmlControlPointEventHandler(ShapeEvtHandler):
+    """
+    Handles both UmlControlPoint and UmlLineControlPoint.  Currently,
+    both work.  Maybe later will need two distinct ones
+    """
 
     def __init__(self):
         self.logger: Logger = getLogger(__name__)
@@ -27,11 +31,9 @@ class UmlControlPointEventHandler(ShapeEvtHandler):
             keys:
             attachment:
         """
-        from umlshapes.shapes.UmlText import UmlText
 
-        shape:   Shape        = self.GetShape()
-        umlText: UmlText      = shape.GetParent()
-        canvas:  DiagramFrame = umlText.GetCanvas()
+        shape:  Shape        = self.GetShape()
+        canvas: DiagramFrame = shape.GetCanvas()
 
         canvas.refresh()
         super().OnDragLeft(draw, x, y, keys, attachment)

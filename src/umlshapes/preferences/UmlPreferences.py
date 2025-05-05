@@ -65,6 +65,7 @@ OGL_PROPERTIES: ValueDescriptions = ValueDescriptions(
         KeyName('autoSizeWidthAdjustment'):  ValueDescription(defaultValue='0.20', deserializer=SecureConversions.secureFloat),
         KeyName('lineHeightAdjustment'):     ValueDescription(defaultValue='1',    deserializer=SecureConversions.secureInteger),
         KeyName('autoResizeShapesOnEdit'):   ValueDescription(defaultValue='True', deserializer=SecureConversions.secureBoolean),
+        KeyName('controlPointSize'):         ValueDescription(defaultValue='4',    deserializer=SecureConversions.secureInteger),
 
     }
 )

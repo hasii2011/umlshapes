@@ -4,18 +4,31 @@ from typing import cast
 from logging import Logger
 from logging import getLogger
 
-from pyutmodelv2.PyutLink import PyutLink
-
-from wx import MemoryDC
 from wx import RED
 
+from wx import MemoryDC
+
+from wx.lib.ogl import CONTROL_POINT_ENDPOINT_FROM
+from wx.lib.ogl import CONTROL_POINT_ENDPOINT_TO
+from wx.lib.ogl import CONTROL_POINT_LINE
 from wx.lib.ogl import FORMAT_SIZE_TO_CONTENTS
+
 from wx.lib.ogl import LineShape
 
+from pyutmodelv2.PyutLink import PyutLink
+
 from umlshapes.UmlDiagram import UmlDiagram
+
 from umlshapes.frames.UmlFrame import UmlFrame
+
 from umlshapes.links.UmlAssociationLabel import UmlAssociationLabel
+from umlshapes.preferences.UmlPreferences import UmlPreferences
+
+from umlshapes.shapes.UmlLineControlPoint import UmlLineControlPoint
+from umlshapes.shapes.eventhandlers.UmlControlPointEventHandler import UmlControlPointEventHandler
+
 from umlshapes.shapes.eventhandlers.UmlTextEventHandler import UmlTextEventHandler
+
 from umlshapes.types.UmlPosition import UmlPosition
 
 ASSOCIATION_LABEL_MIDDLE: int = 0
@@ -28,7 +41,8 @@ class UmlLink(LineShape):
     def __init__(self, pyutLink: PyutLink):
 
         super().__init__()
-        self.linkLogger: Logger = getLogger(__name__)
+        self.linkLogger:   Logger         = getLogger(__name__)
+        self._preferences: UmlPreferences = UmlPreferences()
 
         self._pyutLink: PyutLink = pyutLink
 
@@ -85,3 +99,48 @@ class UmlLink(LineShape):
 
         super().OnDraw(dc=dc)
         self._associationName.Draw(dc=dc)
+
+    def MakeControlPoints(self):
+        """
+
+        """
+        if self._canvas and self._lineControlPoints:
+            first = self._lineControlPoints[0]
+            last = self._lineControlPoints[-1]
+
+            umlControlPointSize: int = self._preferences.controlPointSize
+
+            control: UmlLineControlPoint = UmlLineControlPoint(
+                self._canvas,
+                self,
+                umlControlPointSize,
+                first[0],
+                first[1],
+                CONTROL_POINT_ENDPOINT_FROM
+            )
+
+            control._point = first
+            self._canvas.AddShape(control)
+            self._controlPoints.append(control)
+            self._addEventHandler(umlControlPoint=control)
+
+            for point in self._lineControlPoints[1:-1]:
+                control = UmlLineControlPoint(self._canvas, self, umlControlPointSize, point[0], point[1], CONTROL_POINT_LINE)
+                control._point = point
+                self._canvas.AddShape(control)
+                self._controlPoints.append(control)
+                self._addEventHandler(umlControlPoint=control)
+
+            control = UmlLineControlPoint(self._canvas, self, umlControlPointSize, last[0], last[1], CONTROL_POINT_ENDPOINT_TO)
+            control._point = last
+            self._canvas.AddShape(control)
+            self._controlPoints.append(control)
+            self._addEventHandler(umlControlPoint=control)
+
+    def _addEventHandler(self, umlControlPoint: UmlLineControlPoint):
+
+        eventHandler: UmlControlPointEventHandler = UmlControlPointEventHandler()
+        eventHandler.SetShape(umlControlPoint)
+        eventHandler.SetPreviousHandler(umlControlPoint.GetEventHandler())
+
+        umlControlPoint.SetEventHandler(eventHandler)

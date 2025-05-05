@@ -326,7 +326,7 @@ class DemoUmlElements(App):
 
         umlAssociation: UmlAssociation = UmlAssociation(pyutLink=self._createAssociationPyutLink())
         umlAssociation.SetCanvas(self._diagramFrame)
-        umlAssociation.MakeLineControlPoints(n=4)
+        umlAssociation.MakeLineControlPoints(n=3)       # Make this configurable
 
         eventHandler: UmlLinkEventHandler = UmlLinkEventHandler(umlLink=umlAssociation)
         eventHandler.SetPreviousHandler(umlAssociation.GetEventHandler())
@@ -335,6 +335,8 @@ class DemoUmlElements(App):
         sourceUmlClass.addLink(umlLink=umlAssociation, destinationClass=destinationUmlClass)
         self._diagramFrame.umlDiagram.AddShape(umlAssociation)
         umlAssociation.Show(True)
+
+        self.logger.info(f'controlPoints: {umlAssociation.GetLineControlPoints()}')
 
     def _displayShape(self, umlShape: UmlShape, umlPosition: UmlPosition):
 

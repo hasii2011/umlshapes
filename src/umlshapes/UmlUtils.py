@@ -121,7 +121,7 @@ class UmlUtils:
             fontFamily:    int           = UmlUtils.umlFontFamilyToWxFontFamily(fontFamilyStr)
 
             UmlUtils.DEFAULT_FONT = Font(fontSize, fontFamily, FONTSTYLE_NORMAL, FONTWEIGHT_NORMAL)
-            UmlUtils.clsLogger.info(f'{UmlUtils.DEFAULT_FONT=}')
+            UmlUtils.clsLogger.debug(f'{UmlUtils.DEFAULT_FONT=}')
 
         return UmlUtils.DEFAULT_FONT
 

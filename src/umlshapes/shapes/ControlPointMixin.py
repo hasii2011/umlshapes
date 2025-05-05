@@ -12,10 +12,10 @@ from wx.lib.ogl import EllipseShape
 from wx.lib.ogl import Shape
 
 from umlshapes.frames.UmlFrame import UmlFrame
+from umlshapes.preferences.UmlPreferences import UmlPreferences
 
 from umlshapes.shapes.UmlControlPoint import UmlControlPoint
 from umlshapes.shapes.eventhandlers.UmlControlPointEventHandler import UmlControlPointEventHandler
-from umlshapes.types.Common import UML_CONTROL_POINT_SIZE
 
 
 class ControlPointMixin:
@@ -24,9 +24,10 @@ class ControlPointMixin:
     than the default ogl control points
     """
     def __init__(self, shape: Shape):
-        self.cpLogger: Logger = getLogger(__name__)
 
-        self._shape:  Shape    = shape
+        self.cpLogger:     Logger         = getLogger(__name__)
+        self._preferences: UmlPreferences = UmlPreferences()
+        self._shape:       Shape          = shape
 
     def MakeControlPoints(self):
         from umlshapes.shapes.UmlActor import UmlActor
@@ -51,6 +52,8 @@ class ControlPointMixin:
         canvas: UmlFrame = self._shape.GetCanvas()
         assert isinstance(canvas, UmlFrame), 'I only support this'
 
+        umlControlPointSize: int = self._preferences.controlPointSize
+
         if isinstance(self._shape, CircleShape) is True or isinstance(self._shape, EllipseShape):
             self._makeOrthogonalControlPoints(canvas=canvas, top=top, right=right, bottom=bottom, left=left)
         elif isinstance(self._shape, UmlActor):
@@ -59,56 +62,60 @@ class ControlPointMixin:
             #
             # Bad implementation;  These have to be created in this exact order because of the Shape.ResetControlPoints() method
             #
-            control: UmlControlPoint = UmlControlPoint(canvas, self._shape, UML_CONTROL_POINT_SIZE, left, top, CONTROL_POINT_DIAGONAL)
+            control: UmlControlPoint = UmlControlPoint(canvas, self._shape, umlControlPointSize, left, top, CONTROL_POINT_DIAGONAL)
             self._setupControlPoint(umlControlPoint=control)
 
-            control = UmlControlPoint(canvas, self._shape, UML_CONTROL_POINT_SIZE, 0, top, CONTROL_POINT_VERTICAL)
+            control = UmlControlPoint(canvas, self._shape, umlControlPointSize, 0, top, CONTROL_POINT_VERTICAL)
             self._setupControlPoint(umlControlPoint=control)
 
-            control = UmlControlPoint(canvas, self._shape, UML_CONTROL_POINT_SIZE, right, top, CONTROL_POINT_DIAGONAL)
+            control = UmlControlPoint(canvas, self._shape, umlControlPointSize, right, top, CONTROL_POINT_DIAGONAL)
             self._setupControlPoint(umlControlPoint=control)
 
-            control = UmlControlPoint(canvas, self._shape, UML_CONTROL_POINT_SIZE, right, 0, CONTROL_POINT_HORIZONTAL)
+            control = UmlControlPoint(canvas, self._shape, umlControlPointSize, right, 0, CONTROL_POINT_HORIZONTAL)
             self._setupControlPoint(umlControlPoint=control)
 
-            control = UmlControlPoint(canvas, self._shape, UML_CONTROL_POINT_SIZE, right, bottom, CONTROL_POINT_DIAGONAL)
+            control = UmlControlPoint(canvas, self._shape, umlControlPointSize, right, bottom, CONTROL_POINT_DIAGONAL)
             self._setupControlPoint(umlControlPoint=control)
 
-            control = UmlControlPoint(canvas, self._shape, UML_CONTROL_POINT_SIZE, 0, bottom, CONTROL_POINT_VERTICAL)
+            control = UmlControlPoint(canvas, self._shape, umlControlPointSize, 0, bottom, CONTROL_POINT_VERTICAL)
             self._setupControlPoint(umlControlPoint=control)
 
-            control = UmlControlPoint(canvas, self._shape, UML_CONTROL_POINT_SIZE, left, bottom, CONTROL_POINT_DIAGONAL)
+            control = UmlControlPoint(canvas, self._shape, umlControlPointSize, left, bottom, CONTROL_POINT_DIAGONAL)
             self._setupControlPoint(umlControlPoint=control)
 
-            control = UmlControlPoint(canvas, self._shape, UML_CONTROL_POINT_SIZE, left, 0, CONTROL_POINT_HORIZONTAL)
+            control = UmlControlPoint(canvas, self._shape, umlControlPointSize, left, 0, CONTROL_POINT_HORIZONTAL)
             self._setupControlPoint(umlControlPoint=control)
 
     def _makeOrthogonalControlPoints(self, canvas: UmlFrame, top: int, right: int, bottom: int, left: int):
 
-        control = UmlControlPoint(canvas, self._shape, UML_CONTROL_POINT_SIZE, 0, top, CONTROL_POINT_VERTICAL)
+        umlControlPointSize: int = self._preferences.controlPointSize
+
+        control = UmlControlPoint(canvas, self._shape, umlControlPointSize, 0, top, CONTROL_POINT_VERTICAL)
         self._setupControlPoint(umlControlPoint=control)
 
-        control = UmlControlPoint(canvas, self._shape, UML_CONTROL_POINT_SIZE, right, 0, CONTROL_POINT_HORIZONTAL)
+        control = UmlControlPoint(canvas, self._shape, umlControlPointSize, right, 0, CONTROL_POINT_HORIZONTAL)
         self._setupControlPoint(umlControlPoint=control)
 
-        control = UmlControlPoint(canvas, self._shape, UML_CONTROL_POINT_SIZE, 0, bottom, CONTROL_POINT_VERTICAL)
+        control = UmlControlPoint(canvas, self._shape, umlControlPointSize, 0, bottom, CONTROL_POINT_VERTICAL)
         self._setupControlPoint(umlControlPoint=control)
 
-        control = UmlControlPoint(canvas, self._shape, UML_CONTROL_POINT_SIZE, left, 0, CONTROL_POINT_HORIZONTAL)
+        control = UmlControlPoint(canvas, self._shape, umlControlPointSize, left, 0, CONTROL_POINT_HORIZONTAL)
         self._setupControlPoint(umlControlPoint=control)
 
     def _makeDiagonalControlPoints(self, canvas: UmlFrame, top: int, right: int, bottom: int, left: int):
 
-        control: UmlControlPoint = UmlControlPoint(canvas, self._shape, UML_CONTROL_POINT_SIZE, left, top, CONTROL_POINT_DIAGONAL)
+        umlControlPointSize: int = self._preferences.controlPointSize
+
+        control: UmlControlPoint = UmlControlPoint(canvas, self._shape, umlControlPointSize, left, top, CONTROL_POINT_DIAGONAL)
         self._setupControlPoint(umlControlPoint=control)
 
-        control = UmlControlPoint(canvas, self._shape, UML_CONTROL_POINT_SIZE, right, top, CONTROL_POINT_DIAGONAL)
+        control = UmlControlPoint(canvas, self._shape, umlControlPointSize, right, top, CONTROL_POINT_DIAGONAL)
         self._setupControlPoint(umlControlPoint=control)
 
-        control = UmlControlPoint(canvas, self._shape, UML_CONTROL_POINT_SIZE, right, bottom, CONTROL_POINT_DIAGONAL)
+        control = UmlControlPoint(canvas, self._shape, umlControlPointSize, right, bottom, CONTROL_POINT_DIAGONAL)
         self._setupControlPoint(umlControlPoint=control)
 
-        control = UmlControlPoint(canvas, self._shape, UML_CONTROL_POINT_SIZE, left, bottom, CONTROL_POINT_DIAGONAL)
+        control = UmlControlPoint(canvas, self._shape, umlControlPointSize, left, bottom, CONTROL_POINT_DIAGONAL)
         self._setupControlPoint(umlControlPoint=control)
 
     def _setupControlPoint(self, umlControlPoint: UmlControlPoint):

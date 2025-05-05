@@ -62,7 +62,7 @@ class DiagramFrame(ShapeCanvas):
         systemAppearance: SystemAppearance = SystemSettings.GetAppearance()
         self._darkMode:   bool             = systemAppearance.IsDark()
 
-        self._dfLogger.info(f'{self._darkMode=}')
+        self._dfLogger.debug(f'{self._darkMode=}')
 
         self._setAppropriateSetBackground()
 
