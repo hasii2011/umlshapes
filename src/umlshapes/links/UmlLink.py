@@ -4,6 +4,7 @@ from typing import cast
 from logging import Logger
 from logging import getLogger
 
+from wx import Point
 from wx import RED
 
 from wx import MemoryDC
@@ -71,7 +72,7 @@ class UmlLink(LineShape):
 
     def createAssociationLabels(self):
 
-        x1, y1, x2, y2 = self.FindLineEndPoints()
+        # x1, y1, x2, y2 = self.FindLineEndPoints()
 
         labelX, labelY = self.GetLabelPosition(position=ASSOCIATION_LABEL_MIDDLE)
 
@@ -102,45 +103,71 @@ class UmlLink(LineShape):
 
     def MakeControlPoints(self):
         """
-
+        Override to use our custom points, so that when dragged we can see them
         """
-        if self._canvas and self._lineControlPoints:
-            first = self._lineControlPoints[0]
-            last = self._lineControlPoints[-1]
+        if self._canvas is not None and self._lineControlPoints is not None:
+            first: Point = self._lineControlPoints[0]
+            last:  Point = self._lineControlPoints[-1]
 
             umlControlPointSize: int = self._preferences.controlPointSize
 
             control: UmlLineControlPoint = UmlLineControlPoint(
-                self._canvas,
-                self,
-                umlControlPointSize,
-                first[0],
-                first[1],
-                CONTROL_POINT_ENDPOINT_FROM
+                self.GetCanvas(),
+                umlLink=self,
+                size=umlControlPointSize,
+                # x=first[0],
+                # y=first[1],
+                x=first.x,
+                y=first.y,
+                controlPointType=CONTROL_POINT_ENDPOINT_FROM
             )
 
             control._point = first
-            self._canvas.AddShape(control)
-            self._controlPoints.append(control)
-            self._addEventHandler(umlControlPoint=control)
+            self._setupControlPoint(umlLineControlPoint=control)
 
             for point in self._lineControlPoints[1:-1]:
-                control = UmlLineControlPoint(self._canvas, self, umlControlPointSize, point[0], point[1], CONTROL_POINT_LINE)
+                control = UmlLineControlPoint(
+                    self._canvas,
+                    self,
+                    umlControlPointSize,
+                    point.x,
+                    point.y,
+                    controlPointType=CONTROL_POINT_LINE)
+
                 control._point = point
-                self._canvas.AddShape(control)
-                self._controlPoints.append(control)
-                self._addEventHandler(umlControlPoint=control)
+                self._setupControlPoint(umlLineControlPoint=control)
 
-            control = UmlLineControlPoint(self._canvas, self, umlControlPointSize, last[0], last[1], CONTROL_POINT_ENDPOINT_TO)
+            control = UmlLineControlPoint(
+                self._canvas,
+                self, umlControlPointSize,
+                last.x,
+                last.y,
+                controlPointType=CONTROL_POINT_ENDPOINT_TO)
+
             control._point = last
-            self._canvas.AddShape(control)
-            self._controlPoints.append(control)
-            self._addEventHandler(umlControlPoint=control)
+            self._setupControlPoint(umlLineControlPoint=control)
 
-    def _addEventHandler(self, umlControlPoint: UmlLineControlPoint):
+    def _setupControlPoint(self, umlLineControlPoint: UmlLineControlPoint):
+        """
+
+        Args:
+            umlLineControlPoint: The victim
+
+        """
+        self._canvas.AddShape(umlLineControlPoint)
+        self._controlPoints.append(umlLineControlPoint)
+        self._addEventHandler(umlLineControlPoint=umlLineControlPoint)
+
+    def _addEventHandler(self, umlLineControlPoint: UmlLineControlPoint):
+        """
+
+        Args:
+            umlLineControlPoint: The victim
+
+        """
 
         eventHandler: UmlControlPointEventHandler = UmlControlPointEventHandler()
-        eventHandler.SetShape(umlControlPoint)
-        eventHandler.SetPreviousHandler(umlControlPoint.GetEventHandler())
+        eventHandler.SetShape(umlLineControlPoint)
+        eventHandler.SetPreviousHandler(umlLineControlPoint.GetEventHandler())
 
-        umlControlPoint.SetEventHandler(eventHandler)
+        umlLineControlPoint.SetEventHandler(eventHandler)

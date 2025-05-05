@@ -43,14 +43,6 @@ class UmlLinkEventHandler(ShapeEvtHandler):
 
         self.logger.info(f'{umlLink.GetNumberOfTextRegions()=}')
 
-    def OnMoveLink(self, dc: DC, moveControlPoints: bool = True):
-
-        super().OnMoveLink(dc=dc, moveControlPoints=moveControlPoints)
-        umlLink: UmlLink = self.GetShape()
-
-        controlPoints = umlLink.GetLineControlPoints()
-        # self.logger.info(f'{controlPoints=}')
-
     def OnDrawControlPoints(self, dc):
 
         super().OnDrawControlPoints(dc=dc)

@@ -2,12 +2,13 @@
 from logging import Logger
 from logging import getLogger
 
-from wx.core import WHITE_BRUSH
+from wx import WHITE_BRUSH
+
 from wx.lib.ogl import ControlPoint
 from wx.lib.ogl import Shape
-from wx.lib.ogl import ShapeCanvas
 
 from umlshapes.UmlUtils import UmlUtils
+from umlshapes.frames.UmlFrame import UmlFrame
 
 
 class UmlControlPoint(ControlPoint):
@@ -16,11 +17,11 @@ class UmlControlPoint(ControlPoint):
         * Change the control point color and size
         * Implement resizing of its parent.
     """
-    def __init__(self, canvas: ShapeCanvas, shape: Shape, size: int, xOffSet: float, yOffSet: float, controlPointType: int):
+    def __init__(self, umlFrame: UmlFrame, shape: Shape, size: int, xOffSet: float, yOffSet: float, controlPointType: int):
         """
 
         Args:
-            canvas:             An instance of wx.lib.ogl.Canvas
+            umlFrame:           An instance of wx.lib.ogl.Canvas
             shape:              An instance of wx.lib.ogl.Shape
             size:               The control point size;  Single number since it is a square
             xOffSet:            The x position
@@ -36,7 +37,7 @@ class UmlControlPoint(ControlPoint):
          ======================================== ==================================
 
         """
-        super().__init__(theCanvas=canvas, object=shape, size=size, the_xoffset=xOffSet, the_yoffset=yOffSet, the_type=controlPointType)
+        super().__init__(theCanvas=umlFrame, object=shape, size=size, the_xoffset=xOffSet, the_yoffset=yOffSet, the_type=controlPointType)
         self.logger: Logger = getLogger(__name__)
 
         # Override parent class
