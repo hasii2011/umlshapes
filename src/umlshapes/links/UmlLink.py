@@ -106,46 +106,70 @@ class UmlLink(LineShape):
         Override to use our custom points, so that when dragged we can see them
         """
         if self._canvas is not None and self._lineControlPoints is not None:
-            first: Point = self._lineControlPoints[0]
-            last:  Point = self._lineControlPoints[-1]
+
+            firstPoint: Point = self._lineControlPoints[0]
+            lastPoint:  Point = self._lineControlPoints[-1]
 
             umlControlPointSize: int = self._preferences.controlPointSize
 
-            control: UmlLineControlPoint = UmlLineControlPoint(
-                self.GetCanvas(),
-                umlLink=self,
-                size=umlControlPointSize,
-                # x=first[0],
-                # y=first[1],
-                x=first.x,
-                y=first.y,
-                controlPointType=CONTROL_POINT_ENDPOINT_FROM
-            )
+            self._makeFromControlPoint(firstPoint, umlControlPointSize)
+            self._makeIntermediateControlPoints(umlControlPointSize)
+            self._makeToControlPoint(lastPoint, umlControlPointSize)
 
-            control._point = first
-            self._setupControlPoint(umlLineControlPoint=control)
+    def _makeFromControlPoint(self, firstPoint: Point, umlControlPointSize: int):
+        """
 
-            for point in self._lineControlPoints[1:-1]:
-                control = UmlLineControlPoint(
-                    self._canvas,
-                    self,
-                    umlControlPointSize,
-                    point.x,
-                    point.y,
-                    controlPointType=CONTROL_POINT_LINE)
+        Args:
+            firstPoint:             The coordinates
+            umlControlPointSize:    The size, control points are square
 
-                control._point = point
-                self._setupControlPoint(umlLineControlPoint=control)
+        """
+        control: UmlLineControlPoint = UmlLineControlPoint(
+            self.GetCanvas(),
+            umlLink=self,
+            size=umlControlPointSize,
+            x=firstPoint.x,
+            y=firstPoint.y,
+            controlPointType=CONTROL_POINT_ENDPOINT_FROM
+        )
+        control._point = firstPoint
+        self._setupControlPoint(umlLineControlPoint=control)
 
+    def _makeIntermediateControlPoints(self, umlControlPointSize: int):
+        """
+
+        Args:
+            umlControlPointSize:    The size, control points are square
+
+        """
+        for point in self._lineControlPoints[1:-1]:
             control = UmlLineControlPoint(
                 self._canvas,
-                self, umlControlPointSize,
-                last.x,
-                last.y,
-                controlPointType=CONTROL_POINT_ENDPOINT_TO)
+                self,
+                umlControlPointSize,
+                point.x,
+                point.y,
+                controlPointType=CONTROL_POINT_LINE)
 
-            control._point = last
+            control._point = point
             self._setupControlPoint(umlLineControlPoint=control)
+
+    def _makeToControlPoint(self, lastPoint: Point, umlControlPointSize: int):
+        """
+
+        Args:
+            lastPoint:              The coordinates
+            umlControlPointSize:    The size, control points are square
+
+        """
+        control = UmlLineControlPoint(
+            self._canvas,
+            self, umlControlPointSize,
+            lastPoint.x,
+            lastPoint.y,
+            controlPointType=CONTROL_POINT_ENDPOINT_TO)
+        control._point = lastPoint
+        self._setupControlPoint(umlLineControlPoint=control)
 
     def _setupControlPoint(self, umlLineControlPoint: UmlLineControlPoint):
         """

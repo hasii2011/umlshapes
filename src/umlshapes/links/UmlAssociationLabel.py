@@ -3,15 +3,17 @@ from logging import Logger
 from logging import getLogger
 
 from wx import MemoryDC
+
 from wx.lib.ogl import TextShape
 
 from umlshapes.UmlUtils import UmlUtils
 from umlshapes.preferences.UmlPreferences import UmlPreferences
+from umlshapes.shapes.ControlPointMixin import ControlPointMixin
 from umlshapes.shapes.TopLeftMixin import TopLeftMixin
 from umlshapes.types.UmlDimensions import UmlDimensions
 
 
-class UmlAssociationLabel(TextShape, TopLeftMixin):
+class UmlAssociationLabel(ControlPointMixin, TextShape, TopLeftMixin):
 
     def __init__(self, label: str = '', size: UmlDimensions = None):
 
@@ -23,6 +25,7 @@ class UmlAssociationLabel(TextShape, TopLeftMixin):
         else:
             labelSize = size
 
+        super().__init__(shape=self)
         TextShape.__init__(self, width=labelSize.width, height=labelSize.height)
         TopLeftMixin.__init__(self, umlShape=self, width=labelSize.width, height=labelSize.height)
 
@@ -37,6 +40,7 @@ class UmlAssociationLabel(TextShape, TopLeftMixin):
 
         self.SetDraggable(drag=True)
         self.Show(show=True)
+        self.SetCentreResize(False)
 
     def OnDraw(self, dc: MemoryDC):
 
