@@ -25,7 +25,7 @@ class UmlBaseEventHandler(ShapeEvtHandler):
 
         self._baseLogger: Logger = getLogger(__name__)
 
-        super().__init__(shape)
+        super().__init__(shape=shape)
 
     def OnLeftClick(self, x: int, y: int, keys=0, attachment=0):
 

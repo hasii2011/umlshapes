@@ -1,15 +1,13 @@
-
 from logging import Logger
 from logging import getLogger
 
 from umlshapes.shapes.eventhandlers.UmlBaseEventHandler import UmlBaseEventHandler
 
 
-class UmlNoteEventHandler(UmlBaseEventHandler):
-    """
-    Nothing special here;  Just some syntactic sugar
-    """
-    def __init__(self):
-        self.logger: Logger = getLogger(__name__)
-        super().__init__()
+class UmlAssociationLabelEventHandler(UmlBaseEventHandler):
 
+    def __init__(self):
+
+        self.logger: Logger = getLogger(__name__)
+
+        super().__init__()

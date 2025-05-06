@@ -5,7 +5,6 @@ from logging import Logger
 from logging import getLogger
 
 from wx import Point
-from wx import RED
 
 from wx import MemoryDC
 
@@ -23,12 +22,13 @@ from umlshapes.UmlDiagram import UmlDiagram
 from umlshapes.frames.UmlFrame import UmlFrame
 
 from umlshapes.links.UmlAssociationLabel import UmlAssociationLabel
+
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
 from umlshapes.shapes.UmlLineControlPoint import UmlLineControlPoint
-from umlshapes.shapes.eventhandlers.UmlControlPointEventHandler import UmlControlPointEventHandler
 
-from umlshapes.shapes.eventhandlers.UmlTextEventHandler import UmlTextEventHandler
+from umlshapes.shapes.eventhandlers.UmlControlPointEventHandler import UmlControlPointEventHandler
+from umlshapes.shapes.eventhandlers.UmlAssociationLabelEventHandler import UmlAssociationLabelEventHandler
 
 from umlshapes.types.UmlPosition import UmlPosition
 
@@ -72,29 +72,34 @@ class UmlLink(LineShape):
 
     def createAssociationLabels(self):
 
-        # x1, y1, x2, y2 = self.FindLineEndPoints()
+        x1, y1, x2, y2 = self.FindLineEndPoints()
 
         labelX, labelY = self.GetLabelPosition(position=ASSOCIATION_LABEL_MIDDLE)
 
         associationName: str = self.pyutLink.name
         if len(associationName) > 0:
+
             umlAssociationLabel: UmlAssociationLabel = UmlAssociationLabel(label=associationName)
             umlAssociationLabel.position = UmlPosition(x=labelX, y=labelY)
-
-            umlFrame: UmlFrame = self.GetCanvas()
-            umlAssociationLabel.SetCanvas(umlFrame)
-
-            diagram: UmlDiagram = umlFrame.umlDiagram
-
-            diagram.AddShape(umlAssociationLabel)
-
-            eventHandler: UmlTextEventHandler = UmlTextEventHandler(moveColor=RED)
-            eventHandler.SetShape(umlAssociationLabel)
-            eventHandler.SetPreviousHandler(umlAssociationLabel.GetEventHandler())
-
-            umlAssociationLabel.SetEventHandler(eventHandler)
+            self._setupAssociationLabel(umlAssociationLabel)
 
             self._associationName = umlAssociationLabel
+
+        sourceCardinality: str = self._pyutLink.sourceCardinality
+        if len(sourceCardinality) > 0:
+            sourceCardinalityLabel: UmlAssociationLabel = UmlAssociationLabel(label=sourceCardinality)
+            sourceCardinalityLabel.position = UmlPosition(x=x1, y=y1)
+            self._setupAssociationLabel(sourceCardinalityLabel)
+
+            self._sourceCardinality = sourceCardinalityLabel
+
+        destinationCardinality: str = self.pyutLink.destinationCardinality
+        if len(destinationCardinality) > 0:
+            destinationCardinalityLabel: UmlAssociationLabel = UmlAssociationLabel(label=destinationCardinality)
+            destinationCardinalityLabel.position = UmlPosition(x=x2, y=y2)
+            self._setupAssociationLabel(destinationCardinalityLabel)
+
+            self._sourceCardinality = destinationCardinalityLabel
 
     def OnDraw(self, dc: MemoryDC):
 
@@ -195,3 +200,32 @@ class UmlLink(LineShape):
         eventHandler.SetPreviousHandler(umlLineControlPoint.GetEventHandler())
 
         umlLineControlPoint.SetEventHandler(eventHandler)
+
+    def _setupAssociationLabel(self, umlAssociationLabel):
+        """
+
+        Args:
+            umlAssociationLabel:
+        """
+        umlFrame: UmlFrame = self.GetCanvas()
+        umlAssociationLabel.SetCanvas(umlFrame)
+
+        diagram: UmlDiagram = umlFrame.umlDiagram
+        diagram.AddShape(umlAssociationLabel)
+
+        self._associateAssociationLabelEventHandler(umlAssociationLabel)
+
+    def _associateAssociationLabelEventHandler(self, umlAssociationLabel: UmlAssociationLabel):
+        """
+
+        Args:
+            umlAssociationLabel:
+
+        """
+
+        eventHandler: UmlAssociationLabelEventHandler = UmlAssociationLabelEventHandler()
+
+        eventHandler.SetShape(umlAssociationLabel)
+        eventHandler.SetPreviousHandler(umlAssociationLabel.GetEventHandler())
+
+        umlAssociationLabel.SetEventHandler(eventHandler)

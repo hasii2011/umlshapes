@@ -8,8 +8,10 @@ from wx.lib.ogl import TextShape
 
 from umlshapes.UmlUtils import UmlUtils
 from umlshapes.preferences.UmlPreferences import UmlPreferences
+
 from umlshapes.shapes.ControlPointMixin import ControlPointMixin
 from umlshapes.shapes.TopLeftMixin import TopLeftMixin
+
 from umlshapes.types.UmlDimensions import UmlDimensions
 
 
