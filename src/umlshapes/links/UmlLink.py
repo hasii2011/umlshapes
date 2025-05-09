@@ -4,6 +4,8 @@ from typing import cast
 from logging import Logger
 from logging import getLogger
 
+from os import linesep as osLineSep
+
 from wx import Point
 
 from wx import MemoryDC
@@ -14,6 +16,7 @@ from wx.lib.ogl import CONTROL_POINT_LINE
 from wx.lib.ogl import FORMAT_SIZE_TO_CONTENTS
 
 from wx.lib.ogl import LineShape
+from wx.lib.ogl import Shape
 
 from pyutmodelv2.PyutLink import PyutLink
 
@@ -21,6 +24,7 @@ from umlshapes.UmlDiagram import UmlDiagram
 
 from umlshapes.frames.UmlFrame import UmlFrame
 
+from umlshapes.links.DeltaXY import DeltaXY
 from umlshapes.links.UmlAssociationLabel import UmlAssociationLabel
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
@@ -30,11 +34,16 @@ from umlshapes.shapes.UmlLineControlPoint import UmlLineControlPoint
 from umlshapes.shapes.eventhandlers.UmlControlPointEventHandler import UmlControlPointEventHandler
 from umlshapes.shapes.eventhandlers.UmlAssociationLabelEventHandler import UmlAssociationLabelEventHandler
 
+from umlshapes.types.Common import TAB
 from umlshapes.types.UmlPosition import UmlPosition
 
 ASSOCIATION_LABEL_MIDDLE: int = 0
 ASSOCIATION_LABEL_START:  int = 1
 ASSOCIATION_LABEL_END:    int = 2
+
+NAME_IDX:                    int = 0
+SOURCE_CARDINALITY_IDX:      int = 1
+DESTINATION_CARDINALITY_IDX: int = 2
 
 
 class UmlLink(LineShape):
@@ -51,6 +60,8 @@ class UmlLink(LineShape):
         self._sourceCardinality:      UmlAssociationLabel = cast(UmlAssociationLabel, None)
         self._destinationCardinality: UmlAssociationLabel = cast(UmlAssociationLabel, None)
 
+        self._nameDelta: DeltaXY = DeltaXY()    # no delta to start with
+
         self.SetFormatMode(mode=FORMAT_SIZE_TO_CONTENTS)
         self.SetDraggable(True, recursive=True)
 
@@ -61,6 +72,30 @@ class UmlLink(LineShape):
     @pyutLink.setter
     def pyutLink(self, pyutLink: PyutLink):
         self._pyutLink = pyutLink
+
+    @property
+    def associationName(self) -> UmlAssociationLabel:
+        return self._associationName
+
+    @associationName.setter
+    def associationName(self, newValue: UmlAssociationLabel):
+        self._associationName = newValue
+
+    @property
+    def sourceCardinality(self) -> UmlAssociationLabel:
+        return self._sourceCardinality
+
+    @sourceCardinality.setter
+    def sourceCardinality(self, newValue: UmlAssociationLabel):
+        self._sourceCardinality = newValue
+
+    @property
+    def destinationCardinality(self) -> UmlAssociationLabel:
+        return self._destinationCardinality
+
+    @destinationCardinality.setter
+    def destinationCardinality(self, newValue: UmlAssociationLabel):
+        self._destinationCardinality = newValue
 
     def toggleSpline(self):
 
@@ -104,7 +139,7 @@ class UmlLink(LineShape):
     def OnDraw(self, dc: MemoryDC):
 
         super().OnDraw(dc=dc)
-        self._associationName.Draw(dc=dc)
+        # self._associationName.Draw(dc=dc)
 
     def MakeControlPoints(self):
         """
@@ -229,3 +264,23 @@ class UmlLink(LineShape):
         eventHandler.SetPreviousHandler(umlAssociationLabel.GetEventHandler())
 
         umlAssociationLabel.SetEventHandler(eventHandler)
+
+    def __str__(self) -> str:
+        srcShape: Shape = self.GetFrom()
+        dstShape: Shape = self.GetTo()
+
+        return f'UmlLink: {srcShape} {dstShape}'
+
+    def __repr__(self) -> str:
+
+        srcShape: Shape = self.GetFrom()
+        dstShape: Shape = self.GetTo()
+        sourceId: int   = srcShape.GetId()
+        dstId:    int   = dstShape.GetId()
+
+        readable: str = (
+            f'{osLineSep}'
+            f'{TAB}from: id: {sourceId:<35} {srcShape}{osLineSep}'
+            f'{TAB}to    id: {dstId:<35} {dstShape}'
+        )
+        return readable

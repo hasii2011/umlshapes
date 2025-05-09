@@ -83,8 +83,20 @@ class UmlUtils:
         sx = shape.GetX()
         sy = shape.GetY()
 
+        if isinstance(sx, float):
+            sx = UmlUtils.fixBadFloat(badFloat=sx, message='sx is float')
+
+        if isinstance(sy, float):
+            sy = UmlUtils.fixBadFloat(badFloat=sy, message='sy is float')
+
         width = shape.GetWidth() + 3
         height = shape.GetHeight() + 3
+
+        if isinstance(width, float):
+            width = UmlUtils.fixBadFloat(badFloat=width, message='width is float')
+
+        if isinstance(height, float):
+            height = UmlUtils.fixBadFloat(badFloat=height, message='height is float')
 
         x1 = sx - width // 2
         y1 = sy - height // 2
@@ -231,3 +243,11 @@ class UmlUtils:
     def unspecifiedDisplayIcon(cls) -> Bitmap:
         bmp: Bitmap = unSpecifiedImage.GetBitmap()
         return bmp
+
+    @classmethod
+    def fixBadFloat(cls, badFloat: float, message: str) -> int:
+
+        UmlUtils.clsLogger.warning(f'{message}: {badFloat} - rounded')
+        goodInt: int = round(badFloat)
+
+        return goodInt

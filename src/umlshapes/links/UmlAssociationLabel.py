@@ -1,9 +1,14 @@
 
+from typing import cast
+
 from logging import Logger
 from logging import getLogger
 
 from wx import MemoryDC
 
+from wx.lib.ogl import FORMAT_CENTRE_HORIZ
+from wx.lib.ogl import FORMAT_CENTRE_VERT
+from wx.lib.ogl import Shape
 from wx.lib.ogl import TextShape
 
 from umlshapes.UmlUtils import UmlUtils
@@ -39,7 +44,7 @@ class UmlAssociationLabel(ControlPointMixin, TextShape, TopLeftMixin):
             realLabel = label
 
         self.AddText(realLabel)
-
+        self.SetFormatMode(mode=FORMAT_CENTRE_HORIZ | FORMAT_CENTRE_VERT)
         self.SetDraggable(drag=True)
         self.Show(show=True)
         self.SetCentreResize(False)
@@ -59,3 +64,30 @@ class UmlAssociationLabel(ControlPointMixin, TextShape, TopLeftMixin):
             self.SetTextColour('Black')
 
         super().OnDrawContents(dc=dc)
+
+    @property
+    def parent(self) -> Shape:
+        return self.GetParent()
+
+    def coordinateToRelative(self, x: int, y: int):
+        """
+        Convert absolute coordinates to relative ones.
+        Relative coordinates are coordinates relative to the origin of the
+        shape.
+
+        Args:
+            x:
+            y:
+
+        Returns:  Coordinates relative to the top left
+        """
+        from umlshapes.shapes.UmlClass import UmlClass
+
+        if self.parent is not None:
+            umlClass: UmlClass = cast(UmlClass, self.parent)
+            ox: int = umlClass.position.x
+            oy: int = umlClass.position.y
+            x -= ox
+            y -= oy
+
+        return x, y

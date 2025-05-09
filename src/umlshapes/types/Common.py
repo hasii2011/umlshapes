@@ -23,7 +23,9 @@ if TYPE_CHECKING:
 ModelObject = Union[PyutText, PyutNote, PyutActor, PyutClass, PyutUseCase, None]
 
 
-NOT_SET_INT:     int   = cast(int, None)
+NOT_SET_INT: int = cast(int, None)
+TAB:         str = '\t'
+
 
 @dataclass
 class LeftCoordinate:

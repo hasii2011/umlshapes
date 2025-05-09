@@ -158,10 +158,10 @@ class UmlActor(ControlPointMixin, RectangleShape, TopLeftMixin):
         height: int = self.size.height
 
         # Calculate the top and left of the shape
-        # x: int = round(self.GetX())
-        # y: int = round(self.GetY())
-        x: int = self.GetX()
-        y: int = self.GetY()
+        x: int = round(self.GetX())
+        y: int = round(self.GetY())
+        # x: int = self.GetX()
+        # y: int = self.GetY()
 
         leftX: int = x - (width // 2)
         topY:  int = y - (height // 2)
