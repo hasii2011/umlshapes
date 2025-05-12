@@ -74,7 +74,7 @@ INCREMENT_X: int = 25
 INCREMENT_Y: int = 25
 
 
-class DemoUmlElements(App):
+class DemoUmlShapes(App):
 
     def __init__(self):
 
@@ -164,7 +164,9 @@ class DemoUmlElements(App):
         # self.Bind(EVT_MENU, self._onDisplayElement, id=self._ID_DISPLAY_SEQUENCE_DIAGRAM)
 
     def _onDisplayElement(self, event: CommandEvent):
+
         menuId: int = event.GetId()
+
         match menuId:
             case self._ID_DISPLAY_UML_CLASS:
                 self._displayUmlClass()
@@ -445,6 +447,6 @@ if __name__ == '__main__':
 
     UnitTestBase.setUpLogging()
 
-    testApp: DemoUmlElements = DemoUmlElements()
+    testApp: DemoUmlShapes = DemoUmlShapes()
 
     testApp.MainLoop()

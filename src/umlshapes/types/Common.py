@@ -35,3 +35,7 @@ class LeftCoordinate:
 
 UmlShape     = Union['UmlActor', 'UmlClass', 'UmlNote', 'UmlText', 'UmlUseCase']
 UmlShapeList = NewType('UmlShapeList', List[UmlShape])
+
+NAME_IDX:                    int = 0
+SOURCE_CARDINALITY_IDX:      int = 1
+DESTINATION_CARDINALITY_IDX: int = 2

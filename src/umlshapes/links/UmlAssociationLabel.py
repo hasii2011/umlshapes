@@ -1,4 +1,5 @@
 
+from typing import TYPE_CHECKING
 from typing import cast
 
 from logging import Logger
@@ -8,10 +9,14 @@ from wx import MemoryDC
 
 from wx.lib.ogl import FORMAT_CENTRE_HORIZ
 from wx.lib.ogl import FORMAT_CENTRE_VERT
-from wx.lib.ogl import Shape
 from wx.lib.ogl import TextShape
 
 from umlshapes.UmlUtils import UmlUtils
+from umlshapes.links.DeltaXY import DeltaXY
+
+if TYPE_CHECKING:
+    from umlshapes.links.UmlLink import UmlLink
+
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
 from umlshapes.shapes.ControlPointMixin import ControlPointMixin
@@ -49,6 +54,8 @@ class UmlAssociationLabel(ControlPointMixin, TextShape, TopLeftMixin):
         self.Show(show=True)
         self.SetCentreResize(False)
 
+        self._nameDelta: DeltaXY = DeltaXY()    # no delta to start with
+
     def OnDraw(self, dc: MemoryDC):
 
         dc.SetBrush(self._brush)
@@ -66,8 +73,20 @@ class UmlAssociationLabel(ControlPointMixin, TextShape, TopLeftMixin):
         super().OnDrawContents(dc=dc)
 
     @property
-    def parent(self) -> Shape:
+    def parent(self) -> 'UmlLink':
         return self.GetParent()
+
+    @parent.setter
+    def parent(self, parent: 'UmlLink'):
+        self.SetParent(parent)
+
+    @property
+    def nameDelta(self) -> DeltaXY:
+        return self._nameDelta
+
+    @nameDelta.setter
+    def nameDelta(self, deltaXY: DeltaXY):
+        self._nameDelta = deltaXY
 
     def coordinateToRelative(self, x: int, y: int):
         """

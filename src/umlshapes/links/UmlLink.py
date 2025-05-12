@@ -24,8 +24,8 @@ from umlshapes.UmlDiagram import UmlDiagram
 
 from umlshapes.frames.UmlFrame import UmlFrame
 
-from umlshapes.links.DeltaXY import DeltaXY
 from umlshapes.links.UmlAssociationLabel import UmlAssociationLabel
+from umlshapes.links.UmlLinkEventHandler import NAME_IDX
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
@@ -36,14 +36,6 @@ from umlshapes.shapes.eventhandlers.UmlAssociationLabelEventHandler import UmlAs
 
 from umlshapes.types.Common import TAB
 from umlshapes.types.UmlPosition import UmlPosition
-
-ASSOCIATION_LABEL_MIDDLE: int = 0
-ASSOCIATION_LABEL_START:  int = 1
-ASSOCIATION_LABEL_END:    int = 2
-
-NAME_IDX:                    int = 0
-SOURCE_CARDINALITY_IDX:      int = 1
-DESTINATION_CARDINALITY_IDX: int = 2
 
 
 class UmlLink(LineShape):
@@ -59,8 +51,6 @@ class UmlLink(LineShape):
         self._associationName:        UmlAssociationLabel = cast(UmlAssociationLabel, None)
         self._sourceCardinality:      UmlAssociationLabel = cast(UmlAssociationLabel, None)
         self._destinationCardinality: UmlAssociationLabel = cast(UmlAssociationLabel, None)
-
-        self._nameDelta: DeltaXY = DeltaXY()    # no delta to start with
 
         self.SetFormatMode(mode=FORMAT_SIZE_TO_CONTENTS)
         self.SetDraggable(True, recursive=True)
@@ -109,11 +99,10 @@ class UmlLink(LineShape):
 
         x1, y1, x2, y2 = self.FindLineEndPoints()
 
-        labelX, labelY = self.GetLabelPosition(position=ASSOCIATION_LABEL_MIDDLE)
+        labelX, labelY = self.GetLabelPosition(position=NAME_IDX)
 
         associationName: str = self.pyutLink.name
         if len(associationName) > 0:
-
             umlAssociationLabel: UmlAssociationLabel = UmlAssociationLabel(label=associationName)
             umlAssociationLabel.position = UmlPosition(x=labelX, y=labelY)
             self._setupAssociationLabel(umlAssociationLabel)
@@ -244,6 +233,7 @@ class UmlLink(LineShape):
         """
         umlFrame: UmlFrame = self.GetCanvas()
         umlAssociationLabel.SetCanvas(umlFrame)
+        umlAssociationLabel.parent = self
 
         diagram: UmlDiagram = umlFrame.umlDiagram
         diagram.AddShape(umlAssociationLabel)
