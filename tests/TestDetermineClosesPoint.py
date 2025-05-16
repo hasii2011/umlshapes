@@ -4,10 +4,10 @@ from unittest import main as unitTestMain
 
 from codeallybasic.UnitTestBase import UnitTestBase
 
-from tests.ClosestPoint import DetermineClosestPoint
-from tests.ClosestPoint import ClosestPoint
-from tests.ClosestPoint import FromPoint
-from tests.ClosestPoint import LinePoint
+from umlshapes.types.ClosestPoint import DetermineClosestPoint
+from umlshapes.types.ClosestPoint import ClosestPoint
+from umlshapes.types.ClosestPoint import FromPoint
+from umlshapes.types.ClosestPoint import LinePoint
 
 
 class TestDetermineClosesPoint(UnitTestBase):

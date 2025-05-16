@@ -13,6 +13,7 @@ from wx.lib.ogl import TextShape
 
 from umlshapes.UmlUtils import UmlUtils
 from umlshapes.links.DeltaXY import DeltaXY
+from umlshapes.types.ClosestPoint import ClosestPoint
 
 if TYPE_CHECKING:
     from umlshapes.links.UmlLink import UmlLink
@@ -54,7 +55,8 @@ class UmlAssociationLabel(ControlPointMixin, TextShape, TopLeftMixin):
         self.Show(show=True)
         self.SetCentreResize(False)
 
-        self._nameDelta: DeltaXY = DeltaXY()    # no delta to start with
+        self._nameDelta:    DeltaXY      = DeltaXY()    # no delta to start with
+        self._closestPoint: ClosestPoint = ClosestPoint()
 
     def OnDraw(self, dc: MemoryDC):
 

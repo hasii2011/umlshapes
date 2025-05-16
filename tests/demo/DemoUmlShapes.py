@@ -328,7 +328,7 @@ class DemoUmlShapes(App):
 
         umlAssociation: UmlAssociation = UmlAssociation(pyutLink=self._createAssociationPyutLink())
         umlAssociation.SetCanvas(self._diagramFrame)
-        umlAssociation.MakeLineControlPoints(n=3)       # Make this configurable
+        umlAssociation.MakeLineControlPoints(n=2)       # Make this configurable
 
         eventHandler: UmlLinkEventHandler = UmlLinkEventHandler(umlLink=umlAssociation)
         eventHandler.SetPreviousHandler(umlAssociation.GetEventHandler())

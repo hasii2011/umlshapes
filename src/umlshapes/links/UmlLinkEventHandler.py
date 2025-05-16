@@ -10,15 +10,14 @@ from wx import DC
 from wx.lib.ogl import ShapeCanvas
 from wx.lib.ogl import ShapeEvtHandler
 
+from umlshapes.links.LinkCommon import getClosestPointOnLine
 from umlshapes.links.UmlAssociationLabel import UmlAssociationLabel
+from umlshapes.types.ClosestPoint import ClosestPoint
+from umlshapes.types.Common import NAME_IDX
 from umlshapes.types.UmlPosition import UmlPosition
 
 if TYPE_CHECKING:
     from umlshapes.links.UmlLink import UmlLink
-
-NAME_IDX:                    int = 0
-SOURCE_CARDINALITY_IDX:      int = 1
-DESTINATION_CARDINALITY_IDX: int = 2
 
 
 class UmlLinkEventHandler(ShapeEvtHandler):
@@ -59,34 +58,46 @@ class UmlLinkEventHandler(ShapeEvtHandler):
         super().OnMoveLink(dc=dc, moveControlPoints=moveControlPoints)
 
         umlLink: UmlLink = self.GetShape()
+        associationName = umlLink.associationName
         #
-        if umlLink.associationName is not None:
-            nameLabel: UmlAssociationLabel = umlLink.associationName
-            nameX, nameY       = umlLink.GetLabelPosition(NAME_IDX)
+        if associationName is not None:
+            nameLabel:       UmlAssociationLabel = associationName
+
+            labelX, labelY = umlLink.GetLabelPosition(NAME_IDX)
+            # deltaX = closestPoint.x - nameLabel.position.x
+            # deltaY = closestPoint.y - nameLabel.position.y
+            # deltaX = labelX - nameLabel.position.x
+            # deltaY = labelY - nameLabel.position.y
+
             newNamePosition: UmlPosition = UmlPosition(
-                x=nameX + nameLabel.nameDelta.deltaX,
-                y=nameY + nameLabel.nameDelta.deltaY
+                x=labelX - nameLabel.nameDelta.deltaX,
+                y=labelY - nameLabel.nameDelta.deltaY
             )
-            self.logger.info(f'nameXY={(nameX, nameY)} {newNamePosition=}')
+            # self.logger.info(f'{nameLabel.closestPoint=} {newNamePosition=}')
+            self.logger.info(f'deltaX,deltaY=({nameLabel.nameDelta.deltaX},{nameLabel.nameDelta.deltaY})')
             nameLabel.position = newNamePosition
-        #     srcCardX, srcCardY = umlLink.GetLabelPosition(SOURCE_CARDINALITY_IDX)
-        #     dstCardX, dstCardY = umlLink.GetLabelPosition(DESTINATION_CARDINALITY_IDX)
-        #
-        #     self.logger.info(f'src: ({srcCardX},{srcCardY}) name: ({nameX},{nameY}) dst: ({dstCardX},{dstCardY})')
-        #
-        #     namePosition: UmlPosition = umlLink.associationName.position
-        #     nameDelta: DeltaXY = DeltaXY(
-        #         deltaX=namePosition.x - nameX,
-        #         deltaY=namePosition.y - nameX
-        #     )
-        #     umlLink._nameDelta = nameDelta
-        #     self.logger.info(f'{nameDelta=} before: {umlLink.associationName.position}')
-        #
-        #     newPosition: UmlPosition = UmlPosition(
-        #         x=namePosition.x + nameDelta.deltaX,
-        #         y=namePosition.y + nameDelta.deltaX
-        #     )
-        #
-        #     umlLink.associationName.position = newPosition
-        #
-        #     self.logger.info(f'after: {umlLink.associationName.position}')
+            self.GetShape().GetCanvas().refresh()
+            # noinspection SpellCheckingInspection
+            """         
+            srcCardX, srcCardY = umlLink.GetLabelPosition(SOURCE_CARDINALITY_IDX)
+            dstCardX, dstCardY = umlLink.GetLabelPosition(DESTINATION_CARDINALITY_IDX)
+
+            self.logger.info(f'src: ({srcCardX},{srcCardY}) name: ({nameX},{nameY}) dst: ({dstCardX},{dstCardY})')
+
+            namePosition: UmlPosition = umlLink.associationName.position
+            nameDelta: DeltaXY = DeltaXY(
+                deltaX=namePosition.x - nameX,
+                deltaY=namePosition.y - nameX
+            )
+            umlLink._nameDelta = nameDelta
+            self.logger.info(f'{nameDelta=} before: {umlLink.associationName.position}')
+
+            newPosition: UmlPosition = UmlPosition(
+                x=namePosition.x + nameDelta.deltaX,
+                y=namePosition.y + nameDelta.deltaX
+            )
+
+            umlLink.associationName.position = newPosition
+
+            self.logger.info(f'after: {umlLink.associationName.position}')
+        """

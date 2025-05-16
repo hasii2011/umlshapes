@@ -33,6 +33,7 @@ from umlshapes.shapes.UmlLineControlPoint import UmlLineControlPoint
 
 from umlshapes.shapes.eventhandlers.UmlControlPointEventHandler import UmlControlPointEventHandler
 from umlshapes.shapes.eventhandlers.UmlAssociationLabelEventHandler import UmlAssociationLabelEventHandler
+from umlshapes.types.ClosestPoint import ClosestPoint
 
 from umlshapes.types.Common import TAB
 from umlshapes.types.UmlPosition import UmlPosition
@@ -105,6 +106,7 @@ class UmlLink(LineShape):
         if len(associationName) > 0:
             umlAssociationLabel: UmlAssociationLabel = UmlAssociationLabel(label=associationName)
             umlAssociationLabel.position = UmlPosition(x=labelX, y=labelY)
+
             self._setupAssociationLabel(umlAssociationLabel)
 
             self._associationName = umlAssociationLabel
