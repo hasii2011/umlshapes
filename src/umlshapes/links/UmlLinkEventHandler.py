@@ -10,9 +10,7 @@ from wx import DC
 from wx.lib.ogl import ShapeCanvas
 from wx.lib.ogl import ShapeEvtHandler
 
-from umlshapes.links.LinkCommon import getClosestPointOnLine
 from umlshapes.links.UmlAssociationLabel import UmlAssociationLabel
-from umlshapes.types.ClosestPoint import ClosestPoint
 from umlshapes.types.Common import NAME_IDX
 from umlshapes.types.UmlPosition import UmlPosition
 
@@ -64,10 +62,6 @@ class UmlLinkEventHandler(ShapeEvtHandler):
             nameLabel:       UmlAssociationLabel = associationName
 
             labelX, labelY = umlLink.GetLabelPosition(NAME_IDX)
-            # deltaX = closestPoint.x - nameLabel.position.x
-            # deltaY = closestPoint.y - nameLabel.position.y
-            # deltaX = labelX - nameLabel.position.x
-            # deltaY = labelY - nameLabel.position.y
 
             newNamePosition: UmlPosition = UmlPosition(
                 x=labelX - nameLabel.nameDelta.deltaX,

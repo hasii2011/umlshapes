@@ -50,7 +50,8 @@ class TopLeftMixin:
 
         Returns:  The shape position
         """
-        return UmlPosition(x=self._topLeft.x, y=self._topLeft.y)
+        leftCoordinate: LeftCoordinate = self._computeTopLeft()
+        return UmlPosition(x=leftCoordinate.x, y=leftCoordinate.y)
 
     @position.setter
     def position(self, position: UmlPosition):
@@ -70,8 +71,7 @@ class TopLeftMixin:
         self._shape.SetX(centerX)
         self._shape.SetY(centerY)
 
-    @property
-    def _topLeft(self) -> LeftCoordinate:
+    def _computeTopLeft(self) -> LeftCoordinate:
         """
         This method necessary because ogl reports positions from the center of the shape
         Calculates the left top coordinate

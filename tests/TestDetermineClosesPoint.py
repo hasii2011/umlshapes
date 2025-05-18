@@ -4,10 +4,10 @@ from unittest import main as unitTestMain
 
 from codeallybasic.UnitTestBase import UnitTestBase
 
-from umlshapes.types.ClosestPoint import DetermineClosestPoint
 from umlshapes.types.ClosestPoint import ClosestPoint
 from umlshapes.types.ClosestPoint import FromPoint
 from umlshapes.types.ClosestPoint import LinePoint
+from umlshapes.types.ClosestPoint import determineClosestPoint
 
 
 class TestDetermineClosesPoint(UnitTestBase):
@@ -33,7 +33,7 @@ class TestDetermineClosesPoint(UnitTestBase):
         point2:    LinePoint = LinePoint(x=240, y=308)
         fromPoint: FromPoint = FromPoint(x=410, y=243)
 
-        actual:   ClosestPoint = DetermineClosestPoint.determineClosestPoint(point1, point2, fromPoint)
+        actual:   ClosestPoint = determineClosestPoint(point1, point2, fromPoint)
         expected: ClosestPoint = ClosestPoint(x=350, y=363)
 
         self.assertEqual(expected, actual, 'Algorithm Broken!!!')
@@ -44,7 +44,7 @@ class TestDetermineClosesPoint(UnitTestBase):
         point2:    LinePoint = LinePoint(x=550, y=440)
         fromPoint: FromPoint = FromPoint(x=540, y=445)
 
-        actual:   ClosestPoint = DetermineClosestPoint.determineClosestPoint(point1, point2, fromPoint)
+        actual:   ClosestPoint = determineClosestPoint(point1, point2, fromPoint)
         expected: ClosestPoint = ClosestPoint(x=545, y=437)
 
         self.assertEqual(expected, actual, 'Algorithm Broken!!!')

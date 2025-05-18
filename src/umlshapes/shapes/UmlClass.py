@@ -30,6 +30,7 @@ from umlshapes.UmlUtils import UmlUtils
 
 from umlshapes.frames.UmlFrame import UmlFrame
 from umlshapes.links.UmlLink import UmlLink
+from umlshapes.types.Common import LeftCoordinate
 from umlshapes.types.UmlPosition import UmlPosition
 
 if TYPE_CHECKING:
@@ -140,8 +141,9 @@ class UmlClass(ControlPointMixin, RectangleShape, TopLeftMixin):
         super().OnDraw(dc)
 
         w: int = self.size.width
-        x: int = self._topLeft.x
-        y: int = self._topLeft.y
+        leftCoordinate: LeftCoordinate = self._computeTopLeft()
+        x: int = leftCoordinate.x
+        y: int = leftCoordinate.y
 
         dc.SetFont(self._defaultFont)
         dc.SetTextForeground(self._textColor)
@@ -152,17 +154,17 @@ class UmlClass(ControlPointMixin, RectangleShape, TopLeftMixin):
             self._textHeight = self._determineTextHeight(dc)  + self._preferences.lineHeightAdjustment
 
         # drawing is restricted in the specified region of the device
-        self._startClipping(dc=dc)
-        drawingYOffset = self._drawClassHeader(dc=dc, shapeWidth=w)
+        self._startClipping(dc=dc, leftX=x, leftY=y)
+        drawingYOffset = self._drawClassHeader(dc=dc, leftX=x, leftY=y, shapeWidth=w)
 
         if self.pyutClass.showFields is True:
             dc.DrawLine(x, y + drawingYOffset, x + w, y + drawingYOffset)
-            drawingYOffset = self._drawClassFields(dc, startYOffset=drawingYOffset)
+            drawingYOffset = self._drawClassFields(dc, leftX=x, leftY=y, startYOffset=drawingYOffset)
 
         dc.DrawLine(x, y + drawingYOffset, x + w, y + drawingYOffset)
 
         if self.pyutClass.showMethods is True:
-            self._drawClassMethods(dc=dc, startYOffset=drawingYOffset)
+            self._drawClassMethods(dc=dc, leftX=x, leftY=y, startYOffset=drawingYOffset)
 
         self._endClipping(dc=dc)
 
@@ -280,18 +282,20 @@ class UmlClass(ControlPointMixin, RectangleShape, TopLeftMixin):
 
         return size.width
 
-    def _drawClassHeader(self, dc: MemoryDC | ClientDC, shapeWidth: int) -> int:
+    def _drawClassHeader(self, dc: MemoryDC | ClientDC, leftX: int, leftY: int, shapeWidth: int) -> int:
         """
         Draw the class name and the stereotype name if necessary
 
         Args:
             dc:
+            leftX
+            leftY
             shapeWidth:
 
         Returns:  The updated y drawing position
         """
-        x: int = self._topLeft.x
-        y: int = self._topLeft.y
+        x: int = leftX
+        y: int = leftY
 
         headerMargin:   int = self._textHeight
         drawingYOffset: int = headerMargin
@@ -299,7 +303,12 @@ class UmlClass(ControlPointMixin, RectangleShape, TopLeftMixin):
         self._drawClassName(dc, drawingYOffset, shapeWidth, x, y)
         drawingYOffset += self._textHeight
 
-        drawingYOffset = self._drawStereotypeValue(dc=dc, shapeWidth=shapeWidth, headerMargin=headerMargin, drawingYOffset=drawingYOffset)
+        drawingYOffset = self._drawStereotypeValue(dc=dc, leftX=leftX,
+                                                   leftY=leftY,
+                                                   shapeWidth=shapeWidth,
+                                                   headerMargin=headerMargin,
+                                                   drawingYOffset=drawingYOffset
+                                                   )
 
         return drawingYOffset
 
@@ -322,20 +331,22 @@ class UmlClass(ControlPointMixin, RectangleShape, TopLeftMixin):
 
         dc.DrawText(className, nameX, nameY)
 
-    def _drawStereotypeValue(self, dc: MemoryDC, shapeWidth: int, headerMargin: int, drawingYOffset: int) -> int:
+    def _drawStereotypeValue(self, dc: MemoryDC, leftX: int, leftY: int, shapeWidth: int, headerMargin: int, drawingYOffset: int) -> int:
         """
         Draw the stereotype value;  If class has no stereotype, just leave a blank space
 
         Args:
             dc:
+            leftX
+            leftY
             shapeWidth:
             headerMargin:
             drawingYOffset:
 
         Returns:    Updated Y offset
         """
-        x: int = self._topLeft.x
-        y: int = self._topLeft.y
+        x: int = leftX
+        y: int = leftY
 
         stereoTypeValue:      str = self._getStereoTypeValue()
         stereoTypeValueWidth: int = self.textWidth(dc, stereoTypeValue)
@@ -349,17 +360,19 @@ class UmlClass(ControlPointMixin, RectangleShape, TopLeftMixin):
 
         return updatedYOffset
 
-    def _drawClassFields(self, dc: MemoryDC, startYOffset: int):
+    def _drawClassFields(self, dc: MemoryDC, leftX: int, leftY: int, startYOffset: int):
         """
 
         Args:
             dc:
+            leftX
+            leftY
             startYOffset:  Where to start drawing
 
         Returns:  The updated y drawing position
         """
-        x:       int = self._topLeft.x
-        y:       int = self._topLeft.y
+        x:       int = leftX
+        y:       int = leftY
         yOffset: int = startYOffset
 
         textHeight: int       = self._textHeight
@@ -384,12 +397,14 @@ class UmlClass(ControlPointMixin, RectangleShape, TopLeftMixin):
 
         return yOffset
 
-    def _drawClassMethods(self, dc: MemoryDC, startYOffset: int):
+    def _drawClassMethods(self, dc: MemoryDC, leftX: int, leftY: int, startYOffset: int):
         """
         Display methods
 
         Args:
             dc:
+            leftX
+            leftY
             startYOffset:
         """
         yOffset:    int = startYOffset
@@ -404,11 +419,11 @@ class UmlClass(ControlPointMixin, RectangleShape, TopLeftMixin):
             if self._eligibleToDraw(pyutClass=pyutClass, pyutMethod=method) is True:
 
                 displayParameters: PyutDisplayParameters = pyutClass.displayParameters
-                self._drawMethod(dc, method, displayParameters, yOffset)
+                self._drawMethod(dc, method, displayParameters, leftX=leftX, leftY=leftY, startYOffset=yOffset)
 
                 yOffset += textHeight
 
-    def _drawMethod(self, dc: MemoryDC, pyutMethod: PyutMethod, displayParameters: PyutDisplayParameters, startYOffset: int):
+    def _drawMethod(self, dc: MemoryDC, pyutMethod: PyutMethod, displayParameters: PyutDisplayParameters, leftX: int, leftY: int, startYOffset: int):
         """
         If the preference is not set at the individual class level, then defer to global preference; Otherwise,
         respect the class level preference
@@ -417,10 +432,12 @@ class UmlClass(ControlPointMixin, RectangleShape, TopLeftMixin):
             dc:
             pyutMethod:
             displayParameters:
+            leftX
+            leftY
             startYOffset:
         """
-        x: int = self._topLeft.x
-        y: int = self._topLeft.y
+        x: int = leftX
+        y: int = leftY
 
         methodStr: str = self._getMethodRepresentation(pyutMethod, displayParameters)
 
@@ -504,7 +521,7 @@ class UmlClass(ControlPointMixin, RectangleShape, TopLeftMixin):
             ans = True
         return ans
 
-    def _startClipping(self, dc: DC):
+    def _startClipping(self, dc: DC, leftX: int, leftY: int):
         """
         Convenience method
 
@@ -514,8 +531,8 @@ class UmlClass(ControlPointMixin, RectangleShape, TopLeftMixin):
 
         w: int = self.GetWidth()
         h: int = self.GetHeight()
-        x: int = self._topLeft.x
-        y: int = self._topLeft.y
+        x: int = leftX
+        y: int = leftY
 
         dc.SetClippingRegion(x, y, w, h)
 

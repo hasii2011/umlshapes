@@ -35,8 +35,8 @@ class UmlControlPointEventHandler(ShapeEvtHandler):
         shape:  Shape        = self.GetShape()
         canvas: DiagramFrame = shape.GetCanvas()
 
-        canvas.refresh()
         super().OnDragLeft(draw, x, y, keys, attachment)
+        canvas.refresh()
 
     def OnBeginDragLeft(self, x, y, keys=0, attachment=0):
         """

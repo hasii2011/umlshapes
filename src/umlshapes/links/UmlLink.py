@@ -9,6 +9,7 @@ from os import linesep as osLineSep
 from wx import Point
 
 from wx import MemoryDC
+from wx.core import BLUE_PEN
 
 from wx.lib.ogl import CONTROL_POINT_ENDPOINT_FROM
 from wx.lib.ogl import CONTROL_POINT_ENDPOINT_TO
@@ -33,7 +34,6 @@ from umlshapes.shapes.UmlLineControlPoint import UmlLineControlPoint
 
 from umlshapes.shapes.eventhandlers.UmlControlPointEventHandler import UmlControlPointEventHandler
 from umlshapes.shapes.eventhandlers.UmlAssociationLabelEventHandler import UmlAssociationLabelEventHandler
-from umlshapes.types.ClosestPoint import ClosestPoint
 
 from umlshapes.types.Common import TAB
 from umlshapes.types.UmlPosition import UmlPosition
@@ -130,7 +130,16 @@ class UmlLink(LineShape):
     def OnDraw(self, dc: MemoryDC):
 
         super().OnDraw(dc=dc)
+
+        labelX, labelY = self.GetLabelPosition(NAME_IDX)
+
+        savePen = dc.GetPen()
+        dc.SetPen(BLUE_PEN)
+        dc.DrawText(f'({labelX},{labelY})', x=labelX, y=labelY)
+        dc.DrawRectangle(labelX, labelY, 5, 5)
         # self._associationName.Draw(dc=dc)
+
+        dc.SetPen(savePen)
 
     def MakeControlPoints(self):
         """

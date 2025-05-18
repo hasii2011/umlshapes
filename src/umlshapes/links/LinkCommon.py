@@ -11,7 +11,7 @@ from umlshapes.links.UmlAssociationLabel import UmlAssociationLabel
 from umlshapes.types.ClosestPoint import ClosestPoint
 from umlshapes.types.ClosestPoint import FromPoint
 from umlshapes.types.ClosestPoint import LinePoint
-from umlshapes.types.ClosestPoint import DetermineClosestPoint
+from umlshapes.types.ClosestPoint import determineClosestPoint
 
 from umlshapes.types.UmlPosition import UmlPosition
 
@@ -47,7 +47,7 @@ def getClosestPointOnLine(umlLink: 'UmlLink', umlAssociationLabel: UmlAssociatio
             x=topLeft.x,
             y=topLeft.y
         )
-        closestPoint: ClosestPoint = DetermineClosestPoint.determineClosestPoint(
+        closestPoint: ClosestPoint = determineClosestPoint(
             startPoint=startPoint,
             endPoint=endPoint,
             fromPoint=fromPoint
