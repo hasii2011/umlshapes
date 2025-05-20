@@ -6,10 +6,11 @@ from logging import getLogger
 
 from os import linesep as osLineSep
 
-from wx import Point
+from wx import BLUE_PEN
 
+from wx import Pen
+from wx import Point
 from wx import MemoryDC
-from wx.core import BLUE_PEN
 
 from wx.lib.ogl import CONTROL_POINT_ENDPOINT_FROM
 from wx.lib.ogl import CONTROL_POINT_ENDPOINT_TO
@@ -24,6 +25,7 @@ from pyutmodelv2.PyutLink import PyutLink
 from umlshapes.UmlDiagram import UmlDiagram
 
 from umlshapes.frames.UmlFrame import UmlFrame
+from umlshapes.links.LabelType import LabelType
 
 from umlshapes.links.UmlAssociationLabel import UmlAssociationLabel
 from umlshapes.links.UmlLinkEventHandler import NAME_IDX
@@ -34,6 +36,8 @@ from umlshapes.shapes.UmlLineControlPoint import UmlLineControlPoint
 
 from umlshapes.shapes.eventhandlers.UmlControlPointEventHandler import UmlControlPointEventHandler
 from umlshapes.shapes.eventhandlers.UmlAssociationLabelEventHandler import UmlAssociationLabelEventHandler
+from umlshapes.types.Common import DESTINATION_CARDINALITY_IDX
+from umlshapes.types.Common import SOURCE_CARDINALITY_IDX
 
 from umlshapes.types.Common import TAB
 from umlshapes.types.UmlPosition import UmlPosition
@@ -98,48 +102,22 @@ class UmlLink(LineShape):
 
     def createAssociationLabels(self):
 
-        x1, y1, x2, y2 = self.FindLineEndPoints()
-
-        labelX, labelY = self.GetLabelPosition(position=NAME_IDX)
-
-        associationName: str = self.pyutLink.name
-        if len(associationName) > 0:
-            umlAssociationLabel: UmlAssociationLabel = UmlAssociationLabel(label=associationName)
-            umlAssociationLabel.position = UmlPosition(x=labelX, y=labelY)
-
-            self._setupAssociationLabel(umlAssociationLabel)
-
-            self._associationName = umlAssociationLabel
-
-        sourceCardinality: str = self._pyutLink.sourceCardinality
-        if len(sourceCardinality) > 0:
-            sourceCardinalityLabel: UmlAssociationLabel = UmlAssociationLabel(label=sourceCardinality)
-            sourceCardinalityLabel.position = UmlPosition(x=x1, y=y1)
-            self._setupAssociationLabel(sourceCardinalityLabel)
-
-            self._sourceCardinality = sourceCardinalityLabel
-
-        destinationCardinality: str = self.pyutLink.destinationCardinality
-        if len(destinationCardinality) > 0:
-            destinationCardinalityLabel: UmlAssociationLabel = UmlAssociationLabel(label=destinationCardinality)
-            destinationCardinalityLabel.position = UmlPosition(x=x2, y=y2)
-            self._setupAssociationLabel(destinationCardinalityLabel)
-
-            self._sourceCardinality = destinationCardinalityLabel
+        self._createAssociationName()
+        self._createSourceCardinality()
+        self._createDestinationCardinality()
 
     def OnDraw(self, dc: MemoryDC):
 
         super().OnDraw(dc=dc)
 
-        labelX, labelY = self.GetLabelPosition(NAME_IDX)
+        if self._preferences.drawLabelMarker is True:
+            labelX, labelY = self.GetLabelPosition(NAME_IDX)
 
-        savePen = dc.GetPen()
-        dc.SetPen(BLUE_PEN)
-        dc.DrawText(f'({labelX},{labelY})', x=labelX, y=labelY)
-        dc.DrawRectangle(labelX, labelY, 5, 5)
-        # self._associationName.Draw(dc=dc)
-
-        dc.SetPen(savePen)
+            savePen: Pen = dc.GetPen()
+            dc.SetPen(BLUE_PEN)
+            dc.DrawText(f'({labelX},{labelY})', x=labelX, y=labelY)
+            dc.DrawRectangle(labelX, labelY, 5, 5)
+            dc.SetPen(savePen)
 
     def MakeControlPoints(self):
         """
@@ -236,6 +214,32 @@ class UmlLink(LineShape):
 
         umlLineControlPoint.SetEventHandler(eventHandler)
 
+    def _createDestinationCardinality(self):
+
+        dstCardX, dstCardY = self.GetLabelPosition(position=DESTINATION_CARDINALITY_IDX)
+        self._destinationCardinality = self._createAssociationLabel(x=dstCardX, y=dstCardY, text=self.pyutLink.destinationCardinality, labelType=LabelType.DESTINATION_CARDINALITY)
+
+    def _createSourceCardinality(self):
+
+        srcCardX, srcCardY = self.GetLabelPosition(position=SOURCE_CARDINALITY_IDX)
+        self._sourceCardinality = self._createAssociationLabel(x=srcCardX, y=srcCardY, text=self.pyutLink.sourceCardinality, labelType=LabelType.SOURCE_CARDINALITY)
+
+    def _createAssociationName(self):
+
+        labelX, labelY = self.GetLabelPosition(position=NAME_IDX)
+        self._associationName = self._createAssociationLabel(x=labelX, y=labelY, text=self.pyutLink.name, labelType=LabelType.ASSOCIATION_NAME)
+
+    def _createAssociationLabel(self, x: int, y: int, text: str, labelType: LabelType) -> UmlAssociationLabel:
+
+        assert text is not None, 'Developer error'
+
+        umlAssociationLabel: UmlAssociationLabel = UmlAssociationLabel(label=text, labelType=labelType)
+
+        umlAssociationLabel.position = UmlPosition(x=x, y=y)
+        self._setupAssociationLabel(umlAssociationLabel)
+
+        return umlAssociationLabel
+
     def _setupAssociationLabel(self, umlAssociationLabel):
         """
 
@@ -256,9 +260,7 @@ class UmlLink(LineShape):
 
         Args:
             umlAssociationLabel:
-
         """
-
         eventHandler: UmlAssociationLabelEventHandler = UmlAssociationLabelEventHandler()
 
         eventHandler.SetShape(umlAssociationLabel)

@@ -10,8 +10,12 @@ from wx import DC
 from wx.lib.ogl import ShapeCanvas
 from wx.lib.ogl import ShapeEvtHandler
 
+from umlshapes.links.DeltaXY import DeltaXY
+from umlshapes.links.LabelType import LabelType
 from umlshapes.links.UmlAssociationLabel import UmlAssociationLabel
+from umlshapes.types.Common import DESTINATION_CARDINALITY_IDX
 from umlshapes.types.Common import NAME_IDX
+from umlshapes.types.Common import SOURCE_CARDINALITY_IDX
 from umlshapes.types.UmlPosition import UmlPosition
 
 if TYPE_CHECKING:
@@ -56,42 +60,27 @@ class UmlLinkEventHandler(ShapeEvtHandler):
         super().OnMoveLink(dc=dc, moveControlPoints=moveControlPoints)
 
         umlLink: UmlLink = self.GetShape()
-        associationName = umlLink.associationName
+        associationName:        UmlAssociationLabel = umlLink.associationName
+        sourceCardinality:      UmlAssociationLabel = umlLink.sourceCardinality
+        destinationCardinality: UmlAssociationLabel = umlLink.destinationCardinality
         #
-        if associationName is not None:
-            nameLabel:       UmlAssociationLabel = associationName
-
+        if associationName is not None and associationName.labelType == LabelType.ASSOCIATION_NAME:
             labelX, labelY = umlLink.GetLabelPosition(NAME_IDX)
-
-            newNamePosition: UmlPosition = UmlPosition(
-                x=labelX - nameLabel.nameDelta.deltaX,
-                y=labelY - nameLabel.nameDelta.deltaY
-            )
-            # self.logger.info(f'{nameLabel.closestPoint=} {newNamePosition=}')
-            self.logger.info(f'deltaX,deltaY=({nameLabel.nameDelta.deltaX},{nameLabel.nameDelta.deltaY})')
-            nameLabel.position = newNamePosition
-            self.GetShape().GetCanvas().refresh()
-            # noinspection SpellCheckingInspection
-            """         
+            associationName.position = self._computeRelativePosition(labelX=labelX, labelY=labelY, linkDelta=associationName.linkDelta)
+        if sourceCardinality is not None:
             srcCardX, srcCardY = umlLink.GetLabelPosition(SOURCE_CARDINALITY_IDX)
+            sourceCardinality.position = self._computeRelativePosition(labelX=srcCardX, labelY=srcCardY, linkDelta=sourceCardinality.linkDelta)
+        if destinationCardinality is not None:
             dstCardX, dstCardY = umlLink.GetLabelPosition(DESTINATION_CARDINALITY_IDX)
+            destinationCardinality.position = self._computeRelativePosition(labelX=dstCardX, labelY=dstCardY, linkDelta=destinationCardinality.linkDelta)
 
-            self.logger.info(f'src: ({srcCardX},{srcCardY}) name: ({nameX},{nameY}) dst: ({dstCardX},{dstCardY})')
+        self.GetShape().GetCanvas().refresh()
 
-            namePosition: UmlPosition = umlLink.associationName.position
-            nameDelta: DeltaXY = DeltaXY(
-                deltaX=namePosition.x - nameX,
-                deltaY=namePosition.y - nameX
-            )
-            umlLink._nameDelta = nameDelta
-            self.logger.info(f'{nameDelta=} before: {umlLink.associationName.position}')
+    def _computeRelativePosition(self, labelX: int, labelY: int, linkDelta: DeltaXY):
 
-            newPosition: UmlPosition = UmlPosition(
-                x=namePosition.x + nameDelta.deltaX,
-                y=namePosition.y + nameDelta.deltaX
-            )
-
-            umlLink.associationName.position = newPosition
-
-            self.logger.info(f'after: {umlLink.associationName.position}')
-        """
+        newNamePosition: UmlPosition = UmlPosition(
+            x=labelX - linkDelta.deltaX,
+            y=labelY - linkDelta.deltaY
+        )
+        self.logger.debug(f'labelX,labelY=({labelX},{labelY})  deltaX,deltaY=({linkDelta.deltaX},{linkDelta.deltaY})')
+        return newNamePosition

@@ -13,7 +13,7 @@ from wx.lib.ogl import TextShape
 
 from umlshapes.UmlUtils import UmlUtils
 from umlshapes.links.DeltaXY import DeltaXY
-from umlshapes.types.ClosestPoint import ClosestPoint
+from umlshapes.links.LabelType import LabelType
 
 if TYPE_CHECKING:
     from umlshapes.links.UmlLink import UmlLink
@@ -28,7 +28,14 @@ from umlshapes.types.UmlDimensions import UmlDimensions
 
 class UmlAssociationLabel(ControlPointMixin, TextShape, TopLeftMixin):
 
-    def __init__(self, label: str = '', size: UmlDimensions = None):
+    def __init__(self, label: str = '', size: UmlDimensions = None, labelType: LabelType = LabelType.NOT_SET):
+        """
+
+        Args:
+            label:
+            size:
+            labelType: Source or Destination Cardinality or association name
+        """
 
         # Use preferences to get initial size if not specified
         self._preferences: UmlPreferences = UmlPreferences()
@@ -55,8 +62,8 @@ class UmlAssociationLabel(ControlPointMixin, TextShape, TopLeftMixin):
         self.Show(show=True)
         self.SetCentreResize(False)
 
-        self._nameDelta:    DeltaXY      = DeltaXY()    # no delta to start with
-        self._closestPoint: ClosestPoint = ClosestPoint()
+        self._linkDelta: DeltaXY   = DeltaXY()          # no delta to start with
+        self._labelType: LabelType = labelType
 
     def OnDraw(self, dc: MemoryDC):
 
@@ -83,12 +90,20 @@ class UmlAssociationLabel(ControlPointMixin, TextShape, TopLeftMixin):
         self.SetParent(parent)
 
     @property
-    def nameDelta(self) -> DeltaXY:
-        return self._nameDelta
+    def linkDelta(self) -> DeltaXY:
+        return self._linkDelta
 
-    @nameDelta.setter
-    def nameDelta(self, deltaXY: DeltaXY):
-        self._nameDelta = deltaXY
+    @linkDelta.setter
+    def linkDelta(self, deltaXY: DeltaXY):
+        self._linkDelta = deltaXY
+
+    @property
+    def labelType(self) -> LabelType:
+        return self._labelType
+
+    @labelType.setter
+    def labelType(self, labelType: LabelType):
+        self._labelType = labelType
 
     def coordinateToRelative(self, x: int, y: int):
         """

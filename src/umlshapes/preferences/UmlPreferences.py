@@ -118,6 +118,7 @@ debugPreferences: ValueDescriptions = ValueDescriptions(
         KeyName('classDiagramFromCtxMenu'): ValueDescription(defaultValue='True',  deserializer=SecureConversions.secureBoolean),
         KeyName('trackMouse'):              ValueDescription(defaultValue='True',  deserializer=SecureConversions.secureBoolean),
         KeyName('trackMouseInterval'):      ValueDescription(defaultValue='10',    deserializer=SecureConversions.secureInteger),
+        KeyName('drawLabelMarker'):         ValueDescription(defaultValue='False', deserializer=SecureConversions.secureBoolean),
     }
 )
 

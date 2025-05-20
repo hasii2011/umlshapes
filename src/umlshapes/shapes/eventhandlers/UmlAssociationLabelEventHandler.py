@@ -5,11 +5,15 @@ from logging import Logger
 from logging import getLogger
 
 from umlshapes.links.DeltaXY import DeltaXY
+from umlshapes.links.LabelType import LabelType
 
 from umlshapes.links.UmlAssociationLabel import UmlAssociationLabel
+from umlshapes.shapes.PositionReporter import PositionReporter
 from umlshapes.shapes.eventhandlers.UmlBaseEventHandler import UmlBaseEventHandler
+from umlshapes.types.Common import DESTINATION_CARDINALITY_IDX
 from umlshapes.types.Common import LeftCoordinate
 from umlshapes.types.Common import NAME_IDX
+from umlshapes.types.Common import SOURCE_CARDINALITY_IDX
 from umlshapes.types.UmlPosition import UmlPosition
 
 REPORT_INTERVAL: int = 10
@@ -42,41 +46,57 @@ class UmlAssociationLabelEventHandler(UmlBaseEventHandler):
         Returns:
 
         """
-
         super().OnMovePost(dc, x, y, oldX, oldY, display)
 
-        from umlshapes.links.UmlLink import UmlLink
-
-        self._debugPrint(f'xy=({x},{y})')
-
         umlAssociationLabel: UmlAssociationLabel = cast(UmlAssociationLabel, self.GetShape())
-        umlLink:             UmlLink             = umlAssociationLabel.parent
+        umlLink:             PositionReporter    = umlAssociationLabel.parent
+
+        self._debugPrint(f'label type: {umlAssociationLabel.labelType} xy=({x},{y})')
+
+        if umlAssociationLabel.labelType == LabelType.ASSOCIATION_NAME:
+            linkLabelX, linkLabelY = umlLink.GetLabelPosition(NAME_IDX)
+        elif umlAssociationLabel.labelType == LabelType.SOURCE_CARDINALITY:
+            linkLabelX, linkLabelY = umlLink.GetLabelPosition(SOURCE_CARDINALITY_IDX)
+        elif umlAssociationLabel.labelType == LabelType.DESTINATION_CARDINALITY:
+            linkLabelX, linkLabelY = umlLink.GetLabelPosition(DESTINATION_CARDINALITY_IDX)
+        else:
+            assert False, 'Developer error unknown label type'
 
         labelPosition: UmlPosition = umlAssociationLabel.position
-        linkLabelX, linkLabelY = umlLink.GetLabelPosition(NAME_IDX)
-
+        #
         #
         #
         leftCoordinate: LeftCoordinate = self._convertToTopLeft(x=x, y=y, umlAssociationLabel=umlAssociationLabel)
+        deltaXY = self._calculateDelta(labelPosition, leftCoordinate, linkLabelX, linkLabelY)
+        umlAssociationLabel.linkDelta = deltaXY
+
+    def _calculateDelta(self, labelPosition: UmlPosition, leftCoordinate: LeftCoordinate, linkLabelX, linkLabelY) -> DeltaXY:
+        """
+
+        Args:
+            labelPosition:
+            leftCoordinate:
+            linkLabelX:
+            linkLabelY:
+
+        Returns:  The new delta from the reference point
+        """
         deltaX: int = linkLabelX - leftCoordinate.x
         deltaY: int = linkLabelY - leftCoordinate.y
-
         if linkLabelX > labelPosition.x:
             deltaX = abs(deltaX)
         else:
             pass
-
         if linkLabelY > labelPosition.y:
             deltaY = abs(deltaY)
         else:
             pass
-
         deltaXY: DeltaXY = DeltaXY(
             deltaX=deltaX,
             deltaY=deltaY
         )
-        self.logger.info(f'{leftCoordinate=} {deltaXY=}')
-        umlAssociationLabel.nameDelta = deltaXY
+        self.logger.debug(f'{leftCoordinate=} {deltaXY=}')
+        return deltaXY
 
     def _convertToTopLeft(self, x: int, y: int, umlAssociationLabel: UmlAssociationLabel) -> LeftCoordinate:
         """
@@ -100,7 +120,7 @@ class UmlAssociationLabelEventHandler(UmlBaseEventHandler):
     def _debugPrint(self, message: str):
 
         if self._currentDebugCount <= 0:
-            self.logger.info(message)
+            self.logger.debug(message)
             self._currentDebugCount = REPORT_INTERVAL
         else:
             self._currentDebugCount -= 1
