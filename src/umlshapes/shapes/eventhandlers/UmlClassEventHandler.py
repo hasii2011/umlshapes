@@ -5,7 +5,7 @@ from logging import Logger
 from logging import getLogger
 
 from pyutmodelv2.PyutClass import PyutClass
-from wx import ID_OK
+from wx import OK
 
 from umlshapes.frames.UmlFrame import UmlFrame
 from umlshapes.preferences.UmlPreferences import UmlPreferences
@@ -49,5 +49,5 @@ class UmlClassEventHandler(UmlBaseEventHandler):
         umlFrame:  UmlFrame  = umlClass.GetCanvas()
 
         with DlgEditClass(umlFrame, pyutClass) as dlg:
-            if dlg.ShowModal() == ID_OK:
+            if dlg.ShowModal() == OK:
                 umlFrame.refresh()

@@ -25,21 +25,21 @@ from pyutmodelv2.PyutLink import PyutLink
 from umlshapes.UmlDiagram import UmlDiagram
 
 from umlshapes.frames.UmlFrame import UmlFrame
-from umlshapes.links.LabelType import LabelType
-
-from umlshapes.links.UmlAssociationLabel import UmlAssociationLabel
-from umlshapes.links.UmlLinkEventHandler import NAME_IDX
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
-from umlshapes.shapes.UmlLineControlPoint import UmlLineControlPoint
+from umlshapes.links.LabelType import LabelType
+from umlshapes.links.UmlAssociationLabel import UmlAssociationLabel
+from umlshapes.links.UmlLinkEventHandler import NAME_IDX
+from umlshapes.links.UmlAssociationLabelEventHandler import UmlAssociationLabelEventHandler
 
+from umlshapes.shapes.UmlLineControlPoint import UmlLineControlPoint
 from umlshapes.shapes.eventhandlers.UmlControlPointEventHandler import UmlControlPointEventHandler
-from umlshapes.shapes.eventhandlers.UmlAssociationLabelEventHandler import UmlAssociationLabelEventHandler
+
 from umlshapes.types.Common import DESTINATION_CARDINALITY_IDX
 from umlshapes.types.Common import SOURCE_CARDINALITY_IDX
-
 from umlshapes.types.Common import TAB
+
 from umlshapes.types.UmlPosition import UmlPosition
 
 

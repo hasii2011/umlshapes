@@ -52,11 +52,11 @@ class UmlAssociationLabel(ControlPointMixin, TextShape, TopLeftMixin):
         self.logger: Logger = getLogger(__name__)
 
         if label == '':
-            realLabel: str = self._preferences.defaultAssociationName
+            self._label: str = self._preferences.defaultAssociationName
         else:
-            realLabel = label
+            self._label = label
 
-        self.AddText(realLabel)
+        self.AddText(self._label)
         self.SetFormatMode(mode=FORMAT_CENTRE_HORIZ | FORMAT_CENTRE_VERT)
         self.SetDraggable(drag=True)
         self.Show(show=True)
@@ -104,6 +104,16 @@ class UmlAssociationLabel(ControlPointMixin, TextShape, TopLeftMixin):
     @labelType.setter
     def labelType(self, labelType: LabelType):
         self._labelType = labelType
+
+    @property
+    def label(self) -> str:
+        return self._label
+
+    @label.setter
+    def label(self, label: str):
+        self._label = label
+        self.ClearText()
+        self.AddText(label)
 
     def coordinateToRelative(self, x: int, y: int):
         """
