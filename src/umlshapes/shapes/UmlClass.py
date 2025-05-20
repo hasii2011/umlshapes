@@ -10,7 +10,6 @@ from wx import ClientDC
 from wx import Colour
 from wx import DC
 from wx import Font
-from wx import ID_OK
 from wx import MemoryDC
 from wx import Size
 
@@ -40,7 +39,6 @@ from umlshapes.preferences.UmlPreferences import UmlPreferences
 
 from umlshapes.shapes.TopLeftMixin import TopLeftMixin
 from umlshapes.shapes.ControlPointMixin import ControlPointMixin
-from umlshapes.shapes.UmlClassMenuHandler import UmlClassMenuHandler
 
 from umlshapes.types.UmlColor import UmlColor
 from umlshapes.types.UmlDimensions import UmlDimensions
@@ -88,8 +86,6 @@ class UmlClass(ControlPointMixin, RectangleShape, TopLeftMixin):
         self._defaultFont:  Font     = UmlUtils.defaultFont()
         self._textHeight:   int      = cast(int, None)
         self._margin:       int      = self._preferences.classTextMargin
-
-        self._menuHandler: UmlClassMenuHandler = cast(UmlClassMenuHandler, None)
 
         self.SetId(UmlUtils.getID())
         self.SetDraggable(drag=True)
@@ -167,33 +163,6 @@ class UmlClass(ControlPointMixin, RectangleShape, TopLeftMixin):
             self._drawClassMethods(dc=dc, leftX=x, leftY=y, startYOffset=drawingYOffset)
 
         self._endClipping(dc=dc)
-
-    def OnRightClick(self, x: int, y: int, keys: int = 0, attachment: int = 0):
-        """
-        Currently, a place holder to popup a UmlClass specific dialog
-
-        Args:
-            x:
-            y:
-            keys:
-            attachment:
-        """
-        super().OnRightClick(x=x, y=y, keys=keys, attachment=attachment)
-
-        if self._menuHandler is None:
-            self._menuHandler = UmlClassMenuHandler(umlClass=self)
-
-        self._menuHandler.popupMenu(x=x, y=y)
-
-    def OnLeftDoubleClick(self, x: int, y: int, keys: int = 0, attachment: int = 0):
-
-        from umlshapes.dialogs.DlgEditClass import DlgEditClass
-
-        super().OnLeftDoubleClick(x=x, y=y, keys=keys, attachment=attachment)
-
-        with DlgEditClass(self.umlFrame, self.pyutClass) as dlg:
-            if dlg.ShowModal() == ID_OK:
-                self.umlFrame.refresh()
 
     # This is dangerous, accessing internal stuff
     # noinspection PyProtectedMember
