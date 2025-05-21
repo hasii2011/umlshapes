@@ -28,6 +28,7 @@ from pyutmodelv2.enumerations.PyutDisplayParameters import PyutDisplayParameters
 from umlshapes.UmlUtils import UmlUtils
 
 from umlshapes.frames.UmlFrame import UmlFrame
+from umlshapes.links.UmlAssociation import UmlAssociation
 from umlshapes.links.UmlLink import UmlLink
 from umlshapes.types.Common import LeftCoordinate
 from umlshapes.types.UmlPosition import UmlPosition
@@ -128,9 +129,10 @@ class UmlClass(ControlPointMixin, RectangleShape, TopLeftMixin):
 
         self.AddLine(line=umlLink, other=destinationClass)
 
-        x1, y1, x2, y2 = umlLink.FindLineEndPoints()
-        self.logger.info(f'start: ({x1},{y1}) - end: ({x2},{y2})')
-        umlLink.createAssociationLabels()
+        if isinstance(umlLink, UmlAssociation):
+            x1, y1, x2, y2 = umlLink.FindLineEndPoints()
+            self.logger.info(f'start: ({x1},{y1}) - end: ({x2},{y2})')
+            umlLink.createAssociationLabels()
 
     def OnDraw(self, dc: MemoryDC):
 

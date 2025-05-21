@@ -34,7 +34,7 @@ jobs:
             pip install pyutmodelv2==2.2.3
             pip install six==1.16.0
             pip install attrdict3
-            pip install wxPython
+            pip install -v -U -f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-24.04  wxPython
             pip install hrid==0.2.4
       - run:
             name: run tests
