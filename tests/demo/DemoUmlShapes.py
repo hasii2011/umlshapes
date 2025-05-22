@@ -45,6 +45,7 @@ from umlshapes.UmlDiagram import UmlDiagram
 from umlshapes.frames.UmlClassDiagramFrame import UmlClassDiagramFrame
 
 from umlshapes.links.UmlAssociation import UmlAssociation
+from umlshapes.links.UmlComposition import UmlComposition
 from umlshapes.links.UmlInheritance import UmlInheritance
 from umlshapes.links.UmlLinkEventHandler import UmlLinkEventHandler
 
@@ -97,6 +98,7 @@ class DemoUmlShapes(App):
         self._ID_DISPLAY_UML_CLASS:       int = wxNewIdRef()
         self._ID_DISPLAY_UML_ASSOCIATION: int = wxNewIdRef()
         self._ID_DISPLAY_UML_INHERITANCE: int = wxNewIdRef()
+        self._ID_DISPLAY_UML_COMPOSITION: int = wxNewIdRef()
 
         self._textCounter:        int = 0
         self._noteCounter:        int = 0
@@ -105,6 +107,7 @@ class DemoUmlShapes(App):
         self._classCounter:       int = 0
         self._associationCounter: int = 0
         self._inheritanceCounter: int = 0
+        self._compositionCounter: int = 0
 
         self._preferences: UmlPreferences = UmlPreferences()
         self._frame:       SizedFrame     = SizedFrame(parent=None, title="Test UML Shapes", size=(FRAME_WIDTH, FRAME_HEIGHT), style=DEFAULT_FRAME_STYLE | FRAME_FLOAT_ON_PARENT)
@@ -113,7 +116,6 @@ class DemoUmlShapes(App):
 
         sizedPanel: SizedPanel = self._frame.GetContentsPane()
         sizedPanel.SetSizerProps(expand=True, proportion=1)
-        # self._diagramFrame = DemoUmlFrame(parent=sizedPanel, demoEventEngine=self._demoEventEngine)
         self._diagramFrame = UmlClassDiagramFrame(parent=sizedPanel)
         # noinspection PyUnresolvedReferences
         self._diagramFrame.SetSizerProps(expand=True, proportion=1)
@@ -139,6 +141,7 @@ class DemoUmlShapes(App):
         fileMenu.AppendSeparator()
         # fileMenu.Append(ID_PREFERENCES, "P&references", "Ogl preferences")
 
+        viewMenu.Append(id=self._ID_DISPLAY_UML_COMPOSITION, item='UML Composition', helpString='Display a composition Link')
         viewMenu.Append(id=self._ID_DISPLAY_UML_INHERITANCE, item='UML Inheritance', helpString='Display an Inheritance Link')
         viewMenu.Append(id=self._ID_DISPLAY_UML_ASSOCIATION, item='Uml Association', helpString='Display Bare Association')
         viewMenu.Append(id=self._ID_DISPLAY_UML_CLASS,       item='Uml Class',          helpString='Display an Uml Class')
@@ -165,6 +168,7 @@ class DemoUmlShapes(App):
         self.Bind(EVT_MENU, self._onDisplayElement, id=self._ID_DISPLAY_UML_CLASS)
         self.Bind(EVT_MENU, self._onDisplayElement, id=self._ID_DISPLAY_UML_ASSOCIATION)
         self.Bind(EVT_MENU, self._onDisplayElement, id=self._ID_DISPLAY_UML_INHERITANCE)
+        self.Bind(EVT_MENU, self._onDisplayElement, id=self._ID_DISPLAY_UML_COMPOSITION)
         # self.Bind(EVT_MENU, self._onDisplayElement, id=self._ID_DISPLAY_OGL_COMPOSITION)
         # self.Bind(EVT_MENU, self._onDisplayElement, id=self._ID_DISPLAY_OGL_INTERFACE)
         # self.Bind(EVT_MENU, self._onDisplayElement, id=self._ID_DISPLAY_SEQUENCE_DIAGRAM)
@@ -189,6 +193,8 @@ class DemoUmlShapes(App):
                 self._displayBareAssociation()
             case self._ID_DISPLAY_UML_INHERITANCE:
                 self._displayUmlInheritance()
+            case self._ID_DISPLAY_UML_COMPOSITION:
+                self._displayUmlComposition()
             # case self._ID_DISPLAY_SEQUENCE_DIAGRAM:
             #     self._displaySequenceDiagram()
             # case self._ID_DISPLAY_OGL_COMPOSITION:
@@ -335,6 +341,30 @@ class DemoUmlShapes(App):
         umlAssociation.Show(True)
 
         self.logger.info(f'controlPoints: {umlAssociation.GetLineControlPoints()}')
+
+    def _displayUmlComposition(self):
+
+        composerUmlClass, composedUmlClass = self._createAssociationClasses()
+
+        composerUmlClass.pyutClass.name      = 'Composer'
+        composedUmlClass.pyutClass.name = 'Composed'
+
+        self.logger.info(f'{composerUmlClass.id=} {composedUmlClass.id=}')
+
+        pyutLink: PyutLink = self._createAssociationPyutLink()
+
+        pyutLink.linkType = PyutLinkType.COMPOSITION
+        umlComposition: UmlComposition = UmlComposition(pyutLink=pyutLink)
+        umlComposition.SetCanvas(self._diagramFrame)
+        umlComposition.MakeLineControlPoints(n=2)       # Make this configurable
+
+        composerUmlClass.addLink(umlLink=umlComposition, destinationClass=composedUmlClass)
+        self._diagramFrame.umlDiagram.AddShape(umlComposition)
+        umlComposition.Show(True)
+
+        eventHandler: UmlLinkEventHandler = UmlLinkEventHandler(umlLink=umlComposition)
+        eventHandler.SetPreviousHandler(umlComposition.GetEventHandler())
+        umlComposition.SetEventHandler(eventHandler)
 
     def _displayUmlInheritance(self):
 

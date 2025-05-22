@@ -28,6 +28,7 @@ from umlshapes.types.UmlPosition import UmlPosition
 
 if TYPE_CHECKING:
     from umlshapes.links.UmlLink import UmlLink
+    from umlshapes.links.UmlAssociation import UmlAssociation
 
 
 class UmlLinkEventHandler(ShapeEvtHandler):
@@ -45,9 +46,9 @@ class UmlLinkEventHandler(ShapeEvtHandler):
 
         super().OnLeftDoubleClick(x=x, y=y, keys=keys, attachment=attachment)
 
-        umlLink:  UmlLink  = self.GetShape()
-        pyutLink: PyutLink = umlLink.pyutLink
-        umlFrame: UmlFrame  = umlLink.GetCanvas()
+        umlLink:  UmlAssociation = self.GetShape()
+        pyutLink: PyutLink       = umlLink.pyutLink
+        umlFrame: UmlFrame       = umlLink.GetCanvas()
 
         with DlgEditLink(parent=umlFrame, pyutLink=pyutLink) as dlg:
             if dlg.ShowModal() == OK:
@@ -81,7 +82,7 @@ class UmlLinkEventHandler(ShapeEvtHandler):
 
         super().OnMoveLink(dc=dc, moveControlPoints=moveControlPoints)
 
-        umlLink: UmlLink = self.GetShape()
+        umlLink: UmlAssociation = self.GetShape()
         associationName:        UmlAssociationLabel = umlLink.associationName
         sourceCardinality:      UmlAssociationLabel = umlLink.sourceCardinality
         destinationCardinality: UmlAssociationLabel = umlLink.destinationCardinality
@@ -107,7 +108,7 @@ class UmlLinkEventHandler(ShapeEvtHandler):
         self.logger.debug(f'labelX,labelY=({labelX},{labelY})  deltaX,deltaY=({linkDelta.deltaX},{linkDelta.deltaY})')
         return newNamePosition
 
-    def _updateAssociationLabels(self, umlLink: 'UmlLink', pyutLink: PyutLink):
+    def _updateAssociationLabels(self, umlLink: 'UmlAssociation', pyutLink: PyutLink):
 
         umlLink.sourceCardinality.label      = pyutLink.sourceCardinality
         umlLink.destinationCardinality.label = pyutLink.destinationCardinality
