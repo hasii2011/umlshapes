@@ -22,4 +22,4 @@ class UmlAggregation(UmlAssociation):
 
         self.SetBrush(BLACK_BRUSH)
 
-        self._drawDiamond(dc=dc, filled=True)
+        self._drawDiamond(dc=dc, filled=False)

@@ -68,15 +68,6 @@ class UmlLinkEventHandler(ShapeEvtHandler):
 
         canvas.PrepareDC(dc)
         umlLink.Select(select=True, dc=dc)
-        #
-        # middle = umlLink.GetLabelPosition(0)
-        # start  = umlLink.GetLabelPosition(1)
-        # end    = umlLink.GetLabelPosition(2)
-        #
-        # self.logger.info(f'{middle=} {start=} {end=}')
-
-        # controlPoints = umlLink.GetLineControlPoints()
-        # self.logger.info(f'{controlPoints=}')
 
     def OnMoveLink(self, dc: DC, moveControlPoints: bool = True):
 

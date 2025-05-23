@@ -19,14 +19,21 @@ from wx.lib.ogl import Shape
 
 from pyutmodelv2.PyutLink import PyutLink
 
-from umlshapes.preferences.UmlPreferences import UmlPreferences
+from umlshapes.UmlDiagram import UmlDiagram
+from umlshapes.frames.UmlFrame import UmlFrame
 
+from umlshapes.links.LabelType import LabelType
+from umlshapes.links.UmlAssociationLabelEventHandler import UmlAssociationLabelEventHandler
 from umlshapes.links.UmlAssociationLabel import UmlAssociationLabel
 
 from umlshapes.shapes.UmlLineControlPoint import UmlLineControlPoint
 from umlshapes.shapes.eventhandlers.UmlControlPointEventHandler import UmlControlPointEventHandler
 
+from umlshapes.preferences.UmlPreferences import UmlPreferences
+
+from umlshapes.types.Common import NAME_IDX
 from umlshapes.types.Common import TAB
+from umlshapes.types.UmlPosition import UmlPosition
 
 
 class UmlLink(LineShape):
@@ -37,11 +44,8 @@ class UmlLink(LineShape):
         self.linkLogger:   Logger         = getLogger(__name__)
         self._preferences: UmlPreferences = UmlPreferences()
 
-        self._pyutLink: PyutLink = pyutLink
-
-        self._associationName:        UmlAssociationLabel = cast(UmlAssociationLabel, None)
-        self._sourceCardinality:      UmlAssociationLabel = cast(UmlAssociationLabel, None)
-        self._destinationCardinality: UmlAssociationLabel = cast(UmlAssociationLabel, None)
+        self._pyutLink: PyutLink            = pyutLink
+        self._linkName: UmlAssociationLabel = cast(UmlAssociationLabel, None)
 
         self.SetFormatMode(mode=FORMAT_SIZE_TO_CONTENTS)
         self.SetDraggable(True, recursive=True)
@@ -53,6 +57,22 @@ class UmlLink(LineShape):
     @pyutLink.setter
     def pyutLink(self, pyutLink: PyutLink):
         self._pyutLink = pyutLink
+
+    @property
+    def linkName(self) -> UmlAssociationLabel:
+        return self._linkName
+
+    @linkName.setter
+    def linkName(self, linkName: UmlAssociationLabel):
+        self._linkName = linkName
+
+    @property
+    def selected(self) -> bool:
+        return self.Selected()
+
+    @selected.setter
+    def selected(self, select: bool):
+        self.Select(select=select)
 
     def toggleSpline(self):
 
@@ -159,6 +179,50 @@ class UmlLink(LineShape):
         eventHandler.SetPreviousHandler(umlLineControlPoint.GetEventHandler())
 
         umlLineControlPoint.SetEventHandler(eventHandler)
+
+    def _createAssociationName(self) -> UmlAssociationLabel:
+
+        labelX, labelY = self.GetLabelPosition(position=NAME_IDX)
+        return self._createAssociationLabel(x=labelX, y=labelY, text=self.pyutLink.name, labelType=LabelType.ASSOCIATION_NAME)
+
+    def _createAssociationLabel(self, x: int, y: int, text: str, labelType: LabelType) -> UmlAssociationLabel:
+
+        assert text is not None, 'Developer error'
+
+        umlAssociationLabel: UmlAssociationLabel = UmlAssociationLabel(label=text, labelType=labelType)
+
+        umlAssociationLabel.position = UmlPosition(x=x, y=y)
+        self._setupAssociationLabel(umlAssociationLabel)
+
+        return umlAssociationLabel
+
+    def _setupAssociationLabel(self, umlAssociationLabel):
+        """
+
+        Args:
+            umlAssociationLabel:
+        """
+        umlFrame: UmlFrame = self.GetCanvas()
+        umlAssociationLabel.SetCanvas(umlFrame)
+        umlAssociationLabel.parent = self
+
+        diagram: UmlDiagram = umlFrame.umlDiagram
+        diagram.AddShape(umlAssociationLabel)
+
+        self._associateAssociationLabelEventHandler(umlAssociationLabel)
+
+    def _associateAssociationLabelEventHandler(self, umlAssociationLabel: UmlAssociationLabel):
+        """
+
+        Args:
+            umlAssociationLabel:
+        """
+        eventHandler: UmlAssociationLabelEventHandler = UmlAssociationLabelEventHandler()
+
+        eventHandler.SetShape(umlAssociationLabel)
+        eventHandler.SetPreviousHandler(umlAssociationLabel.GetEventHandler())
+
+        umlAssociationLabel.SetEventHandler(eventHandler)
 
     def __str__(self) -> str:
         srcShape: Shape = self.GetFrom()

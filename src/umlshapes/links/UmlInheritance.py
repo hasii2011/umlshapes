@@ -2,8 +2,9 @@
 from logging import Logger
 from logging import getLogger
 
-from pyutmodelv2.PyutLink import PyutLink
 from wx.lib.ogl import ARROW_ARROW
+
+from pyutmodelv2.PyutLink import PyutLink
 
 from umlshapes.links.UmlLink import UmlLink
 from umlshapes.shapes.UmlClass import UmlClass
@@ -17,15 +18,21 @@ class UmlInheritance(UmlLink):
     dstId == Base Class.  (arrow here)
     """
     def __init__(self, pyutLink: PyutLink, baseClass: UmlClass, subClass: UmlClass):
+        """
 
+        Args:
+            pyutLink:
+            baseClass:
+            subClass:
+        """
         super().__init__(pyutLink=pyutLink)
 
         self.inheritanceLogger: Logger = getLogger(__name__)
 
-        self.AddArrow(type=ARROW_ARROW)
-
         self._baseClass: UmlClass = baseClass
         self._subClass:  UmlClass = subClass
+
+        self.AddArrow(type=ARROW_ARROW)
 
     @property
     def baseClass(self) -> UmlClass:

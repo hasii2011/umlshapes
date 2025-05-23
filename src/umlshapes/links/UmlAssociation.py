@@ -26,12 +26,8 @@ from wx import Pen
 
 from pyutmodelv2.PyutLink import PyutLink
 
-from umlshapes.UmlDiagram import UmlDiagram
-from umlshapes.frames.UmlFrame import UmlFrame
-
 from umlshapes.links.LabelType import LabelType
 from umlshapes.links.UmlAssociationLabel import UmlAssociationLabel
-from umlshapes.links.UmlAssociationLabelEventHandler import UmlAssociationLabelEventHandler
 from umlshapes.links.UmlLink import UmlLink
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
@@ -39,8 +35,6 @@ from umlshapes.preferences.UmlPreferences import UmlPreferences
 from umlshapes.types.Common import DESTINATION_CARDINALITY_IDX
 from umlshapes.types.Common import NAME_IDX
 from umlshapes.types.Common import SOURCE_CARDINALITY_IDX
-
-from umlshapes.types.UmlPosition import UmlPosition
 
 SegmentPoint  = NewType('SegmentPoint',  Tuple[int, int])
 Segments      = NewType('Segments',      List[SegmentPoint])
@@ -61,13 +55,21 @@ class UmlAssociation(UmlLink):
 
         self.associationLogger: Logger = getLogger(__name__)
 
+        self._sourceCardinality:      UmlAssociationLabel = cast(UmlAssociationLabel, None)
+        self._destinationCardinality: UmlAssociationLabel = cast(UmlAssociationLabel, None)
+
     @property
     def associationName(self) -> UmlAssociationLabel:
-        return self._associationName
+        """
+        Syntactic sugar around link name
+
+        Returns:  The association name
+        """
+        return self._linkName
 
     @associationName.setter
     def associationName(self, newValue: UmlAssociationLabel):
-        self._associationName = newValue
+        self._linkName = newValue
 
     @property
     def sourceCardinality(self) -> UmlAssociationLabel:
@@ -106,9 +108,9 @@ class UmlAssociation(UmlLink):
 
     def createAssociationLabels(self):
 
-        self._createAssociationName()
-        self._createSourceCardinality()
-        self._createDestinationCardinality()
+        self._linkName               = self._createAssociationName()
+        self._sourceCardinality      = self._createSourceCardinality()
+        self._destinationCardinality = self._createDestinationCardinality()
 
     def OnDraw(self, dc: MemoryDC):
 
@@ -123,59 +125,15 @@ class UmlAssociation(UmlLink):
             dc.DrawRectangle(labelX, labelY, 5, 5)
             dc.SetPen(savePen)
 
-    def _createDestinationCardinality(self):
+    def _createDestinationCardinality(self) -> UmlAssociationLabel:
 
         dstCardX, dstCardY = self.GetLabelPosition(position=DESTINATION_CARDINALITY_IDX)
-        self._destinationCardinality = self._createAssociationLabel(x=dstCardX, y=dstCardY, text=self.pyutLink.destinationCardinality, labelType=LabelType.DESTINATION_CARDINALITY)
+        return self._createAssociationLabel(x=dstCardX, y=dstCardY, text=self.pyutLink.destinationCardinality, labelType=LabelType.DESTINATION_CARDINALITY)
 
-    def _createSourceCardinality(self):
+    def _createSourceCardinality(self) -> UmlAssociationLabel:
 
         srcCardX, srcCardY = self.GetLabelPosition(position=SOURCE_CARDINALITY_IDX)
-        self._sourceCardinality = self._createAssociationLabel(x=srcCardX, y=srcCardY, text=self.pyutLink.sourceCardinality, labelType=LabelType.SOURCE_CARDINALITY)
-
-    def _createAssociationName(self):
-
-        labelX, labelY = self.GetLabelPosition(position=NAME_IDX)
-        self._associationName = self._createAssociationLabel(x=labelX, y=labelY, text=self.pyutLink.name, labelType=LabelType.ASSOCIATION_NAME)
-
-    def _createAssociationLabel(self, x: int, y: int, text: str, labelType: LabelType) -> UmlAssociationLabel:
-
-        assert text is not None, 'Developer error'
-
-        umlAssociationLabel: UmlAssociationLabel = UmlAssociationLabel(label=text, labelType=labelType)
-
-        umlAssociationLabel.position = UmlPosition(x=x, y=y)
-        self._setupAssociationLabel(umlAssociationLabel)
-
-        return umlAssociationLabel
-
-    def _setupAssociationLabel(self, umlAssociationLabel):
-        """
-
-        Args:
-            umlAssociationLabel:
-        """
-        umlFrame: UmlFrame = self.GetCanvas()
-        umlAssociationLabel.SetCanvas(umlFrame)
-        umlAssociationLabel.parent = self
-
-        diagram: UmlDiagram = umlFrame.umlDiagram
-        diagram.AddShape(umlAssociationLabel)
-
-        self._associateAssociationLabelEventHandler(umlAssociationLabel)
-
-    def _associateAssociationLabelEventHandler(self, umlAssociationLabel: UmlAssociationLabel):
-        """
-
-        Args:
-            umlAssociationLabel:
-        """
-        eventHandler: UmlAssociationLabelEventHandler = UmlAssociationLabelEventHandler()
-
-        eventHandler.SetShape(umlAssociationLabel)
-        eventHandler.SetPreviousHandler(umlAssociationLabel.GetEventHandler())
-
-        umlAssociationLabel.SetEventHandler(eventHandler)
+        return self._createAssociationLabel(x=srcCardX, y=srcCardY, text=self.pyutLink.sourceCardinality, labelType=LabelType.SOURCE_CARDINALITY)
 
     def _drawDiamond(self, dc: DC, filled: bool = False):
         """

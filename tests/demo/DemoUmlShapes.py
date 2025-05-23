@@ -48,6 +48,7 @@ from umlshapes.links.UmlAggregation import UmlAggregation
 from umlshapes.links.UmlAssociation import UmlAssociation
 from umlshapes.links.UmlComposition import UmlComposition
 from umlshapes.links.UmlInheritance import UmlInheritance
+from umlshapes.links.UmlInterface import UmlInterface
 from umlshapes.links.UmlLinkEventHandler import UmlLinkEventHandler
 
 from umlshapes.shapes.UmlActor import UmlActor
@@ -101,6 +102,7 @@ class DemoUmlShapes(App):
         self._ID_DISPLAY_UML_INHERITANCE: int = wxNewIdRef()
         self._ID_DISPLAY_UML_COMPOSITION: int = wxNewIdRef()
         self._ID_DISPLAY_UML_AGGREGATION: int = wxNewIdRef()
+        self._ID_DISPLAY_UML_INTERFACE:   int = wxNewIdRef()
 
         self._textCounter:        int = 0
         self._noteCounter:        int = 0
@@ -110,6 +112,7 @@ class DemoUmlShapes(App):
         self._associationCounter: int = 0
         self._inheritanceCounter: int = 0
         self._compositionCounter: int = 0
+        self._interfaceCounter:   int = 0
 
         self._preferences: UmlPreferences = UmlPreferences()
         self._frame:       SizedFrame     = SizedFrame(
@@ -148,6 +151,7 @@ class DemoUmlShapes(App):
         fileMenu.AppendSeparator()
         # fileMenu.Append(ID_PREFERENCES, "P&references", "Ogl preferences")
 
+        viewMenu.Append(id=self._ID_DISPLAY_UML_INTERFACE,   item='UML Interface',   helpString='Display Normal Interface')
         viewMenu.Append(id=self._ID_DISPLAY_UML_AGGREGATION, item='UML Aggregation', helpString='Display a aggregation Link')
         viewMenu.Append(id=self._ID_DISPLAY_UML_COMPOSITION, item='UML Composition', helpString='Display a composition Link')
         viewMenu.Append(id=self._ID_DISPLAY_UML_INHERITANCE, item='UML Inheritance', helpString='Display an Inheritance Link')
@@ -157,7 +161,6 @@ class DemoUmlShapes(App):
         viewMenu.Append(id=self._ID_DISPLAY_UML_NOTE,        item='Uml Note',           helpString='Display Uml Note')
         viewMenu.Append(id=self._ID_DISPLAY_UML_USE_CASE,    item='Uml Use Case',       helpString='Display Uml Use Case')
         viewMenu.Append(id=self._ID_DISPLAY_UML_ACTOR,       item='Uml Actor',          helpString='Display Uml Actor')
-        # viewMenu.Append(id=self._ID_DISPLAY_OGL_INTERFACE,       item='Ogl Interface',    helpString='Display Lollipop Interface')
         # viewMenu.Append(id=self._ID_DISPLAY_SEQUENCE_DIAGRAM,    item='Sequence Diagram', helpString='Display Sequence Diagram')
         viewMenu.AppendSeparator()
 
@@ -177,7 +180,7 @@ class DemoUmlShapes(App):
         self.Bind(EVT_MENU, self._onDisplayElement, id=self._ID_DISPLAY_UML_INHERITANCE)
         self.Bind(EVT_MENU, self._onDisplayElement, id=self._ID_DISPLAY_UML_COMPOSITION)
         self.Bind(EVT_MENU, self._onDisplayElement, id=self._ID_DISPLAY_UML_AGGREGATION)
-        # self.Bind(EVT_MENU, self._onDisplayElement, id=self._ID_DISPLAY_OGL_INTERFACE)
+        self.Bind(EVT_MENU, self._onDisplayElement, id=self._ID_DISPLAY_UML_INTERFACE)
         # self.Bind(EVT_MENU, self._onDisplayElement, id=self._ID_DISPLAY_SEQUENCE_DIAGRAM)
 
     def _onDisplayElement(self, event: CommandEvent):
@@ -204,10 +207,10 @@ class DemoUmlShapes(App):
                 self._displayUmlComposition()
             case self._ID_DISPLAY_UML_AGGREGATION:
                 self._displayUmlAggregation()
+            case self._ID_DISPLAY_UML_INTERFACE:
+                self._displayUmlInterface()
             # case self._ID_DISPLAY_SEQUENCE_DIAGRAM:
             #     self._displaySequenceDiagram()
-            # case self._ID_DISPLAY_OGL_INTERFACE:
-            #     self._displayOglInterface()
             case _:
                 self.logger.error(f'WTH!  I am not handling that menu item')
 
@@ -331,7 +334,7 @@ class DemoUmlShapes(App):
 
     def _displayBareAssociation(self):
 
-        sourceUmlClass, destinationUmlClass = self._createAssociationClasses()
+        sourceUmlClass, destinationUmlClass = self._createClassPair()
 
         self.logger.info(f'{sourceUmlClass.id=} {destinationUmlClass.id=}')
 
@@ -351,7 +354,7 @@ class DemoUmlShapes(App):
 
     def _displayUmlComposition(self):
 
-        composerUmlClass, composedUmlClass = self._createAssociationClasses()
+        composerUmlClass, composedUmlClass = self._createClassPair()
 
         composerUmlClass.pyutClass.name = 'Composer'
         composedUmlClass.pyutClass.name = 'Composed'
@@ -375,7 +378,7 @@ class DemoUmlShapes(App):
 
     def _displayUmlAggregation(self):
 
-        aggregatorUmlClass, aggregatedUmlClass = self._createAssociationClasses()
+        aggregatorUmlClass, aggregatedUmlClass = self._createClassPair()
 
         aggregatorUmlClass.pyutClass.name = 'Aggregator'
         aggregatedUmlClass.pyutClass.name = 'Aggregated'
@@ -399,14 +402,14 @@ class DemoUmlShapes(App):
 
     def _displayUmlInheritance(self):
 
-        baseUmlClass, subUmlClass = self._createAssociationClasses()
+        baseUmlClass, subUmlClass = self._createClassPair()
         baseUmlClass.pyutClass.name = 'Base Class'
         subUmlClass.pyutClass.name  = 'SubClass'
 
         pyutInheritance: PyutLink = self._createInheritancePyutLink()
 
-        pyutInheritance.source      = baseUmlClass.pyutClass
-        pyutInheritance.destination = subUmlClass.pyutClass
+        pyutInheritance.destination  = baseUmlClass.pyutClass
+        pyutInheritance.source       = subUmlClass.pyutClass
 
         umlInheritance: UmlInheritance = UmlInheritance(pyutLink=pyutInheritance, baseClass=baseUmlClass, subClass=subUmlClass)
         umlInheritance.SetCanvas(self._diagramFrame)
@@ -417,6 +420,27 @@ class DemoUmlShapes(App):
 
         self._diagramFrame.umlDiagram.AddShape(umlInheritance)
         umlInheritance.Show(True)
+
+    def _displayUmlInterface(self):
+
+        interfaceClass, implementingClass = self._createClassPair()
+
+        interfaceClass.pyutClass.name     = 'Interface Class'
+        implementingClass.pyutClass.name  = 'Implementing Class'
+
+        pyutInterface: PyutLink = self._createInterfacePyutLink()
+
+        pyutInterface.destination  = implementingClass.pyutClass
+        pyutInterface.source       = interfaceClass.pyutClass
+
+        umlInterface: UmlInterface = UmlInterface(pyutLink=pyutInterface, interfaceClass=interfaceClass, implementingClass=implementingClass)
+        umlInterface.SetCanvas(self._diagramFrame)
+        umlInterface.MakeLineControlPoints(n=2)
+
+        implementingClass.addLink(umlLink=umlInterface, destinationClass=interfaceClass)
+
+        self._diagramFrame.umlDiagram.AddShape(umlInterface)
+        umlInterface.Show(True)
 
     def _displayShape(self, umlShape: UmlShape, umlPosition: UmlPosition):
 
@@ -513,7 +537,16 @@ class DemoUmlShapes(App):
 
         return pyutInheritance
 
-    def _createAssociationClasses(self) -> Tuple[UmlClass, UmlClass]:
+    def _createInterfacePyutLink(self):
+
+        name: str = f'Interface {self._interfaceCounter}'
+        self._interfaceCounter += 1
+
+        pyutInterface: PyutLink = PyutLink(name=name, linkType=PyutLinkType.INTERFACE)
+
+        return pyutInterface
+
+    def _createClassPair(self) -> Tuple[UmlClass, UmlClass]:
 
         sourcePosition:       UmlPosition = UmlPosition(x=100, y=100)
         destinationPosition:  UmlPosition = UmlPosition(x=200, y=300)

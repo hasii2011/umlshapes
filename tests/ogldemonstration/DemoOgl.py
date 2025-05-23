@@ -349,7 +349,7 @@ class TestWindow(ShapeCanvas):
         return shape
 
     def OnBeginDragLeft(self, x, y, keys=0):
-        self.log.write("OnBeginDragLeft: %s, %s, %s\n" % (x, y, keys))
+        self.log.info("OnBeginDragLeft: %s, %s, %s\n" % (x, y, keys))
 
     def OnEndDragLeft(self, x, y, keys=0):
         self.log.info("OnEndDragLeft: %s, %s, %s\n" % (x, y, keys))

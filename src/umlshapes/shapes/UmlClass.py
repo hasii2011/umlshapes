@@ -130,8 +130,6 @@ class UmlClass(ControlPointMixin, RectangleShape, TopLeftMixin):
         self.AddLine(line=umlLink, other=destinationClass)
 
         if isinstance(umlLink, UmlAssociation):
-            x1, y1, x2, y2 = umlLink.FindLineEndPoints()
-            self.logger.info(f'start: ({x1},{y1}) - end: ({x2},{y2})')
             umlLink.createAssociationLabels()
 
     def OnDraw(self, dc: MemoryDC):
