@@ -42,3 +42,6 @@ class UmlInterface(UmlLink):
         self.SetPen(pen)
 
         super().OnDraw(dc=dc)
+
+    def __repr__(self):
+        return f'UmlInterface - {super().__repr__()}'

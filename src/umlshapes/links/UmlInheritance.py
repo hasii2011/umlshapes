@@ -49,3 +49,14 @@ class UmlInheritance(UmlLink):
     @subClass.setter
     def subClass(self, subClass: UmlClass):
         self._subClass = subClass
+
+    def __str__(self) -> str:
+        return self.__repr__()
+
+    def __repr__(self):
+        baseClass:   UmlClass = self.baseClass
+        subClass:    UmlClass = self.subClass
+        baseClassId: int      = baseClass.id
+        subClassId:  int      = subClass.id
+
+        return f'UmlInheritance[id: {subClassId} {subClass} inherits from: id: {baseClassId} {baseClass}]'

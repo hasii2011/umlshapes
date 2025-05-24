@@ -5,6 +5,7 @@ from typing import cast
 from logging import Logger
 from logging import getLogger
 
+from wx import Font
 from wx import MemoryDC
 
 from wx.lib.ogl import FORMAT_CENTRE_HORIZ
@@ -36,7 +37,6 @@ class UmlAssociationLabel(ControlPointMixin, TextShape, TopLeftMixin):
             size:
             labelType: Source or Destination Cardinality or association name
         """
-
         # Use preferences to get initial size if not specified
         self._preferences: UmlPreferences = UmlPreferences()
 
@@ -51,12 +51,11 @@ class UmlAssociationLabel(ControlPointMixin, TextShape, TopLeftMixin):
 
         self.logger: Logger = getLogger(__name__)
 
-        if label == '':
-            self._label: str = self._preferences.defaultAssociationName
-        else:
-            self._label = label
+        font: Font = self.GetFont()
+        font.SetPointSize(self._preferences.associationTextFontSize)
+        self.SetFont(font)
 
-        self.AddText(self._label)
+        self.AddText(label)
         self.SetFormatMode(mode=FORMAT_CENTRE_HORIZ | FORMAT_CENTRE_VERT)
         self.SetDraggable(drag=True)
         self.Show(show=True)
@@ -64,6 +63,7 @@ class UmlAssociationLabel(ControlPointMixin, TextShape, TopLeftMixin):
 
         self._linkDelta: DeltaXY   = DeltaXY()          # no delta to start with
         self._labelType: LabelType = labelType
+        self._label:     str       = label
 
     def OnDraw(self, dc: MemoryDC):
 

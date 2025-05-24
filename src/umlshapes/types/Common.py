@@ -19,6 +19,11 @@ if TYPE_CHECKING:
     from umlshapes.shapes.UmlNote import UmlNote            # noqa
     from umlshapes.shapes.UmlText import UmlText            # noqa
     from umlshapes.shapes.UmlUseCase import UmlUseCase      # noqa
+    from umlshapes.shapes.UmlAssociation import UmlAssociation      # noqa
+    from umlshapes.shapes.UmlAggregation import UmlAggregation      # noqa
+    from umlshapes.shapes.UmlComposition import UmlComposition      # noqa
+    from umlshapes.shapes.UmlInterface import UmlInterface          # noqa
+    from umlshapes.shapes.UmlInheritance import UmlInheritance      # noqa
 
 ModelObject = Union[PyutText, PyutNote, PyutActor, PyutClass, PyutUseCase, None]
 
@@ -33,7 +38,12 @@ class LeftCoordinate:
     y: int = 0
 
 
-UmlShape     = Union['UmlActor', 'UmlClass', 'UmlNote', 'UmlText', 'UmlUseCase']
+UmlShape = Union[
+    'UmlActor', 'UmlClass', 'UmlNote', 'UmlText', 'UmlUseCase',
+]
+UmlRelationShips = Union[
+    'UmlAssociation', 'UmlAggregation', 'UmlComposition', 'UmlInterface', 'UmlInheritance'
+]
 UmlShapeList = NewType('UmlShapeList', List[UmlShape])
 
 NAME_IDX:                    int = 0

@@ -34,12 +34,12 @@ from pyutmodelv2.PyutMethod import PyutMethod
 from pyutmodelv2.PyutMethod import PyutMethods
 from pyutmodelv2.PyutMethod import PyutParameters
 from pyutmodelv2.PyutParameter import PyutParameter
-from pyutmodelv2.enumerations.PyutDisplayParameters import PyutDisplayParameters
 from pyutmodelv2.PyutLink import PyutLink
 
 from pyutmodelv2.enumerations.PyutLinkType import PyutLinkType
 from pyutmodelv2.enumerations.PyutStereotype import PyutStereotype
 from pyutmodelv2.enumerations.PyutVisibility import PyutVisibility
+from pyutmodelv2.enumerations.PyutDisplayParameters import PyutDisplayParameters
 
 from umlshapes.UmlDiagram import UmlDiagram
 from umlshapes.frames.UmlClassDiagramFrame import UmlClassDiagramFrame
@@ -49,7 +49,6 @@ from umlshapes.links.UmlAssociation import UmlAssociation
 from umlshapes.links.UmlComposition import UmlComposition
 from umlshapes.links.UmlInheritance import UmlInheritance
 from umlshapes.links.UmlInterface import UmlInterface
-from umlshapes.links.UmlLinkEventHandler import UmlLinkEventHandler
 
 from umlshapes.shapes.UmlActor import UmlActor
 from umlshapes.shapes.UmlClass import UmlClass
@@ -62,6 +61,10 @@ from umlshapes.shapes.eventhandlers.UmlNoteEventHandler import UmlNoteEventHandl
 from umlshapes.shapes.eventhandlers.UmlActorEventHandler import UmlActorEventHandler
 from umlshapes.shapes.eventhandlers.UmlUseCaseEventHandler import UmlUseCaseEventHandler
 from umlshapes.shapes.eventhandlers.UmlTextEventHandler import UmlTextEventHandler
+
+from umlshapes.links.UmlAssociationEventHandler import UmlAssociationEventHandler
+from umlshapes.links.UmlLinkEventHandler import UmlLinkEventHandler
+
 from umlshapes.types.Common import UmlShape
 
 from umlshapes.types.UmlPosition import UmlPosition
@@ -356,14 +359,17 @@ class DemoUmlShapes(App):
 
         composerUmlClass, composedUmlClass = self._createClassPair()
 
-        composerUmlClass.pyutClass.name = 'Composer'
-        composedUmlClass.pyutClass.name = 'Composed'
+        composerUmlClass.pyutClass.name = 'Hospital'
+        composedUmlClass.pyutClass.name = 'Department'
 
         self.logger.info(f'{composerUmlClass.id=} {composedUmlClass.id=}')
 
         pyutLink: PyutLink = self._createAssociationPyutLink()
+        pyutLink.linkType               = PyutLinkType.COMPOSITION
+        pyutLink.name                   = ''
+        pyutLink.sourceCardinality      = '1'
+        pyutLink.destinationCardinality = '1..*'
 
-        pyutLink.linkType = PyutLinkType.COMPOSITION
         umlComposition: UmlComposition = UmlComposition(pyutLink=pyutLink)
         umlComposition.SetCanvas(self._diagramFrame)
         umlComposition.MakeLineControlPoints(n=2)       # Make this configurable
@@ -372,7 +378,7 @@ class DemoUmlShapes(App):
         self._diagramFrame.umlDiagram.AddShape(umlComposition)
         umlComposition.Show(True)
 
-        eventHandler: UmlLinkEventHandler = UmlLinkEventHandler(umlLink=umlComposition)
+        eventHandler: UmlAssociationEventHandler = UmlAssociationEventHandler(umlAssociation=umlComposition)
         eventHandler.SetPreviousHandler(umlComposition.GetEventHandler())
         umlComposition.SetEventHandler(eventHandler)
 
@@ -380,23 +386,27 @@ class DemoUmlShapes(App):
 
         aggregatorUmlClass, aggregatedUmlClass = self._createClassPair()
 
-        aggregatorUmlClass.pyutClass.name = 'Aggregator'
-        aggregatedUmlClass.pyutClass.name = 'Aggregated'
+        aggregatorUmlClass.pyutClass.name = 'Triangle'
+        aggregatedUmlClass.pyutClass.name = 'Segment'
 
         self.logger.info(f'{aggregatorUmlClass.id=} {aggregatedUmlClass.id=}')
 
         pyutLink: PyutLink = self._createAssociationPyutLink()
-        pyutLink.linkType = PyutLinkType.AGGREGATION
+        pyutLink.linkType               = PyutLinkType.AGGREGATION
+        pyutLink.name                   = '+sides'
+        pyutLink.sourceCardinality      = '*'
+        pyutLink.destinationCardinality = '3'
 
         umlAggregation: UmlAggregation = UmlAggregation(pyutLink=pyutLink)
         umlAggregation.SetCanvas(self._diagramFrame)
         umlAggregation.MakeLineControlPoints(n=2)       # Make this configurable
 
         aggregatorUmlClass.addLink(umlLink=umlAggregation, destinationClass=aggregatedUmlClass)
+
         self._diagramFrame.umlDiagram.AddShape(umlAggregation)
         umlAggregation.Show(True)
 
-        eventHandler: UmlLinkEventHandler = UmlLinkEventHandler(umlLink=umlAggregation)
+        eventHandler: UmlAssociationEventHandler = UmlAssociationEventHandler(umlAssociation=umlAggregation)
         eventHandler.SetPreviousHandler(umlAggregation.GetEventHandler())
         umlAggregation.SetEventHandler(eventHandler)
 
@@ -441,6 +451,10 @@ class DemoUmlShapes(App):
 
         self._diagramFrame.umlDiagram.AddShape(umlInterface)
         umlInterface.Show(True)
+
+        eventHandler: UmlLinkEventHandler = UmlLinkEventHandler(umlLink=umlInterface)
+        eventHandler.SetPreviousHandler(umlInterface.GetEventHandler())
+        umlInterface.SetEventHandler(eventHandler)
 
     def _displayShape(self, umlShape: UmlShape, umlPosition: UmlPosition):
 
@@ -539,7 +553,7 @@ class DemoUmlShapes(App):
 
     def _createInterfacePyutLink(self):
 
-        name: str = f'Interface {self._interfaceCounter}'
+        name: str = f'implements'
         self._interfaceCounter += 1
 
         pyutInterface: PyutLink = PyutLink(name=name, linkType=PyutLinkType.INTERFACE)

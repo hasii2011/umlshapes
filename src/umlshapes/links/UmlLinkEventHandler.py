@@ -20,9 +20,7 @@ from umlshapes.links.DeltaXY import DeltaXY
 from umlshapes.links.LabelType import LabelType
 from umlshapes.links.UmlAssociationLabel import UmlAssociationLabel
 
-from umlshapes.types.Common import DESTINATION_CARDINALITY_IDX
 from umlshapes.types.Common import NAME_IDX
-from umlshapes.types.Common import SOURCE_CARDINALITY_IDX
 
 from umlshapes.types.UmlPosition import UmlPosition
 
@@ -74,19 +72,11 @@ class UmlLinkEventHandler(ShapeEvtHandler):
         super().OnMoveLink(dc=dc, moveControlPoints=moveControlPoints)
 
         umlLink: UmlAssociation = self.GetShape()
-        associationName:        UmlAssociationLabel = umlLink.associationName
-        sourceCardinality:      UmlAssociationLabel = umlLink.sourceCardinality
-        destinationCardinality: UmlAssociationLabel = umlLink.destinationCardinality
+        associationName:        UmlAssociationLabel = umlLink.linkName
         #
         if associationName is not None and associationName.labelType == LabelType.ASSOCIATION_NAME:
             labelX, labelY = umlLink.GetLabelPosition(NAME_IDX)
             associationName.position = self._computeRelativePosition(labelX=labelX, labelY=labelY, linkDelta=associationName.linkDelta)
-        if sourceCardinality is not None:
-            srcCardX, srcCardY = umlLink.GetLabelPosition(SOURCE_CARDINALITY_IDX)
-            sourceCardinality.position = self._computeRelativePosition(labelX=srcCardX, labelY=srcCardY, linkDelta=sourceCardinality.linkDelta)
-        if destinationCardinality is not None:
-            dstCardX, dstCardY = umlLink.GetLabelPosition(DESTINATION_CARDINALITY_IDX)
-            destinationCardinality.position = self._computeRelativePosition(labelX=dstCardX, labelY=dstCardY, linkDelta=destinationCardinality.linkDelta)
 
         self.GetShape().GetCanvas().refresh()
 

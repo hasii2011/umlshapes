@@ -108,7 +108,7 @@ class UmlAssociation(UmlLink):
 
     def createAssociationLabels(self):
 
-        self._linkName               = self._createAssociationName()
+        self._linkName               = self._createLinkName()
         self._sourceCardinality      = self._createSourceCardinality()
         self._destinationCardinality = self._createDestinationCardinality()
 

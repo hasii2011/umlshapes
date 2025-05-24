@@ -83,6 +83,9 @@ class UmlLink(LineShape):
         # self._indicateDiagramModified()
 
     def OnDraw(self, dc: MemoryDC):
+        if self._linkName is None:
+            self._linkName = self._createLinkName()
+            self._setupAssociationLabel(umlAssociationLabel=self._linkName)
         super().OnDraw(dc=dc)
 
     def MakeControlPoints(self):
@@ -180,7 +183,7 @@ class UmlLink(LineShape):
 
         umlLineControlPoint.SetEventHandler(eventHandler)
 
-    def _createAssociationName(self) -> UmlAssociationLabel:
+    def _createLinkName(self) -> UmlAssociationLabel:
 
         labelX, labelY = self.GetLabelPosition(position=NAME_IDX)
         return self._createAssociationLabel(x=labelX, y=labelY, text=self.pyutLink.name, labelType=LabelType.ASSOCIATION_NAME)
