@@ -62,8 +62,8 @@ from umlshapes.shapes.eventhandlers.UmlActorEventHandler import UmlActorEventHan
 from umlshapes.shapes.eventhandlers.UmlUseCaseEventHandler import UmlUseCaseEventHandler
 from umlshapes.shapes.eventhandlers.UmlTextEventHandler import UmlTextEventHandler
 
-from umlshapes.links.UmlAssociationEventHandler import UmlAssociationEventHandler
-from umlshapes.links.UmlLinkEventHandler import UmlLinkEventHandler
+from umlshapes.links.eventhandlers.UmlAssociationEventHandler import UmlAssociationEventHandler
+from umlshapes.links.eventhandlers.UmlLinkEventHandler import UmlLinkEventHandler
 
 from umlshapes.types.Common import UmlShape
 
@@ -345,13 +345,13 @@ class DemoUmlShapes(App):
         umlAssociation.SetCanvas(self._diagramFrame)
         umlAssociation.MakeLineControlPoints(n=2)       # Make this configurable
 
-        eventHandler: UmlLinkEventHandler = UmlLinkEventHandler(umlLink=umlAssociation)
-        eventHandler.SetPreviousHandler(umlAssociation.GetEventHandler())
-        umlAssociation.SetEventHandler(eventHandler)
-
         sourceUmlClass.addLink(umlLink=umlAssociation, destinationClass=destinationUmlClass)
         self._diagramFrame.umlDiagram.AddShape(umlAssociation)
         umlAssociation.Show(True)
+
+        eventHandler: UmlAssociationEventHandler = UmlAssociationEventHandler(umlAssociation=umlAssociation)
+        eventHandler.SetPreviousHandler(umlAssociation.GetEventHandler())
+        umlAssociation.SetEventHandler(eventHandler)
 
         self.logger.info(f'controlPoints: {umlAssociation.GetLineControlPoints()}')
 
@@ -430,6 +430,10 @@ class DemoUmlShapes(App):
 
         self._diagramFrame.umlDiagram.AddShape(umlInheritance)
         umlInheritance.Show(True)
+
+        eventHandler: UmlLinkEventHandler = UmlLinkEventHandler(umlLink=umlInheritance)
+        eventHandler.SetPreviousHandler(umlInheritance.GetEventHandler())
+        umlInheritance.SetEventHandler(eventHandler)
 
     def _displayUmlInterface(self):
 

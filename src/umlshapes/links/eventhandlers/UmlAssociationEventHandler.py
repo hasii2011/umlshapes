@@ -6,7 +6,7 @@ from wx import DC
 
 from umlshapes.links.UmlAssociation import UmlAssociation
 from umlshapes.links.UmlAssociationLabel import UmlAssociationLabel
-from umlshapes.links.UmlLinkEventHandler import UmlLinkEventHandler
+from umlshapes.links.eventhandlers.UmlLinkEventHandler import UmlLinkEventHandler
 
 from umlshapes.types.Common import DESTINATION_CARDINALITY_IDX
 from umlshapes.types.Common import SOURCE_CARDINALITY_IDX

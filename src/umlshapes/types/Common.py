@@ -1,3 +1,4 @@
+
 from typing import List
 from typing import NewType
 from typing import TYPE_CHECKING
@@ -8,6 +9,7 @@ from dataclasses import dataclass
 
 from pyutmodelv2.PyutActor import PyutActor
 from pyutmodelv2.PyutClass import PyutClass
+from pyutmodelv2.PyutLink import PyutLink
 from pyutmodelv2.PyutNote import PyutNote
 from pyutmodelv2.PyutText import PyutText
 from pyutmodelv2.PyutUseCase import PyutUseCase
@@ -19,13 +21,13 @@ if TYPE_CHECKING:
     from umlshapes.shapes.UmlNote import UmlNote            # noqa
     from umlshapes.shapes.UmlText import UmlText            # noqa
     from umlshapes.shapes.UmlUseCase import UmlUseCase      # noqa
-    from umlshapes.shapes.UmlAssociation import UmlAssociation      # noqa
-    from umlshapes.shapes.UmlAggregation import UmlAggregation      # noqa
-    from umlshapes.shapes.UmlComposition import UmlComposition      # noqa
-    from umlshapes.shapes.UmlInterface import UmlInterface          # noqa
-    from umlshapes.shapes.UmlInheritance import UmlInheritance      # noqa
+    from umlshapes.links.UmlAssociation import UmlAssociation      # noqa
+    from umlshapes.links.UmlAggregation import UmlAggregation      # noqa
+    from umlshapes.links.UmlComposition import UmlComposition      # noqa
+    from umlshapes.links.UmlInterface import UmlInterface          # noqa
+    from umlshapes.links.UmlInheritance import UmlInheritance      # noqa
 
-ModelObject = Union[PyutText, PyutNote, PyutActor, PyutClass, PyutUseCase, None]
+ModelObject = Union[PyutText, PyutNote, PyutActor, PyutClass, PyutUseCase, PyutLink, None]
 
 
 NOT_SET_INT: int = cast(int, None)

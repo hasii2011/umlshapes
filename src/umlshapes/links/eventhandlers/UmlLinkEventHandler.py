@@ -6,6 +6,7 @@ from logging import getLogger
 
 from wx import ClientDC
 from wx import DC
+from wx import MOD_CMD
 from wx import OK
 
 from wx.lib.ogl import ShapeCanvas
@@ -19,6 +20,7 @@ from umlshapes.frames.UmlFrame import UmlFrame
 from umlshapes.links.DeltaXY import DeltaXY
 from umlshapes.links.LabelType import LabelType
 from umlshapes.links.UmlAssociationLabel import UmlAssociationLabel
+from umlshapes.shapes.eventhandlers.UmlBaseEventHandler import UmlBaseEventHandler
 
 from umlshapes.types.Common import NAME_IDX
 
@@ -29,7 +31,7 @@ if TYPE_CHECKING:
     from umlshapes.links.UmlAssociation import UmlAssociation
 
 
-class UmlLinkEventHandler(ShapeEvtHandler):
+class UmlLinkEventHandler(UmlBaseEventHandler):
     """
     BTW, I hate local imports
     """
@@ -53,19 +55,6 @@ class UmlLinkEventHandler(ShapeEvtHandler):
                 umlFrame.refresh()
                 self.logger.info(f'{pyutLink=}')
                 self._updateAssociationLabels(umlLink=umlLink, pyutLink=dlg.value)
-
-    def OnLeftClick(self, x: int, y: int, keys=0, attachment=0):
-        super().OnLeftClick(x, y, keys, attachment)
-
-        # self.logger.info(f'({x},{y}), {keys=} {attachment=}')
-
-        umlLink: 'UmlLink' = self.GetShape()
-
-        canvas: ShapeCanvas = umlLink.GetCanvas()
-        dc:     ClientDC    = ClientDC(canvas)
-
-        canvas.PrepareDC(dc)
-        umlLink.Select(select=True, dc=dc)
 
     def OnMoveLink(self, dc: DC, moveControlPoints: bool = True):
 

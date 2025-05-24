@@ -20,10 +20,11 @@ from wx.lib.ogl import Shape
 from pyutmodelv2.PyutLink import PyutLink
 
 from umlshapes.UmlDiagram import UmlDiagram
+from umlshapes.UmlUtils import UmlUtils
 from umlshapes.frames.UmlFrame import UmlFrame
 
 from umlshapes.links.LabelType import LabelType
-from umlshapes.links.UmlAssociationLabelEventHandler import UmlAssociationLabelEventHandler
+from umlshapes.links.eventhandlers.UmlAssociationLabelEventHandler import UmlAssociationLabelEventHandler
 from umlshapes.links.UmlAssociationLabel import UmlAssociationLabel
 
 from umlshapes.shapes.UmlLineControlPoint import UmlLineControlPoint
@@ -86,6 +87,12 @@ class UmlLink(LineShape):
         if self._linkName is None:
             self._linkName = self._createLinkName()
             self._setupAssociationLabel(umlAssociationLabel=self._linkName)
+
+        if self.Selected() is True:
+            self.SetPen(UmlUtils.redSolidPen())
+        else:
+            self.SetPen(UmlUtils.blackSolidPen())
+
         super().OnDraw(dc=dc)
 
     def MakeControlPoints(self):

@@ -9,6 +9,7 @@ from logging import DEBUG
 
 from time import time as pyTime
 
+from wx import BLACK
 from wx import Bitmap
 from wx import Brush
 from wx import FONTFAMILY_DEFAULT
@@ -49,9 +50,12 @@ class UmlUtils:
 
     clsLogger: Logger = getLogger(__name__)
 
-    RED_SOLID_PEN:  Pen  = cast(Pen, None)
-    RED_DASHED_PEN: Pen  = cast(Pen, None)
-    DEFAULT_FONT:   Font = cast(Font, None)
+    BLACK_SOLID_PEN:  Pen  = cast(Pen, None)
+    RED_SOLID_PEN:    Pen  = cast(Pen, None)
+    RED_DASHED_PEN:   Pen  = cast(Pen, None)
+    BLACK_DASHED_PEN: Pen  = cast(Pen, None)
+
+    DEFAULT_FONT:     Font = cast(Font, None)
 
     DEFAULT_BACKGROUND_BRUSH: Brush = cast(Brush, None)
 
@@ -111,7 +115,15 @@ class UmlUtils:
         dc.DrawEllipse(int(shape.GetX() - shape.GetWidth() / 2.0), int(shape.GetY() - shape.GetHeight() / 2.0), shape.GetWidth(), shape.GetHeight())
 
     @classmethod
-    def redSolidPen(cls):
+    def blackSolidPen(cls) -> Pen:
+
+        if UmlUtils.BLACK_SOLID_PEN is None:
+            UmlUtils.BLACK_SOLID_PEN = Pen(BLACK, 1, PENSTYLE_SOLID)
+
+        return UmlUtils.BLACK_SOLID_PEN
+
+    @classmethod
+    def redSolidPen(cls) -> Pen:
 
         if UmlUtils.RED_SOLID_PEN is None:
             UmlUtils.RED_SOLID_PEN = Pen(RED, 1, PENSTYLE_SOLID)
@@ -119,11 +131,18 @@ class UmlUtils:
         return UmlUtils.RED_SOLID_PEN
 
     @classmethod
-    def redDashedPen(cls):
+    def redDashedPen(cls) -> Pen:
         if UmlUtils.RED_DASHED_PEN is None:
             UmlUtils.RED_DASHED_PEN = Pen(RED, 1, PENSTYLE_SHORT_DASH)
 
         return UmlUtils.RED_DASHED_PEN
+
+    @classmethod
+    def blackDashedPen(cls) -> Pen:
+        if UmlUtils.BLACK_DASHED_PEN is None:
+            UmlUtils.BLACK_DASHED_PEN = Pen(BLACK, 1, PENSTYLE_SHORT_DASH)
+
+        return UmlUtils.BLACK_DASHED_PEN
 
     @classmethod
     def defaultFont(cls) -> Font:

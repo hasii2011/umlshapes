@@ -2,15 +2,14 @@
 from logging import Logger
 from logging import getLogger
 
-from wx import PENSTYLE_SHORT_DASH
-
 from wx import MemoryDC
-from wx import Pen
 
 from wx.lib.ogl import ARROW_ARROW
 
 from pyutmodelv2.PyutLink import PyutLink
+from wx.lib.ogl import LineShape
 
+from umlshapes.UmlUtils import UmlUtils
 from umlshapes.links.UmlLink import UmlLink
 from umlshapes.shapes.UmlClass import UmlClass
 
@@ -37,11 +36,19 @@ class UmlInterface(UmlLink):
 
     def OnDraw(self, dc: MemoryDC):
 
-        pen: Pen = dc.GetPen()
-        pen.SetStyle(PENSTYLE_SHORT_DASH)
-        self.SetPen(pen)
+        assert dc is not None, 'Where is my DC'
 
-        super().OnDraw(dc=dc)
+        if self._linkName is None:
+            self._linkName = self._createLinkName()
+            self._setupAssociationLabel(umlAssociationLabel=self._linkName)
+
+        if self.Selected() is True:
+            self.SetPen(UmlUtils.redDashedPen())
+        else:
+            self.SetPen(UmlUtils.blackDashedPen())
+        # Hack:
+        #       I want to skip the UmlLink OnDraw so this line will be drawn
+        LineShape.OnDraw(self=self, dc=dc)
 
     def __repr__(self):
         return f'UmlInterface - {super().__repr__()}'
