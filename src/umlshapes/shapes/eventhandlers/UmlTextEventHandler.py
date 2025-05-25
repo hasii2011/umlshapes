@@ -23,6 +23,7 @@ from wx import Colour
 from wx import Pen
 
 from wx import NewIdRef as wxNewIdRef
+from wx import RED
 
 from wx.lib.ogl import Shape
 from wx.lib.ogl import ShapeCanvas
@@ -47,12 +48,12 @@ TEXT_SIZE_DECREMENT: int = 2
 
 class UmlTextEventHandler(UmlBaseEventHandler):
 
-    def __init__(self, moveColor: Colour):
+    def __init__(self):
 
         self.logger: Logger = getLogger(__name__)
         super().__init__()
 
-        self._moveColor: Colour = moveColor
+        self._moveColor: Colour = RED
         self._outlinePen: Pen   = Pen(colour=self._moveColor, width=2, style=PENSTYLE_SOLID)
 
         self._menu: Menu = cast(Menu, None)

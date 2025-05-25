@@ -1,7 +1,8 @@
 
+from typing import Tuple
+
 from logging import Logger
 from logging import getLogger
-from typing import Tuple
 
 from wx import EVT_MENU
 from wx import ID_EXIT
@@ -22,25 +23,12 @@ from wx.lib.sized_controls import SizedPanel
 
 from codeallybasic.UnitTestBase import UnitTestBase
 
-from pyutmodelv2.PyutText import PyutText
-from pyutmodelv2.PyutNote import PyutNote
-from pyutmodelv2.PyutUseCase import PyutUseCase
-from pyutmodelv2.PyutActor import PyutActor
 from pyutmodelv2.PyutClass import PyutClass
-from pyutmodelv2.PyutField import PyutField
-from pyutmodelv2.PyutField import PyutFields
-from pyutmodelv2.PyutType import PyutType
-from pyutmodelv2.PyutMethod import PyutMethod
-from pyutmodelv2.PyutMethod import PyutMethods
-from pyutmodelv2.PyutMethod import PyutParameters
-from pyutmodelv2.PyutParameter import PyutParameter
 from pyutmodelv2.PyutLink import PyutLink
 
 from pyutmodelv2.enumerations.PyutLinkType import PyutLinkType
-from pyutmodelv2.enumerations.PyutStereotype import PyutStereotype
-from pyutmodelv2.enumerations.PyutVisibility import PyutVisibility
-from pyutmodelv2.enumerations.PyutDisplayParameters import PyutDisplayParameters
 
+from tests.demo.ShapeCreator import ShapeCreator
 from umlshapes.UmlDiagram import UmlDiagram
 from umlshapes.frames.UmlClassDiagramFrame import UmlClassDiagramFrame
 from umlshapes.links.UmlAggregation import UmlAggregation
@@ -50,17 +38,9 @@ from umlshapes.links.UmlComposition import UmlComposition
 from umlshapes.links.UmlInheritance import UmlInheritance
 from umlshapes.links.UmlInterface import UmlInterface
 
-from umlshapes.shapes.UmlActor import UmlActor
 from umlshapes.shapes.UmlClass import UmlClass
-from umlshapes.shapes.UmlUseCase import UmlUseCase
-from umlshapes.shapes.UmlNote import UmlNote
-from umlshapes.shapes.UmlText import UmlText
 
 from umlshapes.shapes.eventhandlers.UmlClassEventHandler import UmlClassEventHandler
-from umlshapes.shapes.eventhandlers.UmlNoteEventHandler import UmlNoteEventHandler
-from umlshapes.shapes.eventhandlers.UmlActorEventHandler import UmlActorEventHandler
-from umlshapes.shapes.eventhandlers.UmlUseCaseEventHandler import UmlUseCaseEventHandler
-from umlshapes.shapes.eventhandlers.UmlTextEventHandler import UmlTextEventHandler
 
 from umlshapes.links.eventhandlers.UmlAssociationEventHandler import UmlAssociationEventHandler
 from umlshapes.links.eventhandlers.UmlLinkEventHandler import UmlLinkEventHandler
@@ -140,6 +120,8 @@ class DemoUmlShapes(App):
         self._frame.SetAutoLayout(True)
         self._frame.Show(True)
 
+        self._shapeCreator: ShapeCreator = ShapeCreator(diagramFrame=self._diagramFrame)
+
     def OnInit(self):
         return True
 
@@ -188,20 +170,21 @@ class DemoUmlShapes(App):
 
     def _onDisplayElement(self, event: CommandEvent):
 
-        menuId: int = event.GetId()
+        menuId:       int          = event.GetId()
+        shapeCreator: ShapeCreator = self._shapeCreator
 
         # noinspection PyUnreachableCode
         match menuId:
             case self._ID_DISPLAY_UML_CLASS:
-                self._displayUmlClass()
+                shapeCreator.displayShape(self._shapeCreator.ID_DISPLAY_UML_CLASS)
             case self._ID_DISPLAY_UML_TEXT:
-                self._displayUmlText()
+                shapeCreator.displayShape(self._shapeCreator.ID_DISPLAY_UML_TEXT)
             case self._ID_DISPLAY_UML_NOTE:
-                self._displayUmlNote()
+                shapeCreator.displayShape(self._shapeCreator.ID_DISPLAY_UML_NOTE)
             case self._ID_DISPLAY_UML_USE_CASE:
-                self._displayUmlUseCase()
+                shapeCreator.displayShape(self._shapeCreator.ID_DISPLAY_UML_USE_CASE)
             case self._ID_DISPLAY_UML_ACTOR:
-                self._displayUmlActor()
+                shapeCreator.displayShape(self._shapeCreator.ID_DISPLAY_UML_ACTOR)
             case self._ID_DISPLAY_UML_ASSOCIATION:
                 self._displayBareAssociation()
             case self._ID_DISPLAY_UML_INHERITANCE:
@@ -216,124 +199,6 @@ class DemoUmlShapes(App):
             #     self._displaySequenceDiagram()
             case _:
                 self.logger.error(f'WTH!  I am not handling that menu item')
-
-    def _displayUmlText(self):
-
-        content:        str           = f'{self._preferences.textValue} {self._textCounter}'
-        self._textCounter += 1
-
-        pyutText:    PyutText    = PyutText(content=content)
-        umlPosition: UmlPosition = self._computePosition()
-        umlText:     UmlText     = UmlText(pyutText=pyutText)
-
-        umlText.SetCanvas(self._diagramFrame)
-        umlText.position = umlPosition
-
-        diagram: UmlDiagram = self._diagramFrame.umlDiagram
-
-        diagram.AddShape(umlText)
-        umlText.Show(show=True)
-
-        eventHandler: UmlTextEventHandler = UmlTextEventHandler(moveColor=umlText.moveColor)
-        eventHandler.SetShape(umlText)
-        eventHandler.SetPreviousHandler(umlText.GetEventHandler())
-
-        umlText.SetEventHandler(eventHandler)
-
-        self._diagramFrame.refresh()
-
-    def _displayUmlNote(self):
-        content: str = f'{self._preferences.noteText} {self._noteCounter}'
-        self._noteCounter += 1
-        pyutNote: PyutNote = PyutNote(content=content)
-
-        umlPosition:    UmlPosition   = self._computePosition()
-
-        umlNote: UmlNote = UmlNote(pyutNote=pyutNote)
-        umlNote.SetCanvas(self._diagramFrame)
-        umlNote.position = umlPosition
-        diagram: UmlDiagram = self._diagramFrame.umlDiagram
-
-        diagram.AddShape(umlNote)
-        umlNote.Show(show=True)
-
-        eventHandler: UmlNoteEventHandler = UmlNoteEventHandler()
-        eventHandler.SetShape(umlNote)
-        eventHandler.SetPreviousHandler(umlNote.GetEventHandler())
-
-        umlNote.SetEventHandler(eventHandler)
-
-        self._diagramFrame.refresh()
-
-    def _displayUmlUseCase(self):
-        useCaseName: str = f'{self._preferences.defaultNameUsecase} {self._useCaseCounter}'
-        self._useCaseCounter += 1
-        pyutUseCase: PyutUseCase = PyutUseCase(name=useCaseName)
-        umlPosition: UmlPosition = self._computePosition()
-
-        umlUseCase: UmlUseCase = UmlUseCase(pyutUseCase=pyutUseCase)
-        umlUseCase.SetCanvas(self._diagramFrame)
-        umlUseCase.position = umlPosition
-
-        diagram: UmlDiagram = self._diagramFrame.umlDiagram
-
-        diagram.AddShape(umlUseCase)
-        umlUseCase.Show(show=True)
-
-        eventHandler: UmlUseCaseEventHandler = UmlUseCaseEventHandler()
-        eventHandler.SetShape(umlUseCase)
-        eventHandler.SetPreviousHandler(umlUseCase.GetEventHandler())
-
-        umlUseCase.SetEventHandler(eventHandler)
-
-        self._diagramFrame.refresh()
-
-    def _displayUmlActor(self):
-
-        actorName: str = f'{self._preferences.defaultNameActor} {self._actorCounter}'
-        self._actorCounter += 1
-        pyutActor:   PyutActor   = PyutActor(actorName=actorName)
-        umlPosition: UmlPosition = self._computePosition()
-
-        umlActor: UmlActor = UmlActor(pyutActor=pyutActor)
-        umlActor.SetCanvas(self._diagramFrame)
-        umlActor.position = umlPosition
-
-        diagram: UmlDiagram = self._diagramFrame.umlDiagram
-
-        diagram.AddShape(umlActor)
-        umlActor.Show(show=True)
-
-        eventHandler: UmlActorEventHandler = UmlActorEventHandler()
-        eventHandler.SetShape(umlActor)
-        eventHandler.SetPreviousHandler(umlActor.GetEventHandler())
-
-        umlActor.SetEventHandler(eventHandler)
-
-        self._diagramFrame.refresh()
-
-    def _displayUmlClass(self):
-
-        pyutClass: PyutClass  = self._createDemoPyutClass()
-
-        umlClass: UmlClass = UmlClass(pyutClass=pyutClass)
-        umlClass.SetCanvas(self._diagramFrame)
-
-        self.logger.info(f'{umlClass.id=}')
-        umlPosition: UmlPosition = self._computePosition()
-        umlClass.position = umlPosition
-        diagram: UmlDiagram = self._diagramFrame.umlDiagram
-
-        diagram.AddShape(umlClass)
-        umlClass.Show(show=True)
-
-        eventHandler: UmlClassEventHandler = UmlClassEventHandler()
-        eventHandler.SetShape(umlClass)
-        eventHandler.SetPreviousHandler(umlClass.GetEventHandler())
-
-        umlClass.SetEventHandler(eventHandler)
-
-        self._diagramFrame.refresh()
 
     def _displayBareAssociation(self):
 
@@ -480,59 +345,6 @@ class DemoUmlShapes(App):
         self._currentPosition.y += INCREMENT_Y
 
         return currentPosition
-
-    def _createDemoPyutClass(self) -> PyutClass:
-
-        className: str = f'{self._preferences.defaultClassName} {self._classCounter}'
-        self._classCounter += 1
-        pyutClass: PyutClass  = PyutClass(name=className)
-        pyutClass.stereotype  = PyutStereotype.METACLASS
-        pyutClass.showFields  = True
-        pyutClass.showMethods = True
-        pyutClass.displayParameters = PyutDisplayParameters.UNSPECIFIED
-
-        pyutField1: PyutField = PyutField(
-            name='DemoField1',
-            visibility=PyutVisibility.PUBLIC,
-            type=PyutType('float'),
-            defaultValue='42.0'
-        )
-
-        pyutField2: PyutField = PyutField(
-            name='DemoField2',
-            visibility=PyutVisibility.PUBLIC,
-            type=PyutType('int'),
-            defaultValue='666'
-        )
-
-        pyutClass.fields  = PyutFields([pyutField1, pyutField2])
-
-        pyutMethod:    PyutMethod    = PyutMethod(name='DemoMethod', visibility=PyutVisibility.PUBLIC)
-        pyutParameter: PyutParameter = PyutParameter(name='DemoParameter', type=PyutType("str"), defaultValue='Ozzee')
-
-        pyutMethod.parameters = PyutParameters([pyutParameter])
-
-        constructorMethod: PyutMethod = PyutMethod(name='__init__')
-        constructorMethod.parameters = self._manyParameters()
-        dunderStrMethod:   PyutMethod = PyutMethod(name='__str__', visibility=PyutVisibility.PUBLIC, returnType=PyutType(value='str'))
-
-        pyutClass.methods = PyutMethods([constructorMethod, pyutMethod, dunderStrMethod])
-
-        return pyutClass
-
-    def _manyParameters(self) -> PyutParameters:
-
-        pyutParameters: PyutParameters = PyutParameters([])
-
-        pyutParameter1: PyutParameter = PyutParameter(name='parameter1', type=PyutType("str"),   defaultValue='Ozzee')
-        pyutParameter2: PyutParameter = PyutParameter(name='parameter2', type=PyutType("int"),   defaultValue='0')
-        pyutParameter3: PyutParameter = PyutParameter(name='parameter3', type=PyutType("float"), defaultValue='42.00')
-
-        pyutParameters.append(pyutParameter1)
-        pyutParameters.append(pyutParameter2)
-        pyutParameters.append(pyutParameter3)
-
-        return pyutParameters
 
     def _createAssociationPyutLink(self) -> PyutLink:
 
