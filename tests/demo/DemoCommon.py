@@ -1,6 +1,8 @@
 
 from typing import NewType
 
+from wx import NewIdRef as wxNewIdRef
+
 ID_REFERENCE = NewType('ID_REFERENCE', int)
 
 
@@ -9,3 +11,17 @@ INITIAL_Y:   int = 100
 
 INCREMENT_X: int = 25
 INCREMENT_Y: int = 25
+
+
+class Identifiers:
+    ID_DISPLAY_UML_TEXT:     ID_REFERENCE = wxNewIdRef()
+    ID_DISPLAY_UML_NOTE:     ID_REFERENCE = wxNewIdRef()
+    ID_DISPLAY_UML_USE_CASE: ID_REFERENCE = wxNewIdRef()
+    ID_DISPLAY_UML_ACTOR:    ID_REFERENCE = wxNewIdRef()
+    ID_DISPLAY_UML_CLASS:    ID_REFERENCE = wxNewIdRef()
+
+    ID_DISPLAY_UML_ASSOCIATION: ID_REFERENCE = wxNewIdRef()
+    ID_DISPLAY_UML_INHERITANCE: ID_REFERENCE = wxNewIdRef()
+    ID_DISPLAY_UML_COMPOSITION: ID_REFERENCE = wxNewIdRef()
+    ID_DISPLAY_UML_AGGREGATION: ID_REFERENCE = wxNewIdRef()
+    ID_DISPLAY_UML_INTERFACE:   ID_REFERENCE = wxNewIdRef()

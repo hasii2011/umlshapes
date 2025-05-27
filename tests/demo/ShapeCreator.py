@@ -26,30 +26,35 @@ from pyutmodelv2.enumerations.PyutDisplayParameters import PyutDisplayParameters
 from pyutmodelv2.enumerations.PyutStereotype import PyutStereotype
 from pyutmodelv2.enumerations.PyutVisibility import PyutVisibility
 
-from wx import NewIdRef as wxNewIdRef
-
 from wx.lib.ogl import ShapeEvtHandler
+
 
 from tests.demo.DemoCommon import ID_REFERENCE
 from tests.demo.DemoCommon import INCREMENT_X
 from tests.demo.DemoCommon import INCREMENT_Y
 from tests.demo.DemoCommon import INITIAL_X
 from tests.demo.DemoCommon import INITIAL_Y
+from tests.demo.DemoCommon import Identifiers
+
 from umlshapes.UmlDiagram import UmlDiagram
 from umlshapes.frames.UmlClassDiagramFrame import UmlClassDiagramFrame
 from umlshapes.preferences.UmlPreferences import UmlPreferences
+
 from umlshapes.shapes.UmlActor import UmlActor
 from umlshapes.shapes.UmlClass import UmlClass
 from umlshapes.shapes.UmlNote import UmlNote
 from umlshapes.shapes.UmlText import UmlText
 from umlshapes.shapes.UmlUseCase import UmlUseCase
+
 from umlshapes.shapes.eventhandlers.UmlActorEventHandler import UmlActorEventHandler
 from umlshapes.shapes.eventhandlers.UmlClassEventHandler import UmlClassEventHandler
 from umlshapes.shapes.eventhandlers.UmlNoteEventHandler import UmlNoteEventHandler
 from umlshapes.shapes.eventhandlers.UmlTextEventHandler import UmlTextEventHandler
 from umlshapes.shapes.eventhandlers.UmlUseCaseEventHandler import UmlUseCaseEventHandler
+
 from umlshapes.types.Common import ModelObject
 from umlshapes.types.Common import UmlShape
+
 from umlshapes.types.UmlPosition import UmlPosition
 
 CreateModel = Callable[[], ModelObject]
@@ -89,12 +94,6 @@ class ShapeCreator:
         self._compositionCounter: int = 0
         self._interfaceCounter:   int = 0
 
-        self.ID_DISPLAY_UML_TEXT:     ID_REFERENCE = wxNewIdRef()
-        self.ID_DISPLAY_UML_NOTE:     ID_REFERENCE = wxNewIdRef()
-        self.ID_DISPLAY_UML_USE_CASE: ID_REFERENCE = wxNewIdRef()
-        self.ID_DISPLAY_UML_ACTOR:    ID_REFERENCE = wxNewIdRef()
-        self.ID_DISPLAY_UML_CLASS:    ID_REFERENCE = wxNewIdRef()
-
         shapeUmlText:    ShapeDescription = ShapeDescription(umlClass=UmlText,    modelClass=PyutText,    eventHandler=UmlTextEventHandler,    defaultValue=self._preferences.textValue)
         shapeUmlNote:    ShapeDescription = ShapeDescription(umlClass=UmlNote,    modelClass=PyutNote,    eventHandler=UmlNoteEventHandler,    defaultValue=self._preferences.noteText)
         shapeUmlUseCase: ShapeDescription = ShapeDescription(umlClass=UmlUseCase, modelClass=PyutUseCase, eventHandler=UmlUseCaseEventHandler, defaultValue=self._preferences.defaultNameUsecase)
@@ -108,11 +107,11 @@ class ShapeCreator:
 
         self._shapes: ShapesToCreate = ShapesToCreate(
             {
-                self.ID_DISPLAY_UML_TEXT:     shapeUmlText,
-                self.ID_DISPLAY_UML_NOTE:     shapeUmlNote,
-                self.ID_DISPLAY_UML_USE_CASE: shapeUmlUseCase,
-                self.ID_DISPLAY_UML_ACTOR:    shapeUmlActor,
-                self.ID_DISPLAY_UML_CLASS:    shapeUmlClass,
+                Identifiers.ID_DISPLAY_UML_TEXT:     shapeUmlText,
+                Identifiers.ID_DISPLAY_UML_NOTE:     shapeUmlNote,
+                Identifiers.ID_DISPLAY_UML_USE_CASE: shapeUmlUseCase,
+                Identifiers.ID_DISPLAY_UML_ACTOR:    shapeUmlActor,
+                Identifiers.ID_DISPLAY_UML_CLASS:    shapeUmlClass,
             }
         )
 
