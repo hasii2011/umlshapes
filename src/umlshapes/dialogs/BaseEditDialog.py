@@ -77,9 +77,8 @@ class BaseEditDialog(SizedDialog):
         buttonPanel.SetSizerType('horizontal')
         buttonPanel.SetSizerProps(expand=False, halign='right')  # expand False allows aligning right
 
-        for customButton in customButtons:
-            customDialogButton: CustomDialogButton = cast(CustomDialogButton, customButton)
-            button:             Button             = Button(buttonPanel, label=customDialogButton.label)
+        for customDialogButton in customButtons:
+            button: Button = Button(buttonPanel, label=customDialogButton.label)
             self.Bind(EVT_BUTTON, customDialogButton.callback, button)
 
         self._btnCancel = Button(buttonPanel, ID_CANCEL, '&Cancel')

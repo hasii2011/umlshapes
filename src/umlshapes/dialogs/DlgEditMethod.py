@@ -103,8 +103,7 @@ class DlgEditMethod(BaseEditDialog):
             self._rdbVisibility.SetStringSelection(str(self._pyutMethodCopy.visibility))
 
         parameterItems: EnhancedListBoxItems = EnhancedListBoxItems([])
-        for parameter in self._pyutMethodCopy.parameters:
-            pyutParameter: PyutParameter = cast(PyutParameter, parameter)
+        for pyutParameter in self._pyutMethodCopy.parameters:
             parameterItems.append(str(pyutParameter))     # Depends on a reasonable __str__ implementation
 
         self._pyutParameters.setItems(parameterItems)

@@ -90,11 +90,9 @@ class UmlClassDiagramFrameMenuHandler:
         umlFrame:  UmlClassDiagramFrame = self._frame
         umlShapes: UmlShapeList        = umlFrame.umlShapes
 
-        for umlObject in umlShapes:
-            if isinstance(umlObject, UmlClass):
-                oglClass: UmlClass = cast(UmlClass, umlObject)
-
-                oglClass.autoSize()
+        for umlShape in umlShapes:
+            if isinstance(umlShape, UmlClass):
+                umlShape.autoSize()
 
     # def _arrangeLinks(self):
     #

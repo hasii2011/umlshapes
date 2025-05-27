@@ -205,8 +205,6 @@ class UmlUtils:
             return FONTFAMILY_SCRIPT
         elif enumValue == UmlFontFamily.TELETYPE:
             return FONTFAMILY_TELETYPE
-        else:
-            return FONTFAMILY_DEFAULT
 
     @classmethod
     def lineSplitter(cls, text: str, dc: DC, textWidth: int) -> List[str]:

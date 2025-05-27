@@ -66,8 +66,7 @@ class DlgEditMethodModifiers(BaseEditDialog):
         """
 
         stringList: List[str] = []
-        for modifier in self._pyutModifiersCopy:
-            pyutModifier: PyutModifier = cast(PyutModifier, modifier)
+        for pyutModifier in self._pyutModifiersCopy:
             stringList.append(pyutModifier.name)
 
         return stringList

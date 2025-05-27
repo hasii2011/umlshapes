@@ -1,5 +1,7 @@
+
 from typing import Callable
 from typing import Dict
+from typing import NewType
 from typing import cast
 
 from logging import Logger
@@ -7,7 +9,6 @@ from logging import getLogger
 
 from dataclasses import dataclass
 
-from mypy.types import NewType
 from pyutmodelv2.PyutActor import PyutActor
 from pyutmodelv2.PyutClass import PyutClass
 from pyutmodelv2.PyutField import PyutField
@@ -20,13 +21,20 @@ from pyutmodelv2.PyutParameter import PyutParameter
 from pyutmodelv2.PyutText import PyutText
 from pyutmodelv2.PyutType import PyutType
 from pyutmodelv2.PyutUseCase import PyutUseCase
+
 from pyutmodelv2.enumerations.PyutDisplayParameters import PyutDisplayParameters
 from pyutmodelv2.enumerations.PyutStereotype import PyutStereotype
 from pyutmodelv2.enumerations.PyutVisibility import PyutVisibility
+
 from wx import NewIdRef as wxNewIdRef
 
 from wx.lib.ogl import ShapeEvtHandler
 
+from tests.demo.DemoCommon import ID_REFERENCE
+from tests.demo.DemoCommon import INCREMENT_X
+from tests.demo.DemoCommon import INCREMENT_Y
+from tests.demo.DemoCommon import INITIAL_X
+from tests.demo.DemoCommon import INITIAL_Y
 from umlshapes.UmlDiagram import UmlDiagram
 from umlshapes.frames.UmlClassDiagramFrame import UmlClassDiagramFrame
 from umlshapes.preferences.UmlPreferences import UmlPreferences
@@ -44,8 +52,6 @@ from umlshapes.types.Common import ModelObject
 from umlshapes.types.Common import UmlShape
 from umlshapes.types.UmlPosition import UmlPosition
 
-ID_REFERENCE = NewType('ID_REFERENCE', int)
-
 CreateModel = Callable[[], ModelObject]
 
 
@@ -60,12 +66,6 @@ class ShapeDescription:
 
 
 ShapesToCreate = NewType('ShapesToCreate', Dict[ID_REFERENCE, ShapeDescription])
-
-INITIAL_X:   int = 100
-INITIAL_Y:   int = 100
-
-INCREMENT_X: int = 25
-INCREMENT_Y: int = 25
 
 
 class ShapeCreator:

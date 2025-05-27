@@ -122,8 +122,7 @@ class DlgEditClassCommon(BaseEditDialog):
 
         methodItems: EnhancedListBoxItems = EnhancedListBoxItems([])
 
-        for method in self._pyutModelCopy.methods:
-            pyutMethod: PyutMethod = cast(PyutMethod, method)
+        for pyutMethod in self._pyutModelCopy.methods:
             methodItems.append(str(pyutMethod))
 
         self._pyutMethods.setItems(methodItems)

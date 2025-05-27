@@ -18,7 +18,6 @@ from wx.lib.ogl import RectangleShape
 from pyutmodelv2.PyutClass import PyutClass
 from pyutmodelv2.PyutMethod import PyutMethod
 from pyutmodelv2.PyutMethod import PyutMethods
-from pyutmodelv2.PyutField import PyutField
 from pyutmodelv2.PyutField import PyutFields
 
 from pyutmodelv2.enumerations.PyutStereotype import PyutStereotype
@@ -620,8 +619,7 @@ class UmlClass(ControlPointMixin, RectangleShape, TopLeftMixin):
 
         maxWidth: int = 0
         if len(pyutFields) > 0 and pyutClass.showFields is True:
-            for pf in pyutFields:
-                pyutField: PyutField = cast(PyutField, pf)
+            for pyutField in pyutFields:
                 fieldStr: str = str(pyutField)
                 fieldWidth: int = self.textWidth(dc, fieldStr)
                 maxWidth = max(maxWidth, fieldWidth)

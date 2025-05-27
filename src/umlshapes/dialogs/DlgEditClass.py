@@ -64,8 +64,8 @@ class DlgEditClass(DlgEditClassCommon):
     dialog, any modifications are lost.
 
     """
-    # def __init__(self, parent: Window, eventEngine: IEventEngine, pyutClass: PyutClass):
-    def __init__(self, parent: Window, pyutClass: PyutClass):
+    # def __init__(self, parent: UmlClassDiagramFrame, eventEngine: IEventEngine, pyutClass: PyutClass):
+    def __init__(self, parent: UmlClassDiagramFrame, pyutClass: PyutClass):
         """
 
         Args:
@@ -74,10 +74,9 @@ class DlgEditClass(DlgEditClassCommon):
         """
 
         assert isinstance(parent, UmlClassDiagramFrame), 'Developer error.  Must be a Uml Diagram Frame'
-        self._umlFrame: UmlClassDiagramFrame = cast(UmlClassDiagramFrame, parent)
-
-        self.logger:       Logger       = getLogger(__name__)
-        self._pyutClass:   PyutClass    = pyutClass
+        self._umlFrame:    UmlClassDiagramFrame = parent
+        self.logger:       Logger               = getLogger(__name__)
+        self._pyutClass:   PyutClass            = pyutClass
 
         # super().__init__(parent=parent, eventEngine=eventEngine, dlgTitle="Edit Class", pyutModel=self._pyutClass, editInterface=False)
         super().__init__(parent=parent, dlgTitle="Edit Class", pyutModel=self._pyutClass, editInterface=False)
@@ -156,8 +155,7 @@ class DlgEditClass(DlgEditClassCommon):
 
         fieldItems: EnhancedListBoxItems = EnhancedListBoxItems([])
         for field in self._pyutModelCopy.fields:
-            pyutField: PyutField = cast(PyutField, field)
-            fieldItems.append(str(pyutField))     # Depends on a reasonable __str__ implementation
+            fieldItems.append(str(field))     # Depends on a reasonable __str__ implementation
         self._pyutFields.setItems(fieldItems)
 
         self._fillMethodList()
@@ -287,8 +285,8 @@ class DlgEditClass(DlgEditClassCommon):
 
     def _getUmlShapes(self) -> UmlShapeList:
         """
-        The frame may contain no UML objects.
+        The frame may contain no UML shapes.
 
-        Returns: Return the list of UmlObjects in the diagram.
+        Returns: Return the list of UmlShapes in the diagram.
         """
-        return cast(UmlShapeList, self._umlFrame.umlShapes)
+        return self._umlFrame.umlShapes

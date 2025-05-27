@@ -29,24 +29,22 @@ from pyutmodelv2.PyutLink import PyutLink
 from pyutmodelv2.enumerations.PyutLinkType import PyutLinkType
 
 from tests.demo.ShapeCreator import ShapeCreator
+from tests.demo.RelationshipCreator import RelationshipCreator
+
 from umlshapes.UmlDiagram import UmlDiagram
 from umlshapes.frames.UmlClassDiagramFrame import UmlClassDiagramFrame
-from umlshapes.links.UmlAggregation import UmlAggregation
 
-from umlshapes.links.UmlAssociation import UmlAssociation
-from umlshapes.links.UmlComposition import UmlComposition
+from umlshapes.links.UmlAggregation import UmlAggregation
 from umlshapes.links.UmlInheritance import UmlInheritance
 from umlshapes.links.UmlInterface import UmlInterface
-
-from umlshapes.shapes.UmlClass import UmlClass
-
-from umlshapes.shapes.eventhandlers.UmlClassEventHandler import UmlClassEventHandler
 
 from umlshapes.links.eventhandlers.UmlAssociationEventHandler import UmlAssociationEventHandler
 from umlshapes.links.eventhandlers.UmlLinkEventHandler import UmlLinkEventHandler
 
-from umlshapes.types.Common import UmlShape
+from umlshapes.shapes.UmlClass import UmlClass
+from umlshapes.shapes.eventhandlers.UmlClassEventHandler import UmlClassEventHandler
 
+from umlshapes.types.Common import UmlShape
 from umlshapes.types.UmlPosition import UmlPosition
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
@@ -120,7 +118,8 @@ class DemoUmlShapes(App):
         self._frame.SetAutoLayout(True)
         self._frame.Show(True)
 
-        self._shapeCreator: ShapeCreator = ShapeCreator(diagramFrame=self._diagramFrame)
+        self._shapeCreator:        ShapeCreator        = ShapeCreator(diagramFrame=self._diagramFrame)
+        self._relationshipCreator: RelationshipCreator = RelationshipCreator(diagramFrame=self._diagramFrame)
 
     def OnInit(self):
         return True
@@ -170,9 +169,9 @@ class DemoUmlShapes(App):
 
     def _onDisplayElement(self, event: CommandEvent):
 
-        menuId:       int          = event.GetId()
-        shapeCreator: ShapeCreator = self._shapeCreator
-
+        menuId:              int                 = event.GetId()
+        shapeCreator:        ShapeCreator        = self._shapeCreator
+        relationshipCreator: RelationshipCreator = self._relationshipCreator
         # noinspection PyUnreachableCode
         match menuId:
             case self._ID_DISPLAY_UML_CLASS:
@@ -185,67 +184,23 @@ class DemoUmlShapes(App):
                 shapeCreator.displayShape(self._shapeCreator.ID_DISPLAY_UML_USE_CASE)
             case self._ID_DISPLAY_UML_ACTOR:
                 shapeCreator.displayShape(self._shapeCreator.ID_DISPLAY_UML_ACTOR)
+
             case self._ID_DISPLAY_UML_ASSOCIATION:
-                self._displayBareAssociation()
-            case self._ID_DISPLAY_UML_INHERITANCE:
-                self._displayUmlInheritance()
+                relationshipCreator.displayRelationship(idReference=relationshipCreator.ID_DISPLAY_UML_ASSOCIATION)
             case self._ID_DISPLAY_UML_COMPOSITION:
-                self._displayUmlComposition()
+                relationshipCreator.displayRelationship(idReference=relationshipCreator.ID_DISPLAY_UML_COMPOSITION)
             case self._ID_DISPLAY_UML_AGGREGATION:
-                self._displayUmlAggregation()
+                relationshipCreator.displayRelationship(idReference=relationshipCreator.ID_DISPLAY_UML_AGGREGATION)
+
+            case self._ID_DISPLAY_UML_INHERITANCE:
+                # self._displayUmlInheritance()
+                relationshipCreator.displayRelationship(idReference=relationshipCreator.ID_DISPLAY_UML_INHERITANCE)
             case self._ID_DISPLAY_UML_INTERFACE:
-                self._displayUmlInterface()
+                relationshipCreator.displayRelationship(idReference=relationshipCreator.ID_DISPLAY_UML_INTERFACE)
             # case self._ID_DISPLAY_SEQUENCE_DIAGRAM:
             #     self._displaySequenceDiagram()
             case _:
                 self.logger.error(f'WTH!  I am not handling that menu item')
-
-    def _displayBareAssociation(self):
-
-        sourceUmlClass, destinationUmlClass = self._createClassPair()
-
-        self.logger.info(f'{sourceUmlClass.id=} {destinationUmlClass.id=}')
-
-        umlAssociation: UmlAssociation = UmlAssociation(pyutLink=self._createAssociationPyutLink())
-        umlAssociation.SetCanvas(self._diagramFrame)
-        umlAssociation.MakeLineControlPoints(n=2)       # Make this configurable
-
-        sourceUmlClass.addLink(umlLink=umlAssociation, destinationClass=destinationUmlClass)
-        self._diagramFrame.umlDiagram.AddShape(umlAssociation)
-        umlAssociation.Show(True)
-
-        eventHandler: UmlAssociationEventHandler = UmlAssociationEventHandler(umlAssociation=umlAssociation)
-        eventHandler.SetPreviousHandler(umlAssociation.GetEventHandler())
-        umlAssociation.SetEventHandler(eventHandler)
-
-        self.logger.info(f'controlPoints: {umlAssociation.GetLineControlPoints()}')
-
-    def _displayUmlComposition(self):
-
-        composerUmlClass, composedUmlClass = self._createClassPair()
-
-        composerUmlClass.pyutClass.name = 'Hospital'
-        composedUmlClass.pyutClass.name = 'Department'
-
-        self.logger.info(f'{composerUmlClass.id=} {composedUmlClass.id=}')
-
-        pyutLink: PyutLink = self._createAssociationPyutLink()
-        pyutLink.linkType               = PyutLinkType.COMPOSITION
-        pyutLink.name                   = ''
-        pyutLink.sourceCardinality      = '1'
-        pyutLink.destinationCardinality = '1..*'
-
-        umlComposition: UmlComposition = UmlComposition(pyutLink=pyutLink)
-        umlComposition.SetCanvas(self._diagramFrame)
-        umlComposition.MakeLineControlPoints(n=2)       # Make this configurable
-
-        composerUmlClass.addLink(umlLink=umlComposition, destinationClass=composedUmlClass)
-        self._diagramFrame.umlDiagram.AddShape(umlComposition)
-        umlComposition.Show(True)
-
-        eventHandler: UmlAssociationEventHandler = UmlAssociationEventHandler(umlAssociation=umlComposition)
-        eventHandler.SetPreviousHandler(umlComposition.GetEventHandler())
-        umlComposition.SetEventHandler(eventHandler)
 
     def _displayUmlAggregation(self):
 
