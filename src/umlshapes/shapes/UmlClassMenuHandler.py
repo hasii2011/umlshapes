@@ -25,6 +25,8 @@ from pyutmodelv2.enumerations.PyutDisplayParameters import PyutDisplayParameters
 from pyutmodelv2.enumerations.PyutDisplayMethods import PyutDisplayMethods
 
 from umlshapes.UmlUtils import UmlUtils
+from umlshapes.eventengine.UmlEventEngine import UmlEventEngine
+from umlshapes.eventengine.UmlEvents import UmlEventType
 from umlshapes.frames.UmlFrame import UmlFrame
 
 if TYPE_CHECKING:
@@ -61,13 +63,12 @@ class TriStateData:
 
 
 class UmlClassMenuHandler:
-    # def __init__(self, oglClass: 'OglClass', eventEngine: IOglEventEngine):
-    def __init__(self, umlClass: 'UmlClass'):
+    def __init__(self, umlClass: 'UmlClass', eventEngine: UmlEventEngine):
 
         self.logger: Logger = getLogger(__name__)
 
         self._umlClass: 'UmlClass'        = umlClass
-        # self._eventEngine: IOglEventEngine = eventEngine
+        self._eventEngine: UmlEventEngine = eventEngine
 
         self._contextMenu:         Menu     = cast(Menu, None)
         self._toggleStereotype:    MenuItem = cast(MenuItem, None)
@@ -141,9 +142,9 @@ class UmlClassMenuHandler:
         elif eventId == ID_AUTO_SIZE:
             self._umlClass.autoSize()
         # elif eventId == ID_CUT_SHAPE:
-        #     self._eventEngine.sendEvent(OglEventType.CutOglClass, shapeToCut=self._umlClass)
-        # elif eventId == ID_IMPLEMENT_INTERFACE:
-        #     self._eventEngine.sendEvent(OglEventType.RequestLollipopLocation, requestShape=self._umlClass)
+        #     self._eventEngine.sendEvent(UmlEventType.CutOglClass, shapeToCut=self._umlClass)
+        elif eventId == ID_IMPLEMENT_INTERFACE:
+            self._eventEngine.sendEvent(UmlEventType.RequestLollipopLocation, requestShape=self._umlClass)
         else:
             event.Skip()
 
@@ -162,6 +163,7 @@ class UmlClassMenuHandler:
         displayParameters: PyutDisplayParameters = pyutClass.displayParameters
         self.logger.debug(f'{displayParameters=}')
 
+        #    # noinspection PyUnreachableCode
         match displayParameters:
             case PyutDisplayParameters.UNSPECIFIED:
                 pyutClass.displayParameters = PyutDisplayParameters.WITH_PARAMETERS
@@ -217,6 +219,7 @@ class UmlClassMenuHandler:
         displayParameters:    PyutDisplayParameters = pyutClass.displayParameters
         itemToggleParameters: MenuItem              = self._toggleParameters
 
+        # noinspection PyUnreachableCode
         match displayParameters:
             case PyutDisplayParameters.UNSPECIFIED:
                 triStateData: TriStateData = TriStateData(bitMap=UmlUtils.unspecifiedDisplayIcon(), menuText='Unspecified Parameter Display')
@@ -256,6 +259,7 @@ class UmlClassMenuHandler:
 
     def _getTriStateData(self, pyutDisplayValue: PyutDisplayMethods, displayName: str) -> TriStateData:
 
+        # noinspection PyUnreachableCode
         match pyutDisplayValue:
 
             case PyutDisplayMethods.UNSPECIFIED:
@@ -270,6 +274,7 @@ class UmlClassMenuHandler:
 
     def _nextDisplayValue(self, pyutDisplayValue: PyutDisplayMethods) -> PyutDisplayMethods:
 
+        # noinspection PyUnreachableCode
         match pyutDisplayValue:
             case PyutDisplayMethods.UNSPECIFIED:
                 return PyutDisplayMethods.DISPLAY

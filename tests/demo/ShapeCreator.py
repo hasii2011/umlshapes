@@ -46,11 +46,11 @@ from umlshapes.shapes.UmlNote import UmlNote
 from umlshapes.shapes.UmlText import UmlText
 from umlshapes.shapes.UmlUseCase import UmlUseCase
 
-from umlshapes.shapes.eventhandlers.UmlActorEventHandler import UmlActorEventHandler
-from umlshapes.shapes.eventhandlers.UmlClassEventHandler import UmlClassEventHandler
-from umlshapes.shapes.eventhandlers.UmlNoteEventHandler import UmlNoteEventHandler
-from umlshapes.shapes.eventhandlers.UmlTextEventHandler import UmlTextEventHandler
-from umlshapes.shapes.eventhandlers.UmlUseCaseEventHandler import UmlUseCaseEventHandler
+from umlshapes.eventhandlers.UmlActorEventHandler import UmlActorEventHandler
+from umlshapes.eventhandlers.UmlClassEventHandler import UmlClassEventHandler
+from umlshapes.eventhandlers.UmlNoteEventHandler import UmlNoteEventHandler
+from umlshapes.eventhandlers.UmlTextEventHandler import UmlTextEventHandler
+from umlshapes.eventhandlers.UmlUseCaseEventHandler import UmlUseCaseEventHandler
 
 from umlshapes.types.Common import ModelObject
 from umlshapes.types.Common import UmlShape

@@ -15,7 +15,7 @@ from umlshapes.frames.UmlFrame import UmlFrame
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
 from umlshapes.shapes.UmlControlPoint import UmlControlPoint
-from umlshapes.shapes.eventhandlers.UmlControlPointEventHandler import UmlControlPointEventHandler
+from umlshapes.eventhandlers.UmlControlPointEventHandler import UmlControlPointEventHandler
 
 
 class ControlPointMixin:

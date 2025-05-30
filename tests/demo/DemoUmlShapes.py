@@ -1,6 +1,7 @@
 
 from logging import Logger
 from logging import getLogger
+from typing import cast
 
 from wx import EVT_MENU
 from wx import ID_EXIT
@@ -47,42 +48,49 @@ class DemoUmlShapes(App):
 
         self.logger: Logger = getLogger(__name__)
 
-        super().__init__(redirect=False)
+        self._currentPosition: UmlPosition    = cast(UmlPosition, None)
+        self._preferences:     UmlPreferences = cast(UmlPreferences, None)
+        self._wxFrame:         SizedFrame     = cast(SizedFrame, None)
+        self._diagramFrame:    UmlClassDiagramFrame = cast(UmlClassDiagramFrame, None)
 
-        self._currentPosition: UmlPosition = UmlPosition(x=INITIAL_X, y=INITIAL_Y)
+        # self._demoEventEngine = DemoEventEngine(listeningWindow=self._frame)    # Our app event engine
 
+        self._shapeCreator:        ShapeCreator        = cast(ShapeCreator, None)
+        self._relationshipCreator: RelationshipCreator = cast(RelationshipCreator, None)
+
+        super().__init__(redirect=False)    # This calls OnInit()
+
+    def OnInit(self):
         # This creates some pens and brushes that the OGL library uses.
         # It should be called after the app object has been created,
         # but before OGL is used.
         OGLInitialize()
+        self._currentPosition = UmlPosition(x=INITIAL_X, y=INITIAL_Y)
 
-        self._preferences: UmlPreferences = UmlPreferences()
-        self._frame:       SizedFrame     = SizedFrame(
+        self._preferences = UmlPreferences()
+        self._wxFrame     = SizedFrame(
             parent=None,
             title="Test UML Shapes",
             size=(FRAME_WIDTH, FRAME_HEIGHT),
             style=DEFAULT_FRAME_STYLE | FRAME_FLOAT_ON_PARENT
         )
 
-        # self._demoEventEngine = DemoEventEngine(listeningWindow=self._frame)    # Our app event engine
-
-        sizedPanel: SizedPanel = self._frame.GetContentsPane()
+        sizedPanel: SizedPanel = self._wxFrame.GetContentsPane()
         sizedPanel.SetSizerProps(expand=True, proportion=1)
         self._diagramFrame = UmlClassDiagramFrame(parent=sizedPanel)
         # noinspection PyUnresolvedReferences
         self._diagramFrame.SetSizerProps(expand=True, proportion=1)
 
         self._createApplicationMenuBar()
-        self.SetTopWindow(self._frame)
+        self.SetTopWindow(self._wxFrame)
 
-        self._frame.CreateStatusBar()  # should always do this when there's a resize border
-        self._frame.SetAutoLayout(True)
-        self._frame.Show(True)
+        self._wxFrame.CreateStatusBar()  # should always do this when there's a resize border
+        self._wxFrame.SetAutoLayout(True)
+        self._wxFrame.Show(True)
 
-        self._shapeCreator:        ShapeCreator        = ShapeCreator(diagramFrame=self._diagramFrame)
-        self._relationshipCreator: RelationshipCreator = RelationshipCreator(diagramFrame=self._diagramFrame)
+        self._shapeCreator        = ShapeCreator(diagramFrame=self._diagramFrame)
+        self._relationshipCreator = RelationshipCreator(diagramFrame=self._diagramFrame)
 
-    def OnInit(self):
         return True
 
     def _createApplicationMenuBar(self):
@@ -112,7 +120,7 @@ class DemoUmlShapes(App):
         menuBar.Append(fileMenu, 'File')
         menuBar.Append(viewMenu, 'View')
 
-        self._frame.SetMenuBar(menuBar)
+        self._wxFrame.SetMenuBar(menuBar)
 
         # self.Bind(EVT_MENU, self._onOglPreferences, id=ID_PREFERENCES)
 
@@ -138,6 +146,7 @@ class DemoUmlShapes(App):
         match menuId:
             case Identifiers.ID_DISPLAY_UML_CLASS:
                 shapeCreator.displayShape(Identifiers.ID_DISPLAY_UML_CLASS)
+                self._wxFrame.SetStatusText('See the shape !!')
             case Identifiers.ID_DISPLAY_UML_TEXT:
                 shapeCreator.displayShape(Identifiers.ID_DISPLAY_UML_TEXT)
             case Identifiers.ID_DISPLAY_UML_NOTE:

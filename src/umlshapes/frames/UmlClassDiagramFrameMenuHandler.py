@@ -76,6 +76,7 @@ class UmlClassDiagramFrameMenuHandler:
         """
         eventId: int = event.GetId()
 
+        # noinspection PyUnreachableCode
         match eventId:
             case self._autoSizeID:
                 self._autoSize()

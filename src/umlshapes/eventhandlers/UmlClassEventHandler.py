@@ -7,12 +7,13 @@ from logging import getLogger
 from pyutmodelv2.PyutClass import PyutClass
 from wx import OK
 
-from umlshapes.frames.UmlFrame import UmlFrame
+from umlshapes.frames.UmlClassDiagramFrame import UmlClassDiagramFrame
 from umlshapes.preferences.UmlPreferences import UmlPreferences
+
 from umlshapes.shapes.UmlClass import UmlClass
 from umlshapes.shapes.UmlClassMenuHandler import UmlClassMenuHandler
 
-from umlshapes.shapes.eventhandlers.UmlBaseEventHandler import UmlBaseEventHandler
+from umlshapes.eventhandlers.UmlBaseEventHandler import UmlBaseEventHandler
 
 
 class UmlClassEventHandler(UmlBaseEventHandler):
@@ -32,9 +33,10 @@ class UmlClassEventHandler(UmlBaseEventHandler):
         super().OnRightClick(x=x, y=y, keys=keys, attachment=attachment)
 
         umlClass: UmlClass = self.GetShape()
+        umlFrame:  UmlClassDiagramFrame  = umlClass.GetCanvas()
 
         if self._menuHandler is None:
-            self._menuHandler = UmlClassMenuHandler(umlClass=umlClass)
+            self._menuHandler = UmlClassMenuHandler(umlClass=umlClass, eventEngine=umlFrame.eventEngine)
 
         self._menuHandler.popupMenu(x=x, y=y)
 
@@ -46,7 +48,7 @@ class UmlClassEventHandler(UmlBaseEventHandler):
 
         umlClass:  UmlClass  = self.GetShape()
         pyutClass: PyutClass = umlClass.pyutClass
-        umlFrame:  UmlFrame  = umlClass.GetCanvas()
+        umlFrame:  UmlClassDiagramFrame  = umlClass.GetCanvas()
 
         with DlgEditClass(umlFrame, pyutClass) as dlg:
             if dlg.ShowModal() == OK:

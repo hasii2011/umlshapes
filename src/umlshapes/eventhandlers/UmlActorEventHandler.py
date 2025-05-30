@@ -4,7 +4,7 @@ from logging import getLogger
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
-from umlshapes.shapes.eventhandlers.UmlBaseEventHandler import UmlBaseEventHandler
+from umlshapes.eventhandlers.UmlBaseEventHandler import UmlBaseEventHandler
 
 
 class UmlActorEventHandler(UmlBaseEventHandler):

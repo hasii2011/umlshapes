@@ -51,6 +51,7 @@ class UmlClass(ControlPointMixin, RectangleShape, TopLeftMixin):
     """
 
     """
+
     def __init__(self, pyutClass: PyutClass = None, size: UmlDimensions = None):
         """]
         Args:

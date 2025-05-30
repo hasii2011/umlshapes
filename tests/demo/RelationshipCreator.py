@@ -31,7 +31,7 @@ from umlshapes.links.eventhandlers.UmlLinkEventHandler import UmlLinkEventHandle
 
 from umlshapes.shapes.UmlClass import UmlClass
 
-from umlshapes.shapes.eventhandlers.UmlClassEventHandler import UmlClassEventHandler
+from umlshapes.eventhandlers.UmlClassEventHandler import UmlClassEventHandler
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
