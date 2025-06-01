@@ -103,7 +103,7 @@ class UmlUtils:
         db: int = abs(point.y - rectangle.bottom)
 
         m: int = min([dl, dr, dt, db])
-        UmlUtils.clsLogger.info(f'm=')
+        UmlUtils.clsLogger.info(f'{m=}')
         if m == dt:
             return Point(point.x, rectangle.top)
         if m == db:

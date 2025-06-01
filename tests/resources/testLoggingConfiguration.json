@@ -9,7 +9,7 @@
             "format": "%(levelname)s: %(module)s: %(message)s"
         },
          "functionNames": {
-            "format": "%(asctime)s.%(msecs)03d %(module)s.%(funcName)s() %(message)s",
+            "format": "%(asctime)s.%(msecs)03d %(module)s.%(funcName)s():%(lineno)d %(message)s",
             "datefmt" : "%H:%M:%S"
         }
     },
@@ -39,6 +39,10 @@
             "propagate": "False"
         },
         "tests.ogldemo": {
+            "level": "INFO",
+            "propagate": "False"
+        },
+        "codeallybasic.UnitTestBase": {
             "level": "INFO",
             "propagate": "False"
         }
