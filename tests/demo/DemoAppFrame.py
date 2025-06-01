@@ -14,14 +14,16 @@ from wx import CommandEvent
 from wx.lib.sized_controls import SizedFrame
 from wx.lib.sized_controls import SizedPanel
 
+from tests.demo.DemoApplicationAdapter import DemoApplicationAdapter
+from umlshapes.IApplicationAdapter import IApplicationAdapter
 from umlshapes.frames.UmlClassDiagramFrame import UmlClassDiagramFrame
 
 from tests.demo.DemoCommon import Identifiers
 from tests.demo.RelationshipCreator import RelationshipCreator
 from tests.demo.ShapeCreator import ShapeCreator
 
-FRAME_WIDTH:  int = 800
-FRAME_HEIGHT: int = 600
+FRAME_WIDTH:  int = 1024
+FRAME_HEIGHT: int = 720
 
 
 class DemoAppFrame(SizedFrame):
@@ -30,9 +32,11 @@ class DemoAppFrame(SizedFrame):
 
         super().__init__(parent=None, title='Test UML Shapes', size=(FRAME_WIDTH, FRAME_HEIGHT), style=DEFAULT_FRAME_STYLE | FRAME_FLOAT_ON_PARENT)
 
+        self._applicationAdapter: IApplicationAdapter = DemoApplicationAdapter(frame=self)
+
         sizedPanel: SizedPanel = self.GetContentsPane()
         sizedPanel.SetSizerProps(expand=True, proportion=1)
-        self._diagramFrame = UmlClassDiagramFrame(parent=sizedPanel)
+        self._diagramFrame = UmlClassDiagramFrame(parent=sizedPanel, applicationAdapter=self._applicationAdapter)
         # noinspection PyUnresolvedReferences
         self._diagramFrame.SetSizerProps(expand=True, proportion=1)
 
@@ -42,8 +46,8 @@ class DemoAppFrame(SizedFrame):
         self.SetAutoLayout(True)
         self.Show(True)
 
-        self._shapeCreator        = ShapeCreator(diagramFrame=self._diagramFrame)
-        self._relationshipCreator = RelationshipCreator(diagramFrame=self._diagramFrame)
+        self._shapeCreator:        ShapeCreator        = ShapeCreator(diagramFrame=self._diagramFrame)
+        self._relationshipCreator: RelationshipCreator = RelationshipCreator(diagramFrame=self._diagramFrame)
 
     def _createApplicationMenuBar(self):
 
@@ -54,7 +58,7 @@ class DemoAppFrame(SizedFrame):
         fileMenu.AppendSeparator()
         fileMenu.Append(ID_EXIT, '&Quit', "Quit Application")
         fileMenu.AppendSeparator()
-        # fileMenu.Append(ID_PREFERENCES, "P&references", "Ogl preferences")
+        # fileMenu.Append(ID_PREFERENCES, "P&references", "Uml preferences")
 
         viewMenu.Append(id=Identifiers.ID_DISPLAY_UML_INTERFACE,   item='UML Interface',   helpString='Display Normal Interface')
         viewMenu.Append(id=Identifiers.ID_DISPLAY_UML_AGGREGATION, item='UML Aggregation', helpString='Display a aggregation Link')

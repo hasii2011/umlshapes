@@ -2,6 +2,8 @@
 from logging import Logger
 from logging import getLogger
 
+from dataclasses import dataclass
+
 from wx import Size
 from wx.lib.ogl import Shape
 
@@ -10,11 +12,27 @@ from umlshapes.types.UmlDimensions import UmlDimensions
 from umlshapes.types.UmlPosition import UmlPosition
 
 
+@dataclass
+class Rectangle:
+    """
+    A traditional description of a graphical rectangle
+    """
+    left:   int = 0
+    top:    int = 0
+    right:  int = 0
+    bottom: int = 0
+
+
 class TopLeftMixin:
     """
     This mixin adjusts the reported position so that it is effectively top left
     It also provides syntactic sugar for the size of the shape.  It caches
     the size but always reports it to the parent shape
+
+    left:    The X coordinate of the rectangle left side
+    top:     The Y coordinate of the rectangle top
+    right:   The X coordinate of the rectangle right side
+    bottom:  The Y coordinate of the rectangle bottom
     """
 
     def __init__(self, umlShape: Shape, width: int, height: int):
@@ -42,6 +60,26 @@ class TopLeftMixin:
         self._shape.SetSize(newSize.width, newSize.height)
         self._size.SetWidth(newSize.width)
         self._size.SetHeight(newSize.height)
+
+    @property
+    def rectangle(self) -> Rectangle:
+        rect: Rectangle = Rectangle()
+
+        rect.left   = self.position.x
+        rect.top    = self.position.y
+        rect.right  = self.position.x + self.size.width
+        rect.bottom = self.position.y + self.size.height
+
+        return rect
+
+    @property
+    def topLeft(self) -> UmlPosition:
+        """
+        Syntactic sugar
+
+        Returns:  The shape position
+        """
+        return self.position
 
     @property
     def position(self) -> UmlPosition:

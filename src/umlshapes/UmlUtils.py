@@ -12,7 +12,6 @@ from time import time as pyTime
 from wx import BLACK
 from wx import Bitmap
 from wx import Brush
-from wx import FONTFAMILY_DEFAULT
 from wx import FONTFAMILY_MODERN
 from wx import FONTFAMILY_ROMAN
 from wx import FONTFAMILY_SCRIPT
@@ -22,6 +21,7 @@ from wx import FONTSTYLE_NORMAL
 from wx import FONTWEIGHT_NORMAL
 from wx import PENSTYLE_SHORT_DASH
 from wx import PENSTYLE_SOLID
+from wx import Point
 from wx import RED
 
 from wx import Font
@@ -40,8 +40,9 @@ from umlshapes.resources.images.DoNotDisplay import embeddedImage as doNotDispla
 from umlshapes.resources.images.UnSpecified import embeddedImage as unSpecifiedImage
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
-from umlshapes.types.UmlColor import UmlColor
+from umlshapes.shapes.TopLeftMixin import Rectangle
 
+from umlshapes.types.UmlColor import UmlColor
 from umlshapes.types.UmlFontFamily import UmlFontFamily
 from umlshapes.types.UmlPosition import UmlPosition
 
@@ -60,6 +61,57 @@ class UmlUtils:
     DEFAULT_BACKGROUND_BRUSH: Brush = cast(Brush, None)
 
     ID_GENERATOR: HRID = cast(HRID, None)
+
+    """
+    public static Point GetNearestPointInPerimeter(Point point, Rectangle rectangle)
+    {
+        point.X = Math.Max(rectangle.Left, Math.Min(rectangle.Right, point.X));
+        point.Y = Math.Max(rectangle.Top, Math.Min(rectangle.Bottom, point.Y));
+
+        var dl = Math.Abs(point.X - rectangle.Left);
+        var dr = Math.Abs(point.X - rectangle.Right);
+        var dt = Math.Abs(point.Y - rectangle.Top);
+        var db = Math.Abs(point.Y - rectangle.Bottom);
+
+        var m = new[] { dl, dr, dt, db }.Min();
+
+        if (m == dt) return new Point(point.X, rectangle.Top);
+        if (m == db) return new Point(point.X, rectangle.Bottom);
+        if (m == dl) return new Point(rectangle.Left, point.Y);
+        return new Point(rectangle.Right, point.Y);
+    }
+    """
+    @classmethod
+    def getNearestPointOnRectangle(cls, x, y, rectangle: Rectangle) -> Point:
+        """
+        https://stackoverflow.com/questions/20453545/how-to-find-the-nearest-point-in-the-perimeter-of-a-rectangle-to-a-given-point
+
+        Args:
+            x:  The x coordinate we are measuring from
+            y:  The y coordinate we are measuring from
+            rectangle:  The rectangle that describes our shape
+
+        Returns:  The near point on the rectangle
+        """
+        point: Point = Point()
+        point.x = max(rectangle.left, min(rectangle.right, x))
+        point.y = max(rectangle.top,  min(rectangle.bottom, y))
+
+        dl: int = abs(point.x - rectangle.left)
+        dr: int = abs(point.x - rectangle.right)
+        dt: int = abs(point.y - rectangle.top)
+        db: int = abs(point.y - rectangle.bottom)
+
+        m: int = min([dl, dr, dt, db])
+        UmlUtils.clsLogger.info(f'm=')
+        if m == dt:
+            return Point(point.x, rectangle.top)
+        if m == db:
+            return Point(point.x, rectangle.bottom)
+        if m == dl:
+            return Point(rectangle.left, point.y)
+
+        return Point(rectangle.right, point.y)
 
     @classmethod
     def getID(cls) -> str:
@@ -192,6 +244,7 @@ class UmlUtils:
 
         return UmlPosition(x=midPointX, y=midPointY)
 
+    # noinspection PyTypeChecker
     @classmethod
     def umlFontFamilyToWxFontFamily(cls, enumValue: UmlFontFamily) -> int:
 

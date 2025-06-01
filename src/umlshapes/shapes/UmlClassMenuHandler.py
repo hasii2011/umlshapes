@@ -163,7 +163,7 @@ class UmlClassMenuHandler:
         displayParameters: PyutDisplayParameters = pyutClass.displayParameters
         self.logger.debug(f'{displayParameters=}')
 
-        #    # noinspection PyUnreachableCode
+        # noinspection PyUnreachableCode
         match displayParameters:
             case PyutDisplayParameters.UNSPECIFIED:
                 pyutClass.displayParameters = PyutDisplayParameters.WITH_PARAMETERS
