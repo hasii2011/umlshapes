@@ -3,10 +3,15 @@ from unittest import TestSuite
 from unittest import main as unitTestMain
 
 from codeallybasic.UnitTestBase import UnitTestBase
-from wx import Point
 
 from umlshapes.UmlUtils import UmlUtils
 from umlshapes.shapes.TopLeftMixin import Rectangle
+from umlshapes.types.UmlPosition import UmlPosition
+
+RECTANGLE_LEFT:   int = 500
+RECTANGLE__TOP:   int = 1000
+RECTANGLE_RIGHT:  int = 700
+RECTANGLE_BOTTOM: int = 1200
 
 
 class TestUmlUtils(UnitTestBase):
@@ -22,17 +27,45 @@ class TestUmlUtils(UnitTestBase):
 
     def setUp(self):
         super().setUp()
-        self._rectangle: Rectangle = Rectangle(left=500, top=1000, right=700, bottom=1200)
+        self._rectangle: Rectangle = Rectangle(
+            left=RECTANGLE_LEFT,
+            top=RECTANGLE__TOP,
+            right=RECTANGLE_RIGHT,
+            bottom=RECTANGLE_BOTTOM
+        )
 
     def tearDown(self):
         super().tearDown()
+
+    def testConvertToRelativeCoordinateInside(self):
+
+        x: int = 600
+        y: int = 950
+        #
+        # This will return us an absolute position on the shape/rectangle
+        absolutePosition: UmlPosition = UmlUtils.getNearestPointOnRectangle(x=x, y=y, rectangle=self._rectangle)
+
+        expectedRelativePosition: UmlPosition = UmlPosition(x=100, y=0)
+        relativePosition:         UmlPosition = UmlUtils.convertToRelativeCoordinates(absolutePosition=absolutePosition, rectangle=self._rectangle)
+
+        self.assertEqual(expectedRelativePosition, relativePosition, 'Incorrect relative position')
+
+    def testConvertToRelativeCoordinateOutside(self):
+        x: int = 800
+        y: int = 1300
+
+        absolutePosition:         UmlPosition = UmlUtils.getNearestPointOnRectangle(x=x, y=y, rectangle=self._rectangle)
+        expectedRelativePosition: UmlPosition = UmlPosition(x=200, y=200)
+        relativePosition:         UmlPosition = UmlUtils.convertToRelativeCoordinates(absolutePosition=absolutePosition, rectangle=self._rectangle)
+
+        self.assertEqual(expectedRelativePosition, relativePosition, 'Incorrect relative position')
 
     def testGetNearestPointOnRectangleTopOutside(self):
         x: int = 600
         y: int = 950
 
-        expectedPoint: Point = Point(600, 1000)
-        actualPoint:   Point = UmlUtils.getNearestPointOnRectangle(x=x, y=y, rectangle=self._rectangle)
+        expectedPoint: UmlPosition = UmlPosition(600, 1000)
+        actualPoint:   UmlPosition = UmlUtils.getNearestPointOnRectangle(x=x, y=y, rectangle=self._rectangle)
 
         self.logger.info(f'{actualPoint=}')
 
@@ -43,8 +76,8 @@ class TestUmlUtils(UnitTestBase):
         x: int = 450
         y: int = 1100
 
-        expectedPoint: Point = Point(500, 1100)
-        actualPoint:   Point = UmlUtils.getNearestPointOnRectangle(x=x, y=y, rectangle=self._rectangle)
+        expectedPoint: UmlPosition = UmlPosition(500, 1100)
+        actualPoint:   UmlPosition = UmlUtils.getNearestPointOnRectangle(x=x, y=y, rectangle=self._rectangle)
 
         self.assertEqual(expectedPoint, actualPoint, 'Calculation for left outside is wrong')
 
@@ -53,8 +86,8 @@ class TestUmlUtils(UnitTestBase):
         x: int = 650
         y: int = 1100
 
-        expectedPoint: Point = Point(700, 1100)
-        actualPoint:   Point = UmlUtils.getNearestPointOnRectangle(x=x, y=y, rectangle=self._rectangle)
+        expectedPoint: UmlPosition = UmlPosition(700, 1100)
+        actualPoint:   UmlPosition = UmlUtils.getNearestPointOnRectangle(x=x, y=y, rectangle=self._rectangle)
 
         self.assertEqual(expectedPoint, actualPoint, 'Calculation for left outside is wrong')
 

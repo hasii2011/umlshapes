@@ -62,6 +62,18 @@ class UmlUtils:
 
     ID_GENERATOR: HRID = cast(HRID, None)
 
+    @classmethod
+    def convertToRelativeCoordinates(cls, absolutePosition: UmlPosition, rectangle: Rectangle) -> UmlPosition:
+
+        left: int = rectangle.left      # x
+        top: int = rectangle.top        # y
+
+        relativeX: int = absolutePosition.x - left
+        relativeY: int = absolutePosition.y - top
+
+        relativePosition: UmlPosition = UmlPosition(x=relativeX, y=relativeY)
+        return relativePosition
+
     """
     public static Point GetNearestPointInPerimeter(Point point, Rectangle rectangle)
     {
@@ -82,7 +94,7 @@ class UmlUtils:
     }
     """
     @classmethod
-    def getNearestPointOnRectangle(cls, x, y, rectangle: Rectangle) -> Point:
+    def getNearestPointOnRectangle(cls, x, y, rectangle: Rectangle) -> UmlPosition:
         """
         https://stackoverflow.com/questions/20453545/how-to-find-the-nearest-point-in-the-perimeter-of-a-rectangle-to-a-given-point
 
@@ -104,14 +116,17 @@ class UmlUtils:
 
         m: int = min([dl, dr, dt, db])
         UmlUtils.clsLogger.info(f'{m=}')
+        #
+        # TODO: Rewrite this to have a single exit point
+        #
         if m == dt:
-            return Point(point.x, rectangle.top)
+            return UmlPosition(point.x, rectangle.top)
         if m == db:
-            return Point(point.x, rectangle.bottom)
+            return UmlPosition(point.x, rectangle.bottom)
         if m == dl:
-            return Point(rectangle.left, point.y)
+            return UmlPosition(rectangle.left, point.y)
 
-        return Point(rectangle.right, point.y)
+        return UmlPosition(rectangle.right, point.y)
 
     @classmethod
     def getID(cls) -> str:

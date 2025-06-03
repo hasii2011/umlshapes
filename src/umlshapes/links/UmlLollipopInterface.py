@@ -9,6 +9,7 @@ from pyutmodelv2.PyutInterface import PyutInterface
 from wx.lib.ogl import Shape
 
 from umlshapes.frames.UmlClassDiagramFrame import UmlClassDiagramFrame
+from umlshapes.types.UmlPosition import UmlPosition
 
 
 class UmlLollipopInterface(Shape):
@@ -20,6 +21,8 @@ class UmlLollipopInterface(Shape):
         super().__init__(canvas=canvas)
         self.logger: Logger = getLogger(__name__)
 
+        self._relativePosition: UmlPosition = UmlPosition()
+
     @property
     def pyutInterface(self) -> PyutInterface:
         return self._pyutInterface
@@ -27,6 +30,14 @@ class UmlLollipopInterface(Shape):
     @pyutInterface.setter
     def pyutInterface(self, pyutInterface: PyutInterface):
         self._pyutInterface = pyutInterface
+
+    @property
+    def relativePosition(self) -> UmlPosition:
+        return self._relativePosition
+
+    @relativePosition.setter
+    def relativePosition(self, relativePosition: UmlPosition):
+        self._relativePosition = relativePosition
 
     def _isSameName(self, other: 'UmlLollipopInterface') -> bool:
 

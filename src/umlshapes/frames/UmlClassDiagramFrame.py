@@ -18,6 +18,7 @@ from umlshapes.frames.UmlClassDiagramFrameMenuHandler import UmlClassDiagramFram
 from umlshapes.frames.UmlFrame import UmlFrame
 
 from umlshapes.shapes.UmlClass import UmlClass
+from umlshapes.types.UmlPosition import UmlPosition
 
 
 class UmlClassDiagramFrame(UmlFrame):
@@ -52,8 +53,13 @@ class UmlClassDiagramFrame(UmlFrame):
         if self._requestingLollipopLocation is True:
             self.ufLogger.info(f'Request location: x,y=({x},{y}) {self._requestingUmlClass=}')
             self._requestingLollipopLocation = False
-            nPoint: Point = UmlUtils.getNearestPointOnRectangle(x=x, y=y, rectangle=self._requestingUmlClass.rectangle)
-            self.ucdLogger.info(f'Nearest point: {nPoint}')
+            nearestPoint: UmlPosition = UmlUtils.getNearestPointOnRectangle(x=x, y=y, rectangle=self._requestingUmlClass.rectangle)
+            self.ucdLogger.info(f'Nearest point: {nearestPoint}')
+
+            relativePosition: UmlPosition = UmlUtils.convertToRelativeCoordinates(absolutePosition=nearestPoint, rectangle=self._requestingUmlClass.rectangle)
+
+            self.ucdLogger.info(f'{relativePosition=}')
+
         else:
             super().OnLeftClick(x=x, y=y, keys=keys)
 
