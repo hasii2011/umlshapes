@@ -12,7 +12,6 @@ from wx import PyEventBinder
 from umlshapes.eventengine.InvalidKeywordException import InvalidKeywordException
 
 from umlshapes.eventengine.IUmlEventEngine import IUmlEventEngine
-from umlshapes.eventengine.UmlEvents import CreateLollipopInterfaceEvent
 from umlshapes.eventengine.UmlEvents import CutOglClassEvent
 from umlshapes.eventengine.UmlEvents import DiagramFrameModifiedEvent
 from umlshapes.eventengine.UmlEvents import RequestLollipopLocationEvent
@@ -63,8 +62,6 @@ class UmlEventEngine(IUmlEventEngine):
                     self._sendCutShapeEvent(**kwargs)
                 case UmlEventType.ShapeSelected:
                     self._sendSelectedShapeEvent(**kwargs)
-                case UmlEventType.CreateLollipopInterface:
-                    self._sendCreateLollipopInterfaceEvent(**kwargs)
                 case _:
                     self.logger.warning(f'Unknown Ogl Event Type: {eventType}')
         except KeyError as ke:
@@ -98,14 +95,4 @@ class UmlEventEngine(IUmlEventEngine):
 
         requestShape: UmlShape                     = kwargs[REQUEST_LOLLIPOP_LOCATION_PARAMETER]
         eventToPost:  RequestLollipopLocationEvent = RequestLollipopLocationEvent(requestShape=requestShape)
-        PostEvent(dest=self._listeningWindow, event=eventToPost)
-
-    def _sendCreateLollipopInterfaceEvent(self, **kwargs):
-
-        from umlshapes.shapes.UmlClass import UmlClass
-
-        implementor:     UmlClass = kwargs[CREATE_LOLLIPOP_IMPLEMENTOR_PARAMETER]
-        attachmentPoint: Point    = kwargs[CREATE_LOLLIPOP_ATTACHMENT_POINT_PARAMETER]
-
-        eventToPost: CreateLollipopInterfaceEvent = CreateLollipopInterfaceEvent(implementor=implementor, attachmentPoint=attachmentPoint)
         PostEvent(dest=self._listeningWindow, event=eventToPost)

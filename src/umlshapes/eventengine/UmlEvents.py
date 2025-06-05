@@ -11,7 +11,6 @@ CutOglClassEvent,          EVT_CUT_OGL_CLASS          = NewEvent()
 DiagramFrameModifiedEvent, EVT_DIAGRAM_FRAME_MODIFIED = NewEvent()
 
 RequestLollipopLocationEvent, EVT_REQUEST_LOLLIPOP_LOCATION = NewEvent()
-CreateLollipopInterfaceEvent, EVT_CREATE_LOLLIPOP_INTERFACE = NewEvent()
 
 
 class UmlEventType(Enum):
@@ -23,4 +22,3 @@ class UmlEventType(Enum):
     CutOglClass             = 'CutOglClass'
     DiagramFrameModified    = 'DiagramFrameModified'
     RequestLollipopLocation = 'RequestLollipopLocation'
-    CreateLollipopInterface = 'CreateLollipopInterface'

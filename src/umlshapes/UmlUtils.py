@@ -41,6 +41,7 @@ from umlshapes.resources.images.UnSpecified import embeddedImage as unSpecifiedI
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 from umlshapes.shapes.TopLeftMixin import Rectangle
+from umlshapes.types.Common import AttachmentSide
 
 from umlshapes.types.UmlColor import UmlColor
 from umlshapes.types.UmlFontFamily import UmlFontFamily
@@ -63,6 +64,33 @@ class UmlUtils:
     ID_GENERATOR: HRID = cast(HRID, None)
 
     @classmethod
+    def attachmentSide(cls, x, y, rectangle: Rectangle) -> AttachmentSide:
+
+        if y == rectangle.top:
+            return AttachmentSide.TOP
+        if y == rectangle.bottom:
+            return AttachmentSide.BOTTOM
+        if x == rectangle.left:
+            return AttachmentSide.LEFT
+        if x == rectangle.right:
+            return AttachmentSide.RIGHT
+
+        assert False, 'Only works for points on the perimeter'
+
+    @classmethod
+    def convertToAbsoluteCoordinates(cls, relativePosition: UmlPosition, rectangle: Rectangle) -> UmlPosition:
+
+        left: int = rectangle.left      # x
+        top: int = rectangle.top        # y
+
+        absoluteX: int = relativePosition.x + left
+        absoluteY: int = relativePosition.y + top
+
+        absoluteCoordinates: UmlPosition = UmlPosition(x=absoluteX, y=absoluteY)
+
+        return absoluteCoordinates
+
+    @classmethod
     def convertToRelativeCoordinates(cls, absolutePosition: UmlPosition, rectangle: Rectangle) -> UmlPosition:
 
         left: int = rectangle.left      # x
@@ -71,8 +99,8 @@ class UmlUtils:
         relativeX: int = absolutePosition.x - left
         relativeY: int = absolutePosition.y - top
 
-        relativePosition: UmlPosition = UmlPosition(x=relativeX, y=relativeY)
-        return relativePosition
+        relativeCoordinates: UmlPosition = UmlPosition(x=relativeX, y=relativeY)
+        return relativeCoordinates
 
     """
     public static Point GetNearestPointInPerimeter(Point point, Rectangle rectangle)
@@ -115,7 +143,7 @@ class UmlUtils:
         db: int = abs(point.y - rectangle.bottom)
 
         m: int = min([dl, dr, dt, db])
-        UmlUtils.clsLogger.info(f'{m=}')
+        UmlUtils.clsLogger.debug(f'{m=}')
         #
         # TODO: Rewrite this to have a single exit point
         #

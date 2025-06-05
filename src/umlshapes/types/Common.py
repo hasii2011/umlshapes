@@ -5,6 +5,8 @@ from typing import TYPE_CHECKING
 from typing import Union
 from typing import cast
 
+from enum import Enum
+
 from dataclasses import dataclass
 
 from pyutmodelv2.PyutActor import PyutActor
@@ -34,6 +36,45 @@ ModelObject = Union[PyutText, PyutNote, PyutActor, PyutClass, PyutUseCase, PyutL
 
 NOT_SET_INT: int = cast(int, None)
 TAB:         str = '\t'
+
+
+class AttachmentSide(Enum):
+    """
+    Cardinal points, taken to correspond to the attachment points of any shape
+    in a Cartesian coordinate system.
+
+    """
+    LEFT   = 'Left'
+    TOP    = 'Top'
+    RIGHT  = 'Right'
+    BOTTOM = 'Bottom'
+    NONE   = 'None'
+
+    def __str__(self):
+        return str(self.name)
+
+    @classmethod
+    def toEnum(cls, strValue: str) -> 'AttachmentSide':
+        """
+        Converts the input string to the attachment location
+        Args:
+            strValue:   A serialized string value
+
+        Returns:  The attachment side enumeration
+        """
+        canonicalStr: str = strValue.strip(' ')
+
+        if canonicalStr == 'Left':
+            return AttachmentSide.LEFT
+        elif canonicalStr == 'Top':
+            return AttachmentSide.TOP
+        elif canonicalStr == 'Right':
+            return AttachmentSide.RIGHT
+        elif canonicalStr == 'Bottom':
+            return AttachmentSide.BOTTOM
+        else:
+            print(f'Warning: did not recognize this attachment point: {canonicalStr}')
+            return AttachmentSide.TOP
 
 
 @dataclass
