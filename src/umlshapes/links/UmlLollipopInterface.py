@@ -6,16 +6,19 @@ from typing import TYPE_CHECKING
 from logging import Logger
 from logging import getLogger
 
+from dataclasses import dataclass
+
 from wx import BLACK_PEN
 from wx import MemoryDC
 from wx import RED_PEN
-from wx.core import WHITE_BRUSH
+from wx import WHITE_BRUSH
 
 from wx.lib.ogl import Shape
 
 from pyutmodelv2.PyutInterface import PyutInterface
 
 from umlshapes.UmlUtils import UmlUtils
+from umlshapes.shapes.TopLeftMixin import Rectangle
 from umlshapes.types.Common import AttachmentSide
 from umlshapes.types.UmlPosition import UmlPosition
 
@@ -25,6 +28,12 @@ if TYPE_CHECKING:
 
 LOLLIPOP_LINE_LENGTH:   int = 90    # Make these
 LOLLIPOP_CIRCLE_RADIUS: int = 4     # preferences
+
+
+@dataclass
+class LollipopCoordinates:
+    startCoordinates: UmlPosition
+    endCoordinates:   UmlPosition
 
 
 class UmlLollipopInterface(Shape):
@@ -43,8 +52,10 @@ class UmlLollipopInterface(Shape):
         super().__init__(canvas=canvas)
         self.logger: Logger = getLogger(__name__)
 
-        self._relativePosition: UmlPosition = UmlPosition()
-        self._attachedTo:       UmlClass    = cast('UmlClass', None)
+        self._relativePosition: UmlPosition    = UmlPosition()
+        self._attachedTo:       UmlClass       = cast('UmlClass', None)
+        self._lineCentum:         float          = 0.1
+        self._attachmentSide:   AttachmentSide = cast(AttachmentSide, None)
 
     @property
     def pyutInterface(self) -> PyutInterface:
@@ -70,6 +81,22 @@ class UmlLollipopInterface(Shape):
     def attachedTo(self, umlClass: 'UmlClass'):
         self._attachedTo = umlClass
 
+    @property
+    def lineCentum(self) -> float:
+        return self._lineCentum
+
+    @lineCentum.setter
+    def lineCentum(self, distance: float):
+        self._lineCentum = distance
+
+    @property
+    def attachmentSide(self):
+        return self._attachmentSide
+
+    @attachmentSide.setter
+    def attachmentSide(self, attachmentSide: AttachmentSide):
+        self._attachmentSide = attachmentSide
+
     def OnDraw(self, dc: MemoryDC):
         """
         Start coordinates are on the UML Class perimeter
@@ -85,24 +112,69 @@ class UmlLollipopInterface(Shape):
             dc.SetPen(BLACK_PEN)
 
         dc.GetPen().SetWidth(4)
-        startCoordinates: UmlPosition = UmlUtils.convertToAbsoluteCoordinates(relativePosition=self._relativePosition, rectangle=self._attachedTo.rectangle)
 
-        attachmentSide: AttachmentSide = UmlUtils.attachmentSide(
-            x=startCoordinates.x,
-            y=startCoordinates.y,
-            rectangle=self._attachedTo.rectangle
-        )
-        if attachmentSide == AttachmentSide.TOP:
-            endCoordinates:   UmlPosition = UmlPosition(x=startCoordinates.x, y=startCoordinates.y - LOLLIPOP_LINE_LENGTH)
-        elif attachmentSide == AttachmentSide.BOTTOM:
-            endCoordinates = UmlPosition(x=startCoordinates.x, y=startCoordinates.y + LOLLIPOP_LINE_LENGTH)
-        elif attachmentSide == AttachmentSide.LEFT:
-            endCoordinates = UmlPosition(x=startCoordinates.x - LOLLIPOP_LINE_LENGTH, y=startCoordinates.y)
+        rectangle: Rectangle = self._attachedTo.rectangle
+        lollipopCoordinates: LollipopCoordinates = self._computeLollipopCoordinates(rectangle)
+
+        dc.DrawLine(x1=lollipopCoordinates.startCoordinates.x, y1=lollipopCoordinates.startCoordinates.y,
+                    x2=lollipopCoordinates.endCoordinates.x,   y2=lollipopCoordinates.endCoordinates.y)
+
+        dc.DrawCircle(lollipopCoordinates.endCoordinates.x, lollipopCoordinates.endCoordinates.y, LOLLIPOP_CIRCLE_RADIUS)
+
+    def _computeLollipopCoordinates(self, rectangle: Rectangle) -> LollipopCoordinates:
+        """
+
+        Args:
+            rectangle:
+
+        Returns:    The appropriate coordinates
+        """
+        if UmlUtils.isVerticalSide(side=self.attachmentSide) is True:
+            lollipopCoordinates: LollipopCoordinates = self._computeVerticalSideCoordinates(rectangle)
         else:
+            lollipopCoordinates = self._computeHorizontalSideCoordinates(rectangle)
+
+        return lollipopCoordinates
+
+    def _computeHorizontalSideCoordinates(self, rectangle: Rectangle) -> LollipopCoordinates:
+        """
+
+        Args:
+            rectangle:
+
+        Returns:  Coordinates for the horizontal sides of the class
+        """
+        width: int = rectangle.right - rectangle.left
+        x:     int = round(width * self.lineCentum) + rectangle.left
+
+        if self.attachmentSide == AttachmentSide.BOTTOM:
+            startCoordinates = UmlPosition(x=x, y=rectangle.bottom)
+            endCoordinates = UmlPosition(x=startCoordinates.x, y=startCoordinates.y + LOLLIPOP_LINE_LENGTH)
+        else:
+            startCoordinates = UmlPosition(x=x, y=rectangle.top)
+            endCoordinates = UmlPosition(x=startCoordinates.x, y=startCoordinates.y - LOLLIPOP_LINE_LENGTH)
+
+        return LollipopCoordinates(startCoordinates=startCoordinates, endCoordinates=endCoordinates)
+
+    def _computeVerticalSideCoordinates(self, rectangle: Rectangle) -> LollipopCoordinates:
+        """
+
+        Args:
+            rectangle:
+
+        Returns:  Coordinates for the vertical sides of the class
+        """
+        height: int = rectangle.bottom - rectangle.top
+        y:      int = round(height * self.lineCentum) + rectangle.top
+
+        if self.attachmentSide == AttachmentSide.LEFT:
+            startCoordinates: UmlPosition = UmlPosition(x=rectangle.left, y=y)
+            endCoordinates: UmlPosition = UmlPosition(x=startCoordinates.x - LOLLIPOP_LINE_LENGTH, y=startCoordinates.y)
+        else:
+            startCoordinates = UmlPosition(x=rectangle.right, y=y)
             endCoordinates = UmlPosition(x=startCoordinates.x + LOLLIPOP_LINE_LENGTH, y=startCoordinates.y)
 
-        dc.DrawLine(x1=startCoordinates.x, y1=startCoordinates.y, x2=endCoordinates.x, y2=endCoordinates.y)
-        dc.DrawCircle(endCoordinates.x, endCoordinates.y, LOLLIPOP_CIRCLE_RADIUS)
+        return LollipopCoordinates(startCoordinates=startCoordinates, endCoordinates=endCoordinates)
 
     def _isSameName(self, other: 'UmlLollipopInterface') -> bool:
 

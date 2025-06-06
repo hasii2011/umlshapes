@@ -10,7 +10,7 @@ from umlshapes.types.Common import AttachmentSide
 from umlshapes.types.UmlPosition import UmlPosition
 
 RECTANGLE_LEFT:   int = 500
-RECTANGLE__TOP:   int = 1000
+RECTANGLE_TOP:    int = 1000
 RECTANGLE_RIGHT:  int = 700
 RECTANGLE_BOTTOM: int = 1200
 
@@ -36,7 +36,7 @@ class TestUmlUtils(UnitTestBase):
         super().setUp()
         self._rectangle: Rectangle = Rectangle(
             left=RECTANGLE_LEFT,
-            top=RECTANGLE__TOP,
+            top=RECTANGLE_TOP,
             right=RECTANGLE_RIGHT,
             bottom=RECTANGLE_BOTTOM
         )
@@ -44,9 +44,48 @@ class TestUmlUtils(UnitTestBase):
     def tearDown(self):
         super().tearDown()
 
+    def testLineCentumTopFixToMin(self):
+        umlPosition: UmlPosition = UmlPosition(x=RECTANGLE_LEFT + 20, y=RECTANGLE_TOP)
+        distance:    float       = UmlUtils.computeLineCentum(attachmentSide=AttachmentSide.TOP, umlPosition=umlPosition, rectangle=self._rectangle)
+
+        self.assertEqual(0.1, distance, 'Incorrect distance')
+
+    def testCLineCentumTopFixToMax(self):
+        umlPosition: UmlPosition = UmlPosition(x=self._rectangle.right, y=RECTANGLE_TOP)
+        distance:    float       = UmlUtils.computeLineCentum(attachmentSide=AttachmentSide.TOP, umlPosition=umlPosition, rectangle=self._rectangle)
+
+        self.assertEqual(0.9, distance, 'Incorrect distance')
+
+    def testLineCentumBottomMiddle(self):
+        half:        int         = (RECTANGLE_RIGHT - RECTANGLE_LEFT) // 2
+        umlPosition: UmlPosition = UmlPosition(x=RECTANGLE_LEFT + half, y=RECTANGLE_BOTTOM)
+        distance:    float       = UmlUtils.computeLineCentum(attachmentSide=AttachmentSide.BOTTOM, umlPosition=umlPosition, rectangle=self._rectangle)
+
+        self.assertEqual(0.5, distance, 'Incorrect distance')
+
+    def testLineCentumLeft(self):
+        third:       int         = (RECTANGLE_BOTTOM - RECTANGLE_TOP) // 3
+        umlPosition: UmlPosition = UmlPosition(x=RECTANGLE_LEFT, y=RECTANGLE_TOP + third)
+        distance:    float       = UmlUtils.computeLineCentum(attachmentSide=AttachmentSide.LEFT, umlPosition=umlPosition, rectangle=self._rectangle)
+
+        self.assertEqual(0.3, distance, 'Incorrect distance')
+
+    def testLineCentumRight(self):
+        third:       int         = (RECTANGLE_BOTTOM - RECTANGLE_TOP) // 3
+        umlPosition: UmlPosition = UmlPosition(x=RECTANGLE_RIGHT, y=RECTANGLE_TOP + third * 2)
+        distance:    float       = UmlUtils.computeLineCentum(attachmentSide=AttachmentSide.LEFT, umlPosition=umlPosition, rectangle=self._rectangle)
+
+        self.assertEqual(0.7, distance, 'Incorrect distance')
+
+    def testComputePercentageDistance(self):
+        umlPosition: UmlPosition = UmlPosition(x=RECTANGLE_LEFT + 20, y=RECTANGLE_TOP)
+        distance: float = UmlUtils.computeLineCentum(attachmentSide=AttachmentSide.BOTTOM, umlPosition=umlPosition, rectangle=self._rectangle)
+
+        self.assertEqual(0.1, distance, 'Incorrect distance')
+
     def testAttachmentSideTop(self):
         x1: int = RECTANGLE_LEFT + 5
-        y1: int = RECTANGLE__TOP
+        y1: int = RECTANGLE_TOP
         attachmentSide: AttachmentSide = UmlUtils.attachmentSide(x=x1, y=y1, rectangle=self._rectangle)
         self.assertEqual(AttachmentSide.TOP, attachmentSide, 'Incorrect calculation')
 
@@ -142,6 +181,18 @@ class TestUmlUtils(UnitTestBase):
         actualPoint:   UmlPosition = UmlUtils.getNearestPointOnRectangle(x=x, y=y, rectangle=self._rectangle)
 
         self.assertEqual(expectedPoint, actualPoint, 'Calculation for left outside is wrong')
+
+    def testIsVerticalSideTop(self):
+        self.assertFalse(UmlUtils.isVerticalSide(AttachmentSide.TOP))
+
+    def testIsVerticalSideBottom(self):
+        self.assertFalse(UmlUtils.isVerticalSide(AttachmentSide.BOTTOM))
+
+    def testIsVerticalSideRight(self):
+        self.assertTrue(UmlUtils.isVerticalSide(AttachmentSide.RIGHT))
+
+    def testIsVerticalSideLeft(self):
+        self.assertTrue(UmlUtils.isVerticalSide(AttachmentSide.LEFT))
 
 
 def suite() -> TestSuite:

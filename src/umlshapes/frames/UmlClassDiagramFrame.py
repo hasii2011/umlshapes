@@ -20,6 +20,7 @@ from umlshapes.frames.UmlFrame import UmlFrame
 from umlshapes.links.UmlLollipopInterface import UmlLollipopInterface
 
 from umlshapes.shapes.UmlClass import UmlClass
+from umlshapes.types.Common import AttachmentSide
 from umlshapes.types.UmlPosition import UmlPosition
 
 NO_CLASS: UmlClass = cast(UmlClass, None)
@@ -64,7 +65,11 @@ class UmlClassDiagramFrame(UmlFrame):
 
             self.ucdLogger.debug(f'{relativePosition=}')
             assert self._requestingUmlClass is not None, 'I need something to attach to'
-            self.createLollipopInterface(requestingUmlClass=self._requestingUmlClass, relativeCoordinates=relativePosition)
+            self.createLollipopInterface(
+                requestingUmlClass=self._requestingUmlClass,
+                relativeCoordinates=relativePosition,
+                nearestPoint=nearestPoint
+            )
             self._applicationAdapter.updateApplicationStatus('')
         else:
             super().OnLeftClick(x=x, y=y, keys=keys)
@@ -81,13 +86,13 @@ class UmlClassDiagramFrame(UmlFrame):
 
     def _onRequestLollipopLocation(self, event: RequestLollipopLocationEvent):
 
-        self.ufLogger.info(f'{event.requestShape=}')
+        self.ufLogger.debug(f'{event.requestShape=}')
         self._requestingLollipopLocation = True
         self._requestingUmlClass            = event.requestShape
 
         self._applicationAdapter.updateApplicationStatus('Click on the UML Class edge where you want to place the interface')
 
-    def createLollipopInterface(self, requestingUmlClass: UmlClass, relativeCoordinates: UmlPosition):
+    def createLollipopInterface(self, requestingUmlClass: UmlClass, relativeCoordinates: UmlPosition, nearestPoint: UmlPosition):
         """
         TODO:  This code needs to be moved out of here.  Use a callback that creates
         the lollipop
@@ -95,6 +100,7 @@ class UmlClassDiagramFrame(UmlFrame):
         Args:
             requestingUmlClass:
             relativeCoordinates:
+            nearestPoint:
         """
 
         interfaceName: str = f'{self._preferences.defaultNameInterface}{self._pyutInterfaceCount}'
@@ -104,6 +110,13 @@ class UmlClassDiagramFrame(UmlFrame):
         umlLollipopInterface: UmlLollipopInterface = UmlLollipopInterface(pyutInterface=pyutInterface)
         umlLollipopInterface.attachedTo       = requestingUmlClass
         umlLollipopInterface.relativePosition = relativeCoordinates
+
+        attachmentSide: AttachmentSide        = UmlUtils.attachmentSide(x=nearestPoint.x, y=nearestPoint.y, rectangle=self._requestingUmlClass.rectangle)
+        umlLollipopInterface.attachmentSide   = attachmentSide
+
+        umlLollipopInterface.lineCentum       = UmlUtils.computeLineCentum(attachmentSide=attachmentSide, umlPosition=nearestPoint, rectangle=self._requestingUmlClass.rectangle)
+
+        self.ucdLogger.debug(f'{umlLollipopInterface.attachmentSide=} {umlLollipopInterface.lineCentum=}')
 
         umlLollipopInterface.SetCanvas(self)
         diagram: UmlDiagram = self.umlDiagram
