@@ -235,6 +235,7 @@ class UmlClass(ControlPointMixin, RectangleShape, TopLeftMixin):
         )
         self.size     = shapeSize
         self.position = savePosition
+        self.Select(select=False)
         umlFrame.refresh()
 
     def textWidth(self, dc: DC, text: str):
