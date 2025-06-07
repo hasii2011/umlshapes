@@ -31,10 +31,6 @@ if TYPE_CHECKING:
     from umlshapes.shapes.UmlClass import UmlClass
     from umlshapes.frames.UmlClassDiagramFrame import UmlClassDiagramFrame
 
-LOLLIPOP_LINE_LENGTH:         int = 90    # Make these
-LOLLIPOP_CIRCLE_RADIUS:       int = 4     # preferences
-ADJUST_AWAY_FROM_IMPLEMENTOR: int = 10
-
 
 @dataclass
 class LollipopCoordinates:
@@ -64,7 +60,7 @@ class UmlLollipopInterface(Shape):
         self._defaultFont:      Font        = UmlUtils.defaultFont()
         self._pixelSize:        Size        = self._defaultFont.GetPixelSize()
 
-        self._attachedTo:       UmlClass    = cast('UmlClass', None)
+        self._attachedTo:       UmlClass       = cast('UmlClass', None)
         self._attachmentSide:   AttachmentSide = cast(AttachmentSide, None)
 
     @property
@@ -129,7 +125,7 @@ class UmlLollipopInterface(Shape):
         dc.DrawLine(x1=lollipopCoordinates.startCoordinates.x, y1=lollipopCoordinates.startCoordinates.y,
                     x2=lollipopCoordinates.endCoordinates.x,   y2=lollipopCoordinates.endCoordinates.y)
 
-        dc.DrawCircle(lollipopCoordinates.endCoordinates.x, lollipopCoordinates.endCoordinates.y, LOLLIPOP_CIRCLE_RADIUS)
+        dc.DrawCircle(lollipopCoordinates.endCoordinates.x, lollipopCoordinates.endCoordinates.y, self._preferences.lollipopCircleRadius)
 
         extentSize: Size = dc.GetTextExtent(self.pyutInterface.name)
 
@@ -167,12 +163,14 @@ class UmlLollipopInterface(Shape):
         width: int = rectangle.right - rectangle.left
         x:     int = round(width * self.lineCentum) + rectangle.left
 
+        lollipopLineLength: int = self._preferences.lollipopLineLength
+
         if self.attachmentSide == AttachmentSide.BOTTOM:
             startCoordinates: UmlPosition = UmlPosition(x=x, y=rectangle.bottom)
-            endCoordinates:   UmlPosition = UmlPosition(x=startCoordinates.x, y=startCoordinates.y + LOLLIPOP_LINE_LENGTH)
+            endCoordinates:   UmlPosition = UmlPosition(x=startCoordinates.x, y=startCoordinates.y + lollipopLineLength)
         else:
             startCoordinates = UmlPosition(x=x, y=rectangle.top)
-            endCoordinates   = UmlPosition(x=startCoordinates.x, y=startCoordinates.y - LOLLIPOP_LINE_LENGTH)
+            endCoordinates   = UmlPosition(x=startCoordinates.x, y=startCoordinates.y - lollipopLineLength)
 
         return LollipopCoordinates(startCoordinates=startCoordinates, endCoordinates=endCoordinates)
 
@@ -187,12 +185,14 @@ class UmlLollipopInterface(Shape):
         height: int = rectangle.bottom - rectangle.top
         y:      int = round(height * self.lineCentum) + rectangle.top
 
+        lollipopLineLength: int = self._preferences.lollipopLineLength
+
         if self.attachmentSide == AttachmentSide.LEFT:
             startCoordinates: UmlPosition = UmlPosition(x=rectangle.left, y=y)
-            endCoordinates:   UmlPosition = UmlPosition(x=startCoordinates.x - LOLLIPOP_LINE_LENGTH, y=startCoordinates.y)
+            endCoordinates:   UmlPosition = UmlPosition(x=startCoordinates.x - lollipopLineLength, y=startCoordinates.y)
         else:
             startCoordinates = UmlPosition(x=rectangle.right, y=y)
-            endCoordinates   = UmlPosition(x=startCoordinates.x + LOLLIPOP_LINE_LENGTH, y=startCoordinates.y)
+            endCoordinates   = UmlPosition(x=startCoordinates.x + lollipopLineLength, y=startCoordinates.y)
 
         return LollipopCoordinates(startCoordinates=startCoordinates, endCoordinates=endCoordinates)
 
@@ -206,14 +206,18 @@ class UmlLollipopInterface(Shape):
         fHeight: int = pixelSize.height
         tWidth:  int = textSize.width
 
+        lollipopLineLength:   int = self._preferences.lollipopLineLength
+        lollipopCircleRadius: int = self._preferences.lollipopCircleRadius
+        interfaceNameIndent:  int = self._preferences.interfaceNameIndent
+
         if side == AttachmentSide.TOP:
-            y -= (LOLLIPOP_LINE_LENGTH + (LOLLIPOP_CIRCLE_RADIUS * 2) + ADJUST_AWAY_FROM_IMPLEMENTOR)
+            y -= (lollipopLineLength + (lollipopCircleRadius * 2) + interfaceNameIndent)
             x -= (tWidth // 2)
             oglPosition.x = x
             oglPosition.y = y
 
         elif side == AttachmentSide.BOTTOM:
-            y += (LOLLIPOP_LINE_LENGTH + LOLLIPOP_CIRCLE_RADIUS + ADJUST_AWAY_FROM_IMPLEMENTOR)
+            y += (lollipopLineLength + lollipopCircleRadius + interfaceNameIndent)
             x -= (tWidth // 2)
             oglPosition.x = x
             oglPosition.y = y
@@ -221,15 +225,15 @@ class UmlLollipopInterface(Shape):
         elif side == AttachmentSide.LEFT:
             y = y - (fHeight * 2)
             originalX: int = x
-            x = x - LOLLIPOP_LINE_LENGTH - (tWidth // 2)
+            x = x - lollipopLineLength - round((tWidth *  self._preferences.horizontalOffset))
             while x + tWidth > originalX:
-                x -= ADJUST_AWAY_FROM_IMPLEMENTOR
+                x -= interfaceNameIndent
             oglPosition.x = x
             oglPosition.y = y
 
         elif side == AttachmentSide.RIGHT:
             y = y - (fHeight * 2)
-            x = x + round(LOLLIPOP_LINE_LENGTH * 0.8)
+            x = x + round(lollipopLineLength * self._preferences.horizontalOffset)
             oglPosition.x = x
             oglPosition.y = y
         else:

@@ -111,6 +111,15 @@ associationsPreferences: ValueDescriptions = ValueDescriptions(
         KeyName('associationLabelSize'):    ValueDescription(defaultValue=DEFAULT_ASSOCIATION_LABEL_SIZE, deserializer=UmlDimensions.deSerialize),
     }
 )
+
+lollipopPreferences: ValueDescriptions = ValueDescriptions(
+    {
+        KeyName('lollipopLineLength'):   ValueDescription(defaultValue='90',  deserializer=SecureConversions.secureInteger),
+        KeyName('lollipopCircleRadius'): ValueDescription(defaultValue='4',   deserializer=SecureConversions.secureInteger),
+        KeyName('interfaceNameIndent'):  ValueDescription(defaultValue='10',  deserializer=SecureConversions.secureInteger),
+        KeyName('horizontalOffset'):     ValueDescription(defaultValue='0.5', deserializer=SecureConversions.secureFloat),
+    }
+)
 debugPreferences: ValueDescriptions = ValueDescriptions(
     {
         KeyName('debugDiagramFrame'):       ValueDescription(defaultValue='False', deserializer=SecureConversions.secureBoolean),
@@ -129,6 +138,7 @@ sections: Sections = Sections(
         SectionName('Names'):            namePreferences,
         SectionName('SequenceDiagrams'): sequenceDiagramPreferences,
         SectionName('Associations'):     associationsPreferences,
+        SectionName('Lollipops'):        lollipopPreferences,
         SectionName('Debug'):            debugPreferences,
     }
 )
