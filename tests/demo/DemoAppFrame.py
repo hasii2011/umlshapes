@@ -2,6 +2,7 @@
 from logging import Logger
 from logging import getLogger
 
+from pyutmodelv2.PyutInterface import PyutInterface
 from wx import DEFAULT_FRAME_STYLE
 from wx import EVT_MENU
 from wx import FRAME_FLOAT_ON_PARENT
@@ -16,11 +17,18 @@ from wx.lib.sized_controls import SizedPanel
 
 from tests.demo.DemoApplicationAdapter import DemoApplicationAdapter
 from umlshapes.IApplicationAdapter import IApplicationAdapter
+from umlshapes.UmlDiagram import UmlDiagram
+from umlshapes.UmlUtils import UmlUtils
 from umlshapes.frames.UmlClassDiagramFrame import UmlClassDiagramFrame
 
 from tests.demo.DemoCommon import Identifiers
 from tests.demo.RelationshipCreator import RelationshipCreator
 from tests.demo.ShapeCreator import ShapeCreator
+from umlshapes.links.UmlLollipopInterface import UmlLollipopInterface
+from umlshapes.preferences.UmlPreferences import UmlPreferences
+from umlshapes.shapes.UmlClass import UmlClass
+from umlshapes.types.Common import AttachmentSide
+from umlshapes.types.UmlPosition import UmlPosition
 
 FRAME_WIDTH:  int = 1024
 FRAME_HEIGHT: int = 720
@@ -36,7 +44,11 @@ class DemoAppFrame(SizedFrame):
 
         sizedPanel: SizedPanel = self.GetContentsPane()
         sizedPanel.SetSizerProps(expand=True, proportion=1)
-        self._diagramFrame = UmlClassDiagramFrame(parent=sizedPanel, applicationAdapter=self._applicationAdapter)
+        self._diagramFrame = UmlClassDiagramFrame(
+            parent=sizedPanel,
+            applicationAdapter=self._applicationAdapter,
+            createLollipopCallback=self._createLollipopInterface
+        )
         # noinspection PyUnresolvedReferences
         self._diagramFrame.SetSizerProps(expand=True, proportion=1)
 
@@ -48,6 +60,9 @@ class DemoAppFrame(SizedFrame):
 
         self._shapeCreator:        ShapeCreator        = ShapeCreator(diagramFrame=self._diagramFrame)
         self._relationshipCreator: RelationshipCreator = RelationshipCreator(diagramFrame=self._diagramFrame)
+        self._preferences:         UmlPreferences      = UmlPreferences()
+
+        self._pyutInterfaceCount: int = 0
 
     def _createApplicationMenuBar(self):
 
@@ -127,3 +142,34 @@ class DemoAppFrame(SizedFrame):
             #     self._displaySequenceDiagram()
             case _:
                 self.logger.error(f'WTH!  I am not handling that menu item')
+
+    def _createLollipopInterface(self, requestingUmlClass: UmlClass, perimeterPoint: UmlPosition):
+
+        """
+        TODO:  This code needs to be moved out of here.  Use a callback that creates
+        the lollipop
+
+        Args:
+            requestingUmlClass:
+            perimeterPoint:
+        """
+
+        interfaceName: str = f'{self._preferences.defaultNameInterface}{self._pyutInterfaceCount}'
+        self._pyutInterfaceCount += 1
+
+        pyutInterface:        PyutInterface        = PyutInterface(interfaceName)
+        umlLollipopInterface: UmlLollipopInterface = UmlLollipopInterface(pyutInterface=pyutInterface)
+        umlLollipopInterface.attachedTo            = requestingUmlClass
+
+        attachmentSide: AttachmentSide      = UmlUtils.attachmentSide(x=perimeterPoint.x, y=perimeterPoint.y, rectangle=requestingUmlClass.rectangle)
+        umlLollipopInterface.attachmentSide = attachmentSide
+        umlLollipopInterface.lineCentum     = UmlUtils.computeLineCentum(attachmentSide=attachmentSide, umlPosition=perimeterPoint, rectangle=requestingUmlClass.rectangle)
+
+        self.logger.debug(f'{umlLollipopInterface.attachmentSide=} {umlLollipopInterface.lineCentum=}')
+
+        umlLollipopInterface.SetCanvas(self)
+        diagram: UmlDiagram = self._diagramFrame.umlDiagram
+
+        diagram.AddShape(umlLollipopInterface)
+        umlLollipopInterface.Show(show=True)
+        self.logger.info(f'UmlInterface added: {umlLollipopInterface}')

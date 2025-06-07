@@ -55,10 +55,9 @@ class UmlLollipopInterface(Shape):
         super().__init__(canvas=canvas)
         self.logger: Logger = getLogger(__name__)
 
-        self._relativePosition: UmlPosition = UmlPosition()
-        self._lineCentum:       float       = 0.1
-        self._defaultFont:      Font        = UmlUtils.defaultFont()
-        self._pixelSize:        Size        = self._defaultFont.GetPixelSize()
+        self._lineCentum:       float = 0.1
+        self._defaultFont:      Font  = UmlUtils.defaultFont()
+        self._pixelSize:        Size  = self._defaultFont.GetPixelSize()
 
         self._attachedTo:       UmlClass       = cast('UmlClass', None)
         self._attachmentSide:   AttachmentSide = cast(AttachmentSide, None)
@@ -70,14 +69,6 @@ class UmlLollipopInterface(Shape):
     @pyutInterface.setter
     def pyutInterface(self, pyutInterface: PyutInterface):
         self._pyutInterface = pyutInterface
-
-    @property
-    def relativePosition(self) -> UmlPosition:
-        return self._relativePosition
-
-    @relativePosition.setter
-    def relativePosition(self, relativePosition: UmlPosition):
-        self._relativePosition = relativePosition
 
     @property
     def attachedTo(self) -> 'UmlClass':
@@ -225,7 +216,7 @@ class UmlLollipopInterface(Shape):
         elif side == AttachmentSide.LEFT:
             y = y - (fHeight * 2)
             originalX: int = x
-            x = x - lollipopLineLength - round((tWidth *  self._preferences.horizontalOffset))
+            x = x - lollipopLineLength - round((tWidth * self._preferences.horizontalOffset))
             while x + tWidth > originalX:
                 x -= interfaceNameIndent
             oglPosition.x = x
