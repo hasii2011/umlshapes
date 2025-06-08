@@ -137,3 +137,6 @@ class UmlAssociationLabel(ControlPointMixin, TextShape, TopLeftMixin):
             y -= oy
 
         return x, y
+
+    def __repr__(self) -> str:
+        return f'UmlAssociationLabel - `{self.label}` type={self.labelType}'

@@ -17,6 +17,7 @@ from pyutmodelv2.PyutNote import PyutNote
 from pyutmodelv2.PyutText import PyutText
 from pyutmodelv2.PyutUseCase import PyutUseCase
 
+from umlshapes.types.UmlPosition import UmlPosition
 
 if TYPE_CHECKING:
     from umlshapes.shapes.UmlActor import UmlActor                  # noqa
@@ -75,6 +76,24 @@ class AttachmentSide(Enum):
         else:
             print(f'Warning: did not recognize this attachment point: {canonicalStr}')
             return AttachmentSide.TOP
+
+
+@dataclass
+class LollipopCoordinates:
+    startCoordinates:   UmlPosition
+    endCoordinates:     UmlPosition
+    lollipopLineLength: int = 0       # excluding the circle
+
+
+@dataclass
+class Rectangle:
+    """
+    A traditional description of a graphical rectangle
+    """
+    left:   int = 0
+    top:    int = 0
+    right:  int = 0
+    bottom: int = 0
 
 
 @dataclass

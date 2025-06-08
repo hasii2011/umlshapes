@@ -2,7 +2,6 @@
 from logging import Logger
 from logging import getLogger
 
-from pyutmodelv2.PyutInterface import PyutInterface
 from wx import DEFAULT_FRAME_STYLE
 from wx import EVT_MENU
 from wx import FRAME_FLOAT_ON_PARENT
@@ -15,7 +14,8 @@ from wx import CommandEvent
 from wx.lib.sized_controls import SizedFrame
 from wx.lib.sized_controls import SizedPanel
 
-from tests.demo.DemoApplicationAdapter import DemoApplicationAdapter
+from pyutmodelv2.PyutInterface import PyutInterface
+
 from umlshapes.IApplicationAdapter import IApplicationAdapter
 from umlshapes.UmlDiagram import UmlDiagram
 from umlshapes.UmlUtils import UmlUtils
@@ -24,11 +24,17 @@ from umlshapes.frames.UmlClassDiagramFrame import UmlClassDiagramFrame
 from tests.demo.DemoCommon import Identifiers
 from tests.demo.RelationshipCreator import RelationshipCreator
 from tests.demo.ShapeCreator import ShapeCreator
+
 from umlshapes.links.UmlLollipopInterface import UmlLollipopInterface
+from umlshapes.links.eventhandlers.UmlLollipopInterfaceEventHandler import UmlLollipopInterfaceEventHandler
+
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 from umlshapes.shapes.UmlClass import UmlClass
+
 from umlshapes.types.Common import AttachmentSide
 from umlshapes.types.UmlPosition import UmlPosition
+
+from tests.demo.DemoApplicationAdapter import DemoApplicationAdapter
 
 FRAME_WIDTH:  int = 1024
 FRAME_HEIGHT: int = 720
@@ -144,10 +150,7 @@ class DemoAppFrame(SizedFrame):
                 self.logger.error(f'WTH!  I am not handling that menu item')
 
     def _createLollipopInterface(self, requestingUmlClass: UmlClass, perimeterPoint: UmlPosition):
-
         """
-        TODO:  This code needs to be moved out of here.  Use a callback that creates
-        the lollipop
 
         Args:
             requestingUmlClass:
@@ -173,3 +176,7 @@ class DemoAppFrame(SizedFrame):
         diagram.AddShape(umlLollipopInterface)
         umlLollipopInterface.Show(show=True)
         self.logger.info(f'UmlInterface added: {umlLollipopInterface}')
+
+        eventHandler: UmlLollipopInterfaceEventHandler = UmlLollipopInterfaceEventHandler(lollipopInterface=umlLollipopInterface)
+        eventHandler.SetPreviousHandler(umlLollipopInterface.GetEventHandler())
+        umlLollipopInterface.SetEventHandler(eventHandler)

@@ -35,6 +35,7 @@ from wx.lib.ogl import RectangleShape
 
 from hrid import HRID
 
+from umlshapes.links.LollipopInflator import LollipopInflator
 from umlshapes.resources.images.Display import embeddedImage as displayImage
 from umlshapes.resources.images.DoNotDisplay import embeddedImage as doNotDisplayImage
 from umlshapes.resources.images.UnSpecified import embeddedImage as unSpecifiedImage
@@ -42,6 +43,7 @@ from umlshapes.resources.images.UnSpecified import embeddedImage as unSpecifiedI
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 from umlshapes.shapes.TopLeftMixin import Rectangle
 from umlshapes.types.Common import AttachmentSide
+from umlshapes.types.Common import LollipopCoordinates
 
 from umlshapes.types.UmlColor import UmlColor
 from umlshapes.types.UmlFontFamily import UmlFontFamily
@@ -62,6 +64,36 @@ class UmlUtils:
     DEFAULT_BACKGROUND_BRUSH: Brush = cast(Brush, None)
 
     ID_GENERATOR: HRID = cast(HRID, None)
+
+    @classmethod
+    def lollipopHitTest(cls, x: int, y: int, attachmentSide: AttachmentSide, lollipopCoordinates: LollipopCoordinates) -> bool:
+        """
+        This located here for testability
+        Args:
+            x:
+            y:
+            attachmentSide:
+            lollipopCoordinates:
+
+        Returns:
+        """
+        ans: bool = False
+
+        rectangle: Rectangle = LollipopInflator.inflateLollipop(
+            attachmentSide=attachmentSide,
+            lollipopCoordinates=lollipopCoordinates
+        )
+
+        left:   int = rectangle.left
+        right:  int = rectangle.right
+        top:    int = rectangle.top
+        bottom: int = rectangle.bottom
+
+        # noinspection PyChainedComparisons
+        if x >= left and x <= right and y >= top and y <= bottom:
+            ans = True
+
+        return ans
 
     @classmethod
     def attachmentSide(cls, x, y, rectangle: Rectangle) -> AttachmentSide:

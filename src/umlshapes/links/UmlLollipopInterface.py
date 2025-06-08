@@ -6,8 +6,6 @@ from typing import TYPE_CHECKING
 from logging import Logger
 from logging import getLogger
 
-from dataclasses import dataclass
-
 from wx import BLACK_PEN
 from wx import RED_PEN
 from wx import WHITE_BRUSH
@@ -25,17 +23,12 @@ from umlshapes.preferences.UmlPreferences import UmlPreferences
 from umlshapes.shapes.TopLeftMixin import Rectangle
 
 from umlshapes.types.Common import AttachmentSide
+from umlshapes.types.Common import LollipopCoordinates
 from umlshapes.types.UmlPosition import UmlPosition
 
 if TYPE_CHECKING:
     from umlshapes.shapes.UmlClass import UmlClass
     from umlshapes.frames.UmlClassDiagramFrame import UmlClassDiagramFrame
-
-
-@dataclass
-class LollipopCoordinates:
-    startCoordinates: UmlPosition
-    endCoordinates:   UmlPosition
 
 
 class UmlLollipopInterface(Shape):
@@ -127,6 +120,17 @@ class UmlLollipopInterface(Shape):
             textSize=extentSize
         )
         dc.DrawText(self.pyutInterface.name, interfaceNamePosition.x, interfaceNamePosition.y)
+
+    def HitTest(self, x, y):
+        rectangle: Rectangle = self._attachedTo.rectangle
+        lollipopCoordinates: LollipopCoordinates = self._computeLollipopCoordinates(rectangle)
+
+        hit: bool = UmlUtils.lollipopHitTest(x=x, y=y, attachmentSide=self.attachmentSide, lollipopCoordinates=lollipopCoordinates)
+
+        if hit is True:
+            return 0, self
+        else:
+            return False
 
     def _computeLollipopCoordinates(self, rectangle: Rectangle) -> LollipopCoordinates:
         """

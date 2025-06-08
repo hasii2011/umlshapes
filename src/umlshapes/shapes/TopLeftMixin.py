@@ -2,25 +2,13 @@
 from logging import Logger
 from logging import getLogger
 
-from dataclasses import dataclass
-
 from wx import Size
 from wx.lib.ogl import Shape
 
 from umlshapes.types.Common import LeftCoordinate
+from umlshapes.types.Common import Rectangle
 from umlshapes.types.UmlDimensions import UmlDimensions
 from umlshapes.types.UmlPosition import UmlPosition
-
-
-@dataclass
-class Rectangle:
-    """
-    A traditional description of a graphical rectangle
-    """
-    left:   int = 0
-    top:    int = 0
-    right:  int = 0
-    bottom: int = 0
 
 
 class TopLeftMixin:

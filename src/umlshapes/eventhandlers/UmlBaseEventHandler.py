@@ -29,7 +29,7 @@ class UmlBaseEventHandler(ShapeEvtHandler):
 
     def OnLeftClick(self, x: int, y: int, keys=0, attachment=0):
 
-        # self._baseLogger.debug(f'({x},{y}), {keys=} {attachment=}')
+        self._baseLogger.debug(f'({x},{y}), {keys=} {attachment=}')
         shape:  Shape       = self.GetShape()
         canvas: ShapeCanvas = shape.GetCanvas()
         dc:     ClientDC    = ClientDC(canvas)

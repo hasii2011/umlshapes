@@ -118,6 +118,7 @@ lollipopPreferences: ValueDescriptions = ValueDescriptions(
         KeyName('lollipopCircleRadius'): ValueDescription(defaultValue='4',   deserializer=SecureConversions.secureInteger),
         KeyName('interfaceNameIndent'):  ValueDescription(defaultValue='10',  deserializer=SecureConversions.secureInteger),
         KeyName('horizontalOffset'):     ValueDescription(defaultValue='0.5', deserializer=SecureConversions.secureFloat),
+        KeyName('hitAreaInflationRate'): ValueDescription(defaultValue='2', deserializer=SecureConversions.secureInteger),
     }
 )
 debugPreferences: ValueDescriptions = ValueDescriptions(
