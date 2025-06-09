@@ -37,31 +37,32 @@ class LollipopInflator:
         startCoordinates:     UmlPosition = lollipopCoordinates.startCoordinates
         endCoordinates:       UmlPosition = lollipopCoordinates.endCoordinates
         hitAreaInflationRate: int         = LollipopInflator.clsPreferences.hitAreaInflationRate
+        lollipopCircleRadius: int         = LollipopInflator.clsPreferences.lollipopCircleRadius
 
         if attachmentSide == AttachmentSide.BOTTOM:
 
             rectangle.left   = startCoordinates.x - hitAreaInflationRate
             rectangle.right  = endCoordinates.x + hitAreaInflationRate
             rectangle.top    = startCoordinates.y
-            rectangle.bottom = endCoordinates.y
+            rectangle.bottom = endCoordinates.y + lollipopCircleRadius
 
         elif attachmentSide == AttachmentSide.TOP:
 
             rectangle.left   = startCoordinates.x - hitAreaInflationRate
             rectangle.right  = endCoordinates.x + hitAreaInflationRate
-            rectangle.top    = endCoordinates.y
+            rectangle.top    = endCoordinates.y - lollipopCircleRadius
             rectangle.bottom = startCoordinates.y
 
         elif attachmentSide == AttachmentSide.RIGHT:
 
             rectangle.left   = startCoordinates.x
-            rectangle.right  = endCoordinates.x
+            rectangle.right  = endCoordinates.x + lollipopCircleRadius
             rectangle.top    = startCoordinates.y - hitAreaInflationRate
             rectangle.bottom = endCoordinates.y + hitAreaInflationRate
 
         elif attachmentSide == AttachmentSide.LEFT:
 
-            rectangle.left   = endCoordinates.x
+            rectangle.left   = endCoordinates.x - lollipopCircleRadius
             rectangle.right  = startCoordinates.x
             rectangle.top    = startCoordinates.y - hitAreaInflationRate
             rectangle.bottom = endCoordinates.y + hitAreaInflationRate

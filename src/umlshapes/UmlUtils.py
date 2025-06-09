@@ -69,6 +69,7 @@ class UmlUtils:
     def lollipopHitTest(cls, x: int, y: int, attachmentSide: AttachmentSide, lollipopCoordinates: LollipopCoordinates) -> bool:
         """
         This located here for testability
+
         Args:
             x:
             y:

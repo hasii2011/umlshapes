@@ -6,7 +6,9 @@ from typing import TYPE_CHECKING
 from logging import Logger
 from logging import getLogger
 
+from wx import BLACK
 from wx import BLACK_PEN
+from wx import RED
 from wx import RED_PEN
 from wx import WHITE_BRUSH
 from wx import Font
@@ -96,9 +98,12 @@ class UmlLollipopInterface(Shape):
             dc:
         """
         dc.SetBrush(WHITE_BRUSH)
+        dc.SetFont(self._defaultFont)
         if self.Selected() is True:
             dc.SetPen(RED_PEN)
+            dc.SetTextForeground(RED)
         else:
+            dc.SetTextForeground(BLACK)
             dc.SetPen(BLACK_PEN)
 
         dc.GetPen().SetWidth(4)

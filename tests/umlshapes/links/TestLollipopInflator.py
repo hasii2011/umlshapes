@@ -16,6 +16,7 @@ LOLLIPOP_START_X: int = 500
 LOLLIPOP_START_Y: int = 500
 
 TEST_LOLLIPOP_LINE_LENGTH: int = 90
+TEST_CIRCLE_RADIUS:        int = 4
 TEST_INFLATION_RATE:       int = 2
 
 
@@ -34,12 +35,15 @@ class TestLollipopInflator(UnitTestBase):
         super().setUp()
         self._preferences:       UmlPreferences = UmlPreferences()
         self._saveInflationRate: int            = self._preferences.hitAreaInflationRate
+        self._saveCircleRadius:  int            = self._preferences.lollipopCircleRadius
 
-        UmlPreferences().hitAreaInflationRate = TEST_INFLATION_RATE
+        self._preferences.hitAreaInflationRate = TEST_INFLATION_RATE
+        self._preferences.lollipopCircleRadius = TEST_CIRCLE_RADIUS
 
     def tearDown(self):
         super().tearDown()
         self._preferences.hitAreaInflationRate = self._saveInflationRate
+        self._preferences.lollipopCircleRadius = self._saveCircleRadius
 
     def testBottom(self):
 
@@ -52,7 +56,7 @@ class TestLollipopInflator(UnitTestBase):
             left=LOLLIPOP_START_X - TEST_INFLATION_RATE,
             top=LOLLIPOP_START_X,
             right=LOLLIPOP_START_X + TEST_INFLATION_RATE,
-            bottom=LOLLIPOP_START_Y + TEST_LOLLIPOP_LINE_LENGTH
+            bottom=LOLLIPOP_START_Y + TEST_LOLLIPOP_LINE_LENGTH + TEST_CIRCLE_RADIUS
         )
         inflatedLollipop:  Rectangle = LollipopInflator.inflateLollipop(
             attachmentSide=AttachmentSide.BOTTOM,
@@ -70,7 +74,7 @@ class TestLollipopInflator(UnitTestBase):
 
         expectedInflation: Rectangle = Rectangle(
             left=LOLLIPOP_START_X - TEST_INFLATION_RATE,
-            top=LOLLIPOP_START_Y - TEST_LOLLIPOP_LINE_LENGTH,
+            top=LOLLIPOP_START_Y - TEST_LOLLIPOP_LINE_LENGTH - TEST_CIRCLE_RADIUS,
             right=LOLLIPOP_START_X + TEST_INFLATION_RATE,
             bottom=LOLLIPOP_START_Y
         )
@@ -91,7 +95,7 @@ class TestLollipopInflator(UnitTestBase):
         expectedInflation: Rectangle = Rectangle(
             left=LOLLIPOP_START_X,
             top=LOLLIPOP_START_Y - TEST_INFLATION_RATE,
-            right=LOLLIPOP_START_X + TEST_LOLLIPOP_LINE_LENGTH,
+            right=LOLLIPOP_START_X + TEST_LOLLIPOP_LINE_LENGTH + TEST_CIRCLE_RADIUS,
             bottom=LOLLIPOP_START_Y + TEST_INFLATION_RATE
         )
 
@@ -99,7 +103,7 @@ class TestLollipopInflator(UnitTestBase):
             attachmentSide=AttachmentSide.RIGHT,
             lollipopCoordinates=lollipopCoordinates
         )
-        self.assertEqual(expectedInflation, inflatedLollipop, 'Incorrect top inflation :-)')
+        self.assertEqual(expectedInflation, inflatedLollipop, 'Incorrect right inflation :-)')
 
     def testLeft(self):
 
@@ -110,18 +114,18 @@ class TestLollipopInflator(UnitTestBase):
         )
 
         expectedInflation: Rectangle = Rectangle(
-            left=LOLLIPOP_START_X,
+            left=LOLLIPOP_START_X - TEST_LOLLIPOP_LINE_LENGTH - TEST_CIRCLE_RADIUS,
             top=LOLLIPOP_START_Y - TEST_INFLATION_RATE,
-            right=LOLLIPOP_START_X - TEST_LOLLIPOP_LINE_LENGTH,
+            right=LOLLIPOP_START_X,
             bottom=LOLLIPOP_START_Y + TEST_INFLATION_RATE
         )
 
         inflatedLollipop:  Rectangle = LollipopInflator.inflateLollipop(
-            attachmentSide=AttachmentSide.RIGHT,
+            attachmentSide=AttachmentSide.LEFT,
             lollipopCoordinates=lollipopCoordinates
         )
 
-        self.assertEqual(expectedInflation, inflatedLollipop, 'Incorrect top inflation :-)')
+        self.assertEqual(expectedInflation, inflatedLollipop, 'Incorrect left inflation :-)')
 
 
 def suite() -> TestSuite:
