@@ -9,7 +9,7 @@ from umlshapes.links.LabelType import LabelType
 
 from umlshapes.links.UmlAssociationLabel import UmlAssociationLabel
 from umlshapes.shapes.PositionReporter import PositionReporter
-from umlshapes.shapes.eventhandlers.UmlBaseEventHandler import UmlBaseEventHandler
+from umlshapes.UmlBaseEventHandler import UmlBaseEventHandler
 
 from umlshapes.types.Common import DESTINATION_CARDINALITY_IDX
 from umlshapes.types.Common import LeftCoordinate
