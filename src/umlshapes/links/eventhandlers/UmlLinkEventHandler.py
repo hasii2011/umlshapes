@@ -17,7 +17,8 @@ from umlshapes.frames.UmlFrame import UmlFrame
 from umlshapes.links.DeltaXY import DeltaXY
 from umlshapes.links.LabelType import LabelType
 from umlshapes.links.UmlAssociationLabel import UmlAssociationLabel
-from umlshapes.eventhandlers.UmlBaseEventHandler import UmlBaseEventHandler
+
+from umlshapes.shapes.eventhandlers.UmlBaseEventHandler import UmlBaseEventHandler
 
 from umlshapes.types.Common import NAME_IDX
 

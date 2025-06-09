@@ -1,3 +1,4 @@
+
 from typing import Union
 from typing import cast
 from typing import Dict
@@ -31,7 +32,7 @@ from umlshapes.links.eventhandlers.UmlLinkEventHandler import UmlLinkEventHandle
 
 from umlshapes.shapes.UmlClass import UmlClass
 
-from umlshapes.eventhandlers.UmlClassEventHandler import UmlClassEventHandler
+from umlshapes.shapes.eventhandlers.UmlClassEventHandler import UmlClassEventHandler
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 

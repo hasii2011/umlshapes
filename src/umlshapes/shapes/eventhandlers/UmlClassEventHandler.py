@@ -13,7 +13,7 @@ from umlshapes.preferences.UmlPreferences import UmlPreferences
 from umlshapes.shapes.UmlClass import UmlClass
 from umlshapes.shapes.UmlClassMenuHandler import UmlClassMenuHandler
 
-from umlshapes.eventhandlers.UmlBaseEventHandler import UmlBaseEventHandler
+from umlshapes.shapes.eventhandlers.UmlBaseEventHandler import UmlBaseEventHandler
 
 
 class UmlClassEventHandler(UmlBaseEventHandler):

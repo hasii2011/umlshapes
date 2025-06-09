@@ -2,7 +2,7 @@
 from logging import Logger
 from logging import getLogger
 
-from umlshapes.eventhandlers.UmlBaseEventHandler import UmlBaseEventHandler
+from umlshapes.shapes.eventhandlers.UmlBaseEventHandler import UmlBaseEventHandler
 
 from umlshapes.links.UmlLollipopInterface import UmlLollipopInterface
 

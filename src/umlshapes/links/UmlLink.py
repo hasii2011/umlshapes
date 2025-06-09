@@ -28,7 +28,7 @@ from umlshapes.links.eventhandlers.UmlAssociationLabelEventHandler import UmlAss
 from umlshapes.links.UmlAssociationLabel import UmlAssociationLabel
 
 from umlshapes.shapes.UmlLineControlPoint import UmlLineControlPoint
-from umlshapes.eventhandlers.UmlControlPointEventHandler import UmlControlPointEventHandler
+from umlshapes.shapes.eventhandlers.UmlControlPointEventHandler import UmlControlPointEventHandler
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
