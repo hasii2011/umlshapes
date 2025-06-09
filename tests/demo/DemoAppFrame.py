@@ -10,20 +10,21 @@ from wx import ID_EXIT
 from wx import Menu
 from wx import MenuBar
 from wx import CommandEvent
+from wx import OK
 
 from wx.lib.sized_controls import SizedFrame
 from wx.lib.sized_controls import SizedPanel
 
 from pyutmodelv2.PyutInterface import PyutInterface
+from pyutmodelv2.PyutInterface import PyutInterfaces
+from pyutmodelv2.PyutModelTypes import ClassName
 
 from umlshapes.IApplicationAdapter import IApplicationAdapter
 from umlshapes.UmlDiagram import UmlDiagram
 from umlshapes.UmlUtils import UmlUtils
+from umlshapes.dialogs.DlgEditInterface import DlgEditInterface
+from umlshapes.eventengine.UmlEventEngine import UmlEventEngine
 from umlshapes.frames.UmlClassDiagramFrame import UmlClassDiagramFrame
-
-from tests.demo.DemoCommon import Identifiers
-from tests.demo.RelationshipCreator import RelationshipCreator
-from tests.demo.ShapeCreator import ShapeCreator
 
 from umlshapes.links.UmlLollipopInterface import UmlLollipopInterface
 from umlshapes.links.eventhandlers.UmlLollipopInterfaceEventHandler import UmlLollipopInterfaceEventHandler
@@ -34,6 +35,9 @@ from umlshapes.shapes.UmlClass import UmlClass
 from umlshapes.types.Common import AttachmentSide
 from umlshapes.types.UmlPosition import UmlPosition
 
+from tests.demo.DemoCommon import Identifiers
+from tests.demo.RelationshipCreator import RelationshipCreator
+from tests.demo.ShapeCreator import ShapeCreator
 from tests.demo.DemoApplicationAdapter import DemoApplicationAdapter
 
 FRAME_WIDTH:  int = 1024
@@ -161,6 +165,8 @@ class DemoAppFrame(SizedFrame):
         self._pyutInterfaceCount += 1
 
         pyutInterface:        PyutInterface        = PyutInterface(interfaceName)
+        pyutInterface.addImplementor(ClassName(requestingUmlClass.pyutClass.name))
+
         umlLollipopInterface: UmlLollipopInterface = UmlLollipopInterface(pyutInterface=pyutInterface)
         umlLollipopInterface.attachedTo            = requestingUmlClass
 
@@ -180,3 +186,11 @@ class DemoAppFrame(SizedFrame):
         eventHandler: UmlLollipopInterfaceEventHandler = UmlLollipopInterfaceEventHandler(lollipopInterface=umlLollipopInterface)
         eventHandler.SetPreviousHandler(umlLollipopInterface.GetEventHandler())
         umlLollipopInterface.SetEventHandler(eventHandler)
+
+        umlFrame:       UmlClassDiagramFrame = self._diagramFrame
+        eventEngine:    UmlEventEngine       = umlFrame.eventEngine
+        pyutInterfaces: PyutInterfaces       = eventHandler.getLollipopInterfaces()
+
+        with DlgEditInterface(parent=umlFrame, oglInterface2=umlLollipopInterface, eventEngine=eventEngine, pyutInterfaces=pyutInterfaces) as dlg:
+            if dlg.ShowModal() == OK:
+                umlFrame.refresh()

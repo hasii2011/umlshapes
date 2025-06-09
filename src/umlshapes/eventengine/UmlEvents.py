@@ -18,7 +18,7 @@ class UmlEventType(Enum):
 
     """
 
-    ShapeSelected           = 'ShapeSelected'
-    CutOglClass             = 'CutOglClass'
-    DiagramFrameModified    = 'DiagramFrameModified'
-    RequestLollipopLocation = 'RequestLollipopLocation'
+    ShapeSelected           = EVT_SHAPE_SELECTED.typeId
+    CutOglClass             = EVT_CUT_OGL_CLASS.typeId
+    DiagramFrameModified    = EVT_DIAGRAM_FRAME_MODIFIED.typeId
+    RequestLollipopLocation = EVT_REQUEST_LOLLIPOP_LOCATION.typeId

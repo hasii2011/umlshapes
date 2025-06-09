@@ -21,12 +21,11 @@ from umlshapes.eventengine.UmlShapeSelectedData import UmlShapeSelectedData
 
 from umlshapes.types.Common import UmlShape
 
-CUT_OGL_CLASS_PARAMETER:                    str = 'shapeToCut'
-REQUEST_LOLLIPOP_LOCATION_PARAMETER:        str = 'requestShape'
-SELECTED_SHAPE_PARAMETER:                   str = 'selectedShape'
-SELECTED_SHAPE_POSITION_PARAMETER:          str = 'selectedShapePosition'
-CREATE_LOLLIPOP_IMPLEMENTOR_PARAMETER:      str = 'implementor'
-CREATE_LOLLIPOP_ATTACHMENT_POINT_PARAMETER: str = 'attachmentPoint'
+CUT_OGL_CLASS_PARAMETER:             str = 'shapeToCut'
+REQUEST_LOLLIPOP_LOCATION_PARAMETER: str = 'requestShape'
+SELECTED_SHAPE_PARAMETER:            str = 'selectedShape'
+SELECTED_SHAPE_POSITION_PARAMETER:   str = 'selectedShapePosition'
+CALLBACK_PARAMETER:                  str = 'callback'
 
 
 class UmlEventEngine(IUmlEventEngine):
@@ -96,3 +95,4 @@ class UmlEventEngine(IUmlEventEngine):
         requestShape: UmlShape                     = kwargs[REQUEST_LOLLIPOP_LOCATION_PARAMETER]
         eventToPost:  RequestLollipopLocationEvent = RequestLollipopLocationEvent(requestShape=requestShape)
         PostEvent(dest=self._listeningWindow, event=eventToPost)
+

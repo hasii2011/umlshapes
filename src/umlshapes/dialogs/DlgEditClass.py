@@ -14,7 +14,6 @@ from wx import CommandEvent
 from wx import Size
 from wx import StaticText
 from wx import TextCtrl
-from wx import Window
 from wx import CheckBox
 
 from wx.lib.sized_controls import SizedPanel
@@ -23,6 +22,7 @@ from pyutmodelv2.PyutClass import PyutClass
 from pyutmodelv2.PyutField import PyutField
 from pyutmodelv2.PyutParameter import PyutParameter
 
+from umlshapes.eventengine.IUmlEventEngine import IUmlEventEngine
 from umlshapes.types.Common import UmlShapeList
 
 if TYPE_CHECKING:
@@ -64,8 +64,7 @@ class DlgEditClass(DlgEditClassCommon):
     dialog, any modifications are lost.
 
     """
-    # def __init__(self, parent: UmlClassDiagramFrame, eventEngine: IEventEngine, pyutClass: PyutClass):
-    def __init__(self, parent: UmlClassDiagramFrame, pyutClass: PyutClass):
+    def __init__(self, parent: UmlClassDiagramFrame, eventEngine: IUmlEventEngine, pyutClass: PyutClass):
         """
 
         Args:
@@ -78,8 +77,7 @@ class DlgEditClass(DlgEditClassCommon):
         self.logger:       Logger               = getLogger(__name__)
         self._pyutClass:   PyutClass            = pyutClass
 
-        # super().__init__(parent=parent, eventEngine=eventEngine, dlgTitle="Edit Class", pyutModel=self._pyutClass, editInterface=False)
-        super().__init__(parent=parent, dlgTitle="Edit Class", pyutModel=self._pyutClass, editInterface=False)
+        super().__init__(parent=parent, eventEngine=eventEngine, dlgTitle="Edit Class", pyutModel=self._pyutClass, editInterface=False)
         self._oldClassName: str = pyutClass.name
 
         sizedPanel: SizedPanel = self.GetContentsPane()

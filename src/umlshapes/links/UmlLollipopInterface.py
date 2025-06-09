@@ -89,6 +89,14 @@ class UmlLollipopInterface(Shape):
     def attachmentSide(self, attachmentSide: AttachmentSide):
         self._attachmentSide = attachmentSide
 
+    @property
+    def selected(self) -> bool:
+        return self.Selected()
+
+    @selected.setter
+    def selected(self, select: bool):
+        self.Select(select=select)
+
     def OnDraw(self, dc: MemoryDC):
         """
         Start coordinates are on the UML Class perimeter
@@ -99,17 +107,17 @@ class UmlLollipopInterface(Shape):
         """
         dc.SetBrush(WHITE_BRUSH)
         dc.SetFont(self._defaultFont)
-        if self.Selected() is True:
+        if self.selected is True:
             dc.SetPen(RED_PEN)
             dc.SetTextForeground(RED)
         else:
-            dc.SetTextForeground(BLACK)
             dc.SetPen(BLACK_PEN)
+            dc.SetTextForeground(BLACK)
 
         dc.GetPen().SetWidth(4)
 
-        rectangle: Rectangle = self._attachedTo.rectangle
-        lollipopCoordinates: LollipopCoordinates = self._computeLollipopCoordinates(rectangle)
+        umlClassRectangle: Rectangle = self._attachedTo.rectangle
+        lollipopCoordinates: LollipopCoordinates = self._computeLollipopCoordinates(umlClassRectangle)
 
         dc.DrawLine(x1=lollipopCoordinates.startCoordinates.x, y1=lollipopCoordinates.startCoordinates.y,
                     x2=lollipopCoordinates.endCoordinates.x,   y2=lollipopCoordinates.endCoordinates.y)

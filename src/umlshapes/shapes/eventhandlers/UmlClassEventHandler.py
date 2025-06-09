@@ -4,8 +4,9 @@ from typing import cast
 from logging import Logger
 from logging import getLogger
 
-from pyutmodelv2.PyutClass import PyutClass
 from wx import OK
+
+from pyutmodelv2.PyutClass import PyutClass
 
 from umlshapes.frames.UmlClassDiagramFrame import UmlClassDiagramFrame
 from umlshapes.preferences.UmlPreferences import UmlPreferences
@@ -73,6 +74,7 @@ class UmlClassEventHandler(UmlBaseEventHandler):
     def OnLeftDoubleClick(self, x: int, y: int, keys: int = 0, attachment: int = 0):
 
         from umlshapes.dialogs.DlgEditClass import DlgEditClass
+        from umlshapes.eventengine.UmlEventEngine import UmlEventEngine
 
         super().OnLeftDoubleClick(x=x, y=y, keys=keys, attachment=attachment)
 
@@ -80,6 +82,7 @@ class UmlClassEventHandler(UmlBaseEventHandler):
         pyutClass: PyutClass = umlClass.pyutClass
         umlFrame:  UmlClassDiagramFrame  = umlClass.GetCanvas()
 
-        with DlgEditClass(umlFrame, pyutClass) as dlg:
+        eventEngine: UmlEventEngine = umlFrame.eventEngine
+        with DlgEditClass(parent=umlFrame, pyutClass=pyutClass, eventEngine=eventEngine) as dlg:
             if dlg.ShowModal() == OK:
                 umlFrame.refresh()

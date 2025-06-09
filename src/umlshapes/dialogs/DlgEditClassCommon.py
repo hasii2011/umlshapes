@@ -27,6 +27,8 @@ from umlshapes.dialogs.DlgEditDescription import DlgEditDescription
 from umlshapes.dialogs.DlgEditMethod import DlgEditMethod
 from umlshapes.dialogs.DlgEditStereotype import DlgEditStereotype
 
+from umlshapes.eventengine.IUmlEventEngine import IUmlEventEngine
+
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
 from umlshapes.enhancedlistbox.EnhancedListBox import EnhancedListBoxItems
@@ -59,17 +61,15 @@ class DlgEditClassCommon(BaseEditDialog):
     `onOk` the subclasses should retrieve the common attributes from _pyutModelCopy
     `onCancel` the subclasses should restore the common attributes from _pyutModel
     """
-
-    # def __init__(self, parent, eventEngine: IEventEngine, dlgTitle: str, pyutModel: Union[PyutClass, PyutInterface], editInterface: bool = False,):
-    def __init__(self, parent, dlgTitle: str, pyutModel: Union[PyutClass, PyutInterface], editInterface: bool = False, ):
+    def __init__(self, parent, eventEngine: IUmlEventEngine, dlgTitle: str, pyutModel: Union[PyutClass, PyutInterface], editInterface: bool = False, ):
 
         super().__init__(parent, dlgTitle)
 
         self._parent = parent   #
 
-        self.ccLogger:       Logger       = getLogger(__name__)
-        self._editInterface: bool         = editInterface
-        # self._eventEngine:   IEventEngine = eventEngine
+        self.ccLogger:       Logger          = getLogger(__name__)
+        self._editInterface: bool            = editInterface
+        self._eventEngine:   IUmlEventEngine = eventEngine
 
         self._pyutModel:     CommonClassType = pyutModel
         self._pyutModelCopy: CommonClassType = deepcopy(pyutModel)
