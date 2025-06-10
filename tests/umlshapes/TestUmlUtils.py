@@ -5,7 +5,9 @@ from unittest import main as unitTestMain
 from codeallybasic.UnitTestBase import UnitTestBase
 
 from umlshapes.UmlUtils import UmlUtils
-from umlshapes.shapes.TopLeftMixin import Rectangle
+
+from umlshapes.mixins.TopLeftMixin import Rectangle
+
 from umlshapes.types.Common import AttachmentSide
 from umlshapes.types.UmlPosition import UmlPosition
 

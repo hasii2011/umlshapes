@@ -13,9 +13,9 @@ from pyutmodelv2.PyutNote import PyutNote
 from umlshapes.UmlUtils import UmlUtils
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
-from umlshapes.shapes.ControlPointMixin import ControlPointMixin
-from umlshapes.shapes.IDMixin import IDMixin
-from umlshapes.shapes.TopLeftMixin import TopLeftMixin
+from umlshapes.mixins.ControlPointMixin import ControlPointMixin
+from umlshapes.mixins.IDMixin import IDMixin
+from umlshapes.mixins.TopLeftMixin import TopLeftMixin
 
 from umlshapes.types.UmlDimensions import UmlDimensions
 

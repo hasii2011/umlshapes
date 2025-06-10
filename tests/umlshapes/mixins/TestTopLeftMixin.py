@@ -3,12 +3,14 @@ from unittest import TestSuite
 from unittest import main as unitTestMain
 
 from codeallyadvanced.ui.UnitTestBaseW import UnitTestBaseW
+
 from wx.lib.ogl import OGLInitialize
 
 from wx.lib.ogl import Shape
 
-from umlshapes.shapes.TopLeftMixin import Rectangle
-from umlshapes.shapes.TopLeftMixin import TopLeftMixin
+from umlshapes.mixins.TopLeftMixin import Rectangle
+from umlshapes.mixins.TopLeftMixin import TopLeftMixin
+
 from umlshapes.types.UmlPosition import UmlPosition
 
 SHAPE_WIDTH:  int = 120

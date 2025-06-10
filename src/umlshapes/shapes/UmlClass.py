@@ -27,22 +27,23 @@ from pyutmodelv2.enumerations.PyutDisplayParameters import PyutDisplayParameters
 from umlshapes.UmlUtils import UmlUtils
 
 from umlshapes.frames.UmlFrame import UmlFrame
+
 from umlshapes.links.UmlAssociation import UmlAssociation
 from umlshapes.links.UmlLink import UmlLink
-from umlshapes.shapes.IDMixin import IDMixin
+
 from umlshapes.types.Common import LeftCoordinate
 from umlshapes.types.UmlPosition import UmlPosition
-
-if TYPE_CHECKING:
-    from umlshapes.frames.UmlClassDiagramFrame import UmlClassDiagramFrame
+from umlshapes.types.UmlColor import UmlColor
+from umlshapes.types.UmlDimensions import UmlDimensions
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
-from umlshapes.shapes.TopLeftMixin import TopLeftMixin
-from umlshapes.shapes.ControlPointMixin import ControlPointMixin
+from umlshapes.mixins.IDMixin import IDMixin
+from umlshapes.mixins.TopLeftMixin import TopLeftMixin
+from umlshapes.mixins.ControlPointMixin import ControlPointMixin
 
-from umlshapes.types.UmlColor import UmlColor
-from umlshapes.types.UmlDimensions import UmlDimensions
+if TYPE_CHECKING:
+    from umlshapes.frames.UmlClassDiagramFrame import UmlClassDiagramFrame
 
 DUNDER_METHOD_INDICATOR: str = '__'
 CONSTRUCTOR_NAME:        str = '__init__'

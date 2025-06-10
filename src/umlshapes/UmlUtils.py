@@ -39,7 +39,7 @@ from umlshapes.resources.images.DoNotDisplay import embeddedImage as doNotDispla
 from umlshapes.resources.images.UnSpecified import embeddedImage as unSpecifiedImage
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
-from umlshapes.shapes.TopLeftMixin import Rectangle
+from umlshapes.mixins.TopLeftMixin import Rectangle
 from umlshapes.types.Common import AttachmentSide
 from umlshapes.types.Common import LollipopCoordinates
 

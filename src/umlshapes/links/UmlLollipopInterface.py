@@ -22,7 +22,7 @@ from pyutmodelv2.PyutInterface import PyutInterface
 from umlshapes.UmlUtils import UmlUtils
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
-from umlshapes.shapes.TopLeftMixin import Rectangle
+from umlshapes.mixins.TopLeftMixin import Rectangle
 
 from umlshapes.types.Common import AttachmentSide
 from umlshapes.types.Common import LollipopCoordinates

@@ -21,8 +21,8 @@ if TYPE_CHECKING:
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
-from umlshapes.shapes.ControlPointMixin import ControlPointMixin
-from umlshapes.shapes.TopLeftMixin import TopLeftMixin
+from umlshapes.mixins.ControlPointMixin import ControlPointMixin
+from umlshapes.mixins.TopLeftMixin import TopLeftMixin
 
 from umlshapes.types.UmlDimensions import UmlDimensions
 

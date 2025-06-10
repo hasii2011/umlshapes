@@ -3,7 +3,9 @@ from typing_extensions import Protocol
 
 
 class PositionReporter(Protocol):
-
+    """
+    My one and only use of a protocol class
+    """
     def GetLabelPosition(self, idx: int):
         """
 
