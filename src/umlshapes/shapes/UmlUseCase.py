@@ -13,12 +13,13 @@ from umlshapes.UmlUtils import UmlUtils
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
 from umlshapes.shapes.ControlPointMixin import ControlPointMixin
+from umlshapes.shapes.IDMixin import IDMixin
 from umlshapes.shapes.TopLeftMixin import TopLeftMixin
 
 from umlshapes.types.UmlDimensions import UmlDimensions
 
 
-class UmlUseCase(ControlPointMixin,  EllipseShape, TopLeftMixin):
+class UmlUseCase(ControlPointMixin,  EllipseShape, TopLeftMixin, IDMixin):
 
     def __init__(self, pyutUseCase: PyutUseCase = None, size: UmlDimensions = None):
 
@@ -38,6 +39,7 @@ class UmlUseCase(ControlPointMixin,  EllipseShape, TopLeftMixin):
 
         EllipseShape.__init__(self, w=useCaseSize.width, h=useCaseSize.height)
         TopLeftMixin.__init__(self, umlShape=self, width=useCaseSize.width, height=useCaseSize.height)
+        IDMixin.__init__(self, umlShape=self)
 
         self.SetDraggable(drag=True)
 
@@ -123,9 +125,7 @@ class UmlUseCase(ControlPointMixin,  EllipseShape, TopLeftMixin):
         self._controlPoints[3]._yoffset = 0
 
     def __str__(self) -> str:
-        return self.__repr__()
+        return self.pyutUseCase.name
 
     def __repr__(self) -> str:
-        selfName: str = self._pyutUseCase.name
-        modelId:  int = self._pyutUseCase.id
-        return f'UmlUseCase.{selfName} modelId: {modelId}'
+        return f"[UmlUseCase - umlId: `{self.id} `modelId: '{self.pyutUseCase.id}']"

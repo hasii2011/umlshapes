@@ -29,6 +29,7 @@ from umlshapes.UmlUtils import UmlUtils
 from umlshapes.frames.UmlFrame import UmlFrame
 from umlshapes.links.UmlAssociation import UmlAssociation
 from umlshapes.links.UmlLink import UmlLink
+from umlshapes.shapes.IDMixin import IDMixin
 from umlshapes.types.Common import LeftCoordinate
 from umlshapes.types.UmlPosition import UmlPosition
 
@@ -47,7 +48,7 @@ DUNDER_METHOD_INDICATOR: str = '__'
 CONSTRUCTOR_NAME:        str = '__init__'
 
 
-class UmlClass(ControlPointMixin, RectangleShape, TopLeftMixin):
+class UmlClass(ControlPointMixin, RectangleShape, TopLeftMixin, IDMixin):
     """
 
     """
@@ -73,6 +74,7 @@ class UmlClass(ControlPointMixin, RectangleShape, TopLeftMixin):
         super().__init__(shape=self)
         RectangleShape.__init__(self, w=classSize.width, h=classSize.height)
         TopLeftMixin.__init__(self, umlShape=self, width=classSize.width, height=classSize.height)
+        IDMixin.__init__(self, umlShape=self)
 
         self.logger: Logger = getLogger(__name__)
 
@@ -88,7 +90,6 @@ class UmlClass(ControlPointMixin, RectangleShape, TopLeftMixin):
         self._textHeight:   int      = cast(int, None)
         self._margin:       int      = self._preferences.classTextMargin
 
-        self.SetId(UmlUtils.getID())
         self.SetDraggable(drag=True)
         self.SetCentreResize(False)
 
@@ -103,19 +104,6 @@ class UmlClass(ControlPointMixin, RectangleShape, TopLeftMixin):
     @pyutClass.setter
     def pyutClass(self, pyutClass: PyutClass):
         self._pyutClass = pyutClass
-
-    @property
-    def id(self) -> int:
-        """
-        Syntactic sugar for external consumers;  Hide the underlying implementation
-
-        Returns:  The OGL generated ID
-        """
-        return self.GetId()
-
-    @id.setter
-    def id(self, newValue: int):
-        self.SetId(newValue)
 
     @property
     def umlFrame(self) -> 'UmlClassDiagramFrame':
@@ -688,7 +676,7 @@ class UmlClass(ControlPointMixin, RectangleShape, TopLeftMixin):
     def __repr__(self) -> str:
         selfName: str = self.pyutClass.name
         modelId:  int = self.pyutClass.id
-        return f'OglClass.{selfName} modelId: {modelId}'
+        return f'UmlClass.{selfName} umlId: `{self.id}` modelId: {modelId}'
 
     def __eq__(self, other) -> bool:
 

@@ -12,12 +12,15 @@ from pyutmodelv2.PyutNote import PyutNote
 
 from umlshapes.UmlUtils import UmlUtils
 from umlshapes.preferences.UmlPreferences import UmlPreferences
+
 from umlshapes.shapes.ControlPointMixin import ControlPointMixin
+from umlshapes.shapes.IDMixin import IDMixin
 from umlshapes.shapes.TopLeftMixin import TopLeftMixin
+
 from umlshapes.types.UmlDimensions import UmlDimensions
 
 
-class UmlNote(ControlPointMixin, RectangleShape, TopLeftMixin):
+class UmlNote(ControlPointMixin, RectangleShape, TopLeftMixin, IDMixin):
     """
     This is an UML object that represents a UML note in diagrams.
     A note may be linked only with a basic link
@@ -48,6 +51,7 @@ class UmlNote(ControlPointMixin, RectangleShape, TopLeftMixin):
 
         RectangleShape.__init__(self, w=noteSize.width, h=noteSize.height)
         TopLeftMixin.__init__(self, umlShape=self, width=noteSize.width, height=noteSize.height)
+        IDMixin.__init__(self, umlShape=self)
 
         self.logger: Logger = getLogger(__name__)
         self.SetBrush(Brush(Colour(255, 255, 230)))
@@ -113,11 +117,12 @@ class UmlNote(ControlPointMixin, RectangleShape, TopLeftMixin):
         dc.DrawLine(x1, y1, x2, y2)
 
     def __str__(self) -> str:
-        return f'OglNote -  modelId: {self.pyutNote.id}'
-
-    def __repr__(self):
         pyutNote: PyutNote = self._pyutNote
         if pyutNote is None:
             return f'Anonymous Note'
         else:
             return f'{pyutNote.content}'
+
+    def __repr__(self):
+
+        return f'UmlNote - umlId: `{self.id}` modelId: {self.pyutNote.id}'

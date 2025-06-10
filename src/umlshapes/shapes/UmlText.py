@@ -24,6 +24,7 @@ from pyutmodelv2.PyutText import PyutText
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
 from umlshapes.shapes.ControlPointMixin import ControlPointMixin
+from umlshapes.shapes.IDMixin import IDMixin
 from umlshapes.shapes.TopLeftMixin import TopLeftMixin
 
 from umlshapes.types.UmlColor import UmlColor
@@ -35,7 +36,7 @@ from umlshapes.UmlUtils import UmlUtils
 CONTROL_POINT_SIZE: int = 4         # Make this a preference
 
 
-class UmlText(ControlPointMixin, TextShape, TopLeftMixin):
+class UmlText(ControlPointMixin, TextShape, TopLeftMixin, IDMixin):
     MARGIN: int = 5
 
     def __init__(self, pyutText: PyutText, size: UmlDimensions = None):
@@ -59,8 +60,10 @@ class UmlText(ControlPointMixin, TextShape, TopLeftMixin):
         self._pyutText: PyutText = pyutText
 
         super().__init__(shape=self)
+
         TextShape.__init__(self, width=textSize.width, height=textSize.height)
         TopLeftMixin.__init__(self, umlShape=self, width=textSize.width, height=textSize.height)
+        IDMixin.__init__(self, umlShape=self)
 
         self.shadowOffsetX = 0      #
         self.shadowOffsetY = 0      #
@@ -204,9 +207,9 @@ class UmlText(ControlPointMixin, TextShape, TopLeftMixin):
         self.SetFont(self._textFont)
 
     def __str__(self) -> str:
-        return f'UmlText - modelId: `{self._pyutText.id}`'
+        return self.pyutText.content
 
     def __repr__(self):
 
-        strMe: str = f"[UmlText  modelId: '{self._pyutText.id}']"
+        strMe: str = f"[UmlText - umlId: `{self.id} `modelId: '{self.pyutText.id}']"
         return strMe

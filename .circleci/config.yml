@@ -36,6 +36,7 @@ jobs:
             pip install attrdict3
             pip install -v -U -f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-24.04  wxPython
             pip install hrid==0.2.4
+            pip install human_id==0.2.0
       - run:
             name: run tests
             command: | 

@@ -7,8 +7,6 @@ from logging import Logger
 from logging import getLogger
 from logging import DEBUG
 
-from time import time as pyTime
-
 from wx import BLACK
 from wx import Bitmap
 from wx import Brush
@@ -33,7 +31,7 @@ from wx import Size
 from wx.lib.ogl import EllipseShape
 from wx.lib.ogl import RectangleShape
 
-from hrid import HRID
+from human_id import generate_id
 
 from umlshapes.links.LollipopInflator import LollipopInflator
 from umlshapes.resources.images.Display import embeddedImage as displayImage
@@ -62,8 +60,6 @@ class UmlUtils:
     DEFAULT_FONT:     Font = cast(Font, None)
 
     DEFAULT_BACKGROUND_BRUSH: Brush = cast(Brush, None)
-
-    ID_GENERATOR: HRID = cast(HRID, None)
 
     @classmethod
     def lollipopHitTest(cls, x: int, y: int, attachmentSide: AttachmentSide, lollipopCoordinates: LollipopCoordinates) -> bool:
@@ -231,11 +227,7 @@ class UmlUtils:
 
     @classmethod
     def getID(cls) -> str:
-        if UmlUtils.ID_GENERATOR is None:
-            UmlUtils.ID_GENERATOR = HRID(delimiter='.', seed=round(pyTime() * 1000))
-        uuid = UmlUtils.ID_GENERATOR.generate()
-
-        return uuid
+        return generate_id(separator='.')
 
     @staticmethod
     def snapCoordinatesToGrid(x: int, y: int, gridInterval: int) -> Tuple[int, int]:

@@ -17,6 +17,7 @@ from pyutmodelv2.PyutActor import PyutActor
 from umlshapes.UmlUtils import UmlUtils
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 from umlshapes.shapes.ControlPointMixin import ControlPointMixin
+from umlshapes.shapes.IDMixin import IDMixin
 from umlshapes.shapes.TopLeftMixin import TopLeftMixin
 
 from umlshapes.types.UmlDimensions import UmlDimensions
@@ -40,7 +41,7 @@ class HeadComputations:
     adjustedY: int = 0
 
 
-class UmlActor(ControlPointMixin, RectangleShape, TopLeftMixin):
+class UmlActor(ControlPointMixin, RectangleShape, TopLeftMixin, IDMixin):
 
     def __init__(self, pyutActor: PyutActor = None, size: UmlDimensions = None):
         """
@@ -65,6 +66,7 @@ class UmlActor(ControlPointMixin, RectangleShape, TopLeftMixin):
         super().__init__(shape=self)
         RectangleShape.__init__(self, w=actorSize.width, h=actorSize.height)
         TopLeftMixin.__init__(self, umlShape=self, width=actorSize.width, height=actorSize.height)
+        IDMixin.__init__(self, umlShape=self)
 
         self.SetFixedSize(actorSize.width, actorSize.height)
         self.SetDraggable(drag=True)
@@ -78,14 +80,6 @@ class UmlActor(ControlPointMixin, RectangleShape, TopLeftMixin):
     @pyutActor.setter
     def pyutActor(self, value: PyutActor):
         self._pyutActor = value
-
-    # def GetBoundingBoxMin(self):
-    #     """
-    #     Get the minimum bounding box for the shape, that defines the area
-    #     available for drawing the contents (such as text).
-    #
-    #     """
-    #     return self.size.width, self.size.height
 
     # This is dangerous, accessing internal stuff
     # noinspection PyProtectedMember
@@ -281,3 +275,11 @@ class UmlActor(ControlPointMixin, RectangleShape, TopLeftMixin):
             dc.SetTextForeground(RED)
 
         dc.DrawText(self.pyutActor.name, round(x - 0.5 * textWidth), y)
+
+    def __str__(self) -> str:
+        return self.pyutActor.name
+
+    def __repr__(self):
+
+        strMe: str = f"[UmlActor - umlId: `{self.id} `modelId: '{self.pyutActor.id}']"
+        return strMe
