@@ -64,7 +64,7 @@ class UmlClassEventHandler(UmlBaseEventHandler):
         super().OnRightClick(x=x, y=y, keys=keys, attachment=attachment)
 
         umlClass: UmlClass = self.GetShape()
-        umlFrame:  UmlClassDiagramFrame  = umlClass.GetCanvas()
+        umlFrame: UmlClassDiagramFrame  = umlClass.GetCanvas()
 
         if self._menuHandler is None:
             self._menuHandler = UmlClassMenuHandler(umlClass=umlClass, eventEngine=umlFrame.eventEngine)

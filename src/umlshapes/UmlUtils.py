@@ -40,12 +40,13 @@ from umlshapes.resources.images.UnSpecified import embeddedImage as unSpecifiedI
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 from umlshapes.mixins.TopLeftMixin import Rectangle
+
 from umlshapes.types.Common import AttachmentSide
 from umlshapes.types.Common import LollipopCoordinates
-
 from umlshapes.types.UmlColor import UmlColor
 from umlshapes.types.UmlFontFamily import UmlFontFamily
 from umlshapes.types.UmlPosition import UmlPosition
+from umlshapes.types.UmlPosition import UmlPositions
 
 
 class UmlUtils:
@@ -60,6 +61,39 @@ class UmlUtils:
     DEFAULT_FONT:     Font = cast(Font, None)
 
     DEFAULT_BACKGROUND_BRUSH: Brush = cast(Brush, None)
+
+    @classmethod
+    def distance(cls, pt1: UmlPosition, pt2: UmlPosition) -> float:
+        """
+
+        Args:
+            pt1:
+            pt2:
+
+        Returns:    This distance between the 2 points
+        """
+        x1: int = pt1.x
+        y1: int = pt1.y
+        x2: int = pt2.x
+        y2: int = pt2.y
+
+        distance = ((x1 - x2) ** 2 + (y1 - y2) ** 2) ** 0.5
+
+        return distance
+
+    @classmethod
+    def closestPoint(cls, referencePosition: UmlPosition, umlPositions: UmlPositions) -> UmlPosition:
+
+        closest:      UmlPosition = UmlPosition()
+        lastDistance: float       = 10000000.0          # some large number to start
+        for position in umlPositions:
+            dist: float = UmlUtils.distance(pt1=referencePosition, pt2=position)
+            if dist < lastDistance:
+                closest      = position
+                lastDistance = dist
+                UmlUtils.clsLogger.debug(f'{dist}')
+
+        return closest
 
     @classmethod
     def lollipopHitTest(cls, x: int, y: int, attachmentSide: AttachmentSide, lollipopCoordinates: LollipopCoordinates) -> bool:

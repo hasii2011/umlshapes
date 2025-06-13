@@ -56,6 +56,9 @@ class UmlFrame(DiagramFrame):
         self.setInfinite(True)
         self._currentReportInterval: int = self._preferences.trackMouseInterval
 
+    def applicationAdapter(self) -> IApplicationAdapter:
+        return self._applicationAdapter
+
     @property
     def eventEngine(self) -> UmlEventEngine:
         return self._eventEngine

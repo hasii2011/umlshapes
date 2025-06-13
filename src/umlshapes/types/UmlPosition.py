@@ -27,4 +27,4 @@ class UmlPosition:
         return UmlPosition(x=position[0], y=position[1])
 
 
-OglPositions = NewType('OglPositions', List[UmlPosition])
+UmlPositions = NewType('UmlPositions', List[UmlPosition])

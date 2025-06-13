@@ -19,3 +19,12 @@ class IApplicationAdapter(ABC):
             message:   The message a frame wants displayed on the application status bar
         """
         pass
+
+    @abstractmethod
+    def indicateDiagramModified(self):
+        """
+        The application does what it needs to do that indicate that the diagram
+        has been modified
+
+        """
+        pass

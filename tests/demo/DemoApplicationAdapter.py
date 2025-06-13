@@ -21,3 +21,7 @@ class DemoApplicationAdapter(IApplicationAdapter):
 
     def updateApplicationStatus(self, message: str):
         self._frame.SetStatusText(text=message)
+
+    def indicateDiagramModified(self):
+
+        self.logger.info('Diagram modified')

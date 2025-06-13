@@ -1,4 +1,4 @@
-
+from typing import List
 from typing import cast
 
 from logging import Logger
@@ -50,6 +50,10 @@ class UmlLink(LineShape):
 
         self.SetFormatMode(mode=FORMAT_SIZE_TO_CONTENTS)
         self.SetDraggable(True, recursive=True)
+
+    @property
+    def controlPoints(self) -> List[UmlLineControlPoint]:
+        return self._controlPoints
 
     @property
     def pyutLink(self) -> PyutLink:

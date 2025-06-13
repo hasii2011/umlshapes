@@ -10,6 +10,7 @@ from umlshapes.mixins.TopLeftMixin import Rectangle
 
 from umlshapes.types.Common import AttachmentSide
 from umlshapes.types.UmlPosition import UmlPosition
+from umlshapes.types.UmlPosition import UmlPositions
 
 RECTANGLE_LEFT:   int = 500
 RECTANGLE_TOP:    int = 1000
@@ -45,6 +46,60 @@ class TestUmlUtils(UnitTestBase):
 
     def tearDown(self):
         super().tearDown()
+
+    def testBasicDistance(self):
+        pt1: UmlPosition = UmlPosition(x=2, y=3)
+        pt2: UmlPosition = UmlPosition(x=5, y=7)
+
+        expectedDistance: float = 5.0
+        actualDistance:   float = UmlUtils.distance(pt1=pt1, pt2=pt2)
+
+        self.assertAlmostEqual(expectedDistance, actualDistance, places=3, msg='Not close enough')
+
+    def testBackwardsDistance(self):
+
+        pt1: UmlPosition = UmlPosition(x=200, y=200)
+        pt2: UmlPosition = UmlPosition(x=100, y=100)
+
+        expectedDistance: float = 141.42
+        actualDistance:   float = UmlUtils.distance(pt1=pt1, pt2=pt2)
+
+        self.assertAlmostEqual(expectedDistance, actualDistance, places=2, msg='Not close enough')
+
+    def testBasicClosest(self):
+        umlPositions: UmlPositions = UmlPositions(
+            [
+                UmlPosition(100, 100), UmlPosition(100, 250), UmlPosition(100, 500), UmlPosition(100, 750), UmlPosition(100, 900),
+            ]
+        )
+        expectedClosest: UmlPosition = UmlPosition(100, 250)
+        actualClosest:   UmlPosition = UmlUtils.closestPoint(referencePosition=UmlPosition(600, 250), umlPositions=umlPositions)
+
+        self.assertEqual(expectedClosest, actualClosest, 'Basic computation failed')
+
+    def testClosestToGnarlyLine(self):
+        umlPositions: UmlPositions = UmlPositions(
+            [
+                UmlPosition(147, 167), UmlPosition(232, 535), UmlPosition(410, 350), UmlPosition(833, 431)
+            ]
+        )
+
+        expectedClosest: UmlPosition = UmlPosition(410, 350)
+        actualClosest:   UmlPosition = UmlUtils.closestPoint(referencePosition=UmlPosition(360, 410), umlPositions=umlPositions)
+
+        self.assertEqual(expectedClosest, actualClosest, 'Basic computation failed')
+
+    def testNumPyClosest(self):
+        umlPositions: UmlPositions = UmlPositions(
+            [
+                UmlPosition(26, 63), UmlPosition(25, 63), UmlPosition(24, 63),
+                UmlPosition(23, 63), UmlPosition(22, 63), UmlPosition(21, 63),
+                UmlPosition(20, 63), UmlPosition(22, 62), UmlPosition(27, 63)
+             ]
+        )
+        expectedClosest: UmlPosition = UmlPosition(20, 63)
+        actualClosest:   UmlPosition = UmlUtils.closestPoint(referencePosition=UmlPosition(0, 238), umlPositions=umlPositions)
+        self.assertEqual(expectedClosest, actualClosest, 'Numpy computation failed')
 
     def testLineCentumTopFixToMin(self):
         umlPosition: UmlPosition = UmlPosition(x=RECTANGLE_LEFT + 20, y=RECTANGLE_TOP)
@@ -160,7 +215,7 @@ class TestUmlUtils(UnitTestBase):
         expectedPoint: UmlPosition = UmlPosition(600, 1000)
         actualPoint:   UmlPosition = UmlUtils.getNearestPointOnRectangle(x=x, y=y, rectangle=self._rectangle)
 
-        self.logger.info(f'{actualPoint=}')
+        self.logger.debug(f'{actualPoint=}')
 
         self.assertEqual(expectedPoint, actualPoint, 'Calculation for top outside is wrong')
 

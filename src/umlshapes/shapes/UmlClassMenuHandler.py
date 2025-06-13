@@ -88,7 +88,6 @@ class UmlClassMenuHandler:
 
         self.logger.debug(f'UmlClassMenuHandler - x,y: {x},{y}')
 
-        # frame = self._umlClass.diagram.panel
         frame: UmlFrame = self._umlClass.umlFrame
         frame.PopupMenu(self._contextMenu, x, y)
 

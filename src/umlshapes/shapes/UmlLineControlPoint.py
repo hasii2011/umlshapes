@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 from logging import Logger
 from logging import getLogger
 
+from wx import Point
 from wx import WHITE_BRUSH
 
 from wx.lib.ogl import LineControlPoint
@@ -34,3 +35,13 @@ class UmlLineControlPoint(LineControlPoint):
         # Override parent class
         self.SetPen(UmlUtils.redSolidPen())
         self.SetBrush(WHITE_BRUSH)
+
+    @property
+    def point(self) -> Point:
+        return self._point
+
+    def __repr__(self) -> str:
+        return f'UmlLineControlPoint {self.point}'
+
+    def __str__(self) -> str:
+        return self.__repr__()
