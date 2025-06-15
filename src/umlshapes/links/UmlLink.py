@@ -1,3 +1,4 @@
+
 from typing import List
 from typing import cast
 
@@ -24,11 +25,13 @@ from umlshapes.UmlUtils import UmlUtils
 from umlshapes.frames.UmlFrame import UmlFrame
 
 from umlshapes.links.LabelType import LabelType
-from umlshapes.links.eventhandlers.UmlAssociationLabelEventHandler import UmlAssociationLabelEventHandler
 from umlshapes.links.UmlAssociationLabel import UmlAssociationLabel
 
+from umlshapes.links.eventhandlers.UmlAssociationLabelEventHandler import UmlAssociationLabelEventHandler
+
 from umlshapes.shapes.UmlLineControlPoint import UmlLineControlPoint
-from umlshapes.shapes.eventhandlers.UmlControlPointEventHandler import UmlControlPointEventHandler
+
+from umlshapes.shapes.eventhandlers.UmlLineControlPointEventHandler import UmlLineControlPointEventHandler
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
@@ -188,7 +191,7 @@ class UmlLink(LineShape):
 
         """
 
-        eventHandler: UmlControlPointEventHandler = UmlControlPointEventHandler()
+        eventHandler: UmlLineControlPointEventHandler = UmlLineControlPointEventHandler()
         eventHandler.SetShape(umlLineControlPoint)
         eventHandler.SetPreviousHandler(umlLineControlPoint.GetEventHandler())
 

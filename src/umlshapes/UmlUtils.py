@@ -63,6 +63,39 @@ class UmlUtils:
     DEFAULT_BACKGROUND_BRUSH: Brush = cast(Brush, None)
 
     @classmethod
+    def stickToShapeBorder(cls, ox: int, oy: int, width: int, height: int, x: int, y: int) -> UmlPosition:
+        """
+
+        Args:
+            ox:
+            oy:
+            width:
+            height:
+            x:
+            y:
+
+        Returns:  (x, y) on the square (ox, oy, ox+width, oy+height) by
+        placing (x,y) on the nearest border.
+        """
+        left:  int = x - ox
+        right: int = ox + width - x
+        up:    int = y - oy
+        down:  int = oy + height - y
+
+        choice = {
+            left:  lambda xLeft, yLeft: (ox, y),
+            right: lambda xRight, yRight: (ox + width, y),
+            up:    lambda xUp, yUp: (x, oy),
+            down:   lambda xDown, yDown: (x, oy + height),
+        }
+        lesser = min(left, right, up, down)
+
+        UmlUtils.clsLogger.info(f'lesser: {lesser}')
+
+        borderX, borderY = choice[lesser](x, y)
+        return UmlPosition(x=borderX, y=borderY)
+
+    @classmethod
     def distance(cls, pt1: UmlPosition, pt2: UmlPosition) -> float:
         """
 
@@ -126,6 +159,7 @@ class UmlUtils:
 
         return ans
 
+    # noinspection PyTypeChecker
     @classmethod
     def attachmentSide(cls, x, y, rectangle: Rectangle) -> AttachmentSide:
 
@@ -205,25 +239,6 @@ class UmlUtils:
         relativeCoordinates: UmlPosition = UmlPosition(x=relativeX, y=relativeY)
         return relativeCoordinates
 
-    """
-    public static Point GetNearestPointInPerimeter(Point point, Rectangle rectangle)
-    {
-        point.X = Math.Max(rectangle.Left, Math.Min(rectangle.Right, point.X));
-        point.Y = Math.Max(rectangle.Top, Math.Min(rectangle.Bottom, point.Y));
-
-        var dl = Math.Abs(point.X - rectangle.Left);
-        var dr = Math.Abs(point.X - rectangle.Right);
-        var dt = Math.Abs(point.Y - rectangle.Top);
-        var db = Math.Abs(point.Y - rectangle.Bottom);
-
-        var m = new[] { dl, dr, dt, db }.Min();
-
-        if (m == dt) return new Point(point.X, rectangle.Top);
-        if (m == db) return new Point(point.X, rectangle.Bottom);
-        if (m == dl) return new Point(rectangle.Left, point.Y);
-        return new Point(rectangle.Right, point.Y);
-    }
-    """
     @classmethod
     def getNearestPointOnRectangle(cls, x, y, rectangle: Rectangle) -> UmlPosition:
         """

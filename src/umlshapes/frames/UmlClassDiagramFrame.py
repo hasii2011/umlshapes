@@ -121,3 +121,9 @@ class UmlClassDiagramFrame(UmlFrame):
             answer = False
 
         return answer
+
+    def __repr__(self) -> str:
+        return f'UmlClassDiagramFrame - `{self.id}`'
+
+    def __str__(self) -> str:
+        return self.__repr__()

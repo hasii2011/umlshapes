@@ -17,6 +17,9 @@ RECTANGLE_TOP:    int = 1000
 RECTANGLE_RIGHT:  int = 700
 RECTANGLE_BOTTOM: int = 1200
 
+RECTANGLE_WIDTH:  int = RECTANGLE_RIGHT - RECTANGLE_LEFT
+RECTANGLE_HEIGHT: int = RECTANGLE_BOTTOM - RECTANGLE_TOP
+
 TOP_RELATIVE_POSITION_X: int = 100
 TOP_RELATIVE_POSITION_Y: int = 0
 
@@ -46,6 +49,121 @@ class TestUmlUtils(UnitTestBase):
 
     def tearDown(self):
         super().tearDown()
+
+    def testStickToBorderLeft(self):
+        """
+
+                500, 1000                   width: 200
+                -------------------------------------------------
+          x,y   |                                               |
+                |                                               |   height: 200
+                |                                               |
+                |                                               |
+                ------------------------------------------------- 700,1200
+
+        """
+
+        leftX: int = RECTANGLE_LEFT - 3
+        leftY: int = RECTANGLE_TOP + 5
+        borderPosition: UmlPosition = UmlUtils.stickToShapeBorder(
+            ox=self._rectangle.top,
+            oy=self._rectangle.left,
+            width=RECTANGLE_WIDTH,
+            height=RECTANGLE_HEIGHT,
+            x=leftX,
+            y=leftY
+        )
+
+        expectedPosition: UmlPosition = UmlPosition(x=1000, y=1005)
+
+        self.assertEqual(expectedPosition, borderPosition, 'XY not on left border')
+
+    def testStickToBorderRight(self):
+        """
+
+                500, 1000                   width: 200
+                -------------------------------------------------
+                |                                               |       height: 200
+                |                                               |
+                |                                               |   x, y
+                |                                               |
+                ------------------------------------------------- 700,1200
+
+        """
+        x: int = RECTANGLE_RIGHT + 50
+        y: int = RECTANGLE_BOTTOM - 50
+
+        borderPosition: UmlPosition = UmlUtils.stickToShapeBorder(
+            ox=self._rectangle.top,
+            oy=self._rectangle.left,
+            width=RECTANGLE_WIDTH,
+            height=RECTANGLE_HEIGHT,
+            x=x,
+            y=y
+        )
+
+        expectedPosition: UmlPosition = UmlPosition(x=750, y=700)
+
+        self.assertEqual(expectedPosition, borderPosition, 'XY not on right border')
+
+    def testStickToBorderBottom(self):
+        """
+
+                500, 1000                   width: 200
+                -------------------------------------------------
+                |                                               |       height: 200
+                |                                               |
+                |                                               |
+                |                                               |
+                ------------------------------------------------- 700,1200
+                                        x, y
+
+
+        """
+
+        x: int = RECTANGLE_RIGHT + 50
+        y: int = RECTANGLE_BOTTOM + 3
+
+        borderPosition: UmlPosition = UmlUtils.stickToShapeBorder(
+            ox=self._rectangle.top,
+            oy=self._rectangle.left,
+            width=RECTANGLE_WIDTH,
+            height=RECTANGLE_HEIGHT,
+            x=x,
+            y=y
+        )
+
+        expectedPosition: UmlPosition = UmlPosition(x=750, y=700)
+
+        self.assertEqual(expectedPosition, borderPosition, 'XY not on bottom border')
+
+    def testStickToBorderTop(self):
+        """
+
+                500, 1000             x, y             width: 200
+                -------------------------------------------------
+                |                                               |       height: 200
+                |                                               |
+                |                                               |
+                |                                               |
+                ------------------------------------------------- 700,1200
+
+        """
+        x: int = RECTANGLE_RIGHT + 75
+        y: int = RECTANGLE_TOP - 50
+
+        borderPosition: UmlPosition = UmlUtils.stickToShapeBorder(
+            ox=self._rectangle.top,
+            oy=self._rectangle.left,
+            width=RECTANGLE_WIDTH,
+            height=RECTANGLE_HEIGHT,
+            x=x,
+            y=y
+        )
+
+        expectedPosition: UmlPosition = UmlPosition(x=775, y=700)
+
+        self.assertEqual(expectedPosition, borderPosition, 'XY not on top border')
 
     def testBasicDistance(self):
         pt1: UmlPosition = UmlPosition(x=2, y=3)

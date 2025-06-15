@@ -15,6 +15,8 @@ from wx.lib.ogl import ShapeCanvas
 
 from umlshapes.IApplicationAdapter import IApplicationAdapter
 
+from umlshapes.UmlUtils import UmlUtils
+
 from umlshapes.eventengine.UmlEventEngine import UmlEventEngine
 
 from umlshapes.frames.DiagramFrame import DiagramFrame
@@ -34,6 +36,7 @@ PIXELS_PER_UNIT_Y: int = 20
 
 
 class UmlFrame(DiagramFrame):
+
     def __init__(self, parent: Window, applicationAdapter: IApplicationAdapter):
 
         self._applicationAdapter: IApplicationAdapter = applicationAdapter
@@ -56,6 +59,8 @@ class UmlFrame(DiagramFrame):
         self.setInfinite(True)
         self._currentReportInterval: int = self._preferences.trackMouseInterval
 
+        self._id: str = UmlUtils.getID()
+
     def applicationAdapter(self) -> IApplicationAdapter:
         return self._applicationAdapter
 
@@ -68,6 +73,15 @@ class UmlFrame(DiagramFrame):
 
         diagram: UmlDiagram = self.GetDiagram()
         return diagram.GetShapeList()
+
+    @property
+    def id(self) -> str:
+        """
+        UmlFrame ID
+
+        Returns:  The UML generated ID
+        """
+        return self._id
 
     def OnLeftClick(self, x, y, keys=0):
         """
