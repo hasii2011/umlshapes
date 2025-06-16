@@ -2,6 +2,8 @@
 from logging import Logger
 from logging import getLogger
 
+from os import linesep as osLineSep
+
 from wx import MemoryDC
 
 from wx.lib.ogl import ARROW_ARROW
@@ -12,6 +14,7 @@ from wx.lib.ogl import LineShape
 from umlshapes.UmlUtils import UmlUtils
 from umlshapes.links.UmlLink import UmlLink
 from umlshapes.shapes.UmlClass import UmlClass
+from umlshapes.types.Common import TAB
 
 
 class UmlInterface(UmlLink):
@@ -50,5 +53,19 @@ class UmlInterface(UmlLink):
         #       I want to skip the UmlLink OnDraw so this line will be drawn
         LineShape.OnDraw(self=self, dc=dc)
 
+    def __str__(self) -> str:
+        return self.__repr__()
+
     def __repr__(self):
-        return f'UmlInterface - {super().__repr__()}'
+        interfaceClass:    UmlClass = self._interfaceClass
+        implementingClass: UmlClass = self._implementingClass
+
+        readable: str = (
+            f'UmlInterface'
+            f'{osLineSep}'
+            f'{TAB}{implementingClass}{osLineSep}'
+            f'{TAB}implements {osLineSep}'
+            f'{TAB}{interfaceClass}'
+        )
+
+        return readable

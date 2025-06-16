@@ -1,9 +1,9 @@
 
 from typing import TYPE_CHECKING
+from typing import cast
 
 from logging import Logger
 from logging import getLogger
-
 
 from enum import Enum
 
@@ -12,12 +12,14 @@ from wx import WHITE_BRUSH
 
 from wx.lib.ogl import CONTROL_POINT_ENDPOINT_FROM
 from wx.lib.ogl import CONTROL_POINT_ENDPOINT_TO
+from wx.lib.ogl import CONTROL_POINT_LINE
 
 from wx.lib.ogl import LineControlPoint
 
 from umlshapes.UmlUtils import UmlUtils
 
 from umlshapes.frames.UmlFrame import UmlFrame
+from umlshapes.mixins.TopLeftMixin import TopLeftMixin
 
 if TYPE_CHECKING:
     from umlshapes.links.UmlLink import UmlLink
@@ -29,19 +31,46 @@ class UmlLineControlPointType(Enum):
     TO_ENDPOINT   = 'EndPoint To'
     LINE_POINT    = 'Line Point'
 
+    # noinspection PyTypeChecker
+    @classmethod
+    def toWxType(cls, umlLineControlPointType: 'UmlLineControlPointType') -> int:
+
+        if umlLineControlPointType == UmlLineControlPointType.FROM_ENDPOINT:
+            return CONTROL_POINT_ENDPOINT_FROM
+        elif umlLineControlPointType == UmlLineControlPointType.TO_ENDPOINT:
+            return CONTROL_POINT_ENDPOINT_TO
+        elif umlLineControlPointType == UmlLineControlPointType.LINE_POINT:
+            return CONTROL_POINT_LINE
+        else:
+            assert False, 'Unknown line control type'
+
 
 class UmlLineControlPoint(LineControlPoint):
 
-    def __init__(self, umlFrame: UmlFrame, umlLink: 'UmlLink', size: int, x: int = 0, y: int = 0, controlPointType: int = 0):
+    def __init__(self, umlFrame: UmlFrame, umlLink: 'UmlLink', controlPointType: UmlLineControlPointType, size: int, x: int = 0, y: int = 0):
+        """
+
+        Args:
+            umlFrame:           Which frame it is on
+            umlLink:            The associated link
+            controlPointType:   The type of line control point
+            size:               Size; The control is square
+            x:                  x position
+            y:                  y position
+        """
 
         self.logger: Logger = getLogger(__name__)
+
+        self._lineControlPointType: UmlLineControlPointType = controlPointType
+        self._attachedTo:           TopLeftMixin            = cast(TopLeftMixin, None)
+
         super().__init__(
             theCanvas=umlFrame,
             object=umlLink,
             size=size,
             x=x,
             y=y,
-            the_type=controlPointType
+            the_type=UmlLineControlPointType.toWxType(controlPointType)
         )
 
         self.SetDraggable(drag=True)
@@ -65,12 +94,11 @@ class UmlLineControlPoint(LineControlPoint):
         Returns:  An enumerated value
 
         """
-        if self._type == CONTROL_POINT_ENDPOINT_TO:
-            return UmlLineControlPointType.FROM_ENDPOINT
-        elif self._type == CONTROL_POINT_ENDPOINT_FROM:
-            return UmlLineControlPointType.TO_ENDPOINT
-        else:
-            return UmlLineControlPointType.LINE_POINT
+        return self._lineControlPointType
+
+    @property
+    def attachedTo(self) -> 'UmlLink':
+        return self._shape
 
     def __repr__(self) -> str:
         return f'UmlLineControlPoint type=`{self.umlLineControlPointType.value}` {self.point}'

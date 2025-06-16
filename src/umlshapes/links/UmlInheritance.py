@@ -2,12 +2,15 @@
 from logging import Logger
 from logging import getLogger
 
+from os import linesep as osLineSep
+
 from wx.lib.ogl import ARROW_ARROW
 
 from pyutmodelv2.PyutLink import PyutLink
 
 from umlshapes.links.UmlLink import UmlLink
 from umlshapes.shapes.UmlClass import UmlClass
+from umlshapes.types.Common import TAB
 
 
 class UmlInheritance(UmlLink):
@@ -56,7 +59,13 @@ class UmlInheritance(UmlLink):
     def __repr__(self):
         baseClass:   UmlClass = self.baseClass
         subClass:    UmlClass = self.subClass
-        baseClassId: int      = baseClass.id
-        subClassId:  int      = subClass.id
 
-        return f'UmlInheritance[id: {subClassId} {subClass} inherits from: id: {baseClassId} {baseClass}]'
+        readable: str = (
+            f'UmlInheritance'
+            f'{osLineSep}'
+            f'{TAB}{subClass}{osLineSep}'
+            f'{TAB}inherits from{osLineSep}'
+            f'{TAB}{baseClass}'
+        )
+
+        return readable

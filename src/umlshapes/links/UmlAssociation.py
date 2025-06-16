@@ -236,3 +236,9 @@ class UmlAssociation(UmlLink):
         dpy3: float = y2 + 2 * UmlAssociation.clsDiamondSize * sin(alpha)
 
         return DiamondPoint((round(dpx3), round(dpy3)))
+
+    def __repr__(self) -> str:
+        return f'UmlAssociation {self.associationName} {super().__repr__()}'
+
+    def __str__(self) -> str:
+        return f'UmlAssociation {self.associationName} {super().__str__()}'

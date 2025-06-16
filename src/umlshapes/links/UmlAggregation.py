@@ -7,6 +7,7 @@ from pyutmodelv2.PyutLink import PyutLink
 from wx import MemoryDC
 from wx import BLACK_BRUSH
 
+from umlshapes.links.UmlLink import UmlLink
 from umlshapes.links.UmlAssociation import UmlAssociation
 
 
@@ -23,3 +24,9 @@ class UmlAggregation(UmlAssociation):
         self.SetBrush(BLACK_BRUSH)
 
         self._drawDiamond(dc=dc, filled=False)
+
+    def __repr__(self) -> str:
+        return f'UmlAggregation {self.associationName} {UmlLink.__repr__(self)}'
+
+    def __str__(self) -> str:
+        return f'UmlAggregation {self.associationName} {UmlLink.__str__(self)}'

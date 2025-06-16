@@ -79,15 +79,6 @@ class DiagramFrame(ShapeCanvas):
     def umlDiagram(self, newDiagram: 'UmlDiagram'):
         self.SetDiagram(newDiagram)
 
-    def _setAppropriateSetBackground(self):
-
-        if self._darkMode is True:
-            color: Colour = UmlColor.toWxColor(self._umlPreferences.darkModeBackGroundColor)
-            self.SetBackgroundColour(color)
-        else:
-            color = UmlColor.toWxColor(self._umlPreferences.backGroundColor)
-            self.SetBackgroundColour(color)
-
     def refresh(self, eraseBackground: bool = True):
 
         w, h = self.GetSize()
@@ -230,3 +221,13 @@ class DiagramFrame(ShapeCanvas):
         self.PrepareDC(dc)
 
         return dc
+
+    def _setAppropriateSetBackground(self):
+
+        if self._darkMode is True:
+            color: Colour = UmlColor.toWxColor(self._umlPreferences.darkModeBackGroundColor)
+            self.SetBackgroundColour(color)
+        else:
+            color = UmlColor.toWxColor(self._umlPreferences.backGroundColor)
+            self.SetBackgroundColour(color)
+

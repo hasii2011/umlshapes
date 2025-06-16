@@ -2,10 +2,12 @@
 from logging import Logger
 from logging import getLogger
 
-from pyutmodelv2.PyutLink import PyutLink
 from wx import MemoryDC
 from wx import BLACK_BRUSH
 
+from pyutmodelv2.PyutLink import PyutLink
+
+from umlshapes.links.UmlLink import UmlLink
 from umlshapes.links.UmlAssociation import UmlAssociation
 
 
@@ -22,3 +24,9 @@ class UmlComposition(UmlAssociation):
         self.SetBrush(BLACK_BRUSH)
 
         self._drawDiamond(dc=dc, filled=True)
+
+    def __repr__(self) -> str:
+        return f'UmlComposition {self.associationName} {UmlLink.__repr__(self)}'
+
+    def __str__(self) -> str:
+        return f'UmlComposition {self.associationName} {UmlLink.__str__(self)}'
