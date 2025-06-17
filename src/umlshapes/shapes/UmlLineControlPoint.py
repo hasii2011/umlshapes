@@ -20,6 +20,7 @@ from umlshapes.UmlUtils import UmlUtils
 
 from umlshapes.frames.UmlFrame import UmlFrame
 from umlshapes.mixins.TopLeftMixin import TopLeftMixin
+from umlshapes.types.UmlPosition import UmlPosition
 
 if TYPE_CHECKING:
     from umlshapes.links.UmlLink import UmlLink
@@ -99,6 +100,15 @@ class UmlLineControlPoint(LineControlPoint):
     @property
     def attachedTo(self) -> 'UmlLink':
         return self._shape
+
+    @property
+    def position(self) -> UmlPosition:
+        return UmlPosition(x=self.GetX(), y=self.GetY())
+
+    @position.setter
+    def position(self, position: UmlPosition):
+        self.SetX(position.x)
+        self.SetY(position.y)
 
     def __repr__(self) -> str:
         return f'UmlLineControlPoint type=`{self.umlLineControlPointType.value}` {self.point}'

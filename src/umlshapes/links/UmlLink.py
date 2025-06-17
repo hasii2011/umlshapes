@@ -1,5 +1,6 @@
 
 from typing import List
+from typing import Tuple
 from typing import cast
 
 from logging import Logger
@@ -33,6 +34,7 @@ from umlshapes.shapes.eventhandlers.UmlLineControlPointEventHandler import UmlLi
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
+from umlshapes.types.Common import EndPoints
 from umlshapes.types.Common import NAME_IDX
 from umlshapes.types.Common import TAB
 from umlshapes.types.UmlPosition import UmlPosition
@@ -79,6 +81,29 @@ class UmlLink(LineShape):
     @selected.setter
     def selected(self, select: bool):
         self.Select(select=select)
+
+    @property
+    def endPoints(self) -> EndPoints:
+        """
+        Syntactic sugar around the .GetEnds() and .SetEnd() methods
+        Returns:
+        """
+
+        #    fromX, fromY, toX, toY
+        ends: Tuple[int, int, int, int] = self.GetEnds()
+
+        return EndPoints(
+            fromPosition=UmlPosition(x=ends[0], y=ends[1]),
+            toPosition=UmlPosition(x=ends[2], y=ends[3])
+        )
+
+    @endPoints.setter
+    def endPoints(self, endPoints: EndPoints):
+
+        fromPosition: UmlPosition = endPoints.fromPosition
+        toPosition:   UmlPosition = endPoints.toPosition
+
+        self.SetEnds(x1=fromPosition.x, y1=fromPosition.y, x2=toPosition.x, y2=toPosition.y)
 
     def toggleSpline(self):
 

@@ -2,15 +2,22 @@
 from logging import Logger
 from logging import getLogger
 
+from wx import CURSOR_DEFAULT
+
+from wx import Cursor
+
 from wx.lib.ogl import ShapeEvtHandler
 
 from umlshapes.UmlUtils import UmlUtils
-from umlshapes.frames.DiagramFrame import DiagramFrame
-from umlshapes.shapes.UmlLineControlPoint import UmlLineControlPoint
 
+from umlshapes.frames.DiagramFrame import DiagramFrame
+
+from umlshapes.shapes.UmlLineControlPoint import UmlLineControlPoint
 from umlshapes.shapes.UmlLineControlPoint import UmlLineControlPointType
 
+from umlshapes.types.Common import EndPoints
 from umlshapes.types.Common import Rectangle
+
 from umlshapes.types.UmlPosition import UmlPosition
 
 
@@ -28,6 +35,8 @@ class UmlLineControlPointEventHandler(ShapeEvtHandler):
         The drag left handler.  This appears to be the only event handler
         invoked regardless of which direction you are dragging
 
+        We are using this handler to move the line end points
+
         Args:
             draw:
             x:
@@ -35,36 +44,96 @@ class UmlLineControlPointEventHandler(ShapeEvtHandler):
             keys:
             attachment:
         """
-        from umlshapes.links.UmlLink import UmlLink
-        from umlshapes.shapes.UmlClass import UmlClass
 
         umlLineControlPoint:     UmlLineControlPoint     = self.GetShape()
         umlLineControlPointType: UmlLineControlPointType = umlLineControlPoint.umlLineControlPointType
 
-        if umlLineControlPointType == UmlLineControlPointType.FROM_ENDPOINT:
+        if self._isThisAnEndLineControlPoint(umlLineControlPointType=umlLineControlPointType) is True:
+            from umlshapes.links.UmlLink import UmlLink
+
+            # Override OGL
+            defaultCursor: Cursor = Cursor(CURSOR_DEFAULT)
+            umlLineControlPoint.GetCanvas().SetCursor(defaultCursor)
+
+            umlLink: UmlLink = umlLineControlPoint.attachedTo
             self.logger.debug(f'{umlLineControlPoint=} x,y: ({x},{y})')
 
-            umlLink:    UmlLink   = umlLineControlPoint.attachedTo
-            umlClass:   UmlClass  = umlLink.GetFrom()
-            rectangle:  Rectangle = umlClass.rectangle
+            if umlLineControlPointType == UmlLineControlPointType.FROM_ENDPOINT:
+                self._moveTheFromPoint(umlLineControlPoint, umlLink, x, y)
+            elif umlLineControlPointType == UmlLineControlPointType.TO_ENDPOINT:
+                self._moveTheToPoint(umlLineControlPoint, umlLink, x, y)
 
-            self.logger.debug(f'{umlLink=} {umlClass=}')
-
-            borderPosition: UmlPosition = UmlUtils.getNearestPointOnRectangle(x=x, y=y, rectangle=rectangle)
-
-            ends = umlLink.GetEnds()
-            toX = ends[2]
-            toY = ends[3]
-
-            self.logger.info(f'{borderPosition=}')
-            umlLink.SetEnds(x1=borderPosition.x, y1=borderPosition.y, x2=toX, y2=toY)
-            umlLineControlPoint.SetX(borderPosition.x)
-            umlLineControlPoint.SetY(borderPosition.y)
-
-        elif umlLineControlPointType == UmlLineControlPointType.TO_ENDPOINT:
-            pass
         else:
             super().OnDragLeft(draw, x, y, keys, attachment)
 
         canvas: DiagramFrame = umlLineControlPoint.GetCanvas()
         canvas.refresh()
+
+    def _moveTheToPoint(self, umlLineControlPoint, umlLink, x, y):
+        """
+
+        Args:
+            umlLineControlPoint:
+            umlLink:
+            x:
+            y:
+
+        """
+        from umlshapes.shapes.UmlClass import UmlClass
+
+        umlClass:       UmlClass    = umlLink.GetTo()
+        rectangle:      Rectangle   = umlClass.rectangle
+        borderPosition: UmlPosition = UmlUtils.getNearestPointOnRectangle(x=x, y=y, rectangle=rectangle)
+
+        self.logger.debug(f'{umlLink=} {umlClass=} {borderPosition=}')
+
+        endPoints: EndPoints = umlLink.endPoints
+        newTo:     EndPoints = EndPoints(
+            fromPosition=endPoints.fromPosition,
+            toPosition=borderPosition
+        )
+        umlLink.endPoints            = newTo
+        umlLineControlPoint.position = borderPosition
+
+    def _moveTheFromPoint(self, umlLineControlPoint, umlLink, x, y):
+        """
+
+        Args:
+            umlLineControlPoint:
+            umlLink:
+            x:
+            y:
+        """
+        from umlshapes.shapes.UmlClass import UmlClass
+
+        umlClass:       UmlClass    = umlLink.GetFrom()
+        rectangle:      Rectangle   = umlClass.rectangle
+        borderPosition: UmlPosition = UmlUtils.getNearestPointOnRectangle(x=x, y=y, rectangle=rectangle)
+
+        self.logger.debug(f'{umlLink=} {umlClass=} {borderPosition=}')
+
+        endPoints: EndPoints = umlLink.endPoints
+        newFrom:   EndPoints = EndPoints(
+            fromPosition=borderPosition,
+            toPosition=endPoints.toPosition
+        )
+        #
+        # Move the line and the control point
+        #
+        umlLink.endPoints            = newFrom
+        umlLineControlPoint.position = borderPosition
+
+    def _isThisAnEndLineControlPoint(self, umlLineControlPointType: UmlLineControlPointType) -> bool:
+        """
+        Boolean syntactical sugar
+        Args:
+            umlLineControlPointType:
+
+        Returns:  'True' if it is, else 'False'
+        """
+
+        ans: bool = False
+        if umlLineControlPointType == UmlLineControlPointType.FROM_ENDPOINT or umlLineControlPointType == UmlLineControlPointType.TO_ENDPOINT:
+            ans = True
+
+        return ans

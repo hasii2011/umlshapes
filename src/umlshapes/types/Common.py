@@ -97,6 +97,12 @@ class Rectangle:
 
 
 @dataclass
+class EndPoints:
+    fromPosition: UmlPosition
+    toPosition:   UmlPosition
+
+
+@dataclass
 class LeftCoordinate:
     x: int = 0
     y: int = 0
