@@ -37,9 +37,9 @@ from pyutmodelv2.enumerations.PyutVisibility import PyutVisibility
 from umlshapes.dialogs.BaseEditDialog import BaseEditDialog
 from umlshapes.dialogs.BaseEditDialog import CustomDialogButton
 from umlshapes.dialogs.BaseEditDialog import CustomDialogButtons
-from umlshapes.dialogs.DlgEditCode import DlgEditCode
-from umlshapes.dialogs.DlgEditMethodModifiers import DlgEditMethodModifiers
-from umlshapes.dialogs.DlgEditParameter import DlgEditParameter
+from umlshapes.dialogs.umlclass.DlgEditCode import DlgEditCode
+from umlshapes.dialogs.umlclass.DlgEditMethodModifiers import DlgEditMethodModifiers
+from umlshapes.dialogs.umlclass.DlgEditParameter import DlgEditParameter
 from umlshapes.enhancedlistbox.AdvancedListCallbacks import AdvancedListCallbacks
 
 from umlshapes.enhancedlistbox.CallbackAnswer import CallbackAnswer

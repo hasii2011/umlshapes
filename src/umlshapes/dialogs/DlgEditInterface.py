@@ -30,7 +30,7 @@ from pyutmodelv2.PyutInterface import PyutInterface
 from pyutmodelv2.PyutInterface import PyutInterfaces
 from pyutmodelv2.PyutInterface import PyutInterfacesDict
 
-from umlshapes.dialogs.DlgEditClassCommon import DlgEditClassCommon
+from umlshapes.dialogs.umlclass.DlgEditClassCommon import DlgEditClassCommon
 
 from umlshapes.eventengine.IUmlEventEngine import IUmlEventEngine
 from umlshapes.links.UmlLollipopInterface import UmlLollipopInterface
@@ -133,7 +133,7 @@ class DlgEditInterface(DlgEditClassCommon):
     def _interfaceNameCharacterEntered(self, event: CommandEvent):
 
         updatedInterfaceName: str = event.GetString()
-        self.logger.info(f'_interfaceNameCharacterEntered: {updatedInterfaceName=}')
+        self.logger.debug(f'_interfaceNameCharacterEntered: {updatedInterfaceName=}')
         self._pyutModelCopy.name = updatedInterfaceName
         event.Skip()
 

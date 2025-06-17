@@ -28,7 +28,7 @@ from umlshapes.types.Common import UmlShapeList
 if TYPE_CHECKING:
     from umlshapes.shapes.UmlClass import UmlClass
 
-from umlshapes.dialogs.DlgEditClassCommon import DlgEditClassCommon
+from umlshapes.dialogs.umlclass.DlgEditClassCommon import DlgEditClassCommon
 from umlshapes.dialogs.DlgEditField import DlgEditField
 
 from umlshapes.enhancedlistbox.AdvancedListCallbacks import AdvancedListCallbacks

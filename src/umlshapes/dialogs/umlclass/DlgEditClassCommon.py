@@ -23,9 +23,9 @@ from pyutmodelv2.PyutMethod import PyutMethod
 
 from pyutmodelv2.enumerations.PyutStereotype import PyutStereotype
 
-from umlshapes.dialogs.DlgEditDescription import DlgEditDescription
-from umlshapes.dialogs.DlgEditMethod import DlgEditMethod
-from umlshapes.dialogs.DlgEditStereotype import DlgEditStereotype
+from umlshapes.dialogs.umlclass.DlgEditDescription import DlgEditDescription
+from umlshapes.dialogs.umlclass.DlgEditMethod import DlgEditMethod
+from umlshapes.dialogs.umlclass.DlgEditStereotype import DlgEditStereotype
 
 from umlshapes.eventengine.IUmlEventEngine import IUmlEventEngine
 
