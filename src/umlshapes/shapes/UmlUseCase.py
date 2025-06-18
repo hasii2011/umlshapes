@@ -62,6 +62,9 @@ class UmlUseCase(ControlPointMixin,  EllipseShape, TopLeftMixin, IDMixin):
         Args:
             dc:
         """
+        self.ClearText()
+        self.AddText(self.pyutUseCase.name)
+
         super().OnDraw(dc)
 
         if self.Selected() is True:

@@ -91,22 +91,6 @@ class UmlText(ControlPointMixin, TextShape, TopLeftMixin, IDMixin):
         self.SetDraggable(drag=True)
         self.SetCentreResize(False)
 
-    def OnDraw(self, dc: MemoryDC):
-
-        dc.SetBrush(self._brush)
-
-        if self.Selected() is True:
-            UmlUtils.drawSelectedRectangle(dc=dc, shape=self)
-
-    def OnDrawContents(self, dc):
-
-        if self.Selected() is True:
-            self.SetTextColour('Red')
-        else:
-            self.SetTextColour('Black')
-
-        super().OnDrawContents(dc=dc)
-
     @property
     def shadowOffsetX(self):
         return self._shadowOffsetX
@@ -174,6 +158,25 @@ class UmlText(ControlPointMixin, TextShape, TopLeftMixin, IDMixin):
     @textFont.setter
     def textFont(self, newFont: Font):
         self._textFont = newFont
+
+    def OnDraw(self, dc: MemoryDC):
+
+        self.ClearText()
+        self.AddText(self.pyutText.content)
+
+        dc.SetBrush(self._brush)
+
+        if self.Selected() is True:
+            UmlUtils.drawSelectedRectangle(dc=dc, shape=self)
+
+    def OnDrawContents(self, dc):
+
+        if self.Selected() is True:
+            self.SetTextColour('Red')
+        else:
+            self.SetTextColour('Black')
+
+        super().OnDrawContents(dc=dc)
 
     def addChild(self, shape: Shape):
         """

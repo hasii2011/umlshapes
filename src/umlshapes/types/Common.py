@@ -32,7 +32,7 @@ if TYPE_CHECKING:
     from umlshapes.links.UmlInheritance import UmlInheritance       # noqa
     from umlshapes.links.UmlLollipopInterface import UmlLollipopInterface    # noqa
 
-ModelObject = Union[PyutText, PyutNote, PyutActor, PyutClass, PyutUseCase, PyutLink, PyutInterface, None]
+ModelObject = Union[PyutText, PyutNote, PyutActor, PyutClass, PyutUseCase, PyutLink, PyutInterface]
 
 
 NOT_SET_INT: int = cast(int, None)
@@ -94,7 +94,6 @@ class Rectangle:
     top:    int = 0
     right:  int = 0
     bottom: int = 0
-
 
 @dataclass
 class EndPoints:

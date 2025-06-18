@@ -25,6 +25,9 @@ from pyutmodelv2.PyutUseCase import PyutUseCase
 from pyutmodelv2.enumerations.PyutDisplayParameters import PyutDisplayParameters
 from pyutmodelv2.enumerations.PyutStereotype import PyutStereotype
 from pyutmodelv2.enumerations.PyutVisibility import PyutVisibility
+from wx import ID_OK
+
+from wx import OK
 
 from wx.lib.ogl import ShapeEvtHandler
 
@@ -37,6 +40,10 @@ from tests.demo.DemoCommon import INITIAL_Y
 from tests.demo.DemoCommon import Identifiers
 
 from umlshapes.UmlDiagram import UmlDiagram
+from umlshapes.dialogs.DlgEditActor import DlgEditActor
+from umlshapes.dialogs.DlgEditNote import DlgEditNote
+from umlshapes.dialogs.DlgEditText import DlgEditText
+from umlshapes.dialogs.DlgEditUseCase import DlgEditUseCase
 from umlshapes.frames.UmlClassDiagramFrame import UmlClassDiagramFrame
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
@@ -57,17 +64,19 @@ from umlshapes.types.Common import UmlShape
 
 from umlshapes.types.UmlPosition import UmlPosition
 
-CreateModel = Callable[[], ModelObject]
+CreateModel      = Callable[[], ModelObject]
+InvokeEditDialog = Callable[[ModelObject], None]
 
 
 @dataclass
 class ShapeDescription:
-    umlClass:        type[UmlShape]        = cast(type[UmlShape], None)
-    modelClass:      type[ModelObject]     = cast(type[ModelObject], None)
-    createModel:     CreateModel           = cast(CreateModel, None)
-    eventHandler:    type[ShapeEvtHandler] = cast(type[ShapeEvtHandler], None)
-    defaultValue:    str = ''
-    instanceCounter: int = 0
+    umlShape:         type[UmlShape]        = cast(type[UmlShape], None)
+    modelClass:       type[ModelObject]     = cast(type[ModelObject], None)
+    createModel:      CreateModel           = cast(CreateModel, None)
+    invokeEditDialog: InvokeEditDialog      = cast(InvokeEditDialog, None)
+    eventHandler:     type[ShapeEvtHandler] = cast(type[ShapeEvtHandler], None)
+    defaultValue:     str = ''
+    instanceCounter:  int = 0
 
 
 ShapesToCreate = NewType('ShapesToCreate', Dict[ID_REFERENCE, ShapeDescription])
@@ -94,12 +103,36 @@ class ShapeCreator:
         self._compositionCounter: int = 0
         self._interfaceCounter:   int = 0
 
-        shapeUmlText:    ShapeDescription = ShapeDescription(umlClass=UmlText,    modelClass=PyutText,    eventHandler=UmlTextEventHandler,    defaultValue=self._preferences.textValue)
-        shapeUmlNote:    ShapeDescription = ShapeDescription(umlClass=UmlNote,    modelClass=PyutNote,    eventHandler=UmlNoteEventHandler,    defaultValue=self._preferences.noteText)
-        shapeUmlUseCase: ShapeDescription = ShapeDescription(umlClass=UmlUseCase, modelClass=PyutUseCase, eventHandler=UmlUseCaseEventHandler, defaultValue=self._preferences.defaultNameUsecase)
-        shapeUmlActor:   ShapeDescription = ShapeDescription(umlClass=UmlActor,   modelClass=PyutActor,   eventHandler=UmlActorEventHandler,   defaultValue=self._preferences.defaultNameActor)
+        shapeUmlText:    ShapeDescription = ShapeDescription(
+            umlShape=UmlText,
+            modelClass=PyutText,
+            invokeEditDialog=self._invokeEditTextDialog,        # type: ignore
+            eventHandler=UmlTextEventHandler,
+            defaultValue=self._preferences.textValue
+        )
+        shapeUmlNote:    ShapeDescription = ShapeDescription(
+            umlShape=UmlNote,
+            modelClass=PyutNote,
+            invokeEditDialog=self._invokeEditNoteDialog,        # type: ignore
+            eventHandler=UmlNoteEventHandler,
+            defaultValue=self._preferences.noteText
+        )
+        shapeUmlUseCase: ShapeDescription = ShapeDescription(
+            umlShape=UmlUseCase,
+            modelClass=PyutUseCase,
+            invokeEditDialog=self._invokeEditUseCaseDialog,     # type: ignore
+            eventHandler=UmlUseCaseEventHandler,
+            defaultValue=self._preferences.defaultNameUsecase
+        )
+        shapeUmlActor:   ShapeDescription = ShapeDescription(
+            umlShape=UmlActor,
+            modelClass=PyutActor,
+            invokeEditDialog=self._invokeEditActorDialog,       # type: ignore
+            eventHandler=UmlActorEventHandler,
+            defaultValue=self._preferences.defaultNameActor
+        )
         shapeUmlClass:   ShapeDescription = ShapeDescription(
-            umlClass=UmlClass,
+            umlShape=UmlClass,
             createModel=lambda: self._createDemoPyutClass,
             eventHandler=UmlClassEventHandler,
             defaultValue=self._preferences.defaultClassName
@@ -123,10 +156,10 @@ class ShapeCreator:
         if shapeDescription.modelClass is None:
             modelClass = shapeDescription.createModel()
         else:
-            modelClass = shapeDescription.modelClass(defaultValue)          # type: ignore
+            modelClass = shapeDescription.modelClass(defaultValue)
         shapeDescription.instanceCounter += 1
 
-        umlShape: UmlShape = shapeDescription.umlClass(modelClass)      # type: ignore
+        umlShape: UmlShape = shapeDescription.umlShape(modelClass)      # type: ignore
 
         umlPosition: UmlPosition = self._computePosition()
         umlShape.SetCanvas(self._diagramFrame)
@@ -143,6 +176,9 @@ class ShapeCreator:
 
         umlShape.SetEventHandler(eventHandler)
         self._diagramFrame.refresh()
+        if shapeDescription.invokeEditDialog is not None:
+            shapeDescription.invokeEditDialog(modelClass)
+            self._diagramFrame.refresh()
 
     def _computePosition(self) -> UmlPosition:
 
@@ -206,3 +242,39 @@ class ShapeCreator:
         pyutParameters.append(pyutParameter3)
 
         return pyutParameters
+
+    def _invokeEditNoteDialog(self, pyutNote: PyutNote):
+
+        self.logger.info(f'{pyutNote=}')
+
+        with DlgEditNote(self._diagramFrame, pyutNote=pyutNote) as dlg:
+            if dlg.ShowModal() == OK:
+                self.logger.info(f'UpdatedNote: {pyutNote}')
+
+    def _invokeEditTextDialog(self, pyutText: PyutText):
+
+        self.logger.info(f'{pyutText=}')
+
+        with DlgEditText(self._diagramFrame, pyutText=pyutText) as dlg:
+            if dlg.ShowModal() == OK:
+                self.logger.info(f'Updated text: {pyutText}')
+
+    def _invokeEditUseCaseDialog(self, pyutUseCase: PyutUseCase):
+
+        self.logger.info(f'{pyutUseCase=}')
+
+        with DlgEditUseCase(self._diagramFrame, useCaseName=pyutUseCase.name) as dlg:
+            if dlg.ShowModal() == ID_OK:
+                pyutUseCase.name = dlg.useCaseName
+                self.logger.info(f'Updated use case: {pyutUseCase}')
+            else:
+                self.logger.warning('Not Ok')
+
+    def _invokeEditActorDialog(self, pyutActor: PyutActor) -> None:
+
+        with DlgEditActor(self._diagramFrame, actorName=pyutActor.name) as dlg:
+            if dlg.ShowModal() == ID_OK:
+                pyutActor.name = dlg.actorName
+                self.logger.info(f'Updated note: {pyutActor}')
+            else:
+                self.logger.warning('Not Ok')

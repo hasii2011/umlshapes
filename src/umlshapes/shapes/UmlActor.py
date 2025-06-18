@@ -10,6 +10,8 @@ from wx import DC
 from wx import MemoryDC
 from wx import RED
 
+from wx.lib.ogl import FORMAT_CENTRE_HORIZ
+from wx.lib.ogl import FORMAT_CENTRE_VERT
 from wx.lib.ogl import RectangleShape
 
 from pyutmodelv2.PyutActor import PyutActor
@@ -74,6 +76,7 @@ class UmlActor(ControlPointMixin, RectangleShape, TopLeftMixin, IDMixin):
         self.SetDraggable(drag=True)
         self.SetCentreResize(False)
         self.SetMaintainAspectRatio(True)
+        self.SetFormatMode(mode=FORMAT_CENTRE_HORIZ | FORMAT_CENTRE_VERT)
 
     @property
     def pyutActor(self) -> PyutActor:

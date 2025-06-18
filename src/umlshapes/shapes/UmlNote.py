@@ -6,6 +6,8 @@ from wx import Brush
 from wx import Colour
 from wx import MemoryDC
 
+from wx.lib.ogl import FORMAT_CENTRE_HORIZ
+from wx.lib.ogl import FORMAT_CENTRE_VERT
 from wx.lib.ogl import RectangleShape
 
 from pyutmodelv2.PyutNote import PyutNote
@@ -60,6 +62,7 @@ class UmlNote(ControlPointMixin, RectangleShape, TopLeftMixin, IDMixin):
         self.SetCentreResize(False)
 
         self.SetFont(UmlUtils.defaultFont())
+        self.SetFormatMode(mode=FORMAT_CENTRE_HORIZ | FORMAT_CENTRE_VERT)
 
     @property
     def pyutNote(self):
