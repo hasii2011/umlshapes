@@ -114,6 +114,14 @@ class UmlClass(ControlPointMixin, RectangleShape, TopLeftMixin, IDMixin):
     def umlFrame(self, frame: 'UmlClassDiagramFrame'):
         self.SetCanvas(frame)
 
+    @property
+    def selected(self) -> bool:
+        return self.Selected()
+
+    @selected.setter
+    def selected(self, select: bool):
+        self.Select(select=select)
+
     def addLink(self, umlLink: UmlLink, destinationClass: 'UmlClass'):
 
         self.AddLine(line=umlLink, other=destinationClass)
@@ -642,6 +650,7 @@ class UmlClass(ControlPointMixin, RectangleShape, TopLeftMixin, IDMixin):
 
         return maxWidth
 
+    # noinspection PyTypeChecker
     def _getMethodRepresentation(self, pyutMethod: PyutMethod, displayParameters: PyutDisplayParameters) -> str:
         """
 

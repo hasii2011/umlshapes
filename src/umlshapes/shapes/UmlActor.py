@@ -86,6 +86,14 @@ class UmlActor(ControlPointMixin, RectangleShape, TopLeftMixin, IDMixin):
     def pyutActor(self, value: PyutActor):
         self._pyutActor = value
 
+    @property
+    def selected(self) -> bool:
+        return self.Selected()
+
+    @selected.setter
+    def selected(self, select: bool):
+        self.Select(select=select)
+
     # This is dangerous, accessing internal stuff
     # noinspection PyProtectedMember
     # noinspection SpellCheckingInspection

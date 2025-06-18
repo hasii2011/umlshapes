@@ -70,6 +70,8 @@ class UmlUseCase(ControlPointMixin,  EllipseShape, TopLeftMixin, IDMixin):
         if self.Selected() is True:
             if self.Selected() is True:
                 UmlUtils.drawSelectedEllipse(dc=dc, shape=self)
+        else:
+            super().OnDraw(dc)
 
     # This is dangerous, accessing internal stuff
     # noinspection PyProtectedMember

@@ -92,6 +92,14 @@ class UmlText(ControlPointMixin, TextShape, TopLeftMixin, IDMixin):
         self.SetCentreResize(False)
 
     @property
+    def selected(self) -> bool:
+        return self.Selected()
+
+    @selected.setter
+    def selected(self, select: bool):
+        self.Select(select=select)
+
+    @property
     def shadowOffsetX(self):
         return self._shadowOffsetX
 

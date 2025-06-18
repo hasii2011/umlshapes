@@ -6,6 +6,7 @@ from typing import List
 from logging import Logger
 from logging import getLogger
 
+from pyutmodelv2.PyutText import PyutText
 from wx import Bitmap
 from wx import CommandEvent
 
@@ -14,6 +15,7 @@ from wx import FONTSTYLE_ITALIC
 from wx import FONTSTYLE_NORMAL
 from wx import FONTWEIGHT_BOLD
 from wx import FONTWEIGHT_NORMAL
+from wx import OK
 from wx import PENSTYLE_SOLID
 
 from wx import DC
@@ -28,6 +30,8 @@ from wx import RED
 from wx.lib.ogl import Shape
 from wx.lib.ogl import ShapeCanvas
 
+from umlshapes.dialogs.DlgEditText import DlgEditText
+from umlshapes.frames.UmlClassDiagramFrame import UmlClassDiagramFrame
 from umlshapes.frames.UmlFrame import UmlFrame
 from umlshapes.UmlBaseEventHandler import UmlBaseEventHandler
 from umlshapes.shapes.UmlText import UmlText
@@ -91,6 +95,21 @@ class UmlTextEventHandler(UmlBaseEventHandler):
         canvas: ShapeCanvas = self.umlText.GetCanvas()
 
         canvas.PopupMenu(self._menu, x, y)
+
+    def OnLeftDoubleClick(self, x: int, y: int, keys: int = 0, attachment: int = 0):
+
+        super().OnLeftDoubleClick(x=x, y=y, keys=keys, attachment=attachment)
+
+        umlText:  UmlText  = self.GetShape()
+        pyutText: PyutText = umlText.pyutText
+
+        umlFrame:  UmlClassDiagramFrame  = umlText.GetCanvas()
+
+        with DlgEditText(parent=umlFrame, pyutText=pyutText,) as dlg:
+            if dlg.ShowModal() == OK:
+                umlFrame.refresh()
+
+        umlText.selected = False
 
     def _createMenu(self) -> Menu:
 
