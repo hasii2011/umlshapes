@@ -12,7 +12,7 @@ class IDMixin:
         self._umlShape.SetId(UmlUtils.getID())
 
     @property
-    def id(self) -> int:
+    def id(self) -> str:
         """
         Syntactic sugar for external consumers;  Hide the underlying implementation
 
@@ -21,5 +21,5 @@ class IDMixin:
         return self._umlShape.GetId()
 
     @id.setter
-    def id(self, newValue: int):
+    def id(self, newValue: str):
         self._umlShape.SetId(newValue)

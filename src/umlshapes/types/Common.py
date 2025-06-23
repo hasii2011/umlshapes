@@ -95,6 +95,7 @@ class Rectangle:
     right:  int = 0
     bottom: int = 0
 
+
 @dataclass
 class EndPoints:
     fromPosition: UmlPosition
