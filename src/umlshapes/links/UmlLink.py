@@ -109,6 +109,14 @@ class UmlLink(LineShape, IDMixin):
 
         self.SetEnds(x1=fromPosition.x, y1=fromPosition.y, x2=toPosition.x, y2=toPosition.y)
 
+    @property
+    def spline(self) -> bool:
+        return self.IsSpline()
+
+    @spline.setter
+    def spline(self, spline: bool):
+        self.SetSensitivityFilter(spline)
+
     def toggleSpline(self):
 
         self.SetSpline(not self.IsSpline())
