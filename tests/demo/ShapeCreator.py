@@ -98,10 +98,6 @@ class ShapeCreator:
         self._useCaseCounter:     int = 0
         self._actorCounter:       int = 0
         self._classCounter:       int = 0
-        self._associationCounter: int = 0
-        self._inheritanceCounter: int = 0
-        self._compositionCounter: int = 0
-        self._interfaceCounter:   int = 0
 
         shapeUmlText:    ShapeDescription = ShapeDescription(
             umlShape=UmlText,

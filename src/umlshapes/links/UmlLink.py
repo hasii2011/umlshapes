@@ -20,11 +20,13 @@ from pyutmodelv2.PyutLink import PyutLink
 
 from umlshapes.UmlDiagram import UmlDiagram
 from umlshapes.UmlUtils import UmlUtils
+
 from umlshapes.frames.UmlFrame import UmlFrame
+
+from umlshapes.mixins.IDMixin import IDMixin
 
 from umlshapes.links.LabelType import LabelType
 from umlshapes.links.UmlAssociationLabel import UmlAssociationLabel
-
 from umlshapes.links.eventhandlers.UmlAssociationLabelEventHandler import UmlAssociationLabelEventHandler
 
 from umlshapes.shapes.UmlLineControlPoint import UmlLineControlPoint
@@ -40,11 +42,13 @@ from umlshapes.types.Common import TAB
 from umlshapes.types.UmlPosition import UmlPosition
 
 
-class UmlLink(LineShape):
+class UmlLink(LineShape, IDMixin):
 
     def __init__(self, pyutLink: PyutLink):
 
         super().__init__()
+        IDMixin.__init__(self, umlShape=self)
+
         self.linkLogger:   Logger         = getLogger(__name__)
         self._preferences: UmlPreferences = UmlPreferences()
 
