@@ -37,6 +37,22 @@ class UmlInterface(UmlLink):
         self._interfaceClass:    UmlClass = interfaceClass
         self._implementingClass: UmlClass = implementingClass
 
+    @property
+    def interfaceClass(self) -> UmlClass:
+        return self._interfaceClass
+
+    @interfaceClass.setter
+    def interfaceClass(self, interfaceClass: UmlClass):
+        self._interfaceClass = interfaceClass
+
+    @property
+    def implementingClass(self) -> UmlClass:
+        return self._implementingClass
+
+    @implementingClass.setter
+    def implementingClass(self, _implementingClass: UmlClass):
+        self._implementingClass = _implementingClass
+
     def OnDraw(self, dc: MemoryDC):
 
         assert dc is not None, 'Where is my DC'

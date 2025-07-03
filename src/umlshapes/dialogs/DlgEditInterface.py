@@ -37,6 +37,9 @@ from umlshapes.links.UmlLollipopInterface import UmlLollipopInterface
 
 
 class DlgEditInterface(DlgEditClassCommon):
+    """
+    Handles lollipop interfaces
+    """
 
     clsLogger: Logger = getLogger(__name__)
 

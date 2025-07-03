@@ -189,7 +189,7 @@ class DemoAppFrame(SizedFrame):
 
         umlFrame:       UmlClassDiagramFrame = self._diagramFrame
         eventEngine:    UmlEventEngine       = umlFrame.eventEngine
-        pyutInterfaces: PyutInterfaces       = eventHandler.getLollipopInterfaces()
+        pyutInterfaces: PyutInterfaces       = eventHandler.getDefinedInterfaces()
 
         with DlgEditInterface(parent=umlFrame, oglInterface2=umlLollipopInterface, eventEngine=eventEngine, pyutInterfaces=pyutInterfaces) as dlg:
             if dlg.ShowModal() == OK:
