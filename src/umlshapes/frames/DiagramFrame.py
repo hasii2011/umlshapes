@@ -27,6 +27,7 @@ from wx import Window
 
 from wx.lib.ogl import ShapeCanvas
 
+from umlshapes.UmlUtils import UmlUtils
 from umlshapes.types.UmlColor import UmlColor
 from umlshapes.types.UmlPenStyle import UmlPenStyle
 
@@ -70,6 +71,7 @@ class DiagramFrame(ShapeCanvas):
         self._workingBitmap: Bitmap = Bitmap(w, h)   # double buffering
 
         self._isInfinite: bool = False    # Indicates if the frame is infinite
+        self._frameId:    str  = UmlUtils.getID()
 
     @property
     def umlDiagram(self) -> 'UmlDiagram':
@@ -79,12 +81,21 @@ class DiagramFrame(ShapeCanvas):
     def umlDiagram(self, newDiagram: 'UmlDiagram'):
         self.SetDiagram(newDiagram)
 
+    @property
+    def frameId(self):
+        return self._frameId
+
+    @frameId.setter
+    def frameId(self, frameId: str):
+        self._frameId = frameId
+
     def refresh(self, eraseBackground: bool = True):
 
         w, h = self.GetSize()
 
         dc: DC = self._createDC(w, h)
 
+        # noinspection PySimplifyBooleanCheck
         if eraseBackground is True:
             self.Redraw(dc)
             client: ClientDC = ClientDC(self)
@@ -113,6 +124,7 @@ class DiagramFrame(ShapeCanvas):
         """
         self._isInfinite = infinite
 
+        # noinspection PySimplifyBooleanCheck
         if infinite is True:
             # place all the shapes in an area centered on the infinite work area
             vWidth, vHeight = self.GetVirtualSize()
@@ -186,6 +198,7 @@ class DiagramFrame(ShapeCanvas):
 
     def _getGridPen(self) -> Pen:
 
+        # noinspection PySimplifyBooleanCheck
         if self._darkMode is True:
             gridLineColor: Colour = UmlColor.toWxColor(self._umlPreferences.darkModeGridLineColor)
         else:
@@ -224,10 +237,10 @@ class DiagramFrame(ShapeCanvas):
 
     def _setAppropriateSetBackground(self):
 
+        # noinspection PySimplifyBooleanCheck
         if self._darkMode is True:
             color: Colour = UmlColor.toWxColor(self._umlPreferences.darkModeBackGroundColor)
             self.SetBackgroundColour(color)
         else:
             color = UmlColor.toWxColor(self._umlPreferences.backGroundColor)
             self.SetBackgroundColour(color)
-

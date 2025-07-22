@@ -22,6 +22,7 @@ from pyutmodelv2.PyutModelTypes import ClassName
 from umlshapes.UmlDiagram import UmlDiagram
 from umlshapes.UmlUtils import UmlUtils
 from umlshapes.dialogs.DlgEditInterface import DlgEditInterface
+from umlshapes.eventengine.IUmlEventEngine import FrameId
 from umlshapes.eventengine.IUmlEventEngine import IUmlEventEngine
 from umlshapes.eventengine.UmlEventEngine import UmlEventEngine
 from umlshapes.eventengine.UmlEventType import UmlEventType
@@ -74,7 +75,12 @@ class DemoAppFrame(SizedFrame):
 
         self._pyutInterfaceCount: int = 0
 
-        self._umlEventEngine.registerListener(UmlEventType.UPDATE_APPLICATION_STATUS, self._onUpdateApplicationStatus)
+        self._umlEventEngine.registerListener(UmlEventType.UPDATE_APPLICATION_STATUS,
+                                              frameId=FrameId(self._diagramFrame.frameId),
+                                              callback=self._onUpdateApplicationStatus)
+        self._umlEventEngine.registerListener(UmlEventType.DIAGRAM_MODIFIED,
+                                              frameId=self._diagramFrame.frameId,
+                                              callback=self._onDiagramModified)
 
     def _createApplicationMenuBar(self):
 
@@ -199,3 +205,7 @@ class DemoAppFrame(SizedFrame):
 
     def _onUpdateApplicationStatus(self, message: str):
         self.SetStatusText(text=message)
+
+    def _onDiagramModified(self, modifiedFrameId):
+
+        self.logger.info(f'Diagram Modified - {modifiedFrameId=}')

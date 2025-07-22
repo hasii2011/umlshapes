@@ -142,9 +142,15 @@ class UmlClassMenuHandler:
         elif eventId == ID_AUTO_SIZE:
             self._umlClass.autoSize()
         elif eventId == ID_IMPLEMENT_INTERFACE:
-            self._eventEngine.sendEvent(UmlEventType.REQUEST_LOLLIPOP_LOCATION, requestingUmlClass=self._umlClass)
-        # elif eventId == ID_CUT_SHAPE:
-        #     self._eventEngine.sendEvent(UmlEventType.CutOglClass, shapeToCut=self._umlClass)
+            frameId = self._umlClass.umlFrame.frameId
+            self._eventEngine.sendEvent(UmlEventType.REQUEST_LOLLIPOP_LOCATION,
+                                        frameId=frameId,
+                                        requestingUmlClass=self._umlClass)
+        elif eventId == ID_CUT_SHAPE:
+            frameId = self._umlClass.umlFrame.frameId
+            self._eventEngine.sendEvent(UmlEventType.CUT_UML_CLASS,
+                                        frameId=frameId,
+                                        frameshapeToCut=self._umlClass)
         else:
             event.Skip()
 

@@ -7,6 +7,7 @@ from logging import getLogger
 
 from wx import Window
 
+from umlshapes.eventengine.IUmlEventEngine import FrameId
 from umlshapes.eventengine.IUmlEventEngine import IUmlEventEngine
 from umlshapes.eventengine.UmlEventType import UmlEventType
 
@@ -45,7 +46,9 @@ class UmlClassDiagramFrame(UmlFrame):
         self._requestingLollipopLocation: bool     = False
         self._requestingUmlClass:         UmlClass = NO_CLASS
 
-        self._eventEngine.registerListener(eventType=UmlEventType.REQUEST_LOLLIPOP_LOCATION, callback=self._onRequestLollipopLocation)
+        self._eventEngine.registerListener(eventType=UmlEventType.REQUEST_LOLLIPOP_LOCATION,
+                                           frameId=FrameId(self._frameId),
+                                           callback=self._onRequestLollipopLocation)
         # self._oglEventEngine.registerListener(event=EVT_DIAGRAM_FRAME_MODIFIED,    callback=self._onDiagramModified)
         # self._oglEventEngine.registerListener(event=EVT_CUT_OGL_CLASS,             callback=self._onCutClass)
 
@@ -72,7 +75,9 @@ class UmlClassDiagramFrame(UmlFrame):
                 requestingUmlClass=self._requestingUmlClass,
                 perimeterPoint=nearestPoint
             )
-            self.eventEngine.sendEvent(UmlEventType.UPDATE_APPLICATION_STATUS, message='')
+            self.eventEngine.sendEvent(UmlEventType.UPDATE_APPLICATION_STATUS,
+                                       frameId=FrameId(self.frameId),
+                                       message='')
         else:
             super().OnLeftClick(x=x, y=y, keys=keys)
 
@@ -92,7 +97,9 @@ class UmlClassDiagramFrame(UmlFrame):
         self._requestingLollipopLocation = True
         self._requestingUmlClass         = requestingUmlClass
 
-        self.eventEngine.sendEvent(UmlEventType.UPDATE_APPLICATION_STATUS, message='Click on the UML Class edge where you want to place the interface')
+        self.eventEngine.sendEvent(UmlEventType.UPDATE_APPLICATION_STATUS,
+                                   frameId=FrameId(self._frameId),
+                                   message='Click on the UML Class edge where you want to place the interface')
 
     def _createLollipopInterface(self, requestingUmlClass: UmlClass, perimeterPoint: UmlPosition):
         """
@@ -109,6 +116,10 @@ class UmlClassDiagramFrame(UmlFrame):
         self._requestingUmlClass         = NO_CLASS
 
         self.refresh()
+        self._eventEngine.sendEvent(UmlEventType.DIAGRAM_MODIFIED,
+                                    frameId=FrameId(self.frameId),
+                                    modifiedFrameId=FrameId(self.frameId)
+                                    )
 
     def _areWeOverAShape(self, x: int, y: int) -> bool:
         answer:         bool  = True

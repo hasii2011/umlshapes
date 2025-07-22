@@ -6,6 +6,7 @@ from logging import getLogger
 
 from umlshapes.eventengine.BaseEventEngine import BaseEventEngine
 from umlshapes.eventengine.BaseEventEngine import Topic
+from umlshapes.eventengine.IUmlEventEngine import FrameId
 
 from umlshapes.eventengine.IUmlEventEngine import IUmlEventEngine
 from umlshapes.eventengine.UmlEventType import UmlEventType
@@ -23,8 +24,13 @@ class UmlEventEngine(IUmlEventEngine, BaseEventEngine):
 
         self.logger: Logger = getLogger(__name__)
 
-    def registerListener(self, eventType: UmlEventType, callback: Callable):
-        self._subscribe(topic=Topic(eventType.value), callback=callback)
+    def registerListener(self, eventType: UmlEventType, frameId: FrameId, callback: Callable):
+        self._subscribe(topic=self._toTopic(eventType, frameId), callback=callback)
 
-    def sendEvent(self, eventType: UmlEventType, **kwargs):
-        self._sendMessage(topic=Topic(eventType.value), **kwargs)
+    def sendEvent(self, eventType: UmlEventType, frameId: FrameId, **kwargs):
+        self._sendMessage(topic=self._toTopic(eventType, frameId), **kwargs)
+
+    def _toTopic(self, eventType: UmlEventType, frameId: FrameId) -> Topic:
+
+        topic: Topic = Topic(f'{eventType.value}.{frameId}')
+        return topic
