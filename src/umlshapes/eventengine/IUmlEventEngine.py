@@ -3,9 +3,7 @@ from typing import Callable
 from abc import ABC
 from abc import abstractmethod
 
-from wx import PyEventBinder
-
-from umlshapes.eventengine.UmlEvents import UmlEventType
+from umlshapes.eventengine.UmlEventType import UmlEventType
 
 
 class IUmlEventEngine(ABC):
@@ -14,7 +12,7 @@ class IUmlEventEngine(ABC):
     and python interface could not handle subclasses
     """
     @abstractmethod
-    def registerListener(self, event: PyEventBinder, callback: Callable):
+    def registerListener(self, eventType: UmlEventType, callback: Callable):
         pass
 
     @abstractmethod

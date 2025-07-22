@@ -82,7 +82,7 @@ class UmlLollipopInterface(Shape):
         self._lineCentum = distance
 
     @property
-    def attachmentSide(self):
+    def attachmentSide(self) -> AttachmentSide:
         return self._attachmentSide
 
     @attachmentSide.setter
@@ -107,7 +107,7 @@ class UmlLollipopInterface(Shape):
         """
         dc.SetBrush(WHITE_BRUSH)
         dc.SetFont(self._defaultFont)
-        if self.selected is True:
+        if self.selected:
             dc.SetPen(RED_PEN)
             dc.SetTextForeground(RED)
         else:
@@ -135,12 +135,20 @@ class UmlLollipopInterface(Shape):
         dc.DrawText(self.pyutInterface.name, interfaceNamePosition.x, interfaceNamePosition.y)
 
     def HitTest(self, x, y):
+        """
+        Override base behavior
+        Args:
+            x:   The clicked x coordinate
+            y:   The clicked y coordinate
+
+        Returns:  `True` if it meets my criteria, else `False`
+        """
         rectangle: Rectangle = self._attachedTo.rectangle
         lollipopCoordinates: LollipopCoordinates = self._computeLollipopCoordinates(rectangle)
 
-        hit: bool = UmlUtils.lollipopHitTest(x=x, y=y, attachmentSide=self.attachmentSide, lollipopCoordinates=lollipopCoordinates)
+        lollipopWasAbused: bool = UmlUtils.lollipopHitTest(x=x, y=y, attachmentSide=self.attachmentSide, lollipopCoordinates=lollipopCoordinates)
 
-        if hit is True:
+        if lollipopWasAbused:
             return 0, self
         else:
             return False
@@ -153,7 +161,7 @@ class UmlLollipopInterface(Shape):
 
         Returns:    The appropriate coordinates
         """
-        if UmlUtils.isVerticalSide(side=self.attachmentSide) is True:
+        if UmlUtils.isVerticalSide(side=self.attachmentSide):
             lollipopCoordinates: LollipopCoordinates = self._computeVerticalSideCoordinates(rectangle)
         else:
             lollipopCoordinates = self._computeHorizontalSideCoordinates(rectangle)

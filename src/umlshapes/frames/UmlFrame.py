@@ -13,11 +13,8 @@ from wx import Window
 from wx.lib.ogl import Shape
 from wx.lib.ogl import ShapeCanvas
 
-from umlshapes.IApplicationAdapter import IApplicationAdapter
-
 from umlshapes.UmlUtils import UmlUtils
-
-from umlshapes.eventengine.UmlEventEngine import UmlEventEngine
+from umlshapes.eventengine.IUmlEventEngine import IUmlEventEngine
 
 from umlshapes.frames.DiagramFrame import DiagramFrame
 
@@ -37,13 +34,11 @@ PIXELS_PER_UNIT_Y: int = 20
 
 class UmlFrame(DiagramFrame):
 
-    def __init__(self, parent: Window, applicationAdapter: IApplicationAdapter):
+    def __init__(self, parent: Window, umlEventEngine: IUmlEventEngine):
 
-        self._applicationAdapter: IApplicationAdapter = applicationAdapter
-
-        self.ufLogger:     Logger         = getLogger(__name__)
-        self._preferences: UmlPreferences = UmlPreferences()
-        self._eventEngine: UmlEventEngine = UmlEventEngine(listeningWindow=self)
+        self.ufLogger:     Logger          = getLogger(__name__)
+        self._preferences: UmlPreferences  = UmlPreferences()
+        self._eventEngine: IUmlEventEngine = umlEventEngine
 
         super().__init__(parent=parent)
 
@@ -61,11 +56,8 @@ class UmlFrame(DiagramFrame):
 
         self._id: str = UmlUtils.getID()
 
-    def applicationAdapter(self) -> IApplicationAdapter:
-        return self._applicationAdapter
-
     @property
-    def eventEngine(self) -> UmlEventEngine:
+    def eventEngine(self) -> IUmlEventEngine:
         return self._eventEngine
 
     @property

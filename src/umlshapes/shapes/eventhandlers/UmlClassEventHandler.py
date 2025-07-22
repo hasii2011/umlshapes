@@ -54,7 +54,7 @@ class UmlClassEventHandler(UmlBaseEventHandler):
 
         Pass it to the frame Handler
         """
-        if umlFrame.requestingLollipopLocation is True:
+        if umlFrame.requestingLollipopLocation:
             umlFrame.OnLeftClick(x=x, y=y, keys=keys)
         else:
             super().OnLeftClick(x=x, y=y, keys=keys)
@@ -74,7 +74,7 @@ class UmlClassEventHandler(UmlBaseEventHandler):
     def OnLeftDoubleClick(self, x: int, y: int, keys: int = 0, attachment: int = 0):
 
         from umlshapes.dialogs.umlclass.DlgEditClass import DlgEditClass
-        from umlshapes.eventengine.UmlEventEngine import UmlEventEngine
+        from umlshapes.eventengine.IUmlEventEngine import IUmlEventEngine
 
         super().OnLeftDoubleClick(x=x, y=y, keys=keys, attachment=attachment)
 
@@ -82,7 +82,7 @@ class UmlClassEventHandler(UmlBaseEventHandler):
         pyutClass: PyutClass = umlClass.pyutClass
         umlFrame:  UmlClassDiagramFrame  = umlClass.GetCanvas()
 
-        eventEngine: UmlEventEngine = umlFrame.eventEngine
+        eventEngine: IUmlEventEngine = umlFrame.eventEngine
         with DlgEditClass(parent=umlFrame, pyutClass=pyutClass, eventEngine=eventEngine) as dlg:
             if dlg.ShowModal() == OK:
                 umlFrame.refresh()

@@ -23,7 +23,9 @@ from umlshapes.IApplicationAdapter import IApplicationAdapter
 from umlshapes.UmlDiagram import UmlDiagram
 from umlshapes.UmlUtils import UmlUtils
 from umlshapes.dialogs.DlgEditInterface import DlgEditInterface
+from umlshapes.eventengine.IUmlEventEngine import IUmlEventEngine
 from umlshapes.eventengine.UmlEventEngine import UmlEventEngine
+from umlshapes.eventengine.UmlEventType import UmlEventType
 from umlshapes.frames.UmlClassDiagramFrame import UmlClassDiagramFrame
 
 from umlshapes.links.UmlLollipopInterface import UmlLollipopInterface
@@ -54,9 +56,11 @@ class DemoAppFrame(SizedFrame):
 
         sizedPanel: SizedPanel = self.GetContentsPane()
         sizedPanel.SetSizerProps(expand=True, proportion=1)
+
+        self._umlEventEngine: UmlEventEngine = UmlEventEngine()
         self._diagramFrame = UmlClassDiagramFrame(
             parent=sizedPanel,
-            applicationAdapter=self._applicationAdapter,
+            umlEventEngine=self._umlEventEngine,
             createLollipopCallback=self._createLollipopInterface
         )
         # noinspection PyUnresolvedReferences
@@ -73,6 +77,8 @@ class DemoAppFrame(SizedFrame):
         self._preferences:         UmlPreferences      = UmlPreferences()
 
         self._pyutInterfaceCount: int = 0
+
+        self._umlEventEngine.registerListener(UmlEventType.UPDATE_APPLICATION_STATUS, self._onUpdateApplicationStatus)
 
     def _createApplicationMenuBar(self):
 
@@ -188,9 +194,12 @@ class DemoAppFrame(SizedFrame):
         umlLollipopInterface.SetEventHandler(eventHandler)
 
         umlFrame:       UmlClassDiagramFrame = self._diagramFrame
-        eventEngine:    UmlEventEngine       = umlFrame.eventEngine
+        eventEngine:    IUmlEventEngine      = umlFrame.eventEngine
         pyutInterfaces: PyutInterfaces       = eventHandler.getDefinedInterfaces()
 
         with DlgEditInterface(parent=umlFrame, oglInterface2=umlLollipopInterface, eventEngine=eventEngine, pyutInterfaces=pyutInterfaces) as dlg:
             if dlg.ShowModal() == OK:
                 umlFrame.refresh()
+
+    def _onUpdateApplicationStatus(self, message: str):
+        self.SetStatusText(text=message)

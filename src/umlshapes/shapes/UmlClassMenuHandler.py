@@ -1,4 +1,3 @@
-
 from typing import cast
 from typing import TYPE_CHECKING
 
@@ -25,8 +24,10 @@ from pyutmodelv2.enumerations.PyutDisplayParameters import PyutDisplayParameters
 from pyutmodelv2.enumerations.PyutDisplayMethods import PyutDisplayMethods
 
 from umlshapes.UmlUtils import UmlUtils
-from umlshapes.eventengine.UmlEventEngine import UmlEventEngine
-from umlshapes.eventengine.UmlEvents import UmlEventType
+
+from umlshapes.eventengine.IUmlEventEngine import IUmlEventEngine
+from umlshapes.eventengine.UmlEventType import UmlEventType
+
 from umlshapes.frames.UmlFrame import UmlFrame
 
 if TYPE_CHECKING:
@@ -63,12 +64,12 @@ class TriStateData:
 
 
 class UmlClassMenuHandler:
-    def __init__(self, umlClass: 'UmlClass', eventEngine: UmlEventEngine):
+    def __init__(self, umlClass: 'UmlClass', eventEngine: IUmlEventEngine):
 
         self.logger: Logger = getLogger(__name__)
 
-        self._umlClass: 'UmlClass'        = umlClass
-        self._eventEngine: UmlEventEngine = eventEngine
+        self._umlClass:    'UmlClass'      = umlClass
+        self._eventEngine: IUmlEventEngine = eventEngine
 
         self._contextMenu:         Menu     = cast(Menu, None)
         self._toggleStereotype:    MenuItem = cast(MenuItem, None)
@@ -140,10 +141,10 @@ class UmlClassMenuHandler:
             self._umlClass.autoSize()
         elif eventId == ID_AUTO_SIZE:
             self._umlClass.autoSize()
+        elif eventId == ID_IMPLEMENT_INTERFACE:
+            self._eventEngine.sendEvent(UmlEventType.REQUEST_LOLLIPOP_LOCATION, requestingUmlClass=self._umlClass)
         # elif eventId == ID_CUT_SHAPE:
         #     self._eventEngine.sendEvent(UmlEventType.CutOglClass, shapeToCut=self._umlClass)
-        elif eventId == ID_IMPLEMENT_INTERFACE:
-            self._eventEngine.sendEvent(UmlEventType.RequestLollipopLocation, requestShape=self._umlClass)
         else:
             event.Skip()
 

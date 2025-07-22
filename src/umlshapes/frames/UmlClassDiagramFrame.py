@@ -7,10 +7,8 @@ from logging import getLogger
 
 from wx import Window
 
-from umlshapes.IApplicationAdapter import IApplicationAdapter
-
-from umlshapes.eventengine.UmlEvents import EVT_REQUEST_LOLLIPOP_LOCATION
-from umlshapes.eventengine.UmlEvents import RequestLollipopLocationEvent
+from umlshapes.eventengine.IUmlEventEngine import IUmlEventEngine
+from umlshapes.eventengine.UmlEventType import UmlEventType
 
 from umlshapes.frames.UmlClassDiagramFrameMenuHandler import UmlClassDiagramFrameMenuHandler
 from umlshapes.frames.UmlFrame import UmlFrame
@@ -28,16 +26,15 @@ CreateLollipopCallback = Callable[[UmlClass, UmlPosition], None]
 
 class UmlClassDiagramFrame(UmlFrame):
 
-    def __init__(self, parent: Window, applicationAdapter: IApplicationAdapter, createLollipopCallback: CreateLollipopCallback):
+    def __init__(self, parent: Window, umlEventEngine: IUmlEventEngine, createLollipopCallback: CreateLollipopCallback):
         """
 
         Args:
             parent:
-            applicationAdapter:
             createLollipopCallback:
         """
 
-        super().__init__(parent=parent, applicationAdapter=applicationAdapter)
+        super().__init__(parent=parent, umlEventEngine=umlEventEngine)
 
         self._createLollipopCallback: CreateLollipopCallback = createLollipopCallback
 
@@ -48,7 +45,7 @@ class UmlClassDiagramFrame(UmlFrame):
         self._requestingLollipopLocation: bool     = False
         self._requestingUmlClass:         UmlClass = NO_CLASS
 
-        self._eventEngine.registerListener(event=EVT_REQUEST_LOLLIPOP_LOCATION, callback=self._onRequestLollipopLocation)
+        self._eventEngine.registerListener(eventType=UmlEventType.REQUEST_LOLLIPOP_LOCATION, callback=self._onRequestLollipopLocation)
         # self._oglEventEngine.registerListener(event=EVT_DIAGRAM_FRAME_MODIFIED,    callback=self._onDiagramModified)
         # self._oglEventEngine.registerListener(event=EVT_CUT_OGL_CLASS,             callback=self._onCutClass)
 
@@ -65,7 +62,7 @@ class UmlClassDiagramFrame(UmlFrame):
 
     def OnLeftClick(self, x, y, keys=0):
 
-        if self._requestingLollipopLocation is True:
+        if self._requestingLollipopLocation:
             self.ufLogger.debug(f'Request location: x,y=({x},{y}) {self._requestingUmlClass=}')
             nearestPoint: UmlPosition = UmlUtils.getNearestPointOnRectangle(x=x, y=y, rectangle=self._requestingUmlClass.rectangle)
             self.ucdLogger.debug(f'Nearest point: {nearestPoint}')
@@ -75,27 +72,27 @@ class UmlClassDiagramFrame(UmlFrame):
                 requestingUmlClass=self._requestingUmlClass,
                 perimeterPoint=nearestPoint
             )
-            self._applicationAdapter.updateApplicationStatus('')
+            self.eventEngine.sendEvent(UmlEventType.UPDATE_APPLICATION_STATUS, message='')
         else:
             super().OnLeftClick(x=x, y=y, keys=keys)
 
     def OnRightClick(self, x: int, y: int, keys: int = 0):
         self.ucdLogger.debug('Ouch, you right-clicked me !!')
 
-        if self._areWeOverAShape(x=x, y=y) is False:
+        if not self._areWeOverAShape(x=x, y=y):
             self.ucdLogger.info('You missed the shape')
             if self._menuHandler is None:
                 self._menuHandler = UmlClassDiagramFrameMenuHandler(self)
 
             self._menuHandler.popupMenu(x=x, y=y)
 
-    def _onRequestLollipopLocation(self, event: RequestLollipopLocationEvent):
+    def _onRequestLollipopLocation(self, requestingUmlClass: UmlClass):
 
-        self.ufLogger.debug(f'{event.requestShape=}')
+        self.ufLogger.debug(f'{requestingUmlClass=}')
         self._requestingLollipopLocation = True
-        self._requestingUmlClass            = event.requestShape
+        self._requestingUmlClass         = requestingUmlClass
 
-        self._applicationAdapter.updateApplicationStatus('Click on the UML Class edge where you want to place the interface')
+        self.eventEngine.sendEvent(UmlEventType.UPDATE_APPLICATION_STATUS, message='Click on the UML Class edge where you want to place the interface')
 
     def createLollipopInterface(self, requestingUmlClass: UmlClass, perimeterPoint: UmlPosition):
         """

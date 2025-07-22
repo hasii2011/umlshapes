@@ -1,17 +1,16 @@
 
-from typing import cast
-
 from logging import Logger
 from logging import getLogger
 
 from wx import OK
-
 
 from pyutmodelv2.PyutModelTypes import ClassName
 from pyutmodelv2.PyutInterface import PyutInterface
 from pyutmodelv2.PyutInterface import PyutInterfaces
 
 from umlshapes.dialogs.DlgEditInterface import DlgEditInterface
+
+from umlshapes.eventengine.IUmlEventEngine import IUmlEventEngine
 
 from umlshapes.frames.UmlClassDiagramFrame import UmlClassDiagramFrame
 
@@ -33,7 +32,6 @@ class UmlLollipopInterfaceEventHandler(UmlBaseEventHandler):
         super().__init__(shape=lollipopInterface)
 
     def OnLeftDoubleClick(self, x: int, y: int, keys: int = 0, attachment: int = 0):
-        from umlshapes.eventengine.UmlEventEngine import UmlEventEngine
 
         super().OnLeftDoubleClick(x=x, y=y, keys=keys, attachment=attachment)
 
@@ -45,7 +43,7 @@ class UmlLollipopInterfaceEventHandler(UmlBaseEventHandler):
 
         self.logger.info(f'{umlLollipopInterface=}')
 
-        eventEngine:    UmlEventEngine = umlFrame.eventEngine
+        eventEngine:    IUmlEventEngine = umlFrame.eventEngine
         pyutInterfaces: PyutInterfaces = self.getDefinedInterfaces()
         with DlgEditInterface(parent=umlFrame, oglInterface2=umlLollipopInterface, eventEngine=eventEngine, pyutInterfaces=pyutInterfaces, editMode=True) as dlg:
             if dlg.ShowModal() == OK:
@@ -78,7 +76,7 @@ class UmlLollipopInterfaceEventHandler(UmlBaseEventHandler):
                     if pyutInterface not in pyutInterfaces:
                         pyutInterfaces.append(pyutInterface)
             elif isinstance(umlShape, UmlInterface):
-                umlInterface: UmlInterface = cast(UmlInterface, umlShape)
+                umlInterface: UmlInterface = umlShape
                 interface:    UmlClass     = umlInterface.interfaceClass
                 implementor:  UmlClass     = umlInterface.implementingClass
                 #
