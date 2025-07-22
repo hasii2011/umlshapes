@@ -1,0 +1,47 @@
+
+
+notifications:
+  email:
+    recipients:
+      - humberto.a.sanchez.ii@gmail.com
+    on_success: change # default: change
+    on_failure: always # default: always
+
+language: python
+
+dist: jammy
+
+cache: pip
+
+services:
+  - xvfb
+
+python:
+  - "3.12"
+
+install:
+  - GLOBAL=`python --version`
+  - echo $GLOBAL
+  - PY_VERSION=${GLOBAL#* }
+  - pyenv global ${PY_VERSION}
+  - pip install --upgrade pip
+  - pip install wheel==0.45.1
+  - pip install setuptools==75.8.0
+  - pip install twine==6.0.1
+  - pip install build==1.2.2.post1
+  - pip install html-testRunner~=1.2.1
+  - pip install six==1.16.0
+  - pip install attrdict3
+  - pip install codeallybasic==1.10.4
+  - pip install pyutmodelv2==2.2.4
+  - pip install untangle==1.2.1
+  - URL=https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-24.04
+  - pip install -U -f $URL wxPython
+  - pip install codeallyadvanced==1.4.2
+  - pip install Pypubsub==4.0.3
+  - pip install human_id==0.2.0
+
+# command to run tests
+script:
+  - pip install buildlackey
+  - unittests -v loud

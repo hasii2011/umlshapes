@@ -19,7 +19,6 @@ from pyutmodelv2.PyutInterface import PyutInterface
 from pyutmodelv2.PyutInterface import PyutInterfaces
 from pyutmodelv2.PyutModelTypes import ClassName
 
-from umlshapes.IApplicationAdapter import IApplicationAdapter
 from umlshapes.UmlDiagram import UmlDiagram
 from umlshapes.UmlUtils import UmlUtils
 from umlshapes.dialogs.DlgEditInterface import DlgEditInterface
@@ -40,7 +39,6 @@ from umlshapes.types.UmlPosition import UmlPosition
 from tests.demo.DemoCommon import Identifiers
 from tests.demo.RelationshipCreator import RelationshipCreator
 from tests.demo.ShapeCreator import ShapeCreator
-from tests.demo.DemoApplicationAdapter import DemoApplicationAdapter
 
 FRAME_WIDTH:  int = 1024
 FRAME_HEIGHT: int = 720
@@ -51,8 +49,6 @@ class DemoAppFrame(SizedFrame):
         self.logger: Logger = getLogger(__name__)
 
         super().__init__(parent=None, title='Test UML Shapes', size=(FRAME_WIDTH, FRAME_HEIGHT), style=DEFAULT_FRAME_STYLE | FRAME_FLOAT_ON_PARENT)
-
-        self._applicationAdapter: IApplicationAdapter = DemoApplicationAdapter(frame=self)
 
         sizedPanel: SizedPanel = self.GetContentsPane()
         sizedPanel.SetSizerProps(expand=True, proportion=1)

@@ -37,8 +37,8 @@ jobs:
             pip install six==1.16.0
             pip install attrdict3
             pip install -v -U -f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-24.04  wxPython
-            pip install hrid==0.2.4
             pip install human_id==0.2.0
+            pip install Pypubsub==4.0.3
       - save_cache:
           key: *deps1-cache
           paths:

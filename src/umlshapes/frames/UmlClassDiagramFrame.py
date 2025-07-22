@@ -68,7 +68,7 @@ class UmlClassDiagramFrame(UmlFrame):
             self.ucdLogger.debug(f'Nearest point: {nearestPoint}')
 
             assert self._requestingUmlClass is not None, 'I need something to attach to'
-            self.createLollipopInterface(
+            self._createLollipopInterface(
                 requestingUmlClass=self._requestingUmlClass,
                 perimeterPoint=nearestPoint
             )
@@ -94,7 +94,7 @@ class UmlClassDiagramFrame(UmlFrame):
 
         self.eventEngine.sendEvent(UmlEventType.UPDATE_APPLICATION_STATUS, message='Click on the UML Class edge where you want to place the interface')
 
-    def createLollipopInterface(self, requestingUmlClass: UmlClass, perimeterPoint: UmlPosition):
+    def _createLollipopInterface(self, requestingUmlClass: UmlClass, perimeterPoint: UmlPosition):
         """
         Args:
             requestingUmlClass:
