@@ -20,7 +20,7 @@ if TYPE_CHECKING:
 from umlshapes.shapes.UmlClass import UmlClass
 
 
-class UmlClassDiagramFrameMenuHandler:
+class UmlClassCtxMenuHandler:
     def __init__(self, frame: 'UmlClassDiagramFrame'):
 
         from umlshapes.frames.UmlClassDiagramFrame import UmlClassDiagramFrame
@@ -38,7 +38,7 @@ class UmlClassDiagramFrameMenuHandler:
 
     def popupMenu(self, x: int, y: int):
 
-        self.logger.debug(f'UmlClassDiagramFrameMenuHandler - x,y: {x},{y}')
+        self.logger.debug(f'UmlClassCtxMenuHandler - x,y: {x},{y}')
 
         autoSizeMenuItem     = self._contextMenu.FindItemById(id=self._autoSizeID)
         arrangeLinksMenuItem = self._contextMenu.FindItemById(id=self._arrangeLinksID)

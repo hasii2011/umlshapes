@@ -10,7 +10,7 @@ from wx import Window
 from umlshapes.eventengine.IUmlEventEngine import IUmlEventEngine
 from umlshapes.eventengine.UmlEventType import UmlEventType
 
-from umlshapes.frames.UmlClassDiagramFrameMenuHandler import UmlClassDiagramFrameMenuHandler
+from umlshapes.frames.UmlClassCtxMenuHandler import UmlClassCtxMenuHandler
 from umlshapes.frames.UmlFrame import UmlFrame
 
 from umlshapes.UmlUtils import UmlUtils
@@ -40,7 +40,7 @@ class UmlClassDiagramFrame(UmlFrame):
 
         self.ucdLogger: Logger = getLogger(__name__)
 
-        self._menuHandler:  UmlClassDiagramFrameMenuHandler = cast(UmlClassDiagramFrameMenuHandler, None)
+        self._menuHandler:  UmlClassCtxMenuHandler = cast(UmlClassCtxMenuHandler, None)
 
         self._requestingLollipopLocation: bool     = False
         self._requestingUmlClass:         UmlClass = NO_CLASS
@@ -86,7 +86,7 @@ class UmlClassDiagramFrame(UmlFrame):
         if not self._areWeOverAShape(x=x, y=y):
             self.ucdLogger.info('You missed the shape')
             if self._menuHandler is None:
-                self._menuHandler = UmlClassDiagramFrameMenuHandler(self)
+                self._menuHandler = UmlClassCtxMenuHandler(self)
 
             self._menuHandler.popupMenu(x=x, y=y)
 

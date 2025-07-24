@@ -6,10 +6,10 @@ from logging import getLogger
 
 from umlshapes.eventengine.BaseEventEngine import BaseEventEngine
 from umlshapes.eventengine.BaseEventEngine import Topic
-from umlshapes.eventengine.IUmlEventEngine import FrameId
 
 from umlshapes.eventengine.IUmlEventEngine import IUmlEventEngine
 from umlshapes.eventengine.UmlEventType import UmlEventType
+from umlshapes.frames.DiagramFrame import FrameId
 
 
 class UmlEventEngine(IUmlEventEngine, BaseEventEngine):
