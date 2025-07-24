@@ -54,8 +54,6 @@ class UmlFrame(DiagramFrame):
         self.setInfinite(True)
         self._currentReportInterval: int = self._preferences.trackMouseInterval
 
-        self._id: str = UmlUtils.getID()
-
     @property
     def eventEngine(self) -> IUmlEventEngine:
         return self._eventEngine
@@ -65,15 +63,6 @@ class UmlFrame(DiagramFrame):
 
         diagram: UmlDiagram = self.GetDiagram()
         return diagram.GetShapeList()
-
-    @property
-    def id(self) -> str:
-        """
-        UmlFrame ID
-
-        Returns:  The UML generated ID
-        """
-        return self._id
 
     def OnLeftClick(self, x, y, keys=0):
         """

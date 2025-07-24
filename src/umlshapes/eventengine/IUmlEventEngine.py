@@ -3,11 +3,9 @@ from typing import Callable
 from abc import ABC
 from abc import abstractmethod
 
-from mypy.types import NewType
+from umlshapes.frames.DiagramFrame import FrameId
 
 from umlshapes.eventengine.UmlEventType import UmlEventType
-
-FrameId = NewType('FrameId', str)
 
 
 class IUmlEventEngine(ABC):

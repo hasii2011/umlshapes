@@ -1,4 +1,5 @@
 
+from typing import NewType
 from typing import TYPE_CHECKING
 from typing import cast
 
@@ -36,6 +37,8 @@ from umlshapes.preferences.UmlPreferences import UmlPreferences
 if TYPE_CHECKING:
     from umlshapes.UmlDiagram import UmlDiagram
 
+FrameId = NewType('FrameId', str)
+
 
 class DiagramFrame(ShapeCanvas):
     """
@@ -70,8 +73,9 @@ class DiagramFrame(ShapeCanvas):
         w, h = self.GetSize()
         self._workingBitmap: Bitmap = Bitmap(w, h)   # double buffering
 
-        self._isInfinite: bool = False    # Indicates if the frame is infinite
-        self._frameId:    str  = UmlUtils.getID()
+        self._isInfinite: bool    = False    # Indicates if the frame is infinite
+        # The ShapeCanvas ID is an integer;  use our own
+        self._id: FrameId = FrameId(UmlUtils.getID())
 
     @property
     def umlDiagram(self) -> 'UmlDiagram':
@@ -82,12 +86,13 @@ class DiagramFrame(ShapeCanvas):
         self.SetDiagram(newDiagram)
 
     @property
-    def frameId(self):
-        return self._frameId
+    def id(self) -> FrameId:
+        """
+        UmlFrame ID
 
-    @frameId.setter
-    def frameId(self, frameId: str):
-        self._frameId = frameId
+        Returns:  The UML generated Frame ID
+        """
+        return self._id
 
     def refresh(self, eraseBackground: bool = True):
 
