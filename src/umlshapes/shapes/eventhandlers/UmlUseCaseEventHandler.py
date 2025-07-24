@@ -2,12 +2,13 @@
 from logging import Logger
 from logging import getLogger
 
-from pyutmodelv2.PyutUseCase import PyutUseCase
 from wx import ID_OK
+
+from pyutmodelv2.PyutUseCase import PyutUseCase
 
 from umlshapes.UmlBaseEventHandler import UmlBaseEventHandler
 from umlshapes.dialogs.DlgEditUseCase import DlgEditUseCase
-from umlshapes.frames.UmlClassDiagramFrame import UmlClassDiagramFrame
+from umlshapes.frames.UmlFrame import UmlFrame
 from umlshapes.shapes.UmlUseCase import UmlUseCase
 
 
@@ -28,7 +29,7 @@ class UmlUseCaseEventHandler(UmlBaseEventHandler):
         umlUseCase:  UmlUseCase  = self.GetShape()
         pyutUseCase: PyutUseCase = umlUseCase.pyutUseCase
 
-        umlFrame:  UmlClassDiagramFrame  = umlUseCase.GetCanvas()
+        umlFrame:  UmlFrame  = umlUseCase.GetCanvas()
 
         with DlgEditUseCase(umlFrame, useCaseName=pyutUseCase.name) as dlg:
             if dlg.ShowModal() == ID_OK:

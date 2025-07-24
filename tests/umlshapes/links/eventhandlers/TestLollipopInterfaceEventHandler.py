@@ -11,7 +11,7 @@ from pyutmodelv2.PyutInterface import PyutInterfaces
 from pyutmodelv2.PyutLink import PyutLink
 from pyutmodelv2.enumerations.PyutLinkType import PyutLinkType
 
-from umlshapes.frames.UmlClassDiagramFrame import UmlClassDiagramFrame
+from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
 from umlshapes.links.UmlInterface import UmlInterface
 from umlshapes.links.UmlLollipopInterface import UmlLollipopInterface
 from umlshapes.links.eventhandlers.UmlLollipopInterfaceEventHandler import UmlLollipopInterfaceEventHandler
@@ -52,7 +52,7 @@ class TestLollipopInterfaceEventHandler(UnitTestBase):
 
         umlshapes:    UmlShapeList = UmlShapeList([lollipop1, lollipop2])
 
-        mockFrame:    Mock = Mock(spec=UmlClassDiagramFrame)
+        mockFrame:    Mock = Mock(spec=ClassDiagramFrame)
         type(mockFrame).umlShapes = PropertyMock(return_value=umlshapes)
 
         mockShape:    Mock = Mock(spec=UmlLollipopInterface)
@@ -99,7 +99,7 @@ class TestLollipopInterfaceEventHandler(UnitTestBase):
 
         umlshapes:    UmlShapeList = UmlShapeList([standardInterface1, standardInterface2])
 
-        mockFrame:    Mock = Mock(spec=UmlClassDiagramFrame)
+        mockFrame:    Mock = Mock(spec=ClassDiagramFrame)
         type(mockFrame).umlShapes = PropertyMock(return_value=umlshapes)
 
         mockShape:    Mock = Mock(spec=UmlLollipopInterface)

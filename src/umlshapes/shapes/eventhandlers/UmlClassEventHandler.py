@@ -8,7 +8,7 @@ from wx import OK
 
 from pyutmodelv2.PyutClass import PyutClass
 
-from umlshapes.frames.UmlClassDiagramFrame import UmlClassDiagramFrame
+from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
 from umlshapes.shapes.UmlClass import UmlClass
@@ -42,7 +42,7 @@ class UmlClassEventHandler(UmlBaseEventHandler):
             attachment:
         """
         umlClass: UmlClass              = self.GetShape()
-        umlFrame: UmlClassDiagramFrame  = umlClass.GetCanvas()
+        umlFrame: ClassDiagramFrame  = umlClass.GetCanvas()
         """
 
         I really don't like accessing the UML Frame is this manner because
@@ -64,7 +64,7 @@ class UmlClassEventHandler(UmlBaseEventHandler):
         super().OnRightClick(x=x, y=y, keys=keys, attachment=attachment)
 
         umlClass: UmlClass = self.GetShape()
-        umlFrame: UmlClassDiagramFrame  = umlClass.GetCanvas()
+        umlFrame: ClassDiagramFrame  = umlClass.GetCanvas()
 
         if self._menuHandler is None:
             self._menuHandler = UmlClassMenuHandler(umlClass=umlClass, eventEngine=umlFrame.eventEngine)
@@ -80,7 +80,7 @@ class UmlClassEventHandler(UmlBaseEventHandler):
 
         umlClass:  UmlClass  = self.GetShape()
         pyutClass: PyutClass = umlClass.pyutClass
-        umlFrame:  UmlClassDiagramFrame  = umlClass.GetCanvas()
+        umlFrame:  ClassDiagramFrame  = umlClass.GetCanvas()
 
         eventEngine: IUmlEventEngine = umlFrame.eventEngine
         with DlgEditClass(parent=umlFrame, pyutClass=pyutClass, eventEngine=eventEngine) as dlg:

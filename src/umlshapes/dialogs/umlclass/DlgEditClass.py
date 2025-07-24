@@ -38,7 +38,7 @@ from umlshapes.enhancedlistbox.EnhancedListBox import EnhancedListBox
 from umlshapes.enhancedlistbox.EnhancedListBoxItems import EnhancedListBoxItems
 from umlshapes.enhancedlistbox.UpCallbackData import UpCallbackData
 
-from umlshapes.frames.UmlClassDiagramFrame import UmlClassDiagramFrame
+from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
@@ -64,7 +64,7 @@ class DlgEditClass(DlgEditClassCommon):
     dialog, any modifications are lost.
 
     """
-    def __init__(self, parent: UmlClassDiagramFrame, eventEngine: IUmlEventEngine, pyutClass: PyutClass):
+    def __init__(self, parent: ClassDiagramFrame, eventEngine: IUmlEventEngine, pyutClass: PyutClass):
         """
 
         Args:
@@ -72,8 +72,8 @@ class DlgEditClass(DlgEditClassCommon):
             pyutClass:      Class modified by dialog
         """
 
-        assert isinstance(parent, UmlClassDiagramFrame), 'Developer error.  Must be a Uml Diagram Frame'
-        self._umlFrame:    UmlClassDiagramFrame = parent
+        assert isinstance(parent, ClassDiagramFrame), 'Developer error.  Must be a Uml Diagram Frame'
+        self._umlFrame:    ClassDiagramFrame = parent
         self.logger:       Logger               = getLogger(__name__)
         self._pyutClass:   PyutClass            = pyutClass
 

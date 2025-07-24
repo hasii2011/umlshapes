@@ -13,7 +13,6 @@ from wx import Window
 from wx.lib.ogl import Shape
 from wx.lib.ogl import ShapeCanvas
 
-from umlshapes.UmlUtils import UmlUtils
 from umlshapes.eventengine.IUmlEventEngine import IUmlEventEngine
 
 from umlshapes.frames.DiagramFrame import DiagramFrame
@@ -23,7 +22,6 @@ from umlshapes.UmlDiagram import UmlDiagram
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
 from umlshapes.types.Common import UmlShapeList
-
 
 DEFAULT_WIDTH: int   = 3000
 A4_FACTOR:     float = 1.41

@@ -18,7 +18,7 @@ from pyutmodelv2.enumerations.PyutLinkType import PyutLinkType
 from tests.demo.DemoCommon import Identifiers
 from umlshapes.UmlDiagram import UmlDiagram
 
-from umlshapes.frames.UmlClassDiagramFrame import UmlClassDiagramFrame
+from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
 from umlshapes.links.UmlAggregation import UmlAggregation
 from umlshapes.links.UmlComposition import UmlComposition
 from umlshapes.links.UmlInheritance import UmlInheritance
@@ -65,9 +65,9 @@ class RelationshipCreator:
     """
     Not those kinds, dork
     """
-    def __init__(self, diagramFrame: UmlClassDiagramFrame):
+    def __init__(self, diagramFrame: ClassDiagramFrame):
 
-        self._diagramFrame:    UmlClassDiagramFrame = diagramFrame
+        self._diagramFrame:    ClassDiagramFrame = diagramFrame
         self.logger:           Logger               = getLogger(__name__)
         self._preferences:     UmlPreferences       = UmlPreferences()
         self._currentPosition: UmlPosition          = UmlPosition(x=INITIAL_X, y=INITIAL_Y)

@@ -16,18 +16,18 @@ from umlshapes.preferences.UmlPreferences import UmlPreferences
 from umlshapes.types.Common import UmlShapeList
 
 if TYPE_CHECKING:
-    from umlshapes.frames.UmlClassDiagramFrame import UmlClassDiagramFrame
+    from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
 from umlshapes.shapes.UmlClass import UmlClass
 
 
 class UmlClassCtxMenuHandler:
-    def __init__(self, frame: 'UmlClassDiagramFrame'):
+    def __init__(self, frame: 'ClassDiagramFrame'):
 
-        from umlshapes.frames.UmlClassDiagramFrame import UmlClassDiagramFrame
+        from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
 
         self.logger: Logger = getLogger(__name__)
 
-        self._frame:       UmlClassDiagramFrame = frame
+        self._frame:       ClassDiagramFrame = frame
         self._contextMenu: Menu                 = cast(Menu, None)
 
         self._autoSizeID:     int = wxNewIdRef()
@@ -88,7 +88,7 @@ class UmlClassCtxMenuHandler:
 
     def _autoSize(self):
 
-        umlFrame:  UmlClassDiagramFrame = self._frame
+        umlFrame:  ClassDiagramFrame = self._frame
         umlShapes: UmlShapeList        = umlFrame.umlShapes
 
         for umlShape in umlShapes:

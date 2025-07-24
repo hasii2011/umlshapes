@@ -43,7 +43,7 @@ from umlshapes.mixins.TopLeftMixin import TopLeftMixin
 from umlshapes.mixins.ControlPointMixin import ControlPointMixin
 
 if TYPE_CHECKING:
-    from umlshapes.frames.UmlClassDiagramFrame import UmlClassDiagramFrame
+    from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
 
 DUNDER_METHOD_INDICATOR: str = '__'
 CONSTRUCTOR_NAME:        str = '__init__'
@@ -107,11 +107,11 @@ class UmlClass(ControlPointMixin, RectangleShape, TopLeftMixin, IDMixin):
         self._pyutClass = pyutClass
 
     @property
-    def umlFrame(self) -> 'UmlClassDiagramFrame':
+    def umlFrame(self) -> 'ClassDiagramFrame':
         return self.GetCanvas()
 
     @umlFrame.setter
-    def umlFrame(self, frame: 'UmlClassDiagramFrame'):
+    def umlFrame(self, frame: 'ClassDiagramFrame'):
         self.SetCanvas(frame)
 
     @property

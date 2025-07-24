@@ -24,7 +24,7 @@ NO_CLASS: UmlClass = cast(UmlClass, None)
 CreateLollipopCallback = Callable[[UmlClass, UmlPosition], None]
 
 
-class UmlClassDiagramFrame(UmlFrame):
+class ClassDiagramFrame(UmlFrame):
 
     def __init__(self, parent: Window, umlEventEngine: IUmlEventEngine, createLollipopCallback: CreateLollipopCallback):
         """
@@ -130,7 +130,7 @@ class UmlClassDiagramFrame(UmlFrame):
         return answer
 
     def __repr__(self) -> str:
-        return f'UmlClassDiagramFrame - `{self.id}`'
+        return f'ClassDiagramFrame - `{self.id}`'
 
     def __str__(self) -> str:
         return self.__repr__()

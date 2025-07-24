@@ -26,7 +26,7 @@ from umlshapes.eventengine.IUmlEventEngine import IUmlEventEngine
 from umlshapes.eventengine.UmlEventEngine import UmlEventEngine
 from umlshapes.eventengine.UmlEventType import UmlEventType
 from umlshapes.frames.DiagramFrame import FrameId
-from umlshapes.frames.UmlClassDiagramFrame import UmlClassDiagramFrame
+from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
 
 from umlshapes.links.UmlLollipopInterface import UmlLollipopInterface
 from umlshapes.links.eventhandlers.UmlLollipopInterfaceEventHandler import UmlLollipopInterfaceEventHandler
@@ -55,7 +55,7 @@ class DemoAppFrame(SizedFrame):
         sizedPanel.SetSizerProps(expand=True, proportion=1)
 
         self._umlEventEngine: UmlEventEngine = UmlEventEngine()
-        self._diagramFrame = UmlClassDiagramFrame(
+        self._diagramFrame = ClassDiagramFrame(
             parent=sizedPanel,
             umlEventEngine=self._umlEventEngine,
             createLollipopCallback=self._createLollipopInterface
@@ -195,7 +195,7 @@ class DemoAppFrame(SizedFrame):
         eventHandler.SetPreviousHandler(umlLollipopInterface.GetEventHandler())
         umlLollipopInterface.SetEventHandler(eventHandler)
 
-        umlFrame:       UmlClassDiagramFrame = self._diagramFrame
+        umlFrame:       ClassDiagramFrame = self._diagramFrame
         eventEngine:    IUmlEventEngine      = umlFrame.eventEngine
         pyutInterfaces: PyutInterfaces       = eventHandler.getDefinedInterfaces()
 

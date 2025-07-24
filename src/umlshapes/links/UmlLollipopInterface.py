@@ -30,14 +30,14 @@ from umlshapes.types.UmlPosition import UmlPosition
 
 if TYPE_CHECKING:
     from umlshapes.shapes.UmlClass import UmlClass
-    from umlshapes.frames.UmlClassDiagramFrame import UmlClassDiagramFrame
+    from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
 
 
 class UmlLollipopInterface(Shape):
     """
     Lollipops are tasty !!
     """
-    def __init__(self, pyutInterface: PyutInterface, canvas: Optional['UmlClassDiagramFrame'] = None):
+    def __init__(self, pyutInterface: PyutInterface, canvas: Optional['ClassDiagramFrame'] = None):
         """
 
         Args:

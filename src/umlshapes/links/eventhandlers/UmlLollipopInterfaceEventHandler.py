@@ -12,7 +12,7 @@ from umlshapes.dialogs.DlgEditInterface import DlgEditInterface
 
 from umlshapes.eventengine.IUmlEventEngine import IUmlEventEngine
 
-from umlshapes.frames.UmlClassDiagramFrame import UmlClassDiagramFrame
+from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
 
 from umlshapes.links.UmlInterface import UmlInterface
 from umlshapes.links.UmlLollipopInterface import UmlLollipopInterface
@@ -36,7 +36,7 @@ class UmlLollipopInterfaceEventHandler(UmlBaseEventHandler):
         super().OnLeftDoubleClick(x=x, y=y, keys=keys, attachment=attachment)
 
         umlLollipopInterface: UmlLollipopInterface = self.GetShape()
-        umlFrame:             UmlClassDiagramFrame = umlLollipopInterface.GetCanvas()
+        umlFrame:             ClassDiagramFrame = umlLollipopInterface.GetCanvas()
 
         umlLollipopInterface.selected = False
         umlFrame.refresh()
@@ -61,7 +61,7 @@ class UmlLollipopInterfaceEventHandler(UmlBaseEventHandler):
 
         """
         umlLollipopInterface: UmlLollipopInterface = self.GetShape()
-        umlFrame:             UmlClassDiagramFrame = umlLollipopInterface.GetCanvas()
+        umlFrame:             ClassDiagramFrame = umlLollipopInterface.GetCanvas()
 
         umlShapes:      UmlShapeList   = umlFrame.umlShapes
         pyutInterfaces: PyutInterfaces = PyutInterfaces([])

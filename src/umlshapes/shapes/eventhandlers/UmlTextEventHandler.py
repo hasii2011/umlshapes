@@ -6,10 +6,7 @@ from typing import List
 from logging import Logger
 from logging import getLogger
 
-from pyutmodelv2.PyutText import PyutText
-from wx import Bitmap
-from wx import CommandEvent
-
+from wx import RED
 from wx import EVT_MENU
 from wx import FONTSTYLE_ITALIC
 from wx import FONTSTYLE_NORMAL
@@ -19,19 +16,22 @@ from wx import OK
 from wx import PENSTYLE_SOLID
 
 from wx import DC
+from wx import Bitmap
+from wx import CommandEvent
 from wx import Menu
 from wx import MenuItem
 from wx import Colour
 from wx import Pen
 
 from wx import NewIdRef as wxNewIdRef
-from wx import RED
 
 from wx.lib.ogl import Shape
 from wx.lib.ogl import ShapeCanvas
 
+from pyutmodelv2.PyutText import PyutText
+
 from umlshapes.dialogs.DlgEditText import DlgEditText
-from umlshapes.frames.UmlClassDiagramFrame import UmlClassDiagramFrame
+from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
 from umlshapes.frames.UmlFrame import UmlFrame
 from umlshapes.UmlBaseEventHandler import UmlBaseEventHandler
 from umlshapes.shapes.UmlText import UmlText
@@ -103,7 +103,7 @@ class UmlTextEventHandler(UmlBaseEventHandler):
         umlText:  UmlText  = self.GetShape()
         pyutText: PyutText = umlText.pyutText
 
-        umlFrame:  UmlClassDiagramFrame  = umlText.GetCanvas()
+        umlFrame:  ClassDiagramFrame  = umlText.GetCanvas()
 
         with DlgEditText(parent=umlFrame, pyutText=pyutText,) as dlg:
             if dlg.ShowModal() == OK:

@@ -44,7 +44,7 @@ from umlshapes.dialogs.DlgEditActor import DlgEditActor
 from umlshapes.dialogs.DlgEditNote import DlgEditNote
 from umlshapes.dialogs.DlgEditText import DlgEditText
 from umlshapes.dialogs.DlgEditUseCase import DlgEditUseCase
-from umlshapes.frames.UmlClassDiagramFrame import UmlClassDiagramFrame
+from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
 from umlshapes.shapes.UmlActor import UmlActor
@@ -84,11 +84,11 @@ ShapesToCreate = NewType('ShapesToCreate', Dict[ID_REFERENCE, ShapeDescription])
 
 class ShapeCreator:
 
-    def __init__(self, diagramFrame: UmlClassDiagramFrame):
+    def __init__(self, diagramFrame: ClassDiagramFrame):
 
         self.logger: Logger = getLogger(__name__)
 
-        self._diagramFrame: UmlClassDiagramFrame = diagramFrame
+        self._diagramFrame: ClassDiagramFrame = diagramFrame
 
         self._currentPosition: UmlPosition = UmlPosition(x=INITIAL_X, y=INITIAL_Y)
 

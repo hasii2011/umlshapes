@@ -7,7 +7,7 @@ from wx import ID_OK
 from pyutmodelv2.PyutActor import PyutActor
 
 from umlshapes.dialogs.DlgEditActor import DlgEditActor
-from umlshapes.frames.UmlClassDiagramFrame import UmlClassDiagramFrame
+from umlshapes.frames.UmlFrame import UmlFrame
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
 from umlshapes.UmlBaseEventHandler import UmlBaseEventHandler
@@ -31,7 +31,7 @@ class UmlActorEventHandler(UmlBaseEventHandler):
         umlActor:  UmlActor  = self.GetShape()
         pyutActor: PyutActor = umlActor.pyutActor
 
-        umlFrame:  UmlClassDiagramFrame  = umlActor.GetCanvas()
+        umlFrame:  UmlFrame  = umlActor.GetCanvas()
 
         with DlgEditActor(parent=umlFrame, actorName=pyutActor.name,) as dlg:
             if dlg.ShowModal() == ID_OK:

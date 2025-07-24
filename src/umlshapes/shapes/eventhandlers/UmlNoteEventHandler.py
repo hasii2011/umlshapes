@@ -8,7 +8,7 @@ from pyutmodelv2.PyutNote import PyutNote
 
 from umlshapes.UmlBaseEventHandler import UmlBaseEventHandler
 from umlshapes.dialogs.DlgEditNote import DlgEditNote
-from umlshapes.frames.UmlClassDiagramFrame import UmlClassDiagramFrame
+from umlshapes.frames.UmlFrame import UmlFrame
 from umlshapes.shapes.UmlNote import UmlNote
 
 
@@ -27,7 +27,7 @@ class UmlNoteEventHandler(UmlBaseEventHandler):
         umlNote:  UmlNote  = self.GetShape()
         pyutNote: PyutNote = umlNote.pyutNote
 
-        umlFrame:  UmlClassDiagramFrame  = umlNote.GetCanvas()
+        umlFrame:  UmlFrame  = umlNote.GetCanvas()
 
         with DlgEditNote(parent=umlFrame, pyutNote=pyutNote,) as dlg:
             if dlg.ShowModal() == OK:
