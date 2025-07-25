@@ -184,7 +184,7 @@ class DemoAppFrame(SizedFrame):
 
         self.logger.debug(f'{umlLollipopInterface.attachmentSide=} {umlLollipopInterface.lineCentum=}')
 
-        umlLollipopInterface.SetCanvas(self)
+        umlLollipopInterface.umlFrame = self._diagramFrame
         diagram: UmlDiagram = self._diagramFrame.umlDiagram
 
         diagram.AddShape(umlLollipopInterface)

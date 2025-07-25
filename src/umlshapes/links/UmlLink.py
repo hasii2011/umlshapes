@@ -2,6 +2,7 @@
 from typing import List
 from typing import Tuple
 from typing import cast
+from typing import TYPE_CHECKING
 
 from logging import Logger
 from logging import getLogger
@@ -41,6 +42,9 @@ from umlshapes.types.Common import NAME_IDX
 from umlshapes.types.Common import TAB
 from umlshapes.types.UmlPosition import UmlPosition
 
+if TYPE_CHECKING:
+    from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
+
 
 class UmlLink(LineShape, IDMixin):
 
@@ -57,6 +61,14 @@ class UmlLink(LineShape, IDMixin):
 
         self.SetFormatMode(mode=FORMAT_SIZE_TO_CONTENTS)
         self.SetDraggable(True, recursive=True)
+
+    @property
+    def umlFrame(self) -> 'ClassDiagramFrame':
+        return self.GetCanvas()
+
+    @umlFrame.setter
+    def umlFrame(self, frame: 'ClassDiagramFrame'):
+        self.SetCanvas(frame)
 
     @property
     def controlPoints(self) -> List[UmlLineControlPoint]:

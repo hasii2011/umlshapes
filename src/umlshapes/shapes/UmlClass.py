@@ -150,12 +150,14 @@ class UmlClass(ControlPointMixin, RectangleShape, TopLeftMixin, IDMixin):
         self._startClipping(dc=dc, leftX=x, leftY=y)
         drawingYOffset = self._drawClassHeader(dc=dc, leftX=x, leftY=y, shapeWidth=w)
 
+        # noinspection PySimplifyBooleanCheck
         if self.pyutClass.showFields is True:
             dc.DrawLine(x, y + drawingYOffset, x + w, y + drawingYOffset)
             drawingYOffset = self._drawClassFields(dc, leftX=x, leftY=y, startYOffset=drawingYOffset)
 
         dc.DrawLine(x, y + drawingYOffset, x + w, y + drawingYOffset)
 
+        # noinspection PySimplifyBooleanCheck
         if self.pyutClass.showMethods is True:
             self._drawClassMethods(dc=dc, leftX=x, leftY=y, startYOffset=drawingYOffset)
 
@@ -352,6 +354,7 @@ class UmlClass(ControlPointMixin, RectangleShape, TopLeftMixin, IDMixin):
         # This code depends on excellent string representations of fields
         # Provided by the fields __str__() methods
         #
+        # noinspection PySimplifyBooleanCheck
         if pyutClass.showFields is True:
             for field in pyutClass.fields:
                 fieldStr: str = str(field)      # Must be good __str__()
@@ -383,6 +386,7 @@ class UmlClass(ControlPointMixin, RectangleShape, TopLeftMixin, IDMixin):
             yOffset += textHeight
 
         for method in pyutClass.methods:
+            # noinspection PySimplifyBooleanCheck
             if self._eligibleToDraw(pyutClass=pyutClass, pyutMethod=method) is True:
 
                 displayParameters: PyutDisplayParameters = pyutClass.displayParameters
@@ -463,6 +467,7 @@ class UmlClass(ControlPointMixin, RectangleShape, TopLeftMixin, IDMixin):
         ans: bool = True
 
         if classProperty == PyutDisplayMethods.UNSPECIFIED:
+            # noinspection PySimplifyBooleanCheck
             if globalValue is False:
                 ans = False
         else:
@@ -640,8 +645,10 @@ class UmlClass(ControlPointMixin, RectangleShape, TopLeftMixin, IDMixin):
         pyutMethods: PyutMethods = pyutClass.methods
 
         maxWidth: int = 0
+        # noinspection PySimplifyBooleanCheck
         if pyutClass.showMethods is True:
             for pyutMethod in pyutMethods:
+                # noinspection PySimplifyBooleanCheck
                 if self._eligibleToDraw(pyutClass=pyutClass, pyutMethod=pyutMethod) is True:
                     methodStr:   str = self._getMethodRepresentation(pyutMethod=pyutMethod, displayParameters=pyutClass.displayParameters)
                     self.logger.debug(f'{methodStr=}')

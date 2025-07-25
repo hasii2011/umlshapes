@@ -26,6 +26,8 @@ from umlshapes.mixins.TopLeftMixin import TopLeftMixin
 
 from umlshapes.types.UmlDimensions import UmlDimensions
 
+from umlshapes.frames.UseCaseDiagramFrame import UseCaseDiagramFrame
+
 MARGIN: int = 5
 ACTOR_HEIGHT_ADJUSTMENT:    float = 0.8
 ACTOR_HEAD_SIZE_ADJUSTMENT: float = 0.4
@@ -93,6 +95,14 @@ class UmlActor(ControlPointMixin, RectangleShape, TopLeftMixin, IDMixin):
     @selected.setter
     def selected(self, select: bool):
         self.Select(select=select)
+
+    @property
+    def umlFrame(self) -> UseCaseDiagramFrame:
+        return self.GetCanvas()
+
+    @umlFrame.setter
+    def umlFrame(self, frame: UseCaseDiagramFrame):
+        self.SetCanvas(frame)
 
     # This is dangerous, accessing internal stuff
     # noinspection PyProtectedMember

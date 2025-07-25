@@ -158,7 +158,7 @@ class ShapeCreator:
         umlShape: UmlShape = shapeDescription.umlShape(modelClass)      # type: ignore
 
         umlPosition: UmlPosition = self._computePosition()
-        umlShape.SetCanvas(self._diagramFrame)
+        umlShape.umlFrame = self._diagramFrame
         umlShape.position = umlPosition
 
         diagram: UmlDiagram = self._diagramFrame.umlDiagram

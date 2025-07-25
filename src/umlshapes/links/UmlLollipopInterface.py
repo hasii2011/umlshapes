@@ -58,6 +58,14 @@ class UmlLollipopInterface(Shape):
         self._attachmentSide:   AttachmentSide = cast(AttachmentSide, None)
 
     @property
+    def umlFrame(self) -> 'ClassDiagramFrame':
+        return self.GetCanvas()
+
+    @umlFrame.setter
+    def umlFrame(self, frame: 'ClassDiagramFrame'):
+        self.SetCanvas(frame)
+
+    @property
     def pyutInterface(self) -> PyutInterface:
         return self._pyutInterface
 

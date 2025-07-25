@@ -134,7 +134,7 @@ class RelationshipCreator:
 
         umlAssociation = associationDescription.associationClass(pyutLink=pyutLink)
 
-        umlAssociation.SetCanvas(self._diagramFrame)
+        umlAssociation.umlFrame = self._diagramFrame
         umlAssociation.MakeLineControlPoints(n=2)       # Make this configurable
 
         sourceUmlClass.addLink(umlLink=umlAssociation, destinationClass=destinationUmlClass)
@@ -166,7 +166,7 @@ class RelationshipCreator:
         associationDescription.associationCounter += 1
 
         umlInheritance: UmlInheritance = UmlInheritance(pyutLink=pyutInheritance, baseClass=baseUmlClass, subClass=subUmlClass)
-        umlInheritance.SetCanvas(self._diagramFrame)
+        umlInheritance.umlFrame = self._diagramFrame
         umlInheritance.MakeLineControlPoints(n=2)       # Make this configurable
 
         # REMEMBER:   from subclass to base class
@@ -193,7 +193,7 @@ class RelationshipCreator:
         pyutInterface.source       = interfaceClass.pyutClass
 
         umlInterface: UmlInterface = UmlInterface(pyutLink=pyutInterface, interfaceClass=interfaceClass, implementingClass=implementingClass)
-        umlInterface.SetCanvas(self._diagramFrame)
+        umlInterface.umlFrame = self._diagramFrame
         umlInterface.MakeLineControlPoints(n=2)
 
         implementingClass.addLink(umlLink=umlInterface, destinationClass=interfaceClass)
@@ -276,7 +276,7 @@ class RelationshipCreator:
         diagram: UmlDiagram = self._diagramFrame.umlDiagram
 
         umlClass.position = umlPosition
-        umlClass.SetCanvas(self._diagramFrame)
+        umlClass.umlFrame = self._diagramFrame
 
         diagram.AddShape(umlClass)
         umlClass.Show(show=True)

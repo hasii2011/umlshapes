@@ -18,6 +18,8 @@ from umlshapes.mixins.TopLeftMixin import TopLeftMixin
 
 from umlshapes.types.UmlDimensions import UmlDimensions
 
+from umlshapes.frames.UseCaseDiagramFrame import UseCaseDiagramFrame
+
 
 class UmlUseCase(ControlPointMixin,  EllipseShape, TopLeftMixin, IDMixin):
 
@@ -53,6 +55,14 @@ class UmlUseCase(ControlPointMixin,  EllipseShape, TopLeftMixin, IDMixin):
     @pyutUseCase.setter
     def pyutUseCase(self, value: PyutUseCase):
         self._pyutUseCase = value
+
+    @property
+    def umlFrame(self) -> UseCaseDiagramFrame:
+        return self.GetCanvas()
+
+    @umlFrame.setter
+    def umlFrame(self, frame: UseCaseDiagramFrame):
+        self.SetCanvas(frame)
 
     def OnDraw(self, dc: MemoryDC):
         """

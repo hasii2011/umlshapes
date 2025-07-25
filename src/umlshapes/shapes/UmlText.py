@@ -31,6 +31,10 @@ from umlshapes.types.UmlColor import UmlColor
 from umlshapes.types.UmlDimensions import UmlDimensions
 from umlshapes.types.UmlFontFamily import UmlFontFamily
 
+from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
+from umlshapes.frames.UseCaseDiagramFrame import UseCaseDiagramFrame
+from umlshapes.frames.SequenceDiagramFrame import SequenceDiagramFrame
+
 from umlshapes.UmlUtils import UmlUtils
 
 CONTROL_POINT_SIZE: int = 4         # Make this a preference
@@ -90,6 +94,14 @@ class UmlText(ControlPointMixin, TextShape, TopLeftMixin, IDMixin):
         self._brush: Brush = Brush(backgroundColor)
         self.SetDraggable(drag=True)
         self.SetCentreResize(False)
+
+    @property
+    def umlFrame(self) -> ClassDiagramFrame | UseCaseDiagramFrame | SequenceDiagramFrame:
+        return self.GetCanvas()
+
+    @umlFrame.setter
+    def umlFrame(self, frame: ClassDiagramFrame | UseCaseDiagramFrame | SequenceDiagramFrame):
+        self.SetCanvas(frame)
 
     @property
     def selected(self) -> bool:

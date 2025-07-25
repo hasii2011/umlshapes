@@ -21,6 +21,10 @@ from umlshapes.mixins.TopLeftMixin import TopLeftMixin
 
 from umlshapes.types.UmlDimensions import UmlDimensions
 
+from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
+from umlshapes.frames.UseCaseDiagramFrame import UseCaseDiagramFrame
+from umlshapes.frames.SequenceDiagramFrame import SequenceDiagramFrame
+
 
 class UmlNote(ControlPointMixin, RectangleShape, TopLeftMixin, IDMixin):
     """
@@ -71,6 +75,14 @@ class UmlNote(ControlPointMixin, RectangleShape, TopLeftMixin, IDMixin):
     @pyutNote.setter
     def pyutNote(self, newNote: PyutNote):
         self._pyutNote = newNote
+
+    @property
+    def umlFrame(self) -> ClassDiagramFrame | UseCaseDiagramFrame | SequenceDiagramFrame:
+        return self.GetCanvas()
+
+    @umlFrame.setter
+    def umlFrame(self, frame: ClassDiagramFrame | UseCaseDiagramFrame | SequenceDiagramFrame):
+        self.SetCanvas(frame)
 
     def OnDraw(self, dc: MemoryDC):
         """
