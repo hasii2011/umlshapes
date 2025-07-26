@@ -16,7 +16,7 @@ from pyutmodelv2.PyutLink import PyutLink
 from pyutmodelv2.enumerations.PyutLinkType import PyutLinkType
 
 from umlshapes.UmlDiagram import UmlDiagram
-from umlshapes.eventengine.UmlPubSubEngine import UmlEventEngine
+from umlshapes.pubsubengine.UmlPubSubEngine import UmlEventEngine
 
 from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
 from umlshapes.links.UmlAggregation import UmlAggregation

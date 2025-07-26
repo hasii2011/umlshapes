@@ -22,9 +22,9 @@ from pyutmodelv2.PyutModelTypes import ClassName
 from umlshapes.UmlDiagram import UmlDiagram
 from umlshapes.UmlUtils import UmlUtils
 from umlshapes.dialogs.DlgEditInterface import DlgEditInterface
-from umlshapes.eventengine.IUmlPubSubEngine import IUmlPubSubEngine
-from umlshapes.eventengine.UmlPubSubEngine import UmlEventEngine
-from umlshapes.eventengine.UmlMessageType import UmlMessageType
+from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
+from umlshapes.pubsubengine.UmlPubSubEngine import UmlEventEngine
+from umlshapes.pubsubengine.UmlMessageType import UmlMessageType
 from umlshapes.frames.DiagramFrame import FrameId
 from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
 

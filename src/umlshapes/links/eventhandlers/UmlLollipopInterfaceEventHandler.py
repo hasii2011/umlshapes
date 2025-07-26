@@ -10,7 +10,7 @@ from pyutmodelv2.PyutInterface import PyutInterfaces
 
 from umlshapes.dialogs.DlgEditInterface import DlgEditInterface
 
-from umlshapes.eventengine.IUmlPubSubEngine import IUmlPubSubEngine
+from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 
 from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
 

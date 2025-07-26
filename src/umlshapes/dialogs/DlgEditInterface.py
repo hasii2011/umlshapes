@@ -32,7 +32,7 @@ from pyutmodelv2.PyutInterface import PyutInterfacesDict
 
 from umlshapes.dialogs.umlclass.DlgEditClassCommon import DlgEditClassCommon
 
-from umlshapes.eventengine.IUmlPubSubEngine import IUmlPubSubEngine
+from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 from umlshapes.links.UmlLollipopInterface import UmlLollipopInterface
 
 

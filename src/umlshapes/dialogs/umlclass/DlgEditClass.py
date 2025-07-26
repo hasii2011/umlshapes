@@ -22,7 +22,7 @@ from pyutmodelv2.PyutClass import PyutClass
 from pyutmodelv2.PyutField import PyutField
 from pyutmodelv2.PyutParameter import PyutParameter
 
-from umlshapes.eventengine.IUmlPubSubEngine import IUmlPubSubEngine
+from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 from umlshapes.types.Common import UmlShapeList
 
 if TYPE_CHECKING:

@@ -27,7 +27,7 @@ from umlshapes.dialogs.umlclass.DlgEditDescription import DlgEditDescription
 from umlshapes.dialogs.umlclass.DlgEditMethod import DlgEditMethod
 from umlshapes.dialogs.umlclass.DlgEditStereotype import DlgEditStereotype
 
-from umlshapes.eventengine.IUmlPubSubEngine import IUmlPubSubEngine
+from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 

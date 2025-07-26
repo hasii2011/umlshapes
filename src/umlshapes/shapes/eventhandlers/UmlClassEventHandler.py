@@ -74,7 +74,7 @@ class UmlClassEventHandler(UmlBaseEventHandler):
     def OnLeftDoubleClick(self, x: int, y: int, keys: int = 0, attachment: int = 0):
 
         from umlshapes.dialogs.umlclass.DlgEditClass import DlgEditClass
-        from umlshapes.eventengine.IUmlPubSubEngine import IUmlPubSubEngine
+        from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 
         super().OnLeftDoubleClick(x=x, y=y, keys=keys, attachment=attachment)
 

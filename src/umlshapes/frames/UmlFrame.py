@@ -13,7 +13,7 @@ from wx import Window
 from wx.lib.ogl import Shape
 from wx.lib.ogl import ShapeCanvas
 
-from umlshapes.eventengine.IUmlPubSubEngine import IUmlPubSubEngine
+from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 
 from umlshapes.frames.DiagramFrame import DiagramFrame
 

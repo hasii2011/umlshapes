@@ -25,8 +25,8 @@ from pyutmodelv2.enumerations.PyutDisplayMethods import PyutDisplayMethods
 
 from umlshapes.UmlUtils import UmlUtils
 
-from umlshapes.eventengine.IUmlPubSubEngine import IUmlPubSubEngine
-from umlshapes.eventengine.UmlMessageType import UmlMessageType
+from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
+from umlshapes.pubsubengine.UmlMessageType import UmlMessageType
 
 from umlshapes.frames.UmlFrame import UmlFrame
 

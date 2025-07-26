@@ -25,8 +25,8 @@ from pyutmodelv2.enumerations.PyutLinkType import PyutLinkType
 
 from umlshapes.UmlUtils import UmlUtils
 from umlshapes.dialogs.DlgEditLink import DlgEditLink
-from umlshapes.eventengine.UmlPubSubEngine import UmlEventEngine
-from umlshapes.eventengine.UmlMessageType import UmlMessageType
+from umlshapes.pubsubengine.UmlPubSubEngine import UmlEventEngine
+from umlshapes.pubsubengine.UmlMessageType import UmlMessageType
 
 from umlshapes.frames.UmlFrame import UmlFrame
 

@@ -38,7 +38,7 @@ from umlshapes.dialogs.DlgEditNote import DlgEditNote
 from umlshapes.dialogs.DlgEditText import DlgEditText
 from umlshapes.dialogs.DlgEditUseCase import DlgEditUseCase
 
-from umlshapes.eventengine.UmlPubSubEngine import UmlEventEngine
+from umlshapes.pubsubengine.UmlPubSubEngine import UmlEventEngine
 from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 

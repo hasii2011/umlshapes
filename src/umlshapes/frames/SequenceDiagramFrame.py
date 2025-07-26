@@ -4,7 +4,7 @@ from logging import getLogger
 
 from wx import Window
 
-from umlshapes.eventengine.IUmlPubSubEngine import IUmlPubSubEngine
+from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 from umlshapes.frames.UmlFrame import UmlFrame
 
 

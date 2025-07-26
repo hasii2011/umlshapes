@@ -5,7 +5,7 @@ from abc import abstractmethod
 
 from umlshapes.frames.DiagramFrame import FrameId
 
-from umlshapes.eventengine.UmlMessageType import UmlMessageType
+from umlshapes.pubsubengine.UmlMessageType import UmlMessageType
 
 
 class IUmlPubSubEngine(ABC):

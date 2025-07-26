@@ -4,11 +4,11 @@ from typing import Callable
 from logging import Logger
 from logging import getLogger
 
-from umlshapes.eventengine.BasePubSubEngine import BasePubSubEngine
-from umlshapes.eventengine.BasePubSubEngine import Topic
+from umlshapes.pubsubengine.BasePubSubEngine import BasePubSubEngine
+from umlshapes.pubsubengine.BasePubSubEngine import Topic
 
-from umlshapes.eventengine.IUmlPubSubEngine import IUmlPubSubEngine
-from umlshapes.eventengine.UmlMessageType import UmlMessageType
+from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
+from umlshapes.pubsubengine.UmlMessageType import UmlMessageType
 from umlshapes.frames.DiagramFrame import FrameId
 
 

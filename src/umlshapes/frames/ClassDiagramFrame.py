@@ -7,8 +7,8 @@ from logging import getLogger
 
 from wx import Window
 
-from umlshapes.eventengine.IUmlPubSubEngine import IUmlPubSubEngine
-from umlshapes.eventengine.UmlMessageType import UmlMessageType
+from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
+from umlshapes.pubsubengine.UmlMessageType import UmlMessageType
 
 from umlshapes.frames.UmlClassCtxMenuHandler import UmlClassCtxMenuHandler
 from umlshapes.frames.UmlFrame import UmlFrame
