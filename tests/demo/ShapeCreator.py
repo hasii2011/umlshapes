@@ -9,6 +9,11 @@ from logging import getLogger
 
 from dataclasses import dataclass
 
+from wx import ID_OK
+from wx import OK
+
+from wx.lib.ogl import ShapeEvtHandler
+
 from pyutmodelv2.PyutActor import PyutActor
 from pyutmodelv2.PyutClass import PyutClass
 from pyutmodelv2.PyutField import PyutField
@@ -25,25 +30,15 @@ from pyutmodelv2.PyutUseCase import PyutUseCase
 from pyutmodelv2.enumerations.PyutDisplayParameters import PyutDisplayParameters
 from pyutmodelv2.enumerations.PyutStereotype import PyutStereotype
 from pyutmodelv2.enumerations.PyutVisibility import PyutVisibility
-from wx import ID_OK
-
-from wx import OK
-
-from wx.lib.ogl import ShapeEvtHandler
-
-
-from tests.demo.DemoCommon import ID_REFERENCE
-from tests.demo.DemoCommon import INCREMENT_X
-from tests.demo.DemoCommon import INCREMENT_Y
-from tests.demo.DemoCommon import INITIAL_X
-from tests.demo.DemoCommon import INITIAL_Y
-from tests.demo.DemoCommon import Identifiers
 
 from umlshapes.UmlDiagram import UmlDiagram
+
 from umlshapes.dialogs.DlgEditActor import DlgEditActor
 from umlshapes.dialogs.DlgEditNote import DlgEditNote
 from umlshapes.dialogs.DlgEditText import DlgEditText
 from umlshapes.dialogs.DlgEditUseCase import DlgEditUseCase
+
+from umlshapes.eventengine.UmlEventEngine import UmlEventEngine
 from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
@@ -63,6 +58,13 @@ from umlshapes.types.Common import ModelObject
 from umlshapes.types.Common import UmlShape
 
 from umlshapes.types.UmlPosition import UmlPosition
+
+from tests.demo.DemoCommon import ID_REFERENCE
+from tests.demo.DemoCommon import INCREMENT_X
+from tests.demo.DemoCommon import INCREMENT_Y
+from tests.demo.DemoCommon import INITIAL_X
+from tests.demo.DemoCommon import INITIAL_Y
+from tests.demo.DemoCommon import Identifiers
 
 CreateModel      = Callable[[], ModelObject]
 InvokeEditDialog = Callable[[ModelObject], None]
@@ -84,11 +86,12 @@ ShapesToCreate = NewType('ShapesToCreate', Dict[ID_REFERENCE, ShapeDescription])
 
 class ShapeCreator:
 
-    def __init__(self, diagramFrame: ClassDiagramFrame):
+    def __init__(self, diagramFrame: ClassDiagramFrame, umlEventEngine: UmlEventEngine):
 
         self.logger: Logger = getLogger(__name__)
 
-        self._diagramFrame: ClassDiagramFrame = diagramFrame
+        self._diagramFrame:   ClassDiagramFrame = diagramFrame
+        self._umlEventEngine: UmlEventEngine    = umlEventEngine
 
         self._currentPosition: UmlPosition = UmlPosition(x=INITIAL_X, y=INITIAL_Y)
 
@@ -168,6 +171,7 @@ class ShapeCreator:
 
         eventHandler = shapeDescription.eventHandler()
         eventHandler.SetShape(umlShape)
+        eventHandler.umlEventEngine = self._umlEventEngine
         eventHandler.SetPreviousHandler(umlShape.GetEventHandler())
 
         umlShape.SetEventHandler(eventHandler)

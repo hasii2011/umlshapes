@@ -1,4 +1,5 @@
 
+from typing import cast
 from typing import List
 from typing import NewType
 from typing import TYPE_CHECKING
@@ -24,6 +25,8 @@ from pyutmodelv2.enumerations.PyutLinkType import PyutLinkType
 
 from umlshapes.UmlUtils import UmlUtils
 from umlshapes.dialogs.DlgEditLink import DlgEditLink
+from umlshapes.eventengine.UmlEventEngine import UmlEventEngine
+from umlshapes.eventengine.UmlEventType import UmlEventType
 
 from umlshapes.frames.UmlFrame import UmlFrame
 
@@ -66,7 +69,14 @@ class UmlLinkEventHandler(UmlBaseEventHandler):
 
         super().__init__(shape=umlLink)
 
-        self._contextMenu: Menu = self._createContextMenu()
+        self._umlEventEngine: UmlEventEngine = cast(UmlEventEngine, None)
+        self._contextMenu:    Menu           = self._createContextMenu()
+
+    def _setEventEngine(self, umlEventEngine: UmlEventEngine):
+        self._umlEventEngine = umlEventEngine
+
+    # noinspection PyTypeChecker
+    umlEventEngine = property(fget=None, fset=_setEventEngine)
 
     def OnLeftDoubleClick(self, x: int, y: int, keys: int = 0, attachment: int = 0):
         """
@@ -247,7 +257,8 @@ class UmlLinkEventHandler(UmlBaseEventHandler):
 
     def _indicateDiagramModified(self):
         frame: UmlFrame = self._getFrame()
-        frame.applicationAdapter().indicateDiagramModified()
+        assert self._umlEventEngine is not None, 'Developer error;  Remember to inject the UML Event Engine'
+        self._umlEventEngine.sendEvent(UmlEventType.DIAGRAM_MODIFIED, frameId=frame.id)
 
     def _getFrame(self) -> UmlFrame:
 

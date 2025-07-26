@@ -15,8 +15,8 @@ from pyutmodelv2.PyutLink import PyutLink
 
 from pyutmodelv2.enumerations.PyutLinkType import PyutLinkType
 
-from tests.demo.DemoCommon import Identifiers
 from umlshapes.UmlDiagram import UmlDiagram
+from umlshapes.eventengine.UmlEventEngine import UmlEventEngine
 
 from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
 from umlshapes.links.UmlAggregation import UmlAggregation
@@ -38,6 +38,7 @@ from umlshapes.preferences.UmlPreferences import UmlPreferences
 
 from umlshapes.types.UmlPosition import UmlPosition
 
+from tests.demo.DemoCommon import Identifiers
 from tests.demo.DemoCommon import ID_REFERENCE
 
 INITIAL_X:   int = 100
@@ -54,8 +55,6 @@ class AssociationDescription:
     associationClass:   type[UmlLink]          = cast(type[UmlLink], None)
     linkType:           PyutLinkType           = PyutLinkType.ASSOCIATION
     eventHandler:       type[LinkEventHandler] = cast(type[LinkEventHandler], None)
-    associationCounter: int = 0
-    classCounter:       int = 0
 
 
 RelationshipDescription = NewType('RelationshipDescription', Dict[ID_REFERENCE, AssociationDescription])
@@ -65,12 +64,18 @@ class RelationshipCreator:
     """
     Not those kinds, dork
     """
-    def __init__(self, diagramFrame: ClassDiagramFrame):
+    def __init__(self, diagramFrame: ClassDiagramFrame, umlEventEngine: UmlEventEngine):
 
         self._diagramFrame:    ClassDiagramFrame = diagramFrame
-        self.logger:           Logger               = getLogger(__name__)
-        self._preferences:     UmlPreferences       = UmlPreferences()
-        self._currentPosition: UmlPosition          = UmlPosition(x=INITIAL_X, y=INITIAL_Y)
+        self._umlEventEngine:  UmlEventEngine    = umlEventEngine
+
+        self.logger:           Logger         = getLogger(__name__)
+        self._preferences:     UmlPreferences = UmlPreferences()
+        self._currentPosition: UmlPosition    = UmlPosition(x=INITIAL_X, y=INITIAL_Y)
+
+        self._classCounter:       int = 0
+        self._associationCounter: int = 0
+        self._inheritanceCounter: int = 0
 
         association: AssociationDescription = AssociationDescription(
             linkType=PyutLinkType.ASSOCIATION,
@@ -112,9 +117,9 @@ class RelationshipCreator:
         associationDescription: AssociationDescription = self._relationShips[idReference]
 
         if associationDescription.linkType == PyutLinkType.INHERITANCE:
-            self._displayUmlInheritance(associationDescription=associationDescription)
+            self._displayUmlInheritance()
         elif associationDescription.linkType == PyutLinkType.INTERFACE:
-            self._displayUmlInterface(associationDescription=associationDescription)
+            self._displayUmlInterface()
         else:
             self._displayAssociation(associationDescription=associationDescription)
 
@@ -124,13 +129,13 @@ class RelationshipCreator:
         Args:
             associationDescription:
         """
-        sourceUmlClass, destinationUmlClass = self._createClassPair(associationDescription.classCounter)
-        associationDescription.classCounter += 2
+        sourceUmlClass, destinationUmlClass = self._createClassPair()
         self.logger.info(f'{sourceUmlClass.id=} {destinationUmlClass.id=}')
 
-        pyutLink = self._createAssociationPyutLink(associationDescription.associationCounter)
+        pyutLink = self._createAssociationPyutLink()
 
-        associationDescription.associationCounter += 1
+        pyutLink.name = f'{associationDescription.linkType}-{self._associationCounter}'
+        self._associationCounter += 1
 
         umlAssociation = associationDescription.associationClass(pyutLink=pyutLink)
 
@@ -147,23 +152,18 @@ class RelationshipCreator:
         else:
             eventHandler = associationDescription.eventHandler(umlLink=umlAssociation)
 
+        eventHandler.umlEventEngine = self._umlEventEngine
         eventHandler.SetPreviousHandler(umlAssociation.GetEventHandler())
         umlAssociation.SetEventHandler(eventHandler)
 
-    def _displayUmlInheritance(self, associationDescription: AssociationDescription):
+    def _displayUmlInheritance(self):
         """
-
-        Args:
-            associationDescription:
         """
-
-        baseUmlClass, subUmlClass = self._createClassPair(associationDescription.classCounter)
+        baseUmlClass, subUmlClass = self._createClassPair()
         baseUmlClass.pyutClass.name = 'Base Class'
         subUmlClass.pyutClass.name  = 'SubClass'
-        associationDescription.classCounter += 2
 
-        pyutInheritance: PyutLink = self._createInheritancePyutLink(inheritanceCounter=associationDescription.associationCounter, baseUmlClass=baseUmlClass, subUmlClass=subUmlClass)
-        associationDescription.associationCounter += 1
+        pyutInheritance: PyutLink = self._createInheritancePyutLink(baseUmlClass=baseUmlClass, subUmlClass=subUmlClass)
 
         umlInheritance: UmlInheritance = UmlInheritance(pyutLink=pyutInheritance, baseClass=baseUmlClass, subClass=subUmlClass)
         umlInheritance.umlFrame = self._diagramFrame
@@ -179,13 +179,14 @@ class RelationshipCreator:
         eventHandler.SetPreviousHandler(umlInheritance.GetEventHandler())
         umlInheritance.SetEventHandler(eventHandler)
 
-    def _displayUmlInterface(self, associationDescription: AssociationDescription):
+    def _displayUmlInterface(self):
 
-        interfaceClass, implementingClass = self._createClassPair(classCounter=associationDescription.classCounter)
-        associationDescription.classCounter += 2
+        interfaceClass, implementingClass = self._createClassPair()
 
-        interfaceClass.pyutClass.name     = 'Interface Class'
-        implementingClass.pyutClass.name  = 'Implementing Class'
+        interfaceClass.pyutClass.name     = f'InterfaceClass-{self._classCounter}'
+        self._classCounter += 1
+        implementingClass.pyutClass.name  = f'ImplementingClass-{self._classCounter}'
+        self._classCounter += 1
 
         pyutInterface: PyutLink = self._createInterfacePyutLink()
 
@@ -205,15 +206,15 @@ class RelationshipCreator:
         eventHandler.SetPreviousHandler(umlInterface.GetEventHandler())
         umlInterface.SetEventHandler(eventHandler)
 
-    def _createClassPair(self, classCounter: int) -> Tuple[UmlClass, UmlClass]:
+    def _createClassPair(self) -> Tuple[UmlClass, UmlClass]:
 
         sourcePosition:       UmlPosition = UmlPosition(x=100, y=100)       # fix this should be input
         destinationPosition:  UmlPosition = UmlPosition(x=200, y=300)
 
-        sourcePyutClass:      PyutClass   = self._createSimplePyutClass(classCounter=classCounter)
-        classCounter += 1
-        destinationPyutClass: PyutClass   = self._createSimplePyutClass(classCounter=classCounter)
-        classCounter += 1
+        sourcePyutClass:      PyutClass   = self._createSimplePyutClass(classCounter=self._classCounter)
+        self._classCounter += 1
+        destinationPyutClass: PyutClass   = self._createSimplePyutClass(classCounter=self._classCounter)
+        self._classCounter += 1
 
         sourceUmlClass:      UmlClass = UmlClass(pyutClass=sourcePyutClass)
         destinationUmlClass: UmlClass = UmlClass(pyutClass=destinationPyutClass)
@@ -228,16 +229,15 @@ class RelationshipCreator:
 
     def _createSimplePyutClass(self, classCounter: int) -> PyutClass:
 
-        className: str = f'{self._preferences.defaultClassName} {classCounter}'
+        className: str = f'{self._preferences.defaultClassName}-{classCounter}'
         classCounter += 1
         pyutClass: PyutClass  = PyutClass(name=className)
 
         return pyutClass
 
-    def _createAssociationPyutLink(self, associationCounter: int) -> PyutLink:
+    def _createAssociationPyutLink(self) -> PyutLink:
 
-        name: str = f'{self._preferences.defaultAssociationName} {associationCounter}'
-
+        name: str = f'{self._preferences.defaultAssociationName}-{self._associationCounter}'
         pyutLink: PyutLink = PyutLink(name=name, linkType=PyutLinkType.ASSOCIATION)
 
         pyutLink.sourceCardinality      = 'src Card'
@@ -245,15 +245,16 @@ class RelationshipCreator:
 
         return pyutLink
 
-    def _createInheritancePyutLink(self, inheritanceCounter: int, baseUmlClass: UmlClass, subUmlClass: UmlClass) -> PyutLink:
+    def _createInheritancePyutLink(self, baseUmlClass: UmlClass, subUmlClass: UmlClass) -> PyutLink:
 
-        name: str = f'Inheritance {inheritanceCounter}'
+        name: str = f'Inheritance-{self._inheritanceCounter}'
 
         pyutInheritance: PyutLink = PyutLink(name=name, linkType=PyutLinkType.INHERITANCE)
 
         pyutInheritance.destination  = baseUmlClass.pyutClass
         pyutInheritance.source       = subUmlClass.pyutClass
 
+        self._inheritanceCounter += 1
         return pyutInheritance
 
     def _createInterfacePyutLink(self):

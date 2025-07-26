@@ -69,8 +69,8 @@ class DemoAppFrame(SizedFrame):
         self.SetAutoLayout(True)
         self.Show(True)
 
-        self._shapeCreator:        ShapeCreator        = ShapeCreator(diagramFrame=self._diagramFrame)
-        self._relationshipCreator: RelationshipCreator = RelationshipCreator(diagramFrame=self._diagramFrame)
+        self._shapeCreator:        ShapeCreator        = ShapeCreator(diagramFrame=self._diagramFrame, umlEventEngine=self._umlEventEngine)
+        self._relationshipCreator: RelationshipCreator = RelationshipCreator(diagramFrame=self._diagramFrame, umlEventEngine=self._umlEventEngine)
         self._preferences:         UmlPreferences      = UmlPreferences()
 
         self._pyutInterfaceCount: int = 0
