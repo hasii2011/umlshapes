@@ -22,9 +22,9 @@ from pyutmodelv2.PyutModelTypes import ClassName
 from umlshapes.UmlDiagram import UmlDiagram
 from umlshapes.UmlUtils import UmlUtils
 from umlshapes.dialogs.DlgEditInterface import DlgEditInterface
-from umlshapes.eventengine.IUmlEventEngine import IUmlEventEngine
-from umlshapes.eventengine.UmlEventEngine import UmlEventEngine
-from umlshapes.eventengine.UmlEventType import UmlEventType
+from umlshapes.eventengine.IUmlPubSubEngine import IUmlPubSubEngine
+from umlshapes.eventengine.UmlPubSubEngine import UmlEventEngine
+from umlshapes.eventengine.UmlMessageType import UmlMessageType
 from umlshapes.frames.DiagramFrame import FrameId
 from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
 
@@ -75,12 +75,12 @@ class DemoAppFrame(SizedFrame):
 
         self._pyutInterfaceCount: int = 0
 
-        self._umlEventEngine.registerListener(UmlEventType.UPDATE_APPLICATION_STATUS,
-                                              frameId=FrameId(self._diagramFrame.id),
-                                              callback=self._onUpdateApplicationStatus)
-        self._umlEventEngine.registerListener(UmlEventType.DIAGRAM_MODIFIED,
-                                              frameId=self._diagramFrame.id,
-                                              callback=self._onDiagramModified)
+        self._umlEventEngine.subscribe(UmlMessageType.UPDATE_APPLICATION_STATUS,
+                                       frameId=FrameId(self._diagramFrame.id),
+                                       callback=self._onUpdateApplicationStatus)
+        self._umlEventEngine.subscribe(UmlMessageType.DIAGRAM_MODIFIED,
+                                       frameId=self._diagramFrame.id,
+                                       callback=self._onDiagramModified)
 
     def _createApplicationMenuBar(self):
 
@@ -196,7 +196,7 @@ class DemoAppFrame(SizedFrame):
         umlLollipopInterface.SetEventHandler(eventHandler)
 
         umlFrame:       ClassDiagramFrame = self._diagramFrame
-        eventEngine:    IUmlEventEngine      = umlFrame.eventEngine
+        eventEngine:    IUmlPubSubEngine      = umlFrame.eventEngine
         pyutInterfaces: PyutInterfaces       = eventHandler.getDefinedInterfaces()
 
         with DlgEditInterface(parent=umlFrame, oglInterface2=umlLollipopInterface, eventEngine=eventEngine, pyutInterfaces=pyutInterfaces) as dlg:

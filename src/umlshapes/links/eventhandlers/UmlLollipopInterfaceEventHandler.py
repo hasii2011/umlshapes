@@ -10,7 +10,7 @@ from pyutmodelv2.PyutInterface import PyutInterfaces
 
 from umlshapes.dialogs.DlgEditInterface import DlgEditInterface
 
-from umlshapes.eventengine.IUmlEventEngine import IUmlEventEngine
+from umlshapes.eventengine.IUmlPubSubEngine import IUmlPubSubEngine
 
 from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
 
@@ -43,7 +43,7 @@ class UmlLollipopInterfaceEventHandler(UmlBaseEventHandler):
 
         self.logger.info(f'{umlLollipopInterface=}')
 
-        eventEngine:    IUmlEventEngine = umlFrame.eventEngine
+        eventEngine:    IUmlPubSubEngine = umlFrame.eventEngine
         pyutInterfaces: PyutInterfaces = self.getDefinedInterfaces()
         with DlgEditInterface(parent=umlFrame, oglInterface2=umlLollipopInterface, eventEngine=eventEngine, pyutInterfaces=pyutInterfaces, editMode=True) as dlg:
             if dlg.ShowModal() == OK:

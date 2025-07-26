@@ -32,7 +32,7 @@ from pyutmodelv2.PyutInterface import PyutInterfacesDict
 
 from umlshapes.dialogs.umlclass.DlgEditClassCommon import DlgEditClassCommon
 
-from umlshapes.eventengine.IUmlEventEngine import IUmlEventEngine
+from umlshapes.eventengine.IUmlPubSubEngine import IUmlPubSubEngine
 from umlshapes.links.UmlLollipopInterface import UmlLollipopInterface
 
 
@@ -43,7 +43,7 @@ class DlgEditInterface(DlgEditClassCommon):
 
     clsLogger: Logger = getLogger(__name__)
 
-    def __init__(self, parent, eventEngine: IUmlEventEngine, oglInterface2: UmlLollipopInterface, pyutInterfaces: PyutInterfaces, editMode: bool = False):
+    def __init__(self, parent, eventEngine: IUmlPubSubEngine, oglInterface2: UmlLollipopInterface, pyutInterfaces: PyutInterfaces, editMode: bool = False):
 
         self._oglInterface2:     UmlLollipopInterface = oglInterface2
         self._pyutInterface:     PyutInterface = oglInterface2.pyutInterface

@@ -4,15 +4,15 @@ from typing import Callable
 from logging import Logger
 from logging import getLogger
 
-from umlshapes.eventengine.BaseEventEngine import BaseEventEngine
-from umlshapes.eventengine.BaseEventEngine import Topic
+from umlshapes.eventengine.BasePubSubEngine import BasePubSubEngine
+from umlshapes.eventengine.BasePubSubEngine import Topic
 
-from umlshapes.eventengine.IUmlEventEngine import IUmlEventEngine
-from umlshapes.eventengine.UmlEventType import UmlEventType
+from umlshapes.eventengine.IUmlPubSubEngine import IUmlPubSubEngine
+from umlshapes.eventengine.UmlMessageType import UmlMessageType
 from umlshapes.frames.DiagramFrame import FrameId
 
 
-class UmlEventEngine(IUmlEventEngine, BaseEventEngine):
+class UmlEventEngine(IUmlPubSubEngine, BasePubSubEngine):
     """
     The rationale for this class is to isolate the underlying implementation
     of events.  Currently, it depends on the wxPython event loop.  This leaves
@@ -24,13 +24,13 @@ class UmlEventEngine(IUmlEventEngine, BaseEventEngine):
 
         self.logger: Logger = getLogger(__name__)
 
-    def registerListener(self, eventType: UmlEventType, frameId: FrameId, callback: Callable):
+    def subscribe(self, eventType: UmlMessageType, frameId: FrameId, callback: Callable):
         self._subscribe(topic=self._toTopic(eventType, frameId), callback=callback)
 
-    def sendEvent(self, eventType: UmlEventType, frameId: FrameId, **kwargs):
+    def sendMessage(self, eventType: UmlMessageType, frameId: FrameId, **kwargs):
         self._sendMessage(topic=self._toTopic(eventType, frameId), **kwargs)
 
-    def _toTopic(self, eventType: UmlEventType, frameId: FrameId) -> Topic:
+    def _toTopic(self, eventType: UmlMessageType, frameId: FrameId) -> Topic:
 
         topic: Topic = Topic(f'{eventType.value}.{frameId}')
         return topic

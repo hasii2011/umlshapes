@@ -25,8 +25,8 @@ from pyutmodelv2.enumerations.PyutDisplayMethods import PyutDisplayMethods
 
 from umlshapes.UmlUtils import UmlUtils
 
-from umlshapes.eventengine.IUmlEventEngine import IUmlEventEngine
-from umlshapes.eventengine.UmlEventType import UmlEventType
+from umlshapes.eventengine.IUmlPubSubEngine import IUmlPubSubEngine
+from umlshapes.eventengine.UmlMessageType import UmlMessageType
 
 from umlshapes.frames.UmlFrame import UmlFrame
 
@@ -64,12 +64,12 @@ class TriStateData:
 
 
 class UmlClassMenuHandler:
-    def __init__(self, umlClass: 'UmlClass', eventEngine: IUmlEventEngine):
+    def __init__(self, umlClass: 'UmlClass', eventEngine: IUmlPubSubEngine):
 
         self.logger: Logger = getLogger(__name__)
 
         self._umlClass:    'UmlClass'      = umlClass
-        self._eventEngine: IUmlEventEngine = eventEngine
+        self._eventEngine: IUmlPubSubEngine = eventEngine
 
         self._contextMenu:         Menu     = cast(Menu, None)
         self._toggleStereotype:    MenuItem = cast(MenuItem, None)
@@ -143,14 +143,14 @@ class UmlClassMenuHandler:
             self._umlClass.autoSize()
         elif eventId == ID_IMPLEMENT_INTERFACE:
             frameId = self._umlClass.umlFrame.id
-            self._eventEngine.sendEvent(UmlEventType.REQUEST_LOLLIPOP_LOCATION,
-                                        frameId=frameId,
-                                        requestingUmlClass=self._umlClass)
+            self._eventEngine.sendMessage(UmlMessageType.REQUEST_LOLLIPOP_LOCATION,
+                                          frameId=frameId,
+                                          requestingUmlClass=self._umlClass)
         elif eventId == ID_CUT_SHAPE:
             frameId = self._umlClass.umlFrame.id
-            self._eventEngine.sendEvent(UmlEventType.CUT_UML_CLASS,
-                                        frameId=frameId,
-                                        frameshapeToCut=self._umlClass)
+            self._eventEngine.sendMessage(UmlMessageType.CUT_UML_CLASS,
+                                          frameId=frameId,
+                                          frameshapeToCut=self._umlClass)
         else:
             event.Skip()
 

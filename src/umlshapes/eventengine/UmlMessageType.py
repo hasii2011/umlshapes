@@ -2,7 +2,7 @@
 from enum import Enum
 
 
-class UmlEventType(Enum):
+class UmlMessageType(Enum):
     """
 
     """

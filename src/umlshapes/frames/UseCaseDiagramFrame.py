@@ -4,12 +4,12 @@ from logging import getLogger
 
 from wx import Window
 
-from umlshapes.eventengine.IUmlEventEngine import IUmlEventEngine
+from umlshapes.eventengine.IUmlPubSubEngine import IUmlPubSubEngine
 from umlshapes.frames.UmlFrame import UmlFrame
 
 
 class UseCaseDiagramFrame(UmlFrame):
-    def __init__(self, parent: Window, umlEventEngine: IUmlEventEngine):
+    def __init__(self, parent: Window, umlEventEngine: IUmlPubSubEngine):
         """
 
         Args:

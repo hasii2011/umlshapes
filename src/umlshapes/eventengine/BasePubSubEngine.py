@@ -8,7 +8,7 @@ from pubsub import pub
 Topic = NewType('Topic', str)
 
 
-class BaseEventEngine:
+class BasePubSubEngine:
     """
     Wrapper class to hide underlying implementation
     """

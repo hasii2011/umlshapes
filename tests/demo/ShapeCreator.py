@@ -38,7 +38,7 @@ from umlshapes.dialogs.DlgEditNote import DlgEditNote
 from umlshapes.dialogs.DlgEditText import DlgEditText
 from umlshapes.dialogs.DlgEditUseCase import DlgEditUseCase
 
-from umlshapes.eventengine.UmlEventEngine import UmlEventEngine
+from umlshapes.eventengine.UmlPubSubEngine import UmlEventEngine
 from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
@@ -78,7 +78,7 @@ class ShapeDescription:
     invokeEditDialog: InvokeEditDialog      = cast(InvokeEditDialog, None)
     eventHandler:     type[ShapeEvtHandler] = cast(type[ShapeEvtHandler], None)
     defaultValue:     str = ''
-    instanceCounter:  int = 0
+    instanceCounter:  int = 1000
 
 
 ShapesToCreate = NewType('ShapesToCreate', Dict[ID_REFERENCE, ShapeDescription])
@@ -100,7 +100,7 @@ class ShapeCreator:
         self._noteCounter:        int = 0
         self._useCaseCounter:     int = 0
         self._actorCounter:       int = 0
-        self._classCounter:       int = 0
+        self._classCounter:       int = 1000
 
         shapeUmlText:    ShapeDescription = ShapeDescription(
             umlShape=UmlText,

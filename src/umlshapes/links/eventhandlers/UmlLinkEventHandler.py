@@ -25,8 +25,8 @@ from pyutmodelv2.enumerations.PyutLinkType import PyutLinkType
 
 from umlshapes.UmlUtils import UmlUtils
 from umlshapes.dialogs.DlgEditLink import DlgEditLink
-from umlshapes.eventengine.UmlEventEngine import UmlEventEngine
-from umlshapes.eventengine.UmlEventType import UmlEventType
+from umlshapes.eventengine.UmlPubSubEngine import UmlEventEngine
+from umlshapes.eventengine.UmlMessageType import UmlMessageType
 
 from umlshapes.frames.UmlFrame import UmlFrame
 
@@ -258,7 +258,7 @@ class UmlLinkEventHandler(UmlBaseEventHandler):
     def _indicateDiagramModified(self):
         frame: UmlFrame = self._getFrame()
         assert self._umlEventEngine is not None, 'Developer error;  Remember to inject the UML Event Engine'
-        self._umlEventEngine.sendEvent(UmlEventType.DIAGRAM_MODIFIED, frameId=frame.id)
+        self._umlEventEngine.sendMessage(UmlMessageType.DIAGRAM_MODIFIED, frameId=frame.id)
 
     def _getFrame(self) -> UmlFrame:
 

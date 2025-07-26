@@ -13,7 +13,7 @@ from wx import Window
 from wx.lib.ogl import Shape
 from wx.lib.ogl import ShapeCanvas
 
-from umlshapes.eventengine.IUmlEventEngine import IUmlEventEngine
+from umlshapes.eventengine.IUmlPubSubEngine import IUmlPubSubEngine
 
 from umlshapes.frames.DiagramFrame import DiagramFrame
 
@@ -32,11 +32,11 @@ PIXELS_PER_UNIT_Y: int = 20
 
 class UmlFrame(DiagramFrame):
 
-    def __init__(self, parent: Window, umlEventEngine: IUmlEventEngine):
+    def __init__(self, parent: Window, umlEventEngine: IUmlPubSubEngine):
 
         self.ufLogger:     Logger          = getLogger(__name__)
         self._preferences: UmlPreferences  = UmlPreferences()
-        self._eventEngine: IUmlEventEngine = umlEventEngine
+        self._eventEngine: IUmlPubSubEngine = umlEventEngine
 
         super().__init__(parent=parent)
 
@@ -53,7 +53,7 @@ class UmlFrame(DiagramFrame):
         self._currentReportInterval: int = self._preferences.trackMouseInterval
 
     @property
-    def eventEngine(self) -> IUmlEventEngine:
+    def eventEngine(self) -> IUmlPubSubEngine:
         return self._eventEngine
 
     @property

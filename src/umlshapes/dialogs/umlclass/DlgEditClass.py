@@ -22,7 +22,7 @@ from pyutmodelv2.PyutClass import PyutClass
 from pyutmodelv2.PyutField import PyutField
 from pyutmodelv2.PyutParameter import PyutParameter
 
-from umlshapes.eventengine.IUmlEventEngine import IUmlEventEngine
+from umlshapes.eventengine.IUmlPubSubEngine import IUmlPubSubEngine
 from umlshapes.types.Common import UmlShapeList
 
 if TYPE_CHECKING:
@@ -64,7 +64,7 @@ class DlgEditClass(DlgEditClassCommon):
     dialog, any modifications are lost.
 
     """
-    def __init__(self, parent: ClassDiagramFrame, eventEngine: IUmlEventEngine, pyutClass: PyutClass):
+    def __init__(self, parent: ClassDiagramFrame, eventEngine: IUmlPubSubEngine, pyutClass: PyutClass):
         """
 
         Args:

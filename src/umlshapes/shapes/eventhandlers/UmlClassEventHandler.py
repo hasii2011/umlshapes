@@ -74,7 +74,7 @@ class UmlClassEventHandler(UmlBaseEventHandler):
     def OnLeftDoubleClick(self, x: int, y: int, keys: int = 0, attachment: int = 0):
 
         from umlshapes.dialogs.umlclass.DlgEditClass import DlgEditClass
-        from umlshapes.eventengine.IUmlEventEngine import IUmlEventEngine
+        from umlshapes.eventengine.IUmlPubSubEngine import IUmlPubSubEngine
 
         super().OnLeftDoubleClick(x=x, y=y, keys=keys, attachment=attachment)
 
@@ -82,7 +82,7 @@ class UmlClassEventHandler(UmlBaseEventHandler):
         pyutClass: PyutClass = umlClass.pyutClass
         umlFrame:  ClassDiagramFrame  = umlClass.GetCanvas()
 
-        eventEngine: IUmlEventEngine = umlFrame.eventEngine
+        eventEngine: IUmlPubSubEngine = umlFrame.eventEngine
         with DlgEditClass(parent=umlFrame, pyutClass=pyutClass, eventEngine=eventEngine) as dlg:
             if dlg.ShowModal() == OK:
                 umlFrame.refresh()
