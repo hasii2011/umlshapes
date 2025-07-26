@@ -22,9 +22,11 @@ from pyutmodelv2.PyutModelTypes import ClassName
 from umlshapes.UmlDiagram import UmlDiagram
 from umlshapes.UmlUtils import UmlUtils
 from umlshapes.dialogs.DlgEditInterface import DlgEditInterface
+
 from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
-from umlshapes.pubsubengine.UmlPubSubEngine import UmlEventEngine
+from umlshapes.pubsubengine.UmlPubSubEngine import UmlPubSubEngine
 from umlshapes.pubsubengine.UmlMessageType import UmlMessageType
+
 from umlshapes.frames.DiagramFrame import FrameId
 from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
 
@@ -54,10 +56,10 @@ class DemoAppFrame(SizedFrame):
         sizedPanel: SizedPanel = self.GetContentsPane()
         sizedPanel.SetSizerProps(expand=True, proportion=1)
 
-        self._umlEventEngine: UmlEventEngine = UmlEventEngine()
+        self._umlPubSubEngine: UmlPubSubEngine = UmlPubSubEngine()
         self._diagramFrame = ClassDiagramFrame(
             parent=sizedPanel,
-            umlEventEngine=self._umlEventEngine,
+            umlPubSubEngine=self._umlPubSubEngine,
             createLollipopCallback=self._createLollipopInterface
         )
         # noinspection PyUnresolvedReferences
@@ -69,18 +71,18 @@ class DemoAppFrame(SizedFrame):
         self.SetAutoLayout(True)
         self.Show(True)
 
-        self._shapeCreator:        ShapeCreator        = ShapeCreator(diagramFrame=self._diagramFrame, umlEventEngine=self._umlEventEngine)
-        self._relationshipCreator: RelationshipCreator = RelationshipCreator(diagramFrame=self._diagramFrame, umlEventEngine=self._umlEventEngine)
+        self._shapeCreator:        ShapeCreator        = ShapeCreator(diagramFrame=self._diagramFrame, umlPubSubEngine=self._umlPubSubEngine)
+        self._relationshipCreator: RelationshipCreator = RelationshipCreator(diagramFrame=self._diagramFrame, umlPubSubEngine=self._umlPubSubEngine)
         self._preferences:         UmlPreferences      = UmlPreferences()
 
         self._pyutInterfaceCount: int = 0
 
-        self._umlEventEngine.subscribe(UmlMessageType.UPDATE_APPLICATION_STATUS,
-                                       frameId=FrameId(self._diagramFrame.id),
-                                       callback=self._onUpdateApplicationStatus)
-        self._umlEventEngine.subscribe(UmlMessageType.DIAGRAM_MODIFIED,
-                                       frameId=self._diagramFrame.id,
-                                       callback=self._onDiagramModified)
+        self._umlPubSubEngine.subscribe(UmlMessageType.UPDATE_APPLICATION_STATUS,
+                                        frameId=FrameId(self._diagramFrame.id),
+                                        callback=self._onUpdateApplicationStatus)
+        self._umlPubSubEngine.subscribe(UmlMessageType.DIAGRAM_MODIFIED,
+                                        frameId=self._diagramFrame.id,
+                                        callback=self._onDiagramModified)
 
     def _createApplicationMenuBar(self):
 
@@ -196,7 +198,7 @@ class DemoAppFrame(SizedFrame):
         umlLollipopInterface.SetEventHandler(eventHandler)
 
         umlFrame:       ClassDiagramFrame = self._diagramFrame
-        eventEngine:    IUmlPubSubEngine      = umlFrame.eventEngine
+        eventEngine:    IUmlPubSubEngine      = umlFrame.umlPubSubEngine
         pyutInterfaces: PyutInterfaces       = eventHandler.getDefinedInterfaces()
 
         with DlgEditInterface(parent=umlFrame, oglInterface2=umlLollipopInterface, eventEngine=eventEngine, pyutInterfaces=pyutInterfaces) as dlg:

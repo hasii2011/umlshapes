@@ -29,12 +29,10 @@ from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 from umlshapes.pubsubengine.UmlMessageType import UmlMessageType
 
 from umlshapes.frames.UmlFrame import UmlFrame
+from umlshapes.frames.DiagramFrame import FrameId
 
 if TYPE_CHECKING:
     from umlshapes.shapes.UmlClass import UmlClass
-
-# from ogl.events.IOglEventEngine import IOglEventEngine
-# from ogl.events.OglEvents import OglEventType
 
 # Menu IDs
 [
@@ -64,12 +62,12 @@ class TriStateData:
 
 
 class UmlClassMenuHandler:
-    def __init__(self, umlClass: 'UmlClass', eventEngine: IUmlPubSubEngine):
+    def __init__(self, umlClass: 'UmlClass', umlPubSubEngine: IUmlPubSubEngine):
 
         self.logger: Logger = getLogger(__name__)
 
-        self._umlClass:    'UmlClass'      = umlClass
-        self._eventEngine: IUmlPubSubEngine = eventEngine
+        self._umlClass:       'UmlClass'        = umlClass
+        self._umlPubSubEngine: IUmlPubSubEngine = umlPubSubEngine
 
         self._contextMenu:         Menu     = cast(Menu, None)
         self._toggleStereotype:    MenuItem = cast(MenuItem, None)
@@ -129,6 +127,7 @@ class UmlClassMenuHandler:
         """
         pyutClass: PyutClass = self._umlClass.pyutClass
         eventId:   int       = event.GetId()
+        frameId:   FrameId   = self._getFrameId()
 
         if eventId == ID_TOGGLE_STEREOTYPE:
             pyutClass.displayStereoType = not pyutClass.displayStereoType
@@ -142,17 +141,17 @@ class UmlClassMenuHandler:
         elif eventId == ID_AUTO_SIZE:
             self._umlClass.autoSize()
         elif eventId == ID_IMPLEMENT_INTERFACE:
-            frameId = self._umlClass.umlFrame.id
-            self._eventEngine.sendMessage(UmlMessageType.REQUEST_LOLLIPOP_LOCATION,
-                                          frameId=frameId,
-                                          requestingUmlClass=self._umlClass)
+            self._umlPubSubEngine.sendMessage(UmlMessageType.REQUEST_LOLLIPOP_LOCATION,
+                                              frameId=frameId,
+                                              requestingUmlClass=self._umlClass)
         elif eventId == ID_CUT_SHAPE:
-            frameId = self._umlClass.umlFrame.id
-            self._eventEngine.sendMessage(UmlMessageType.CUT_UML_CLASS,
-                                          frameId=frameId,
-                                          frameshapeToCut=self._umlClass)
+            self._umlPubSubEngine.sendMessage(UmlMessageType.CUT_UML_CLASS,
+                                              frameId=frameId,
+                                              frameshapeToCut=self._umlClass)
         else:
             event.Skip()
+
+        self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.DIAGRAM_MODIFIED, frameId=frameId, modifiedFrameId=frameId)
 
     # noinspection PyUnusedLocal
     def _onDisplayParametersClick(self, event: CommandEvent):
@@ -290,3 +289,10 @@ class UmlClassMenuHandler:
                 return PyutDisplayMethods.UNSPECIFIED
             case _:
                 assert False, "Unknown method display type"
+
+    def _getFrameId(self) -> FrameId:
+        return self._getFrame().id
+
+    def _getFrame(self) -> UmlFrame:
+        umlFrame: UmlFrame = self._umlClass.umlFrame
+        return umlFrame

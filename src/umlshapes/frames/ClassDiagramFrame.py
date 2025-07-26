@@ -26,7 +26,7 @@ CreateLollipopCallback = Callable[[UmlClass, UmlPosition], None]
 
 class ClassDiagramFrame(UmlFrame):
 
-    def __init__(self, parent: Window, umlEventEngine: IUmlPubSubEngine, createLollipopCallback: CreateLollipopCallback):
+    def __init__(self, parent: Window, umlPubSubEngine: IUmlPubSubEngine, createLollipopCallback: CreateLollipopCallback):
         """
 
         Args:
@@ -34,7 +34,7 @@ class ClassDiagramFrame(UmlFrame):
             createLollipopCallback:
         """
 
-        super().__init__(parent=parent, umlEventEngine=umlEventEngine)
+        super().__init__(parent=parent, umlPubSubEngine=umlPubSubEngine)
 
         self._createLollipopCallback: CreateLollipopCallback = createLollipopCallback
 
@@ -45,9 +45,9 @@ class ClassDiagramFrame(UmlFrame):
         self._requestingLollipopLocation: bool     = False
         self._requestingUmlClass:         UmlClass = NO_CLASS
 
-        self._eventEngine.subscribe(eventType=UmlMessageType.REQUEST_LOLLIPOP_LOCATION,
-                                    frameId=self.id,
-                                    callback=self._onRequestLollipopLocation)
+        self._umlPubSubEngine.subscribe(messageType=UmlMessageType.REQUEST_LOLLIPOP_LOCATION,
+                                        frameId=self.id,
+                                        callback=self._onRequestLollipopLocation)
         # self._oglEventEngine.registerListener(event=EVT_DIAGRAM_FRAME_MODIFIED,    callback=self._onDiagramModified)
         # self._oglEventEngine.registerListener(event=EVT_CUT_OGL_CLASS,             callback=self._onCutClass)
 
@@ -74,9 +74,9 @@ class ClassDiagramFrame(UmlFrame):
                 requestingUmlClass=self._requestingUmlClass,
                 perimeterPoint=nearestPoint
             )
-            self.eventEngine.sendMessage(UmlMessageType.UPDATE_APPLICATION_STATUS,
-                                         frameId=self.id,
-                                         message='')
+            self.umlPubSubEngine.sendMessage(UmlMessageType.UPDATE_APPLICATION_STATUS,
+                                             frameId=self.id,
+                                             message='')
         else:
             super().OnLeftClick(x=x, y=y, keys=keys)
 
@@ -96,9 +96,9 @@ class ClassDiagramFrame(UmlFrame):
         self._requestingLollipopLocation = True
         self._requestingUmlClass         = requestingUmlClass
 
-        self.eventEngine.sendMessage(UmlMessageType.UPDATE_APPLICATION_STATUS,
-                                     frameId=self.id,
-                                     message='Click on the UML Class edge where you want to place the interface')
+        self.umlPubSubEngine.sendMessage(UmlMessageType.UPDATE_APPLICATION_STATUS,
+                                         frameId=self.id,
+                                         message='Click on the UML Class edge where you want to place the interface')
 
     def _createLollipopInterface(self, requestingUmlClass: UmlClass, perimeterPoint: UmlPosition):
         """
@@ -115,10 +115,10 @@ class ClassDiagramFrame(UmlFrame):
         self._requestingUmlClass         = NO_CLASS
 
         self.refresh()
-        self._eventEngine.sendMessage(UmlMessageType.DIAGRAM_MODIFIED,
-                                      frameId=self.id,
-                                      modifiedFrameId=self.id
-                                      )
+        self._umlPubSubEngine.sendMessage(UmlMessageType.DIAGRAM_MODIFIED,
+                                          frameId=self.id,
+                                          modifiedFrameId=self.id
+                                          )
 
     def _areWeOverAShape(self, x: int, y: int) -> bool:
         answer:         bool  = True

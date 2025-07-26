@@ -43,7 +43,7 @@ class UmlLollipopInterfaceEventHandler(UmlBaseEventHandler):
 
         self.logger.info(f'{umlLollipopInterface=}')
 
-        eventEngine:    IUmlPubSubEngine = umlFrame.eventEngine
+        eventEngine:    IUmlPubSubEngine = umlFrame.umlPubSubEngine
         pyutInterfaces: PyutInterfaces = self.getDefinedInterfaces()
         with DlgEditInterface(parent=umlFrame, oglInterface2=umlLollipopInterface, eventEngine=eventEngine, pyutInterfaces=pyutInterfaces, editMode=True) as dlg:
             if dlg.ShowModal() == OK:

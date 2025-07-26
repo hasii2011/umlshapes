@@ -32,11 +32,11 @@ PIXELS_PER_UNIT_Y: int = 20
 
 class UmlFrame(DiagramFrame):
 
-    def __init__(self, parent: Window, umlEventEngine: IUmlPubSubEngine):
+    def __init__(self, parent: Window, umlPubSubEngine: IUmlPubSubEngine):
 
-        self.ufLogger:     Logger          = getLogger(__name__)
-        self._preferences: UmlPreferences  = UmlPreferences()
-        self._eventEngine: IUmlPubSubEngine = umlEventEngine
+        self.ufLogger:         Logger           = getLogger(__name__)
+        self._preferences:     UmlPreferences   = UmlPreferences()
+        self._umlPubSubEngine: IUmlPubSubEngine = umlPubSubEngine
 
         super().__init__(parent=parent)
 
@@ -53,8 +53,8 @@ class UmlFrame(DiagramFrame):
         self._currentReportInterval: int = self._preferences.trackMouseInterval
 
     @property
-    def eventEngine(self) -> IUmlPubSubEngine:
-        return self._eventEngine
+    def umlPubSubEngine(self) -> IUmlPubSubEngine:
+        return self._umlPubSubEngine
 
     @property
     def umlShapes(self) -> UmlShapeList:

@@ -9,13 +9,13 @@ from umlshapes.frames.UmlFrame import UmlFrame
 
 
 class UseCaseDiagramFrame(UmlFrame):
-    def __init__(self, parent: Window, umlEventEngine: IUmlPubSubEngine):
+    def __init__(self, parent: Window, umlPubSubEngine: IUmlPubSubEngine):
         """
 
         Args:
             parent:
-            umlEventEngine:
+            umlPubSubEngine:
         """
 
         self.logger: Logger = getLogger(__name__)
-        super().__init__(parent=parent, umlEventEngine=umlEventEngine)
+        super().__init__(parent=parent, umlPubSubEngine=umlPubSubEngine)

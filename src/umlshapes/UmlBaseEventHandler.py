@@ -13,6 +13,7 @@ from wx.lib.ogl import Shape
 from wx.lib.ogl import ShapeCanvas
 from wx.lib.ogl import ShapeEvtHandler
 
+from umlshapes.pubsubengine.UmlPubSubEngine import UmlPubSubEngine
 from umlshapes.types.Common import UmlShape
 from umlshapes.types.UmlDimensions import UmlDimensions
 
@@ -26,6 +27,14 @@ class UmlBaseEventHandler(ShapeEvtHandler):
         self._baseLogger: Logger = getLogger(__name__)
 
         super().__init__(shape=shape)
+
+        self._umlPubSubEngine: UmlPubSubEngine = cast(UmlPubSubEngine, None)
+
+    def _setUmlPubSubEngine(self, umlPubSubEngine: UmlPubSubEngine):
+        self._umlPubSubEngine = umlPubSubEngine
+
+    # noinspection PyTypeChecker
+    umlPubSubEngine = property(fget=None, fset=_setUmlPubSubEngine)
 
     def OnLeftClick(self, x: int, y: int, keys=0, attachment=0):
 

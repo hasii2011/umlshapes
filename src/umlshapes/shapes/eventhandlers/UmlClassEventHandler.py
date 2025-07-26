@@ -23,7 +23,7 @@ class UmlClassEventHandler(UmlBaseEventHandler):
     """
 
     def __init__(self):
-        self.baseLogger:       Logger         = getLogger(__name__)
+        self.baseLogger:   Logger         = getLogger(__name__)
         self._preferences: UmlPreferences = UmlPreferences()
         super().__init__()
 
@@ -67,7 +67,7 @@ class UmlClassEventHandler(UmlBaseEventHandler):
         umlFrame: ClassDiagramFrame  = umlClass.GetCanvas()
 
         if self._menuHandler is None:
-            self._menuHandler = UmlClassMenuHandler(umlClass=umlClass, eventEngine=umlFrame.eventEngine)
+            self._menuHandler = UmlClassMenuHandler(umlClass=umlClass, umlPubSubEngine=umlFrame.umlPubSubEngine)
 
         self._menuHandler.popupMenu(x=x, y=y)
 
@@ -82,7 +82,7 @@ class UmlClassEventHandler(UmlBaseEventHandler):
         pyutClass: PyutClass = umlClass.pyutClass
         umlFrame:  ClassDiagramFrame  = umlClass.GetCanvas()
 
-        eventEngine: IUmlPubSubEngine = umlFrame.eventEngine
+        eventEngine: IUmlPubSubEngine = umlFrame.umlPubSubEngine
         with DlgEditClass(parent=umlFrame, pyutClass=pyutClass, eventEngine=eventEngine) as dlg:
             if dlg.ShowModal() == OK:
                 umlFrame.refresh()

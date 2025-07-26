@@ -38,7 +38,7 @@ from umlshapes.dialogs.DlgEditNote import DlgEditNote
 from umlshapes.dialogs.DlgEditText import DlgEditText
 from umlshapes.dialogs.DlgEditUseCase import DlgEditUseCase
 
-from umlshapes.pubsubengine.UmlPubSubEngine import UmlEventEngine
+from umlshapes.pubsubengine.UmlPubSubEngine import UmlPubSubEngine
 from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
@@ -86,12 +86,12 @@ ShapesToCreate = NewType('ShapesToCreate', Dict[ID_REFERENCE, ShapeDescription])
 
 class ShapeCreator:
 
-    def __init__(self, diagramFrame: ClassDiagramFrame, umlEventEngine: UmlEventEngine):
+    def __init__(self, diagramFrame: ClassDiagramFrame, umlPubSubEngine: UmlPubSubEngine):
 
         self.logger: Logger = getLogger(__name__)
 
-        self._diagramFrame:   ClassDiagramFrame = diagramFrame
-        self._umlEventEngine: UmlEventEngine    = umlEventEngine
+        self._diagramFrame:    ClassDiagramFrame = diagramFrame
+        self._umlPubSubEngine: UmlPubSubEngine   = umlPubSubEngine
 
         self._currentPosition: UmlPosition = UmlPosition(x=INITIAL_X, y=INITIAL_Y)
 
@@ -171,7 +171,7 @@ class ShapeCreator:
 
         eventHandler = shapeDescription.eventHandler()
         eventHandler.SetShape(umlShape)
-        eventHandler.umlEventEngine = self._umlEventEngine
+        eventHandler.umlPubSubEngine = self._umlPubSubEngine
         eventHandler.SetPreviousHandler(umlShape.GetEventHandler())
 
         umlShape.SetEventHandler(eventHandler)

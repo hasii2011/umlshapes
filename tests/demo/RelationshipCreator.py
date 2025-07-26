@@ -16,7 +16,7 @@ from pyutmodelv2.PyutLink import PyutLink
 from pyutmodelv2.enumerations.PyutLinkType import PyutLinkType
 
 from umlshapes.UmlDiagram import UmlDiagram
-from umlshapes.pubsubengine.UmlPubSubEngine import UmlEventEngine
+from umlshapes.pubsubengine.UmlPubSubEngine import UmlPubSubEngine
 
 from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
 from umlshapes.links.UmlAggregation import UmlAggregation
@@ -64,10 +64,10 @@ class RelationshipCreator:
     """
     Not those kinds, dork
     """
-    def __init__(self, diagramFrame: ClassDiagramFrame, umlEventEngine: UmlEventEngine):
+    def __init__(self, diagramFrame: ClassDiagramFrame, umlPubSubEngine: UmlPubSubEngine):
 
         self._diagramFrame:    ClassDiagramFrame = diagramFrame
-        self._umlEventEngine:  UmlEventEngine    = umlEventEngine
+        self._umlPubSubEngine: UmlPubSubEngine   = umlPubSubEngine
 
         self.logger:           Logger         = getLogger(__name__)
         self._preferences:     UmlPreferences = UmlPreferences()
@@ -152,7 +152,7 @@ class RelationshipCreator:
         else:
             eventHandler = associationDescription.eventHandler(umlLink=umlAssociation)
 
-        eventHandler.umlEventEngine = self._umlEventEngine
+        eventHandler.umlPubSubEngine = self._umlPubSubEngine
         eventHandler.SetPreviousHandler(umlAssociation.GetEventHandler())
         umlAssociation.SetEventHandler(eventHandler)
 
@@ -176,6 +176,7 @@ class RelationshipCreator:
         umlInheritance.Show(True)
 
         eventHandler: UmlLinkEventHandler = UmlLinkEventHandler(umlLink=umlInheritance)
+        eventHandler.umlPubSubEngine = self._umlPubSubEngine
         eventHandler.SetPreviousHandler(umlInheritance.GetEventHandler())
         umlInheritance.SetEventHandler(eventHandler)
 
@@ -203,6 +204,7 @@ class RelationshipCreator:
         umlInterface.Show(True)
 
         eventHandler: UmlLinkEventHandler = UmlLinkEventHandler(umlLink=umlInterface)
+        eventHandler.umlPubSubEngine = self._umlPubSubEngine
         eventHandler.SetPreviousHandler(umlInterface.GetEventHandler())
         umlInterface.SetEventHandler(eventHandler)
 
