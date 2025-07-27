@@ -6,11 +6,18 @@ from typing import cast
 from logging import Logger
 from logging import getLogger
 
+from enum import Enum
+
+from wx import Point
+from wx import VERTICAL
+from wx import HORIZONTAL
+from wx import SUNKEN_BORDER
+
 # I know it is there
 # noinspection PyUnresolvedReferences
 from wx.core import PenStyle
-from wx import SUNKEN_BORDER
 
+from wx import MouseEvent
 from wx import Bitmap
 from wx import Brush
 from wx import ClientDC
@@ -40,12 +47,25 @@ if TYPE_CHECKING:
 FrameId = NewType('FrameId', str)
 
 
+class WheelAxis(Enum):
+    WHEEL_AXIS_VERTICAL   = 0
+    WHEEL_AXIS_HORIZONTAL = 1
+
+    @classmethod
+    def toEnum(cls, value: int) -> 'WheelAxis':
+
+        if value == 0:
+            return WheelAxis.WHEEL_AXIS_VERTICAL
+        elif value == 1:
+            return WheelAxis.WHEEL_AXIS_HORIZONTAL
+        else:
+            assert False, f'Unknown wheel axis: {value=}'
+
+
 class DiagramFrame(ShapeCanvas):
     """
     A frame to draw UML diagrams.
-
     """
-
     def __init__(self, parent: Window):
         """
 
@@ -169,6 +189,29 @@ class DiagramFrame(ShapeCanvas):
         self.Redraw(mem)
 
         dc.Blit(0, 0, w, h, mem, x, y)
+
+    def OnMouseEvent(self, mouseEvent: MouseEvent):
+
+        rotation:  int       = mouseEvent.GetWheelRotation()
+        wheelAxis: WheelAxis = WheelAxis.toEnum(value=mouseEvent.GetWheelAxis())
+        inverted:  bool      = mouseEvent.IsWheelInverted()
+
+        if not inverted:
+            rotation = -rotation
+
+        self._dfLogger.debug(f'{wheelAxis} - {inverted=} - {rotation=}')
+
+        yScrollPosition: int = self.GetScrollPos(VERTICAL)
+        xScrollPosition: int = self.GetScrollPos(HORIZONTAL)
+
+        if wheelAxis == WheelAxis.WHEEL_AXIS_VERTICAL:
+            yScrollPosition += rotation
+        else:
+            xScrollPosition += rotation
+
+        self.Scroll(Point(x=xScrollPosition, y=yScrollPosition))
+
+        super().OnMouseEvent(evt=mouseEvent)
 
     def _drawGrid(self, memDC: DC, width: int, height: int, startX: int, startY: int):
 

@@ -23,7 +23,7 @@ from umlshapes.preferences.UmlPreferences import UmlPreferences
 
 from umlshapes.types.Common import UmlShapeList
 
-DEFAULT_WIDTH: int   = 3000
+DEFAULT_WIDTH: int   = 16000
 A4_FACTOR:     float = 1.41
 
 PIXELS_PER_UNIT_X: int = 20
