@@ -102,8 +102,8 @@ class UmlLinkEventHandler(UmlBaseEventHandler):
             keys:
             attachment:
         """
-
-        super().OnRightClick(x=x, y=y, keys=keys, attachment=attachment)
+        # TODO:  May have to revisit this later
+        # super().OnRightClick(x=x, y=y, keys=keys, attachment=attachment)
 
         line:    LineShape   = self.GetShape()
         cPoints: List[Point] = line.GetLineControlPoints()
