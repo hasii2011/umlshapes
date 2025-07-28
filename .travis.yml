@@ -26,6 +26,8 @@ install:
   - sudo apt-get install -y -V libtiff-dev
   - sudo apt-get install -y  libsdl2-dev
   - ldconfig -p | grep libtiff
+  - sudo ln -s /lib/x86_64-linux-gnu/libtiff.so.5 /lib/x86_64-linux-gnu/libtiff.so.6
+  - sudo ldconfig | grep libtiff
   - GLOBAL=`python --version`
   - echo $GLOBAL
   - PY_VERSION=${GLOBAL#* }
