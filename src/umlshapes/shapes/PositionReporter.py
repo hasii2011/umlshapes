@@ -1,5 +1,5 @@
 
-from typing_extensions import Protocol
+from typing import Protocol
 
 
 class PositionReporter(Protocol):
