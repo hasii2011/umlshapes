@@ -13,6 +13,8 @@ workflows:
 
 jobs:
   build:
+    machine:
+      image: ubuntu-2404:current
     docker:
       - image: cimg/python:3.12-browsers
     executor: python/default
@@ -41,7 +43,7 @@ jobs:
             pip install pyutmodelv2==2.2.4
             pip install six==1.16.0
             pip install attrdict3
-            pip install -v -U -f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-22.04  wxPython
+            pip install -v -U -f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-24.04  wxPython
             pip install codeallyadvanced==1.4.2
             pip install human_id==0.2.0
             pip install Pypubsub==4.0.3
