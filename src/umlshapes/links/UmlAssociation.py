@@ -1,6 +1,7 @@
 
 from typing import List
 from typing import NewType
+from typing import TYPE_CHECKING
 from typing import Tuple
 from typing import cast
 
@@ -36,6 +37,9 @@ from umlshapes.types.Common import DESTINATION_CARDINALITY_IDX
 from umlshapes.types.Common import NAME_IDX
 from umlshapes.types.Common import SOURCE_CARDINALITY_IDX
 
+if TYPE_CHECKING:
+    from umlshapes.ShapeTypes import LinkableUmlShape
+
 SegmentPoint  = NewType('SegmentPoint',  Tuple[int, int])
 Segments      = NewType('Segments',      List[SegmentPoint])
 
@@ -57,6 +61,22 @@ class UmlAssociation(UmlLink):
 
         self._sourceCardinality:      UmlAssociationLabel = cast(UmlAssociationLabel, None)
         self._destinationCardinality: UmlAssociationLabel = cast(UmlAssociationLabel, None)
+
+    @property
+    def sourceShape(self) -> 'LinkableUmlShape':
+        return self.GetFrom()
+
+    @sourceShape.setter
+    def sourceShape(self, shape: 'LinkableUmlShape'):
+        self.SetFrom(shape)
+
+    @property
+    def destinationShape(self) -> 'LinkableUmlShape':
+        return self.GetTo()
+
+    @destinationShape.setter
+    def destinationShape(self, shape: 'LinkableUmlShape'):
+        self.SetTo(shape)
 
     @property
     def associationName(self) -> UmlAssociationLabel:
@@ -149,12 +169,14 @@ class UmlAssociation(UmlLink):
         points: DiamondPoints = UmlAssociation.calculateDiamondPoints(lineSegments=line)
         # self.UmlAssociation.debug(f'{points:}')
 
+        # noinspection PySimplifyBooleanCheck
         if self._selected is True:
             dc.SetPen(RED_PEN)
         else:
             dc.SetPen(BLACK_PEN)
 
         if filled:
+            # noinspection PySimplifyBooleanCheck
             if self._selected is True:
                 dc.SetBrush(RED_BRUSH)
             else:
