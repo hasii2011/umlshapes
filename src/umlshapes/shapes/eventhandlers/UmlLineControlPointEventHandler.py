@@ -6,7 +6,7 @@ from wx import CURSOR_DEFAULT
 
 from wx import Cursor
 
-from wx.lib.ogl import ShapeEvtHandler
+from umlshapes.lib.ogl import ShapeEvtHandler
 
 from umlshapes.UmlUtils import UmlUtils
 

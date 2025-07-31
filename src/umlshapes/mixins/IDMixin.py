@@ -1,5 +1,5 @@
 
-from wx.lib.ogl import Shape
+from umlshapes.lib.ogl import Shape
 
 from umlshapes.UmlUtils import UmlUtils
 

@@ -13,8 +13,6 @@ from wx import Font
 from wx import MemoryDC
 from wx import Size
 
-from wx.lib.ogl import RectangleShape
-
 from pyutmodelv2.PyutClass import PyutClass
 from pyutmodelv2.PyutMethod import PyutMethod
 from pyutmodelv2.PyutMethod import PyutMethods
@@ -23,6 +21,8 @@ from pyutmodelv2.PyutField import PyutFields
 from pyutmodelv2.enumerations.PyutStereotype import PyutStereotype
 from pyutmodelv2.enumerations.PyutDisplayMethods import PyutDisplayMethods
 from pyutmodelv2.enumerations.PyutDisplayParameters import PyutDisplayParameters
+
+from umlshapes.lib.ogl import RectangleShape
 
 from umlshapes.UmlUtils import UmlUtils
 

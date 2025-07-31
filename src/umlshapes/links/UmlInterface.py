@@ -6,10 +6,10 @@ from os import linesep as osLineSep
 
 from wx import MemoryDC
 
-from wx.lib.ogl import ARROW_ARROW
-
 from pyutmodelv2.PyutLink import PyutLink
-from wx.lib.ogl import LineShape
+
+from umlshapes.lib.ogl import ARROW_ARROW
+from umlshapes.lib.ogl import LineShape
 
 from umlshapes.UmlUtils import UmlUtils
 from umlshapes.links.UmlLink import UmlLink

@@ -12,10 +12,10 @@ from os import linesep as osLineSep
 from wx import Point
 from wx import MemoryDC
 
-from wx.lib.ogl import FORMAT_SIZE_TO_CONTENTS
+from umlshapes.lib.ogl import FORMAT_SIZE_TO_CONTENTS
 
-from wx.lib.ogl import LineShape
-from wx.lib.ogl import Shape
+from umlshapes.lib.ogl import LineShape
+from umlshapes.lib.ogl import Shape
 
 from pyutmodelv2.PyutLink import PyutLink
 

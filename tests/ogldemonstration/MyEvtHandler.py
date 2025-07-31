@@ -1,9 +1,11 @@
+
 from logging import Logger
 from logging import getLogger
 
 from wx import ClientDC
 from wx import PlatformInfo
-from wx.lib.ogl import ShapeEvtHandler
+
+from umlshapes.lib.ogl import ShapeEvtHandler
 
 
 class MyEvtHandler(ShapeEvtHandler):

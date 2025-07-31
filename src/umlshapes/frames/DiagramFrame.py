@@ -33,7 +33,7 @@ from wx import SystemSettings
 
 from wx import Window
 
-from wx.lib.ogl import ShapeCanvas
+from umlshapes.lib.ogl import ShapeCanvas
 
 from umlshapes.UmlUtils import UmlUtils
 from umlshapes.types.UmlColor import UmlColor

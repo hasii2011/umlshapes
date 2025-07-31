@@ -28,8 +28,8 @@ from wx import DC
 from wx import Pen
 from wx import Size
 
-from wx.lib.ogl import EllipseShape
-from wx.lib.ogl import RectangleShape
+from umlshapes.lib.ogl import EllipseShape
+from umlshapes.lib.ogl import RectangleShape
 
 from human_id import generate_id
 

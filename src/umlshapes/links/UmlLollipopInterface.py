@@ -15,7 +15,7 @@ from wx import Font
 from wx import MemoryDC
 from wx import Size
 
-from wx.lib.ogl import Shape
+from umlshapes.lib.ogl import Shape
 
 from pyutmodelv2.PyutInterface import PyutInterface
 

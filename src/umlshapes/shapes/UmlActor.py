@@ -10,11 +10,11 @@ from wx import DC
 from wx import MemoryDC
 from wx import RED
 
-from wx.lib.ogl import FORMAT_CENTRE_HORIZ
-from wx.lib.ogl import FORMAT_CENTRE_VERT
-from wx.lib.ogl import RectangleShape
-
 from pyutmodelv2.PyutActor import PyutActor
+
+from umlshapes.lib.ogl import FORMAT_CENTRE_HORIZ
+from umlshapes.lib.ogl import FORMAT_CENTRE_VERT
+from umlshapes.lib.ogl import RectangleShape
 
 from umlshapes.UmlUtils import UmlUtils
 

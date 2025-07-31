@@ -10,11 +10,11 @@ from enum import Enum
 from wx import Point
 from wx import WHITE_BRUSH
 
-from wx.lib.ogl import CONTROL_POINT_ENDPOINT_FROM
-from wx.lib.ogl import CONTROL_POINT_ENDPOINT_TO
-from wx.lib.ogl import CONTROL_POINT_LINE
+from umlshapes.lib.ogl import CONTROL_POINT_ENDPOINT_FROM
+from umlshapes.lib.ogl import CONTROL_POINT_ENDPOINT_TO
+from umlshapes.lib.ogl import CONTROL_POINT_LINE
 
-from wx.lib.ogl import LineControlPoint
+from umlshapes.lib.ogl import LineControlPoint
 
 from umlshapes.UmlUtils import UmlUtils
 

@@ -12,7 +12,8 @@ from dataclasses import dataclass
 from wx import ID_OK
 from wx import OK
 
-from wx.lib.ogl import ShapeEvtHandler
+from umlshapes.UmlBaseEventHandler import UmlBaseEventHandler
+from umlshapes.lib.ogl import ShapeEvtHandler
 
 from pyutmodelv2.PyutActor import PyutActor
 from pyutmodelv2.PyutClass import PyutClass
@@ -171,7 +172,7 @@ class ShapeCreator:
 
         eventHandler = shapeDescription.eventHandler()
         eventHandler.SetShape(umlShape)
-        eventHandler.umlPubSubEngine = self._umlPubSubEngine
+        cast(UmlBaseEventHandler, eventHandler).umlPubSubEngine = self._umlPubSubEngine
         eventHandler.SetPreviousHandler(umlShape.GetEventHandler())
 
         umlShape.SetEventHandler(eventHandler)

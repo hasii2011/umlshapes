@@ -25,10 +25,10 @@ from wx import Pen
 
 from wx import NewIdRef as wxNewIdRef
 
-from wx.lib.ogl import Shape
-from wx.lib.ogl import ShapeCanvas
-
 from pyutmodelv2.PyutText import PyutText
+
+from umlshapes.lib.ogl import Shape
+from umlshapes.lib.ogl import ShapeCanvas
 
 from umlshapes.dialogs.DlgEditText import DlgEditText
 from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame

@@ -7,7 +7,7 @@ from logging import getLogger
 
 from wx import App
 
-from wx.lib.ogl import OGLInitialize
+from umlshapes.lib.ogl import OGLInitialize
 
 from codeallybasic.UnitTestBase import UnitTestBase
 

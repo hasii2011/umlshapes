@@ -4,8 +4,8 @@ from logging import getLogger
 
 from wx import WHITE_BRUSH
 
-from wx.lib.ogl import ControlPoint
-from wx.lib.ogl import Shape
+from umlshapes.lib.ogl import ControlPoint
+from umlshapes.lib.ogl import Shape
 
 from umlshapes.UmlUtils import UmlUtils
 from umlshapes.frames.UmlFrame import UmlFrame
@@ -21,8 +21,8 @@ class UmlControlPoint(ControlPoint):
         """
 
         Args:
-            umlFrame:           An instance of wx.lib.ogl.Canvas
-            shape:              An instance of wx.lib.ogl.Shape
+            umlFrame:           An instance of umlshapes.lib.ogl.Canvas
+            shape:              An instance of umlshapes.lib.ogl.Shape
             size:               The control point size;  Single number since it is a square
             xOffSet:            The x position
             yOffSet:            The y position

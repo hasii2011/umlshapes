@@ -4,9 +4,9 @@ from unittest import main as unitTestMain
 
 from codeallyadvanced.ui.UnitTestBaseW import UnitTestBaseW
 
-from wx.lib.ogl import OGLInitialize
+from umlshapes.lib.ogl import OGLInitialize
 
-from wx.lib.ogl import Shape
+from umlshapes.lib.ogl import Shape
 
 from umlshapes.mixins.TopLeftMixin import Rectangle
 from umlshapes.mixins.TopLeftMixin import TopLeftMixin
@@ -23,7 +23,7 @@ class MixinShape(Shape, TopLeftMixin):
 
     def __init__(self):
 
-        super().__init__()      # type: ignore
+        super().__init__()
         TopLeftMixin.__init__(self, umlShape=self, width=SHAPE_WIDTH, height=SHAPE_HEIGHT)
 
         self.SetX(x=SHAPE_X)       # These are the OGL center coordinates

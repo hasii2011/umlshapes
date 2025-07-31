@@ -31,26 +31,26 @@ from wx import RED
 from wx import RED_BRUSH
 from wx import WHITE_BRUSH
 
-from wx.lib.ogl import ARROW_ARROW
-from wx.lib.ogl import CONSTRAINT_MIDALIGNED_BOTTOM
-from wx.lib.ogl import CircleShape
-from wx.lib.ogl import CompositeShape as OglCompositeShape
-from wx.lib.ogl import Constraint
-from wx.lib.ogl import Diagram
-from wx.lib.ogl import FORMAT_CENTRE_HORIZ
-from wx.lib.ogl import FORMAT_CENTRE_VERT
-from wx.lib.ogl import FORMAT_NONE
-from wx.lib.ogl import LineShape
+from umlshapes.lib.ogl import ARROW_ARROW
+from umlshapes.lib.ogl import CONSTRAINT_MIDALIGNED_BOTTOM
+from umlshapes.lib.ogl import CircleShape
+from umlshapes.lib.ogl import CompositeShape as OglCompositeShape
+from umlshapes.lib.ogl import Constraint
+from umlshapes.lib.ogl import Diagram
+from umlshapes.lib.ogl import FORMAT_CENTRE_HORIZ
+from umlshapes.lib.ogl import FORMAT_CENTRE_VERT
+from umlshapes.lib.ogl import FORMAT_NONE
+from umlshapes.lib.ogl import LineShape
 
-from wx.lib.ogl import OGLInitialize
-from wx.lib.ogl import DrawnShape as OglDrawnShape
-from wx.lib.ogl import DividedShape as OglDividedShape
-from wx.lib.ogl import PolygonShape
-from wx.lib.ogl import RectangleShape
-from wx.lib.ogl import Shape
-from wx.lib.ogl import ShapeCanvas
-from wx.lib.ogl import ShapeRegion
-from wx.lib.ogl import TextShape
+from umlshapes.lib.ogl import OGLInitialize
+from umlshapes.lib.ogl import DrawnShape as OglDrawnShape
+from umlshapes.lib.ogl import DividedShape as OglDividedShape
+from umlshapes.lib.ogl import PolygonShape
+from umlshapes.lib.ogl import RectangleShape
+from umlshapes.lib.ogl import Shape
+from umlshapes.lib.ogl import ShapeCanvas
+from umlshapes.lib.ogl import ShapeRegion
+from umlshapes.lib.ogl import TextShape
 
 from wx.lib.sized_controls import SizedFrame
 from wx.lib.sized_controls import SizedPanel

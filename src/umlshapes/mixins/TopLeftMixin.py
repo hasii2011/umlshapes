@@ -3,7 +3,8 @@ from logging import Logger
 from logging import getLogger
 
 from wx import Size
-from wx.lib.ogl import Shape
+
+from umlshapes.lib.ogl import Shape
 
 from umlshapes.types.Common import LeftCoordinate
 from umlshapes.types.Common import Rectangle

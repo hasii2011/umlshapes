@@ -8,9 +8,9 @@ from logging import getLogger
 from wx import Font
 from wx import MemoryDC
 
-from wx.lib.ogl import FORMAT_CENTRE_HORIZ
-from wx.lib.ogl import FORMAT_CENTRE_VERT
-from wx.lib.ogl import TextShape
+from umlshapes.lib.ogl import FORMAT_CENTRE_HORIZ
+from umlshapes.lib.ogl import FORMAT_CENTRE_VERT
+from umlshapes.lib.ogl import TextShape
 
 from umlshapes.UmlUtils import UmlUtils
 from umlshapes.links.DeltaXY import DeltaXY

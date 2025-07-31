@@ -15,9 +15,10 @@ from wx import NewIdRef as wxNewIdRef
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 from umlshapes.types.Common import UmlShapeList
 
+from umlshapes.shapes.UmlClass import UmlClass
+
 if TYPE_CHECKING:
     from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
-from umlshapes.shapes.UmlClass import UmlClass
 
 
 class UmlClassCtxMenuHandler:

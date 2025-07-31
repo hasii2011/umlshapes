@@ -4,9 +4,9 @@ from logging import getLogger
 
 from os import linesep as osLineSep
 
-from wx.lib.ogl import ARROW_ARROW
-
 from pyutmodelv2.PyutLink import PyutLink
+
+from umlshapes.lib.ogl import ARROW_ARROW
 
 from umlshapes.links.UmlLink import UmlLink
 from umlshapes.shapes.UmlClass import UmlClass

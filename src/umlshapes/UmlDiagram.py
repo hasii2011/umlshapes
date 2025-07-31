@@ -6,8 +6,9 @@ from logging import Logger
 from logging import getLogger
 
 from collections.abc import Iterable
-from wx.lib.ogl import Diagram
-from wx.lib.ogl import Shape
+
+from umlshapes.lib.ogl import Diagram
+from umlshapes.lib.ogl import Shape
 
 from umlshapes.frames.DiagramFrame import DiagramFrame
 

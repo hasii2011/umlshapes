@@ -16,8 +16,8 @@ from wx import Font
 from wx import MemoryDC
 from wx import Menu
 
-from wx.lib.ogl import Shape
-from wx.lib.ogl import TextShape
+from umlshapes.lib.ogl import Shape
+from umlshapes.lib.ogl import TextShape
 
 from pyutmodelv2.PyutText import PyutText
 

@@ -2,8 +2,8 @@
 from logging import Logger
 from logging import getLogger
 
-from wx.lib.ogl import Shape
-from wx.lib.ogl import ShapeEvtHandler
+from umlshapes.lib.ogl import Shape
+from umlshapes.lib.ogl import ShapeEvtHandler
 
 from umlshapes.frames.DiagramFrame import DiagramFrame
 

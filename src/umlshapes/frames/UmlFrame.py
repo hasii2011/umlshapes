@@ -10,8 +10,8 @@ from wx import ClientDC
 from wx import MouseEvent
 from wx import Window
 
-from wx.lib.ogl import Shape
-from wx.lib.ogl import ShapeCanvas
+from umlshapes.lib.ogl import Shape
+from umlshapes.lib.ogl import ShapeCanvas
 
 from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 

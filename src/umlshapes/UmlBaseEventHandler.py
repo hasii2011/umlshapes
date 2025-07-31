@@ -9,9 +9,9 @@ from logging import getLogger
 from wx import ClientDC
 from wx import MOD_CMD
 
-from wx.lib.ogl import Shape
-from wx.lib.ogl import ShapeCanvas
-from wx.lib.ogl import ShapeEvtHandler
+from umlshapes.lib.ogl import Shape
+from umlshapes.lib.ogl import ShapeCanvas
+from umlshapes.lib.ogl import ShapeEvtHandler
 
 from umlshapes.pubsubengine.UmlPubSubEngine import UmlPubSubEngine
 from umlshapes.types.Common import UmlShape

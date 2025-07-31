@@ -4,7 +4,7 @@ from logging import getLogger
 
 from wx import MemoryDC
 
-from wx.lib.ogl import EllipseShape
+from umlshapes.lib.ogl import EllipseShape
 
 from pyutmodelv2.PyutUseCase import PyutUseCase
 

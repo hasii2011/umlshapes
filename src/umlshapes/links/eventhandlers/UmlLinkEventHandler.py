@@ -17,10 +17,10 @@ from wx import Point
 
 from wx import NewIdRef as wxNewIdRef
 
-from wx.lib.ogl import LineShape
-
 from pyutmodelv2.PyutLink import PyutLink
 from pyutmodelv2.enumerations.PyutLinkType import PyutLinkType
+
+from umlshapes.lib.ogl import LineShape
 
 from umlshapes.UmlUtils import UmlUtils
 from umlshapes.dialogs.DlgEditLink import DlgEditLink
