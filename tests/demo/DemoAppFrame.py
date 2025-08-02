@@ -151,11 +151,11 @@ class DemoAppFrame(SizedFrame):
                 shapeCreator.displayShape(Identifiers.ID_DISPLAY_UML_ACTOR)
 
             case Identifiers.ID_DISPLAY_UML_ASSOCIATION:
-                linkCreator.displayRelationship(idReference=Identifiers.ID_DISPLAY_UML_ASSOCIATION)
+                linkCreator.displayAssociation(idReference=Identifiers.ID_DISPLAY_UML_ASSOCIATION)
             case Identifiers.ID_DISPLAY_UML_COMPOSITION:
-                linkCreator.displayRelationship(idReference=Identifiers.ID_DISPLAY_UML_COMPOSITION)
+                linkCreator.displayAssociation(idReference=Identifiers.ID_DISPLAY_UML_COMPOSITION)
             case Identifiers.ID_DISPLAY_UML_AGGREGATION:
-                linkCreator.displayRelationship(idReference=Identifiers.ID_DISPLAY_UML_AGGREGATION)
+                linkCreator.displayAssociation(idReference=Identifiers.ID_DISPLAY_UML_AGGREGATION)
 
             case Identifiers.ID_DISPLAY_UML_NOTE_LINK:
                 linkCreator.displayNoteLink()

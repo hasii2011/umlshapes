@@ -28,7 +28,6 @@ from umlshapes.links.UmlComposition import UmlComposition
 from umlshapes.links.UmlInheritance import UmlInheritance
 from umlshapes.links.UmlInterface import UmlInterface
 from umlshapes.links.UmlNoteLink import UmlNoteLink
-from umlshapes.links.UmlLink import UmlLink
 
 from umlshapes.links.eventhandlers.UmlAssociationEventHandler import UmlAssociationEventHandler
 from umlshapes.links.eventhandlers.UmlLinkEventHandler import UmlLinkEventHandler
@@ -58,9 +57,8 @@ LinkEventHandler = Union[UmlAssociationEventHandler, UmlLinkEventHandler]
 
 @dataclass
 class AssociationDescription:
-    associationClass:   type[UmlLink]          = cast(type[UmlLink], None)
-    linkType:           PyutLinkType           = PyutLinkType.ASSOCIATION
-    eventHandler:       type[LinkEventHandler] = cast(type[LinkEventHandler], None)
+    associationClass:   type[UmlAssociation]  = cast(type[UmlAssociation], None)
+    linkType:           PyutLinkType          = PyutLinkType.ASSOCIATION
 
 
 RelationshipDescription = NewType('RelationshipDescription', Dict[ID_REFERENCE, AssociationDescription])
@@ -85,44 +83,51 @@ class LinkCreator:
 
         association: AssociationDescription = AssociationDescription(
             linkType=PyutLinkType.ASSOCIATION,
-            eventHandler=UmlAssociationEventHandler,
             associationClass=UmlAssociation
         )
         composition: AssociationDescription = AssociationDescription(
             linkType=PyutLinkType.COMPOSITION,
-            eventHandler=UmlAssociationEventHandler,
             associationClass=UmlComposition
         )
         aggregation: AssociationDescription = AssociationDescription(
             linkType=PyutLinkType.AGGREGATION,
-            eventHandler=UmlAssociationEventHandler,
             associationClass=UmlAggregation
         )
-        inheritance: AssociationDescription = AssociationDescription(
-            linkType=PyutLinkType.INHERITANCE,
-            eventHandler=UmlLinkEventHandler,
-            associationClass=UmlInheritance
-        )
-        interface: AssociationDescription = AssociationDescription(
-            linkType=PyutLinkType.INTERFACE,
-            eventHandler=UmlLinkEventHandler,
-            associationClass=UmlInterface
-        )
-        self._relationShips: RelationshipDescription = RelationshipDescription(
+        self._associations: RelationshipDescription = RelationshipDescription(
             {
                 Identifiers.ID_DISPLAY_UML_ASSOCIATION: association,
                 Identifiers.ID_DISPLAY_UML_COMPOSITION: composition,
                 Identifiers.ID_DISPLAY_UML_AGGREGATION: aggregation,
-                Identifiers.ID_DISPLAY_UML_INHERITANCE: inheritance,
-                Identifiers.ID_DISPLAY_UML_INTERFACE:   interface
             }
         )
 
-    def displayRelationship(self, idReference: ID_REFERENCE):
+    def displayAssociation(self, idReference: ID_REFERENCE):
 
-        associationDescription: AssociationDescription = self._relationShips[idReference]
+        associationDescription: AssociationDescription = self._associations[idReference]
 
-        self._displayAssociation(associationDescription=associationDescription)
+        sourceUmlClass, destinationUmlClass = self._createClassPair()
+        self.logger.info(f'{sourceUmlClass.id=} {destinationUmlClass.id=}')
+
+        pyutLink = self._createAssociationPyutLink()
+
+        pyutLink.name = f'{associationDescription.linkType}-{self._associationCounter}'
+        self._associationCounter += 1
+
+        umlAssociation: UmlAssociation = associationDescription.associationClass(pyutLink=pyutLink)
+
+        umlAssociation.umlFrame = self._diagramFrame
+        umlAssociation.MakeLineControlPoints(n=2)       # Make this configurable
+
+        sourceUmlClass.addLink(umlLink=umlAssociation, destinationClass=destinationUmlClass)
+
+        self._diagramFrame.umlDiagram.AddShape(umlAssociation)
+        umlAssociation.Show(True)
+
+        eventHandler: UmlAssociationEventHandler = UmlAssociationEventHandler(umlAssociation=umlAssociation)
+
+        eventHandler.umlPubSubEngine = self._umlPubSubEngine
+        eventHandler.SetPreviousHandler(umlAssociation.GetEventHandler())
+        umlAssociation.SetEventHandler(eventHandler)
 
     def displayUmlInheritance(self):
         """
@@ -175,39 +180,6 @@ class LinkCreator:
         eventHandler.umlPubSubEngine = self._umlPubSubEngine
         eventHandler.SetPreviousHandler(umlInterface.GetEventHandler())
         umlInterface.SetEventHandler(eventHandler)
-
-    def _displayAssociation(self, associationDescription: AssociationDescription):
-        """
-
-        Args:
-            associationDescription:
-        """
-        sourceUmlClass, destinationUmlClass = self._createClassPair()
-        self.logger.info(f'{sourceUmlClass.id=} {destinationUmlClass.id=}')
-
-        pyutLink = self._createAssociationPyutLink()
-
-        pyutLink.name = f'{associationDescription.linkType}-{self._associationCounter}'
-        self._associationCounter += 1
-
-        umlAssociation = associationDescription.associationClass(pyutLink=pyutLink)
-
-        umlAssociation.umlFrame = self._diagramFrame
-        umlAssociation.MakeLineControlPoints(n=2)       # Make this configurable
-
-        sourceUmlClass.addLink(umlLink=umlAssociation, destinationClass=destinationUmlClass)
-
-        self._diagramFrame.umlDiagram.AddShape(umlAssociation)
-        umlAssociation.Show(True)
-
-        if isinstance(umlAssociation, UmlAssociation):
-            eventHandler = associationDescription.eventHandler(umlAssociation=umlAssociation)   # type: ignore
-        else:
-            eventHandler = associationDescription.eventHandler(umlLink=umlAssociation)
-
-        eventHandler.umlPubSubEngine = self._umlPubSubEngine
-        eventHandler.SetPreviousHandler(umlAssociation.GetEventHandler())
-        umlAssociation.SetEventHandler(eventHandler)
 
     def displayNoteLink(self):
         classPosition: UmlPosition = UmlPosition(x=450, y=100)
