@@ -174,8 +174,8 @@ class ShapeCreator:
         eventHandler.SetShape(umlShape)
         cast(UmlBaseEventHandler, eventHandler).umlPubSubEngine = self._umlPubSubEngine
         eventHandler.SetPreviousHandler(umlShape.GetEventHandler())
-
         umlShape.SetEventHandler(eventHandler)
+
         self._diagramFrame.refresh()
         if shapeDescription.invokeEditDialog is not None:
             shapeDescription.invokeEditDialog(modelClass)

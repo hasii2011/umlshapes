@@ -13,11 +13,16 @@ from umlshapes.lib.ogl import RectangleShape
 from pyutmodelv2.PyutNote import PyutNote
 
 from umlshapes.UmlUtils import UmlUtils
+
+from umlshapes.links.UmlNoteLink import UmlNoteLink
+
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
-from umlshapes.mixins.ControlPointMixin import ControlPointMixin
 from umlshapes.mixins.IDMixin import IDMixin
 from umlshapes.mixins.TopLeftMixin import TopLeftMixin
+from umlshapes.mixins.ControlPointMixin import ControlPointMixin
+
+from umlshapes.shapes.UmlClass import UmlClass
 
 from umlshapes.types.UmlDimensions import UmlDimensions
 
@@ -91,6 +96,10 @@ class UmlNote(ControlPointMixin, RectangleShape, TopLeftMixin, IDMixin):
     @umlFrame.setter
     def umlFrame(self, frame: ClassDiagramFrame | UseCaseDiagramFrame | SequenceDiagramFrame):
         self.SetCanvas(frame)
+
+    def addLink(self, umlNoteLink: UmlNoteLink, umlClass: UmlClass):
+
+        self.AddLine(line=umlNoteLink, other=umlClass)
 
     def OnDraw(self, dc: MemoryDC):
         """

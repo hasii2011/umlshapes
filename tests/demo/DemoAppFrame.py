@@ -40,7 +40,7 @@ from umlshapes.types.Common import AttachmentSide
 from umlshapes.types.UmlPosition import UmlPosition
 
 from tests.demo.DemoCommon import Identifiers
-from tests.demo.RelationshipCreator import RelationshipCreator
+from tests.demo.LinkCreator import LinkCreator
 from tests.demo.ShapeCreator import ShapeCreator
 
 FRAME_WIDTH:  int = 1024
@@ -71,9 +71,9 @@ class DemoAppFrame(SizedFrame):
         self.SetAutoLayout(True)
         self.Show(True)
 
-        self._shapeCreator:        ShapeCreator        = ShapeCreator(diagramFrame=self._diagramFrame, umlPubSubEngine=self._umlPubSubEngine)
-        self._relationshipCreator: RelationshipCreator = RelationshipCreator(diagramFrame=self._diagramFrame, umlPubSubEngine=self._umlPubSubEngine)
-        self._preferences:         UmlPreferences      = UmlPreferences()
+        self._shapeCreator: ShapeCreator   = ShapeCreator(diagramFrame=self._diagramFrame, umlPubSubEngine=self._umlPubSubEngine)
+        self._linkCreator:  LinkCreator    = LinkCreator(diagramFrame=self._diagramFrame, umlPubSubEngine=self._umlPubSubEngine)
+        self._preferences:  UmlPreferences = UmlPreferences()
 
         self._pyutInterfaceCount: int = 0
 
@@ -100,6 +100,7 @@ class DemoAppFrame(SizedFrame):
         viewMenu.Append(id=Identifiers.ID_DISPLAY_UML_COMPOSITION, item='UML Composition', helpString='Display a composition Link')
         viewMenu.Append(id=Identifiers.ID_DISPLAY_UML_INHERITANCE, item='UML Inheritance', helpString='Display an Inheritance Link')
         viewMenu.Append(id=Identifiers.ID_DISPLAY_UML_ASSOCIATION, item='Uml Association', helpString='Display Bare Association')
+        viewMenu.Append(id=Identifiers.ID_DISPLAY_UML_NOTE_LINK,   item='Uml Note Link',   helpString='Display a note link')
         viewMenu.Append(id=Identifiers.ID_DISPLAY_UML_CLASS,       item='Uml Class',          helpString='Display an Uml Class')
         viewMenu.Append(id=Identifiers.ID_DISPLAY_UML_TEXT,        item='Uml Text',           helpString='Display Uml Text')
         viewMenu.Append(id=Identifiers.ID_DISPLAY_UML_NOTE,        item='Uml Note',           helpString='Display Uml Note')
@@ -125,13 +126,15 @@ class DemoAppFrame(SizedFrame):
         self.Bind(EVT_MENU, self._onDisplayElement, id=Identifiers.ID_DISPLAY_UML_COMPOSITION)
         self.Bind(EVT_MENU, self._onDisplayElement, id=Identifiers.ID_DISPLAY_UML_AGGREGATION)
         self.Bind(EVT_MENU, self._onDisplayElement, id=Identifiers.ID_DISPLAY_UML_INTERFACE)
+        self.Bind(EVT_MENU, self._onDisplayElement, id=Identifiers.ID_DISPLAY_UML_NOTE_LINK)
+
         # self.Bind(EVT_MENU, self._onDisplayElement, id=self._ID_DISPLAY_SEQUENCE_DIAGRAM)
 
     def _onDisplayElement(self, event: CommandEvent):
 
         menuId:              int                 = event.GetId()
         shapeCreator:        ShapeCreator        = self._shapeCreator
-        relationshipCreator: RelationshipCreator = self._relationshipCreator
+        linkCreator: LinkCreator = self._linkCreator
 
         # noinspection PyUnreachableCode
         match menuId:
@@ -148,16 +151,19 @@ class DemoAppFrame(SizedFrame):
                 shapeCreator.displayShape(Identifiers.ID_DISPLAY_UML_ACTOR)
 
             case Identifiers.ID_DISPLAY_UML_ASSOCIATION:
-                relationshipCreator.displayRelationship(idReference=Identifiers.ID_DISPLAY_UML_ASSOCIATION)
+                linkCreator.displayRelationship(idReference=Identifiers.ID_DISPLAY_UML_ASSOCIATION)
             case Identifiers.ID_DISPLAY_UML_COMPOSITION:
-                relationshipCreator.displayRelationship(idReference=Identifiers.ID_DISPLAY_UML_COMPOSITION)
+                linkCreator.displayRelationship(idReference=Identifiers.ID_DISPLAY_UML_COMPOSITION)
             case Identifiers.ID_DISPLAY_UML_AGGREGATION:
-                relationshipCreator.displayRelationship(idReference=Identifiers.ID_DISPLAY_UML_AGGREGATION)
+                linkCreator.displayRelationship(idReference=Identifiers.ID_DISPLAY_UML_AGGREGATION)
+
+            case Identifiers.ID_DISPLAY_UML_NOTE_LINK:
+                linkCreator.displayNoteLink()
 
             case Identifiers.ID_DISPLAY_UML_INHERITANCE:
-                relationshipCreator.displayRelationship(idReference=Identifiers.ID_DISPLAY_UML_INHERITANCE)
+                linkCreator.displayUmlInheritance()
             case Identifiers.ID_DISPLAY_UML_INTERFACE:
-                relationshipCreator.displayRelationship(idReference=Identifiers.ID_DISPLAY_UML_INTERFACE)
+                linkCreator.displayUmlInterface()
             # case self._ID_DISPLAY_SEQUENCE_DIAGRAM:
             #     self._displaySequenceDiagram()
             case _:

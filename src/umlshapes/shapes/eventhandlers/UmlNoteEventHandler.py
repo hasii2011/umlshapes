@@ -2,6 +2,7 @@
 from logging import Logger
 from logging import getLogger
 
+from wx import DC
 from wx import OK
 
 from pyutmodelv2.PyutNote import PyutNote
@@ -34,3 +35,12 @@ class UmlNoteEventHandler(UmlBaseEventHandler):
                 umlFrame.refresh()
 
         umlNote.selected = False
+
+    def OnMoveLink(self, dc: DC, moveControlPoints: bool = True):
+        """
+
+        Args:
+            dc:
+            moveControlPoints:
+        """
+        super().OnMoveLink(dc=dc, moveControlPoints=moveControlPoints)

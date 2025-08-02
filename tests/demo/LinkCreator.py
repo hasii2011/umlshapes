@@ -12,30 +12,36 @@ from dataclasses import dataclass
 
 from pyutmodelv2.PyutClass import PyutClass
 from pyutmodelv2.PyutLink import PyutLink
+from pyutmodelv2.PyutNote import PyutNote
 
 from pyutmodelv2.enumerations.PyutLinkType import PyutLinkType
 
 from umlshapes.UmlDiagram import UmlDiagram
+from umlshapes.links.eventhandlers.UmlNoteLinkEventHandler import UmlNoteLinkEventHandler
+
 from umlshapes.pubsubengine.UmlPubSubEngine import UmlPubSubEngine
 
+from umlshapes.links.UmlAssociation import UmlAssociation
 from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
 from umlshapes.links.UmlAggregation import UmlAggregation
 from umlshapes.links.UmlComposition import UmlComposition
 from umlshapes.links.UmlInheritance import UmlInheritance
 from umlshapes.links.UmlInterface import UmlInterface
-
+from umlshapes.links.UmlNoteLink import UmlNoteLink
 from umlshapes.links.UmlLink import UmlLink
-from umlshapes.links.UmlAssociation import UmlAssociation
 
 from umlshapes.links.eventhandlers.UmlAssociationEventHandler import UmlAssociationEventHandler
 from umlshapes.links.eventhandlers.UmlLinkEventHandler import UmlLinkEventHandler
 
 from umlshapes.shapes.UmlClass import UmlClass
+from umlshapes.shapes.UmlNote import UmlNote
 
 from umlshapes.shapes.eventhandlers.UmlClassEventHandler import UmlClassEventHandler
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
+from umlshapes.shapes.eventhandlers.UmlNoteEventHandler import UmlNoteEventHandler
 
+from umlshapes.types.UmlDimensions import UmlDimensions
 from umlshapes.types.UmlPosition import UmlPosition
 
 from tests.demo.DemoCommon import Identifiers
@@ -60,7 +66,7 @@ class AssociationDescription:
 RelationshipDescription = NewType('RelationshipDescription', Dict[ID_REFERENCE, AssociationDescription])
 
 
-class RelationshipCreator:
+class LinkCreator:
     """
     Not those kinds, dork
     """
@@ -116,12 +122,59 @@ class RelationshipCreator:
 
         associationDescription: AssociationDescription = self._relationShips[idReference]
 
-        if associationDescription.linkType == PyutLinkType.INHERITANCE:
-            self._displayUmlInheritance()
-        elif associationDescription.linkType == PyutLinkType.INTERFACE:
-            self._displayUmlInterface()
-        else:
-            self._displayAssociation(associationDescription=associationDescription)
+        self._displayAssociation(associationDescription=associationDescription)
+
+    def displayUmlInheritance(self):
+        """
+        """
+        baseUmlClass, subUmlClass = self._createClassPair()
+        baseUmlClass.pyutClass.name = 'Base Class'
+        subUmlClass.pyutClass.name  = 'SubClass'
+
+        pyutInheritance: PyutLink = self._createInheritancePyutLink(baseUmlClass=baseUmlClass, subUmlClass=subUmlClass)
+
+        umlInheritance: UmlInheritance = UmlInheritance(pyutLink=pyutInheritance, baseClass=baseUmlClass, subClass=subUmlClass)
+        umlInheritance.umlFrame = self._diagramFrame
+        umlInheritance.MakeLineControlPoints(n=2)       # Make this configurable
+
+        # REMEMBER:   from subclass to base class
+        subUmlClass.addLink(umlLink=umlInheritance, destinationClass=baseUmlClass)
+
+        self._diagramFrame.umlDiagram.AddShape(umlInheritance)
+        umlInheritance.Show(True)
+
+        eventHandler: UmlLinkEventHandler = UmlLinkEventHandler(umlLink=umlInheritance)
+        eventHandler.umlPubSubEngine = self._umlPubSubEngine
+        eventHandler.SetPreviousHandler(umlInheritance.GetEventHandler())
+        umlInheritance.SetEventHandler(eventHandler)
+
+    def displayUmlInterface(self):
+
+        interfaceClass, implementingClass = self._createClassPair()
+
+        interfaceClass.pyutClass.name     = f'InterfaceClass-{self._classCounter}'
+        self._classCounter += 1
+        implementingClass.pyutClass.name  = f'ImplementingClass-{self._classCounter}'
+        self._classCounter += 1
+
+        pyutInterface: PyutLink = self._createInterfacePyutLink()
+
+        pyutInterface.destination  = implementingClass.pyutClass
+        pyutInterface.source       = interfaceClass.pyutClass
+
+        umlInterface: UmlInterface = UmlInterface(pyutLink=pyutInterface, interfaceClass=interfaceClass, implementingClass=implementingClass)
+        umlInterface.umlFrame = self._diagramFrame
+        umlInterface.MakeLineControlPoints(n=2)
+
+        implementingClass.addLink(umlLink=umlInterface, destinationClass=interfaceClass)
+
+        self._diagramFrame.umlDiagram.AddShape(umlInterface)
+        umlInterface.Show(True)
+
+        eventHandler: UmlLinkEventHandler = UmlLinkEventHandler(umlLink=umlInterface)
+        eventHandler.umlPubSubEngine = self._umlPubSubEngine
+        eventHandler.SetPreviousHandler(umlInterface.GetEventHandler())
+        umlInterface.SetEventHandler(eventHandler)
 
     def _displayAssociation(self, associationDescription: AssociationDescription):
         """
@@ -156,57 +209,39 @@ class RelationshipCreator:
         eventHandler.SetPreviousHandler(umlAssociation.GetEventHandler())
         umlAssociation.SetEventHandler(eventHandler)
 
-    def _displayUmlInheritance(self):
-        """
-        """
-        baseUmlClass, subUmlClass = self._createClassPair()
-        baseUmlClass.pyutClass.name = 'Base Class'
-        subUmlClass.pyutClass.name  = 'SubClass'
+    def displayNoteLink(self):
+        classPosition: UmlPosition = UmlPosition(x=450, y=100)
 
-        pyutInheritance: PyutLink = self._createInheritancePyutLink(baseUmlClass=baseUmlClass, subUmlClass=subUmlClass)
+        umlNote: UmlNote = self._createUmlNote()
 
-        umlInheritance: UmlInheritance = UmlInheritance(pyutLink=pyutInheritance, baseClass=baseUmlClass, subClass=subUmlClass)
-        umlInheritance.umlFrame = self._diagramFrame
-        umlInheritance.MakeLineControlPoints(n=2)       # Make this configurable
+        pyutClass: PyutClass = self._createSimplePyutClass(classCounter=self._classCounter)
+        umlClass:  UmlClass  = UmlClass(pyutClass=pyutClass, size=UmlDimensions(100, 50))
 
-        # REMEMBER:   from subclass to base class
-        subUmlClass.addLink(umlLink=umlInheritance, destinationClass=baseUmlClass)
+        self._displayUmlClass(umlClass=umlClass, umlPosition=classPosition)
 
-        self._diagramFrame.umlDiagram.AddShape(umlInheritance)
-        umlInheritance.Show(True)
+        pyutLink:    PyutLink    = PyutLink(linkType=PyutLinkType.NOTELINK)
+        umlNoteLink: UmlNoteLink = UmlNoteLink(pyutLink=pyutLink)
+        umlNoteLink.MakeLineControlPoints(2)
+        umlNoteLink.sourceNote       = umlNote
+        umlNoteLink.destinationClass = umlClass
 
-        eventHandler: UmlLinkEventHandler = UmlLinkEventHandler(umlLink=umlInheritance)
-        eventHandler.umlPubSubEngine = self._umlPubSubEngine
-        eventHandler.SetPreviousHandler(umlInheritance.GetEventHandler())
-        umlInheritance.SetEventHandler(eventHandler)
+        umlNote.umlFrame  = self._diagramFrame
+        umlClass.umlFrame = self._diagramFrame
+        umlNote.addLink(umlNoteLink=umlNoteLink, umlClass=umlClass)
 
-    def _displayUmlInterface(self):
+        self._diagramFrame.umlDiagram.AddShape(umlNote)
+        self._diagramFrame.umlDiagram.AddShape(umlClass)
+        self._diagramFrame.umlDiagram.AddShape(umlNoteLink)
 
-        interfaceClass, implementingClass = self._createClassPair()
+        umlNote.Show(True)
+        umlNoteLink.Show(True)
 
-        interfaceClass.pyutClass.name     = f'InterfaceClass-{self._classCounter}'
-        self._classCounter += 1
-        implementingClass.pyutClass.name  = f'ImplementingClass-{self._classCounter}'
-        self._classCounter += 1
+        self._associateClassEventHandler(umlClass=umlClass)
+        self._associateNoteLinkEventHandler(umlNoteLink=umlNoteLink)
 
-        pyutInterface: PyutLink = self._createInterfacePyutLink()
+        umlNote.addLink(umlNoteLink=umlNoteLink, umlClass=umlClass)
 
-        pyutInterface.destination  = implementingClass.pyutClass
-        pyutInterface.source       = interfaceClass.pyutClass
-
-        umlInterface: UmlInterface = UmlInterface(pyutLink=pyutInterface, interfaceClass=interfaceClass, implementingClass=implementingClass)
-        umlInterface.umlFrame = self._diagramFrame
-        umlInterface.MakeLineControlPoints(n=2)
-
-        implementingClass.addLink(umlLink=umlInterface, destinationClass=interfaceClass)
-
-        self._diagramFrame.umlDiagram.AddShape(umlInterface)
-        umlInterface.Show(True)
-
-        eventHandler: UmlLinkEventHandler = UmlLinkEventHandler(umlLink=umlInterface)
-        eventHandler.umlPubSubEngine = self._umlPubSubEngine
-        eventHandler.SetPreviousHandler(umlInterface.GetEventHandler())
-        umlInterface.SetEventHandler(eventHandler)
+        self._diagramFrame.refresh()
 
     def _createClassPair(self) -> Tuple[UmlClass, UmlClass]:
 
@@ -221,7 +256,7 @@ class RelationshipCreator:
         sourceUmlClass:      UmlClass = UmlClass(pyutClass=sourcePyutClass)
         destinationUmlClass: UmlClass = UmlClass(pyutClass=destinationPyutClass)
 
-        self._displayUmlClass(umlClass=sourceUmlClass,      umlPosition=sourcePosition)
+        self._displayUmlClass(umlClass=sourceUmlClass, umlPosition=sourcePosition)
         self._displayUmlClass(umlClass=destinationUmlClass, umlPosition=destinationPosition)
 
         self._associateClassEventHandler(umlClass=sourceUmlClass)
@@ -269,10 +304,38 @@ class RelationshipCreator:
     def _associateClassEventHandler(self, umlClass: UmlClass):
 
         eventHandler: UmlClassEventHandler = UmlClassEventHandler()
+
+        eventHandler.umlPubSubEngine = self._umlPubSubEngine
         eventHandler.SetShape(umlClass)
         eventHandler.SetPreviousHandler(umlClass.GetEventHandler())
 
         umlClass.SetEventHandler(eventHandler)
+
+    def _associateNoteLinkEventHandler(self, umlNoteLink: UmlNoteLink):
+
+        eventHandler: UmlNoteLinkEventHandler = UmlNoteLinkEventHandler(umlNoteLink=umlNoteLink)
+        eventHandler.umlPubSubEngine = self._umlPubSubEngine
+
+        eventHandler.SetPreviousHandler(umlNoteLink.GetEventHandler())
+        umlNoteLink.SetEventHandler(eventHandler)
+
+    def _createUmlNote(self) -> UmlNote:
+
+        pyutNote: PyutNote = PyutNote(content='I am a great note')
+        umlNote:  UmlNote  = UmlNote(pyutNote=pyutNote)
+
+        notePosition:  UmlPosition = UmlPosition(x=100, y=100)
+
+        umlNote.size     = UmlDimensions(width=150, height=50)
+        umlNote.pyutNote = pyutNote
+        umlNote.position = notePosition
+
+        eventHandler: UmlNoteEventHandler = UmlNoteEventHandler()
+        eventHandler.SetShape(umlNote)
+        eventHandler.SetPreviousHandler(umlNote.GetEventHandler())
+        umlNote.SetEventHandler(eventHandler)
+
+        return umlNote
 
     def _displayUmlClass(self, umlClass: UmlClass, umlPosition: UmlPosition):
 
