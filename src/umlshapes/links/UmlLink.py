@@ -44,6 +44,7 @@ from umlshapes.types.UmlPosition import UmlPosition
 
 if TYPE_CHECKING:
     from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
+    from umlshapes.ShapeTypes import LinkableUmlShape
 
 
 class UmlLink(LineShape, IDMixin):
@@ -61,6 +62,22 @@ class UmlLink(LineShape, IDMixin):
 
         self.SetFormatMode(mode=FORMAT_SIZE_TO_CONTENTS)
         self.SetDraggable(True, recursive=True)
+
+    @property
+    def sourceShape(self) -> 'LinkableUmlShape':
+        return self.GetFrom()
+
+    @sourceShape.setter
+    def sourceShape(self, shape: 'LinkableUmlShape'):
+        self.SetFrom(shape)
+
+    @property
+    def destinationShape(self) -> 'LinkableUmlShape':
+        return self.GetTo()
+
+    @destinationShape.setter
+    def destinationShape(self, shape: 'LinkableUmlShape'):
+        self.SetTo(shape)
 
     @property
     def umlFrame(self) -> 'ClassDiagramFrame':

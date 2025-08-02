@@ -20,6 +20,7 @@ from umlshapes.lib.ogl import Shape
 from pyutmodelv2.PyutInterface import PyutInterface
 
 from umlshapes.UmlUtils import UmlUtils
+from umlshapes.mixins.IDMixin import IDMixin
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 from umlshapes.mixins.TopLeftMixin import Rectangle
@@ -33,7 +34,7 @@ if TYPE_CHECKING:
     from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
 
 
-class UmlLollipopInterface(Shape):
+class UmlLollipopInterface(Shape, IDMixin):
     """
     Lollipops are tasty !!
     """
@@ -48,6 +49,8 @@ class UmlLollipopInterface(Shape):
         self._preferences:   UmlPreferences = UmlPreferences()
 
         super().__init__(canvas=canvas)
+        IDMixin.__init__(self, umlShape=self)
+
         self.logger: Logger = getLogger(__name__)
 
         self._lineCentum:       float = 0.1
