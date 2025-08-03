@@ -56,7 +56,7 @@ class UmlNote(ControlPointMixin, RectangleShape, TopLeftMixin, IDMixin):
         super().__init__(shape=self)
 
         if size is None:
-            noteSize: UmlDimensions = self._preferences.useCaseSize
+            noteSize: UmlDimensions = self._preferences.noteDimensions
         else:
             noteSize = size
 

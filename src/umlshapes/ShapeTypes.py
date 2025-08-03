@@ -13,7 +13,8 @@ from umlshapes.shapes.UmlClass import UmlClass
 from umlshapes.shapes.UmlNote import UmlNote
 from umlshapes.shapes.UmlUseCase import UmlUseCase
 
-LinkableUmlShape = Union[UmlClass, UmlNote, UmlActor, UmlUseCase]
+
+LinkableUmlShape = UmlClass | UmlNote | UmlActor | UmlUseCase
 
 LinkableUmlShapes = NewType('LinkableUmlShapes', Dict[int, LinkableUmlShape])
 

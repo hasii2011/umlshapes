@@ -35,7 +35,7 @@ class UmlUseCase(ControlPointMixin,  EllipseShape, TopLeftMixin, IDMixin):
 
         super().__init__(shape=self)
         if size is None:
-            useCaseSize: UmlDimensions = self._preferences.useCaseSize
+            useCaseSize: UmlDimensions = self._preferences.useCaseDimensions
         else:
             useCaseSize = size
 

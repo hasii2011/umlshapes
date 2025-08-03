@@ -57,7 +57,7 @@ class UmlText(ControlPointMixin, TextShape, TopLeftMixin, IDMixin):
         self._preferences: UmlPreferences = UmlPreferences()
 
         if size is None:
-            textSize: UmlDimensions = self._preferences.useCaseSize
+            textSize: UmlDimensions = self._preferences.textDimensions
         else:
             textSize = size
 

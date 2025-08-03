@@ -43,8 +43,9 @@ OGL_PROPERTIES: ValueDescriptions = ValueDescriptions(
     {
         KeyName('textValue'):            ValueDescription(defaultValue='fac America magna iterum'),
         KeyName('noteText'):             ValueDescription(defaultValue='This is the note text'),
-        KeyName('noteDimensions'):       ValueDescription(defaultValue=str(UmlDimensions(100, 50)), deserializer=UmlDimensions.deSerialize),
+        KeyName('noteDimensions'):       ValueDescription(defaultValue=str(UmlDimensions(150, 50)), deserializer=UmlDimensions.deSerialize),
         KeyName('textDimensions'):       ValueDescription(defaultValue=str(UmlDimensions(125, 50)), deserializer=UmlDimensions.deSerialize),
+        KeyName('useCaseDimensions'):    ValueDescription(defaultValue=DEFAULT_USE_CASE_SIZE,       deserializer=UmlDimensions.deSerialize),
         KeyName('textBold'):             ValueDescription(defaultValue='False',                     deserializer=SecureConversions.secureBoolean),
         KeyName('textItalicize'):        ValueDescription(defaultValue='False',                     deserializer=SecureConversions.secureBoolean),
         KeyName('textFontFamily'):       ValueDescription(defaultValue='Swiss',                     deserializer=UmlFontFamily.deSerialize),
@@ -58,7 +59,6 @@ OGL_PROPERTIES: ValueDescriptions = ValueDescriptions(
         KeyName('classBackGroundColor'): ValueDescription(defaultValue=DEFAULT_CLASS_BACKGROUND_COLOR, enumUseValue=True, deserializer=UmlColor),
         KeyName('classTextColor'):       ValueDescription(defaultValue=DEFAULT_CLASS_TEXT_COLOR,       enumUseValue=True, deserializer=UmlColor),
         KeyName('classTextMargin'):      ValueDescription(defaultValue='10',                        deserializer=SecureConversions.secureInteger),
-        KeyName('useCaseSize'):          ValueDescription(defaultValue=DEFAULT_USE_CASE_SIZE,       deserializer=UmlDimensions.deSerialize),
         KeyName('actorSize'):            ValueDescription(defaultValue=DEFAULT_ACTOR_SIZE,          deserializer=UmlDimensions.deSerialize),
 
         KeyName('autoSizeHeightAdjustment'): ValueDescription(defaultValue='0.20', deserializer=SecureConversions.secureFloat),
