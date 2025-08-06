@@ -21,26 +21,26 @@ classifiers = [
 
 dependencies = [
     'wxPython~=4.2.3',
-    'codeallybasic>=1.12.0',
+    'codeallybasic>=1.15.0',
     'codeallyadvanced>=1.3.3',
-    'pyutmodelv2>=2.2.4',
+    'pyutmodelv2>=2.2.6',
     'human_id==0.2.0',
     'Pypubsub==4.0.3',
 ]
 
 [project.optional-dependencies]
 test = [
-  'mypy==1.14.0',
-  'mypy-extensions==1.0.0',
+  'mypy==1.17.1',
+  'mypy-extensions==1.1.0',
   'types-Deprecated==1.2.9.20240311',
   'html-testRunner~=1.2.1',
 ]
 
 deploy = [
     "wheel==0.45.1",
-    "setuptools==75.7.0",
+    "setuptools==80.9.0",
     "twine==6.1.0",
-    "build==1.2.2.post1",
+    "build==1.3.0",
     'pkginfo==1.12.1.2'
 
 ]

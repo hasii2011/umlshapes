@@ -20,9 +20,14 @@ from umlshapes.UmlUtils import UmlUtils
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
-from umlshapes.mixins.ControlPointMixin import ControlPointMixin
 from umlshapes.mixins.IDMixin import IDMixin
 from umlshapes.mixins.TopLeftMixin import TopLeftMixin
+from umlshapes.mixins.ControlPointMixin import ControlPointMixin
+
+from umlshapes.links.UmlAssociation import UmlAssociation
+
+from umlshapes.shapes.UmlClass import UmlClass
+from umlshapes.shapes.UmlUseCase import UmlUseCase
 
 from umlshapes.types.UmlDimensions import UmlDimensions
 
@@ -103,6 +108,10 @@ class UmlActor(ControlPointMixin, RectangleShape, TopLeftMixin, IDMixin):
     @umlFrame.setter
     def umlFrame(self, frame: UseCaseDiagramFrame):
         self.SetCanvas(frame)
+
+    def addLink(self, umlAssociation: UmlAssociation, umlUseCase: UmlUseCase):
+
+        self.AddLine(line=umlAssociation, other=umlUseCase)
 
     # This is dangerous, accessing internal stuff
     # noinspection PyProtectedMember
