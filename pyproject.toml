@@ -54,6 +54,7 @@ where = ['src']
 
 [tool.setuptools.package-data]
 'uml.resources' = ['loggingConfiguration.json']
+umlshapes = ['py.typed']
 
 [tool.setuptools.dynamic]
 version = {attr = 'umlshapes.__version__'}
