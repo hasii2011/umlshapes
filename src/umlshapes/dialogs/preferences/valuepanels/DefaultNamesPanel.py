@@ -44,12 +44,13 @@ class DefaultNamesPanel(SizedPanel):
         #
         p: UmlPreferences = self._preferences
         self._nameData: List[NameData] = [
-            NameData(label='Interface Name: ', callback=self._onInterfaceNameChanged, initialValue=p.defaultNameInterface),
-            NameData(label='Use Case Name: ',  callback=self._onUseCaseNameChanged,   initialValue=p.defaultNameUsecase),
-            NameData(label='Actor Name: ',     callback=self._onActorNameChanged,     initialValue=p.defaultNameActor),
-            NameData(label='Method Name: ',    callback=self._onMethodNameChanged,    initialValue=p.defaultNameMethod),
-            NameData(label='Field Name: ',     callback=self._onFieldNameChanged,     initialValue=p.defaultNameField),
-            NameData(label='Parameter Name: ', callback=self._onParameterNameChanged, initialValue=p.defaultNameParameter),
+            NameData(label='Interface Name: ',   callback=self._onInterfaceNameChanged,   initialValue=p.defaultNameInterface),
+            NameData(label='Use Case Name: ',    callback=self._onUseCaseNameChanged,     initialValue=p.defaultNameUsecase),
+            NameData(label='Actor Name: ',       callback=self._onActorNameChanged,       initialValue=p.defaultNameActor),
+            NameData(label='Method Name: ',      callback=self._onMethodNameChanged,      initialValue=p.defaultNameMethod),
+            NameData(label='Field Name: ',       callback=self._onFieldNameChanged,       initialValue=p.defaultNameField),
+            NameData(label='Parameter Name: ',   callback=self._onParameterNameChanged,   initialValue=p.defaultNameParameter),
+            NameData(label='Association Name: ', callback=self._onAssociationNameChanged, initialValue=p.defaultAssociationName),
         ]
         for nameData in self._nameData:
 
@@ -81,3 +82,8 @@ class DefaultNamesPanel(SizedPanel):
     def _onParameterNameChanged(self, event: CommandEvent):
         newValue: str = event.GetString()
         self._preferences.parameterName = newValue
+
+    def _onAssociationNameChanged(self, event: CommandEvent):
+        newValue: str = event.GetString()
+        self._preferences.defaultAssociationName = newValue
+

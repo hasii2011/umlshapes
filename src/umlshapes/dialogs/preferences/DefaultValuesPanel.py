@@ -26,6 +26,8 @@ from codeallyadvanced.resources.images.icons.embedded16.ImgToolboxRelationshipCo
 
 from umlshapes.dialogs.preferences.BasePreferencesPanel import BasePreferencesPanel
 from umlshapes.dialogs.preferences.valuepanels.DefaultNamesPanel import DefaultNamesPanel
+from umlshapes.dialogs.preferences.valuepanels.NotePreferencesPanel import NotePreferencesPanel
+from umlshapes.dialogs.preferences.valuepanels.TextPreferencesPanel import TextPreferencesPanel
 
 
 # from ogl.ui.valuecontrols.NoteAttributesControl import NoteAttributesControl
@@ -72,8 +74,8 @@ class DefaultValuesPanel(BasePreferencesPanel):
 
         imageIdGenerator = getNextImageID(imageList.GetImageCount())
 
-        # notePanel:  NoteAttributesControl  = NoteAttributesControl(parent=toolBook)
-        # textPanel:  TextAttributesControl  = TextAttributesControl(parent=toolBook)
+        notePreferencesPanel:  NotePreferencesPanel  = NotePreferencesPanel(parent=toolBook)
+        textPreferencesPanel:  TextPreferencesPanel  = TextPreferencesPanel(parent=toolBook)
         # classPanel: ClassAttributesControl = ClassAttributesControl(parent=toolBook)
 
         defaultNamesPanel: DefaultNamesPanel = DefaultNamesPanel(parent=toolBook)
@@ -81,8 +83,8 @@ class DefaultValuesPanel(BasePreferencesPanel):
         #
         # associationPanel:  AssociationAttributesControl = AssociationAttributesControl(parent=toolBook)
 
-        # toolBook.AddPage(notePanel,         text='Notes', select=True, imageId=next(imageIdGenerator))
-        # toolBook.AddPage(textPanel,         text='Text',  select=False, imageId=next(imageIdGenerator))
+        toolBook.AddPage(notePreferencesPanel, text='Notes', select=True,  imageId=next(imageIdGenerator))
+        toolBook.AddPage(textPreferencesPanel, text='Text',  select=False, imageId=next(imageIdGenerator))
         # toolBook.AddPage(classPanel,        text='Class', select=False, imageId=next(imageIdGenerator))
         toolBook.AddPage(defaultNamesPanel, text='Names', select=False, imageId=next(imageIdGenerator))
         # toolBook.AddPage(sdPanel,           text='SD',    select=False, imageId=next(imageIdGenerator))

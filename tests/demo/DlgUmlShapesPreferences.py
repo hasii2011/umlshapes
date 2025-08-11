@@ -30,9 +30,9 @@ class DlgUmlShapesPreferences(SizedDialog):
     def __init__(self, parent):
 
         style:   int  = DEFAULT_DIALOG_STYLE | RESIZE_BORDER
-        dlgSize: Size = Size(460, 440)
+        dlgSize: Size = Size(460, 500)
 
-        super().__init__(parent, title='Ogl Preferences', size=dlgSize, style=style)
+        super().__init__(parent, title='UML Shape Preferences', size=dlgSize, style=style)
 
         self.logger: Logger     = getLogger(__name__)
         sizedPanel:  SizedPanel = self.GetContentsPane()
