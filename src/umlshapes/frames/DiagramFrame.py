@@ -191,6 +191,12 @@ class DiagramFrame(ShapeCanvas):
         dc.Blit(0, 0, w, h, mem, x, y)
 
     def OnMouseEvent(self, mouseEvent: MouseEvent):
+        """
+        Add additional behaviour to add wheel mouse scrolling
+
+        Args:
+            mouseEvent:
+        """
 
         rotation:  int       = mouseEvent.GetWheelRotation()
         wheelAxis: WheelAxis = WheelAxis.toEnum(value=mouseEvent.GetWheelAxis())

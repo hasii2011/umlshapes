@@ -22,6 +22,7 @@ from wx.lib.sized_controls import SizedDialog
 from wx.lib.sized_controls import SizedPanel
 
 from umlshapes.dialogs.preferences.DefaultValuesPanel import DefaultValuesPanel
+from umlshapes.dialogs.preferences.DiagramPreferencesPanel import DiagramPreferencesPanel
 
 
 class DlgUmlShapesPreferences(SizedDialog):
@@ -42,10 +43,10 @@ class DlgUmlShapesPreferences(SizedDialog):
         book: Notebook = Notebook(sizedPanel, style=nbStyle)
         book.SetSizerProps(expand=True, proportion=1)
 
-        # diagramPreferencesPage:       DiagramPreferencesPage       = DiagramPreferencesPage(parent=book)
-        defaultValuesPreferencesPage: DefaultValuesPanel = DefaultValuesPanel(parent=book)
+        diagramPreferencesPanel:      DiagramPreferencesPanel = DiagramPreferencesPanel(parent=book)
+        defaultValuesPreferencesPage: DefaultValuesPanel      = DefaultValuesPanel(parent=book)
 
-        # book.AddPage(diagramPreferencesPage,       text=diagramPreferencesPage.name,       select=True)
+        book.AddPage(diagramPreferencesPanel,      text=diagramPreferencesPanel.name,       select=True)
         book.AddPage(defaultValuesPreferencesPage, text=defaultValuesPreferencesPage.name, select=False)
 
         self._layoutStandardOkCancelButtonSizer()
