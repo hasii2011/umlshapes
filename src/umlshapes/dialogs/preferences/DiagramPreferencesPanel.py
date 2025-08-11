@@ -128,6 +128,10 @@ class DiagramPreferencesPanel(BasePreferencesPanel):
         selectedIndex:  int       = gridLineStyles.index(self._preferences.gridLineStyle.value)
         self._gridStyleChoice.SetSelection(selectedIndex)
 
+        self._normalBackgroundColor.SetValue(self._preferences.backGroundColor.value)
+        self._darkModeBackgroundColor.SetValue(self._preferences.darkModeBackGroundColor.value)
+        self._darkModeGridLineColor.SetValue(self._preferences.darkModeGridLineColor.value)
+
     def _bindCallbacks(self, parent):
 
         parent.Bind(EVT_CHECKBOX, self._onEnableBackgroundGridChanged,   self._enableBackgroundGrid)
@@ -137,6 +141,10 @@ class DiagramPreferencesPanel(BasePreferencesPanel):
         parent.Bind(EVT_COMBOBOX, self._onGridLineColorSelectionChanged, self._gridLineColor)
         parent.Bind(EVT_SPINCTRL, self._onGridIntervalChanged,           self._gridInterval)
         parent.Bind(EVT_CHOICE,   self._onGridStyleChanged,              self._gridStyleChoice)
+
+        parent.Bind(EVT_COMBOBOX, self._onNormalBackGroundColorChanged,   self._normalBackgroundColor)
+        parent.Bind(EVT_COMBOBOX, self._onDarkModeBackgroundColorChanged, self._darkModeBackgroundColor)
+        parent.Bind(EVT_COMBOBOX, self._onDarkModeGridLineColorChanged,   self._darkModeGridLineColor)
 
     def _layoutDiagramPreferences(self, verticalPanel: SizedPanel):
 
@@ -268,3 +276,21 @@ class DiagramPreferencesPanel(BasePreferencesPanel):
             self._snapToGrid.SetValue(False)
             self._snapToGrid.Enabled = False
             self._preferences.snapToGrid = False
+
+    def _onNormalBackGroundColorChanged(self, event: CommandEvent):
+        colorValue:    str      = event.GetString()
+        pyutColorEnum: UmlColor = UmlColor(colorValue)
+
+        self._preferences.backGroundColor = pyutColorEnum
+
+    def _onDarkModeBackgroundColorChanged(self, event: CommandEvent):
+        colorValue:    str      = event.GetString()
+        pyutColorEnum: UmlColor = UmlColor(colorValue)
+
+        self._preferences.darkModeBackGroundColor = pyutColorEnum
+
+    def _onDarkModeGridLineColorChanged(self, event: CommandEvent):
+        colorValue:    str      = event.GetString()
+        pyutColorEnum: UmlColor = UmlColor(colorValue)
+
+        self._preferences.darkModeGridLineColor = pyutColorEnum
