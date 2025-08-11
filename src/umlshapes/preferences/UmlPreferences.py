@@ -18,7 +18,7 @@ from codeallybasic.DynamicConfiguration import Sections
 from codeallybasic.DynamicConfiguration import ValueDescription
 from codeallybasic.DynamicConfiguration import ValueDescriptions
 
-MODULE_NAME:           str = 'ogl'
+MODULE_NAME:           str = 'umlshapes'
 PREFERENCES_FILE_NAME: str = f'{MODULE_NAME}.ini'
 
 DEFAULT_BACKGROUND_COLOR:           str = UmlColor.WHITE.value
@@ -39,7 +39,7 @@ DEFAULT_ACTOR_SIZE:             str = str(UmlDimensions(width=80, height=100))
 DEFAULT_ASSOCIATION_LABEL_SIZE: str = str(UmlDimensions(width=20, height=14))
 
 
-OGL_PROPERTIES: ValueDescriptions = ValueDescriptions(
+UML_SHAPES_PROPERTIES: ValueDescriptions = ValueDescriptions(
     {
         KeyName('textValue'):            ValueDescription(defaultValue='fac America magna iterum'),
         KeyName('noteText'):             ValueDescription(defaultValue='This is the note text'),
@@ -134,7 +134,7 @@ debugPreferences: ValueDescriptions = ValueDescriptions(
 
 sections: Sections = Sections(
     {
-        SectionName('Ogl'):              OGL_PROPERTIES,
+        SectionName('UMLShapes'):        UML_SHAPES_PROPERTIES,
         SectionName('Diagram'):          DIAGRAM_PROPERTIES,
         SectionName('Names'):            namePreferences,
         SectionName('SequenceDiagrams'): sequenceDiagramPreferences,

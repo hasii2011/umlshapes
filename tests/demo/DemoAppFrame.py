@@ -6,6 +6,7 @@ from wx import DEFAULT_FRAME_STYLE
 from wx import EVT_MENU
 from wx import FRAME_FLOAT_ON_PARENT
 from wx import ID_EXIT
+from wx import ID_PREFERENCES
 
 from wx import Menu
 from wx import MenuBar
@@ -19,6 +20,7 @@ from pyutmodelv2.PyutInterface import PyutInterface
 from pyutmodelv2.PyutInterface import PyutInterfaces
 from pyutmodelv2.PyutModelTypes import ClassName
 
+from tests.demo.DlgUmlShapesPreferences import DlgUmlShapesPreferences
 from umlshapes.UmlDiagram import UmlDiagram
 from umlshapes.UmlUtils import UmlUtils
 from umlshapes.dialogs.DlgEditInterface import DlgEditInterface
@@ -93,7 +95,7 @@ class DemoAppFrame(SizedFrame):
         fileMenu.AppendSeparator()
         fileMenu.Append(ID_EXIT, '&Quit', "Quit Application")
         fileMenu.AppendSeparator()
-        # fileMenu.Append(ID_PREFERENCES, "P&references", "Uml preferences")
+        fileMenu.Append(ID_PREFERENCES, "P&references", "Uml preferences")
 
         viewMenu.Append(id=Identifiers.ID_DISPLAY_UML_INTERFACE,   item='UML Interface',   helpString='Display Normal Interface')
         viewMenu.Append(id=Identifiers.ID_DISPLAY_UML_AGGREGATION, item='UML Aggregation', helpString='Display a aggregation Link')
@@ -127,6 +129,8 @@ class DemoAppFrame(SizedFrame):
         self.Bind(EVT_MENU, self._onDisplayElement, id=Identifiers.ID_DISPLAY_UML_AGGREGATION)
         self.Bind(EVT_MENU, self._onDisplayElement, id=Identifiers.ID_DISPLAY_UML_INTERFACE)
         self.Bind(EVT_MENU, self._onDisplayElement, id=Identifiers.ID_DISPLAY_UML_NOTE_LINK)
+
+        self.Bind(EVT_MENU, self._onUmlShapePreferences, id=ID_PREFERENCES)
 
         # self.Bind(EVT_MENU, self._onDisplayElement, id=self._ID_DISPLAY_SEQUENCE_DIAGRAM)
 
@@ -217,3 +221,9 @@ class DemoAppFrame(SizedFrame):
     def _onDiagramModified(self, modifiedFrameId):
 
         self.logger.info(f'Diagram Modified - {modifiedFrameId=}')
+
+    def _onUmlShapePreferences(self, event: CommandEvent):
+
+        with DlgUmlShapesPreferences(parent=self) as dlg:
+            if dlg.ShowModal() == OK:
+                self.logger.info(f'Pressed Ok')
