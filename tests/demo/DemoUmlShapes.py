@@ -4,9 +4,11 @@ from typing import cast
 from logging import Logger
 from logging import getLogger
 
+import platform
 
 from wx import App
 
+from tests.demo.Versions import Versions
 from umlshapes.lib.ogl import OGLInitialize
 
 from codeallybasic.UnitTestBase import UnitTestBase
@@ -45,6 +47,22 @@ class DemoUmlShapes(App):
 if __name__ == '__main__':
 
     UnitTestBase.setUpLogging()
+
+    version: Versions = Versions()
+    print("Versions: ")
+    print(f'Platform: {version.platform}')
+
+    print(f'    System:       {platform.system()}')
+    print(f'    Version:      {platform.version()}')
+    print(f'    Release:      {platform.release()}')
+
+    print(f'WxPython: {version.wxPythonVersion}')
+    print(f'')
+    print(f'UML Diagrammer Packages')
+    print(f'    Uml Shapes:      {version.umlShapesVersion}')
+
+    print(f'')
+    print(f'Python:   {version.pythonVersion}')
 
     testApp: DemoUmlShapes = DemoUmlShapes()
 
