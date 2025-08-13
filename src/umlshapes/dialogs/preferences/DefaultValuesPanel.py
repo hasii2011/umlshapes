@@ -21,18 +21,11 @@ from codeallyadvanced.resources.images.icons.embedded16.ImgToolboxClass import e
 from codeallyadvanced.resources.images.icons.embedded16.ImgToolboxSequenceDiagramInstance import embeddedImage as ImgToolboxSequenceDiagramInstance
 from codeallyadvanced.resources.images.icons.embedded16.ImgToolboxRelationshipComposition import embeddedImage as ImgToolboxRelationshipComposition
 
-# from ogl.ui.valuecontrols.AssociationAttributesControl import AssociationAttributesControl
-# from ogl.ui.valuecontrols.ClassAttributesControl import ClassAttributesControl
-
 from umlshapes.dialogs.preferences.BasePreferencesPanel import BasePreferencesPanel
+from umlshapes.dialogs.preferences.valuepanels.ClassPreferencesPanel import ClassPreferencesPanel
 from umlshapes.dialogs.preferences.valuepanels.DefaultNamesPanel import DefaultNamesPanel
 from umlshapes.dialogs.preferences.valuepanels.NotePreferencesPanel import NotePreferencesPanel
 from umlshapes.dialogs.preferences.valuepanels.TextPreferencesPanel import TextPreferencesPanel
-
-
-# from ogl.ui.valuecontrols.NoteAttributesControl import NoteAttributesControl
-# from ogl.ui.valuecontrols.SDAttributesControl import SDAttributesControl
-# from ogl.ui.valuecontrols.TextAttributesControl import TextAttributesControl
 
 
 def getNextImageID(count):
@@ -76,17 +69,17 @@ class DefaultValuesPanel(BasePreferencesPanel):
 
         notePreferencesPanel:  NotePreferencesPanel  = NotePreferencesPanel(parent=toolBook)
         textPreferencesPanel:  TextPreferencesPanel  = TextPreferencesPanel(parent=toolBook)
-        # classPanel: ClassAttributesControl = ClassAttributesControl(parent=toolBook)
+        classPreferencesPanel: ClassPreferencesPanel = ClassPreferencesPanel(parent=toolBook)
 
         defaultNamesPanel: DefaultNamesPanel = DefaultNamesPanel(parent=toolBook)
         # sdPanel:           SDAttributesControl = SDAttributesControl(parent=toolBook)
         #
         # associationPanel:  AssociationAttributesControl = AssociationAttributesControl(parent=toolBook)
 
-        toolBook.AddPage(notePreferencesPanel, text='Notes', select=True,  imageId=next(imageIdGenerator))
-        toolBook.AddPage(textPreferencesPanel, text='Text',  select=False, imageId=next(imageIdGenerator))
-        # toolBook.AddPage(classPanel,        text='Class', select=False, imageId=next(imageIdGenerator))
-        toolBook.AddPage(defaultNamesPanel, text='Names', select=False, imageId=next(imageIdGenerator))
+        toolBook.AddPage(notePreferencesPanel,  text='Notes', select=True,  imageId=next(imageIdGenerator))
+        toolBook.AddPage(textPreferencesPanel,  text='Text',  select=False, imageId=next(imageIdGenerator))
+        toolBook.AddPage(classPreferencesPanel, text='Class', select=False, imageId=next(imageIdGenerator))
+        toolBook.AddPage(defaultNamesPanel,     text='Names', select=False, imageId=next(imageIdGenerator))
         # toolBook.AddPage(sdPanel,           text='SD',    select=False, imageId=next(imageIdGenerator))
         # toolBook.AddPage(associationPanel,  text='Association', select=False, imageId=next(imageIdGenerator))
 
