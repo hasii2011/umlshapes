@@ -8,8 +8,9 @@ from logging import getLogger
 from wx import Font
 from wx import MemoryDC
 
-from umlshapes.lib.ogl import FORMAT_CENTRE_HORIZ
+
 from umlshapes.lib.ogl import FORMAT_CENTRE_VERT
+from umlshapes.lib.ogl import FORMAT_NONE
 from umlshapes.lib.ogl import TextShape
 
 from umlshapes.UmlUtils import UmlUtils
@@ -56,7 +57,7 @@ class UmlAssociationLabel(ControlPointMixin, TextShape, TopLeftMixin):
         self.SetFont(font)
 
         self.AddText(label)
-        self.SetFormatMode(mode=FORMAT_CENTRE_HORIZ | FORMAT_CENTRE_VERT)
+        self.SetFormatMode(mode=FORMAT_NONE | FORMAT_CENTRE_VERT)   # TODO Preference
         self.SetDraggable(drag=True)
         self.Show(show=True)
         self.SetCentreResize(False)
