@@ -26,6 +26,7 @@ from umlshapes.dialogs.preferences.valuepanels.AssociationPreferencesPanel impor
 from umlshapes.dialogs.preferences.valuepanels.ClassPreferencesPanel import ClassPreferencesPanel
 from umlshapes.dialogs.preferences.valuepanels.DefaultNamesPanel import DefaultNamesPanel
 from umlshapes.dialogs.preferences.valuepanels.NotePreferencesPanel import NotePreferencesPanel
+from umlshapes.dialogs.preferences.valuepanels.SDPreferencesPanel import SDPreferencesPanel
 from umlshapes.dialogs.preferences.valuepanels.TextPreferencesPanel import TextPreferencesPanel
 
 
@@ -53,7 +54,9 @@ class DefaultValuesPanel(BasePreferencesPanel):
 
         toolBook: Toolbook = Toolbook(parent, ID_ANY, style=BK_DEFAULT)
         toolBook.SetSizerProps(expand=True, proportion=1)
-
+        #
+        # Brittle code; these MUST be in the specific order
+        # and the toolBook.AddPage must be in exactly that ordr
         embeddedImages: List[PyEmbeddedImage] = [ImgToolboxNote, ImgToolboxText, ImgToolboxClass, DefaultPreferences,
                                                  ImgToolboxSequenceDiagramInstance,
                                                  ImgToolboxRelationshipComposition
@@ -72,8 +75,8 @@ class DefaultValuesPanel(BasePreferencesPanel):
         textPreferencesPanel:  TextPreferencesPanel  = TextPreferencesPanel(parent=toolBook)
         classPreferencesPanel: ClassPreferencesPanel = ClassPreferencesPanel(parent=toolBook)
 
-        defaultNamesPanel: DefaultNamesPanel = DefaultNamesPanel(parent=toolBook)
-        # sdPanel:           SDAttributesControl = SDAttributesControl(parent=toolBook)
+        defaultNamesPanel: DefaultNamesPanel  = DefaultNamesPanel(parent=toolBook)
+        sdPanel:           SDPreferencesPanel = SDPreferencesPanel(parent=toolBook)
         #
         associationPreferencesPanel:  AssociationPreferencesPanel = AssociationPreferencesPanel(parent=toolBook)
 
@@ -81,7 +84,7 @@ class DefaultValuesPanel(BasePreferencesPanel):
         toolBook.AddPage(textPreferencesPanel,  text='Text',  select=False, imageId=next(imageIdGenerator))
         toolBook.AddPage(classPreferencesPanel, text='Class', select=False, imageId=next(imageIdGenerator))
         toolBook.AddPage(defaultNamesPanel,     text='Names', select=False, imageId=next(imageIdGenerator))
-        # toolBook.AddPage(sdPanel,           text='SD',    select=False, imageId=next(imageIdGenerator))
+        toolBook.AddPage(sdPanel,               text='SD',    select=False, imageId=next(imageIdGenerator))
         toolBook.AddPage(associationPreferencesPanel,  text='Association', select=False, imageId=next(imageIdGenerator))
 
     def _setControlValues(self):
