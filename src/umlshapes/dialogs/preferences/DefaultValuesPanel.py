@@ -22,6 +22,7 @@ from codeallyadvanced.resources.images.icons.embedded16.ImgToolboxSequenceDiagra
 from codeallyadvanced.resources.images.icons.embedded16.ImgToolboxRelationshipComposition import embeddedImage as ImgToolboxRelationshipComposition
 
 from umlshapes.dialogs.preferences.BasePreferencesPanel import BasePreferencesPanel
+from umlshapes.dialogs.preferences.valuepanels.AssociationPreferencesPanel import AssociationPreferencesPanel
 from umlshapes.dialogs.preferences.valuepanels.ClassPreferencesPanel import ClassPreferencesPanel
 from umlshapes.dialogs.preferences.valuepanels.DefaultNamesPanel import DefaultNamesPanel
 from umlshapes.dialogs.preferences.valuepanels.NotePreferencesPanel import NotePreferencesPanel
@@ -74,14 +75,14 @@ class DefaultValuesPanel(BasePreferencesPanel):
         defaultNamesPanel: DefaultNamesPanel = DefaultNamesPanel(parent=toolBook)
         # sdPanel:           SDAttributesControl = SDAttributesControl(parent=toolBook)
         #
-        # associationPanel:  AssociationAttributesControl = AssociationAttributesControl(parent=toolBook)
+        associationPreferencesPanel:  AssociationPreferencesPanel = AssociationPreferencesPanel(parent=toolBook)
 
         toolBook.AddPage(notePreferencesPanel,  text='Notes', select=True,  imageId=next(imageIdGenerator))
         toolBook.AddPage(textPreferencesPanel,  text='Text',  select=False, imageId=next(imageIdGenerator))
         toolBook.AddPage(classPreferencesPanel, text='Class', select=False, imageId=next(imageIdGenerator))
         toolBook.AddPage(defaultNamesPanel,     text='Names', select=False, imageId=next(imageIdGenerator))
         # toolBook.AddPage(sdPanel,           text='SD',    select=False, imageId=next(imageIdGenerator))
-        # toolBook.AddPage(associationPanel,  text='Association', select=False, imageId=next(imageIdGenerator))
+        toolBook.AddPage(associationPreferencesPanel,  text='Association', select=False, imageId=next(imageIdGenerator))
 
     def _setControlValues(self):
         pass

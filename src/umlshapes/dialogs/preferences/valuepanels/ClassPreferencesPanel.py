@@ -28,7 +28,6 @@ from wx.lib.sized_controls import SizedStaticBox
 from codeallyadvanced.ui.widgets.DimensionsControl import DimensionsControl
 
 from umlshapes.dialogs.preferences.BasePreferencesPanel import BasePreferencesPanel
-from umlshapes.preferences.UmlPreferences import UmlPreferences
 
 from umlshapes.types.UmlColor import UmlColor
 from umlshapes.types.UmlDimensions import UmlDimensions
@@ -42,7 +41,7 @@ class ClassPreferencesPanel(BasePreferencesPanel):
     def __init__(self, parent: Window):
 
         self.logger:       Logger         = getLogger(__name__)
-        self._preferences: UmlPreferences = UmlPreferences()
+
         super().__init__(parent)
 
         self._className:            TextCtrl          = cast(TextCtrl, None)
@@ -70,6 +69,22 @@ class ClassPreferencesPanel(BasePreferencesPanel):
         parent.Bind(EVT_CHECKBOX, self._onDisplayDunderMethodsChanged, self._displayDunderMethods)
         parent.Bind(EVT_CHECKBOX, self._onDisplayConstructorChanged, self._displayConstructor)
         parent.Bind(EVT_SPINCTRL, self._onClassTextMarginChanged, self._classTextMargin)
+
+    def _setControlValues(self):
+        """
+        """
+        self._classDimensions.dimensions = self._preferences.classDimensions
+        self._classTextMargin.SetValue(self._preferences.classTextMargin)
+
+        oglColors:      List[str] = self._classBackgroundColor.GetItems()
+        bgColorSelIdx:  int       = oglColors.index(self._preferences.classBackGroundColor.value)
+        self._classBackgroundColor.SetSelection(bgColorSelIdx)
+
+        txtColorSelIdx: int = oglColors.index(self._preferences.classTextColor.value)
+        self._classTextColor.SetSelection(txtColorSelIdx)
+
+        self._displayDunderMethods.SetValue(self._preferences.displayDunderMethods)
+        self._displayConstructor.SetValue(self._preferences.displayConstructor)
 
     def _layoutControls(self, parentPanel: SizedPanel):
 
@@ -149,22 +164,6 @@ class ClassPreferencesPanel(BasePreferencesPanel):
 
         self._displayDunderMethods = CheckBox(parent=methodDisplayPanel, label='Display Dunder Methods')
         self._displayConstructor   = CheckBox(parent=methodDisplayPanel, label='Display Constructor')
-
-    def _setControlValues(self):
-        """
-        """
-        self._classDimensions.dimensions = self._preferences.classDimensions
-        self._classTextMargin.SetValue(self._preferences.classTextMargin)
-
-        oglColors:      List[str] = self._classBackgroundColor.GetItems()
-        bgColorSelIdx:  int       = oglColors.index(self._preferences.classBackGroundColor.value)
-        self._classBackgroundColor.SetSelection(bgColorSelIdx)
-
-        txtColorSelIdx: int = oglColors.index(self._preferences.classTextColor.value)
-        self._classTextColor.SetSelection(txtColorSelIdx)
-
-        self._displayDunderMethods.SetValue(self._preferences.displayDunderMethods)
-        self._displayConstructor.SetValue(self._preferences.displayConstructor)
 
     def _classNameChanged(self, event: CommandEvent):
         newValue: str = event.GetString()
