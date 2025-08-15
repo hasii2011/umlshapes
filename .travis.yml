@@ -45,7 +45,7 @@ install:
   - pip install attrdict3
   - URL=https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-24.04
   - pip install -U -f $URL wxPython
-  - pip install codeallyadvanced==1.4.2
+  - pip install codeallyadvanced==1.4.3
   - pip install Pypubsub==4.0.3
   - pip install human_id==0.2.0
 

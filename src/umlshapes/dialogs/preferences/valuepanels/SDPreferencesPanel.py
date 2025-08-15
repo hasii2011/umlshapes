@@ -17,16 +17,15 @@ from codeallybasic.Dimensions import Dimensions
 
 from codeallyadvanced.ui.widgets.DimensionsControl import DimensionsControl
 
-from umlshapes.preferences.UmlPreferences import UmlPreferences
+from umlshapes.dialogs.preferences.BasePreferencesPanel import BasePreferencesPanel
 from umlshapes.types.UmlDimensions import UmlDimensions
 
 
-class SDPreferencesPanel(SizedPanel):
+class SDPreferencesPanel(BasePreferencesPanel):
 
     def __init__(self, parent: Window):
 
         self.logger:       Logger          = getLogger(__name__)
-        self._preferences: UmlPreferences  = UmlPreferences()
         super().__init__(parent)
         self.SetSizerType('horizontal')
 

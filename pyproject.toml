@@ -3,14 +3,14 @@ requires = ['setuptools', 'wheel']
 build-backend = "setuptools.build_meta"
 
 [project]
-name='umlshapes'
-dynamic = ["version"]
+name        = 'umlshapes'
+dynamic     = ["version"]
 description = 'Pyut Ogl without homegrown miniogl'
-readme = "README.md"
-authors = [{name = 'Humberto A. Sanchez II', email = 'Humberto.A.Sanchez.II@gmail.com'}]
+readme      = "README.md"
+authors     = [{name = 'Humberto A. Sanchez II', email = 'Humberto.A.Sanchez.II@gmail.com'}]
 maintainers = [{name = 'Humberto A. Sanchez II', email = 'Humberto.A.Sanchez.II@gmail.com'}]
-keywords = ['pyut,graphical shapes,python']
-license = 'AGPL-1.0-or-later'
+keywords    = ['pyut,graphical shapes,python']
+license     = 'AGPL-1.0-or-later'
 
 classifiers = [
   "Programming Language :: Python",
@@ -22,7 +22,7 @@ classifiers = [
 dependencies = [
     'wxPython~=4.2.3',
     'codeallybasic>=1.15.0',
-    'codeallyadvanced>=1.3.3',
+    'codeallyadvanced>=1.4.3',
     'pyutmodelv2>=2.2.6',
     'human_id==0.2.0',
     'Pypubsub==4.0.3',
