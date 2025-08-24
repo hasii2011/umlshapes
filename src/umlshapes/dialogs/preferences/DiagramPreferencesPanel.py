@@ -5,7 +5,6 @@ from typing import cast
 from logging import Logger
 from logging import getLogger
 
-
 from wx import CB_READONLY
 from wx import EVT_CHECKBOX
 from wx import EVT_CHOICE
@@ -15,6 +14,7 @@ from wx import EVT_SPINCTRL
 from wx import CheckBox
 from wx import Choice
 from wx import ComboBox
+from wx import Size
 from wx import SpinCtrl
 from wx import SpinEvent
 from wx import Window
@@ -23,13 +23,38 @@ from wx import CommandEvent
 from wx.lib.sized_controls import SizedPanel
 from wx.lib.sized_controls import SizedStaticBox
 
+from umlshapes.dialogs.preferences.NamedSpinCtrl import NSCValueType
+from umlshapes.dialogs.preferences.NamedSpinCtrl import NSC_CALLBACK_PARAMETER_TYPE
+from umlshapes.dialogs.preferences.NamedSpinCtrl import NamedSpinControlDescription
+from umlshapes.dialogs.preferences.NamedSpinCtrl import NamedSpinCtrl
+from umlshapes.dialogs.preferences.BasePreferencesPanel import BasePreferencesPanel
+
 from umlshapes.types.UmlColor import UmlColor
 from umlshapes.types.UmlPenStyle import UmlPenStyle
 
-from umlshapes.dialogs.preferences.BasePreferencesPanel import BasePreferencesPanel
+from umlshapes.preferences.UmlPreferences import UmlPreferences
 
 SPINNER_WIDTH:  int = 60
 SPINNER_HEIGHT: int = 35
+
+DEFAULT_SPIN_CTRL_SIZE: Size = Size(width=75, height=SPINNER_HEIGHT)
+
+MIN_VIRTUAL_WINDOW_WIDTH: int = 0
+MAX_VIRTUAL_WINDOW_WIDTH: int = 50000
+
+
+def virtualWindowWidthChanged(newValue: NSC_CALLBACK_PARAMETER_TYPE):
+    UmlPreferences().virtualWindowWidth = newValue
+
+
+virtualWindowLengthDescription: NamedSpinControlDescription = NamedSpinControlDescription(
+    label='UML Frame Virtual Window Width',
+    controlSize=DEFAULT_SPIN_CTRL_SIZE,
+    minValue=MIN_VIRTUAL_WINDOW_WIDTH,
+    maxValue=MAX_VIRTUAL_WINDOW_WIDTH,
+    valueType=NSCValueType.INT,
+    valueChangedCallback=virtualWindowWidthChanged
+)
 
 
 class DiagramPreferencesPanel(BasePreferencesPanel):
@@ -81,6 +106,9 @@ class DiagramPreferencesPanel(BasePreferencesPanel):
         self._snapToGrid:           CheckBox = cast(CheckBox, None)
         self._centerDiagramView:    CheckBox = cast(CheckBox, None)
         self._showParameters:       CheckBox = cast(CheckBox, None)
+
+        self._virtualWindowWidth:   NamedSpinCtrl = cast(NamedSpinCtrl, None)
+
         self._gridInterval:         SpinCtrl = cast(SpinCtrl, None)
         self._gridLineColor:        ComboBox = cast(ComboBox, None)
         self._gridStyleChoice:      Choice   = cast(Choice, None)
@@ -120,6 +148,7 @@ class DiagramPreferencesPanel(BasePreferencesPanel):
         self._snapToGrid.SetValue(self._preferences.snapToGrid)
         self._centerDiagramView.SetValue(self._preferences.centerDiagram)
         self._showParameters.SetValue(self._preferences.showParameters)
+        self._virtualWindowWidth.value = self._preferences.virtualWindowWidth
 
         self._gridInterval.SetValue(self._preferences.backgroundGridInterval)
         self._gridLineColor.SetValue(self._preferences.gridLineColor.value)
@@ -153,10 +182,17 @@ class DiagramPreferencesPanel(BasePreferencesPanel):
         self._centerDiagramView    = CheckBox(verticalPanel, label='Center Diagram View')
         self._showParameters       = CheckBox(verticalPanel, label='Show Method Parameters')
 
+        self._virtualWindowWidth = NamedSpinCtrl(parent=verticalPanel, description=virtualWindowLengthDescription)
+        # noinspection PyUnresolvedReferences
+        # self._virtualWindowWidth.SetSizerProps(proportion=4)
+
         self._enableBackgroundGrid.SetToolTip('Turn on a diagram grid in the UML Frame')
         self._snapToGrid.SetToolTip('Snap class diagram shapes to the closest grid corner')
         self._centerDiagramView.SetToolTip('Center the view in the virtual frame')
         self._showParameters.SetToolTip('Global value to display method parameters;  Unless overridden by the class')
+        self._virtualWindowWidth.SetToolTip('Determines the virtual window width and height of the UML Frame')
+
+        self._fixPanelSize(verticalPanel)
 
     def _layoutDarkModeOptions(self, horizontalPanel: SizedPanel):
 

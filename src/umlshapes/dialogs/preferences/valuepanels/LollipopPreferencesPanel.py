@@ -1,35 +1,25 @@
-
-from typing import Dict
-from typing import NewType
 from typing import cast
 
 from logging import Logger
 from logging import getLogger
 
-from dataclasses import dataclass
-
-from enum import Enum
-
-from wx import EVT_SPINCTRL
 from wx import EVT_SPINCTRLDOUBLE
 from wx import ID_ANY
 from wx import SP_ARROW_KEYS
 
 from wx import Size
-from wx import SpinCtrl
 from wx import SpinCtrlDouble
 from wx import SpinDoubleEvent
-from wx import SpinEvent
 from wx import Window
 
 from wx.lib.sized_controls import SizedPanel
 from wx.lib.sized_controls import SizedStaticBox
 
-from umlshapes.dialogs.preferences.valuepanels.NamedSpinCtrl import NSCValueType
-from umlshapes.dialogs.preferences.valuepanels.NamedSpinCtrl import NSC_CALLBACK_PARAMETER_TYPE
+from umlshapes.dialogs.preferences.NamedSpinCtrl import NSCValueType
+from umlshapes.dialogs.preferences.NamedSpinCtrl import NSC_CALLBACK_PARAMETER_TYPE
 
-from umlshapes.dialogs.preferences.valuepanels.NamedSpinCtrl import NamedSpinCtrl
-from umlshapes.dialogs.preferences.valuepanels.NamedSpinCtrl import NamedSpinControlDescription
+from umlshapes.dialogs.preferences.NamedSpinCtrl import NamedSpinCtrl
+from umlshapes.dialogs.preferences.NamedSpinCtrl import NamedSpinControlDescription
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 

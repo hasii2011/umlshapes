@@ -71,6 +71,7 @@ UML_SHAPES_PROPERTIES: ValueDescriptions = ValueDescriptions(
 )
 DIAGRAM_PROPERTIES: ValueDescriptions = ValueDescriptions(
     {
+        KeyName('virtualWindowWidth'):      ValueDescription(defaultValue='16000', deserializer=SecureConversions.secureInteger),
         KeyName('centerDiagram'):           ValueDescription(defaultValue='False', deserializer=SecureConversions.secureBoolean),
         KeyName('backGroundGridEnabled'):   ValueDescription(defaultValue='True',  deserializer=SecureConversions.secureBoolean),
         KeyName('snapToGrid'):              ValueDescription(defaultValue='True',  deserializer=SecureConversions.secureBoolean),
