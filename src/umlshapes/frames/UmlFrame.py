@@ -20,8 +20,10 @@ from umlshapes.frames.DiagramFrame import DiagramFrame
 from umlshapes.UmlDiagram import UmlDiagram
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
+from umlshapes.pubsubengine.UmlMessageType import UmlMessageType
 
 from umlshapes.types.Common import UmlShapeList
+from umlshapes.types.UmlPosition import UmlPosition
 
 A4_FACTOR:     float = 1.41
 
@@ -81,7 +83,11 @@ class UmlFrame(DiagramFrame):
 
             umlShape.Select(select=False, dc=dc)
 
-        print(f'x,y ({x},{y})')
+        self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.FRAME_LEFT_CLICK,
+                                          frameId=self.id,
+                                          clickedFrameId=self.id,
+                                          umlPosition=UmlPosition(x=x, y=y)
+                                          )
         self.refresh()
 
     def OnMouseEvent(self, mouseEvent: MouseEvent):

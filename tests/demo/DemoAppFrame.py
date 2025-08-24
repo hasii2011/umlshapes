@@ -86,6 +86,10 @@ class DemoAppFrame(SizedFrame):
                                         frameId=self._diagramFrame.id,
                                         callback=self._onDiagramModified)
 
+        self._umlPubSubEngine.subscribe(UmlMessageType.FRAME_LEFT_CLICK,
+                                        frameId=self._diagramFrame.id,
+                                        callback=self._onFrameLeftClick)
+
     def _createApplicationMenuBar(self):
 
         menuBar:  MenuBar = MenuBar()
@@ -218,10 +222,14 @@ class DemoAppFrame(SizedFrame):
     def _onUpdateApplicationStatus(self, message: str):
         self.SetStatusText(text=message)
 
-    def _onDiagramModified(self, modifiedFrameId):
+    def _onDiagramModified(self, modifiedFrameId: str):
 
         self.logger.info(f'Diagram Modified - {modifiedFrameId=}')
 
+    def _onFrameLeftClick(self, clickedFrameId: str, umlPosition: UmlPosition):
+        self.logger.info(f'Frame {clickedFrameId}, clicked at {umlPosition=}')
+
+    # noinspection PyUnusedLocal
     def _onUmlShapePreferences(self, event: CommandEvent):
 
         with DlgUmlShapesPreferences(parent=self) as dlg:
