@@ -8,9 +8,6 @@ from logging import getLogger
 from wx import Font
 from wx import MemoryDC
 
-
-from umlshapes.lib.ogl import FORMAT_CENTRE_VERT
-from umlshapes.lib.ogl import FORMAT_NONE
 from umlshapes.lib.ogl import TextShape
 
 from umlshapes.UmlUtils import UmlUtils
@@ -50,6 +47,9 @@ class UmlAssociationLabel(ControlPointMixin, TextShape, TopLeftMixin):
         TextShape.__init__(self, width=labelSize.width, height=labelSize.height)
         TopLeftMixin.__init__(self, umlShape=self, width=labelSize.width, height=labelSize.height)
 
+        formatMode: int = self._preferences.associationLabelFormat
+        self.SetFormatMode(mode=formatMode)
+
         self.logger: Logger = getLogger(__name__)
 
         font: Font = self.GetFont()
@@ -57,7 +57,7 @@ class UmlAssociationLabel(ControlPointMixin, TextShape, TopLeftMixin):
         self.SetFont(font)
 
         self.AddText(label)
-        self.SetFormatMode(mode=FORMAT_NONE | FORMAT_CENTRE_VERT)   # TODO Preference
+
         self.SetDraggable(drag=True)
         self.Show(show=True)
         self.SetCentreResize(False)

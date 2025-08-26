@@ -20,10 +20,11 @@ from umlshapes.frames.DiagramFrame import DiagramFrame
 from umlshapes.UmlDiagram import UmlDiagram
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
+from umlshapes.pubsubengine.UmlMessageType import UmlMessageType
 
 from umlshapes.types.Common import UmlShapeList
+from umlshapes.types.UmlPosition import UmlPosition
 
-DEFAULT_WIDTH: int   = 16000
 A4_FACTOR:     float = 1.41
 
 PIXELS_PER_UNIT_X: int = 20
@@ -40,11 +41,11 @@ class UmlFrame(DiagramFrame):
 
         super().__init__(parent=parent)
 
-        self.maxWidth:  int  = DEFAULT_WIDTH
-        self.maxHeight: int = int(self.maxWidth / A4_FACTOR)  # 1.41 is for A4 support
+        self._maxWidth:  int  = self._preferences.virtualWindowWidth
+        self._maxHeight: int = int(self._maxWidth / A4_FACTOR)  # 1.41 is for A4 support
 
-        nbrUnitsX: int = self.maxWidth // PIXELS_PER_UNIT_X
-        nbrUnitsY: int = self.maxHeight // PIXELS_PER_UNIT_Y
+        nbrUnitsX: int = self._maxWidth // PIXELS_PER_UNIT_X
+        nbrUnitsY: int = self._maxHeight // PIXELS_PER_UNIT_Y
         initPosX:  int = 0
         initPosY:  int = 0
         self.SetScrollbars(PIXELS_PER_UNIT_X, PIXELS_PER_UNIT_Y, nbrUnitsX, nbrUnitsY, initPosX, initPosY, False)
@@ -82,6 +83,11 @@ class UmlFrame(DiagramFrame):
 
             umlShape.Select(select=False, dc=dc)
 
+        self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.FRAME_LEFT_CLICK,
+                                          frameId=self.id,
+                                          clickedFrameId=self.id,
+                                          umlPosition=UmlPosition(x=x, y=y)
+                                          )
         self.refresh()
 
     def OnMouseEvent(self, mouseEvent: MouseEvent):

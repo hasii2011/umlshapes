@@ -1,15 +1,19 @@
 
+from typing import List
+
 from logging import Logger
 from logging import getLogger
 
+from codeallybasic.DynamicConfiguration import StringList
 from codeallybasic.SecureConversions import SecureConversions
 from codeallybasic.SingletonV3 import SingletonV3
 
 from umlshapes.types.UmlColor import UmlColor
-
 from umlshapes.types.UmlDimensions import UmlDimensions
 from umlshapes.types.UmlPenStyle import UmlPenStyle
 from umlshapes.types.UmlFontFamily import UmlFontFamily
+
+from umlshapes.links.UmlAssociationLabelFormat import UmlAssociationLabelFormat
 
 from codeallybasic.DynamicConfiguration import DynamicConfiguration
 from codeallybasic.DynamicConfiguration import KeyName
@@ -34,12 +38,17 @@ DEFAULT_GRID_LINE_STYLE:        str = UmlPenStyle.DOT.value
 # When the text value is selected
 DEFAULT_TEXT_BACKGROUND_COLOR:  str = UmlColor.WHITE.value
 
-DEFAULT_USE_CASE_SIZE:          str = str(UmlDimensions(width=100, height=60))
-DEFAULT_ACTOR_SIZE:             str = str(UmlDimensions(width=80, height=100))
-DEFAULT_ASSOCIATION_LABEL_SIZE: str = str(UmlDimensions(width=20, height=14))
+DEFAULT_USE_CASE_SIZE:            str = str(UmlDimensions(width=100, height=60))
+DEFAULT_ACTOR_SIZE:               str = str(UmlDimensions(width=80, height=100))
+DEFAULT_ASSOCIATION_LABEL_SIZE:   str = str(UmlDimensions(width=20, height=14))
+
+DEFAULT_ASSOCIATION_LABEL_FORMAT: str = (
+    f'{UmlAssociationLabelFormat.FORMAT_CENTER_HORIZONTAL.value},'
+    f'{UmlAssociationLabelFormat.FORMAT_CENTER_VERTICAL.value}'
+)
 
 
-UML_SHAPES_PROPERTIES: ValueDescriptions = ValueDescriptions(
+UML_SHAPE_PREFERENCES: ValueDescriptions = ValueDescriptions(
     {
         KeyName('textValue'):            ValueDescription(defaultValue='fac America magna iterum'),
         KeyName('noteText'):             ValueDescription(defaultValue='This is the note text'),
@@ -69,8 +78,9 @@ UML_SHAPES_PROPERTIES: ValueDescriptions = ValueDescriptions(
 
     }
 )
-DIAGRAM_PROPERTIES: ValueDescriptions = ValueDescriptions(
+DIAGRAM_PREFERENCES: ValueDescriptions = ValueDescriptions(
     {
+        KeyName('virtualWindowWidth'):      ValueDescription(defaultValue='16000', deserializer=SecureConversions.secureInteger),
         KeyName('centerDiagram'):           ValueDescription(defaultValue='False', deserializer=SecureConversions.secureBoolean),
         KeyName('backGroundGridEnabled'):   ValueDescription(defaultValue='True',  deserializer=SecureConversions.secureBoolean),
         KeyName('snapToGrid'):              ValueDescription(defaultValue='True',  deserializer=SecureConversions.secureBoolean),
@@ -86,7 +96,7 @@ DIAGRAM_PROPERTIES: ValueDescriptions = ValueDescriptions(
     }
 )
 
-namePreferences: ValueDescriptions = ValueDescriptions(
+NAME_PREFERENCES: ValueDescriptions = ValueDescriptions(
     {
         KeyName('defaultClassName'):       ValueDescription(defaultValue='ClassName'),
         KeyName('defaultNameInterface'):   ValueDescription(defaultValue='IClassInterface'),
@@ -98,21 +108,22 @@ namePreferences: ValueDescriptions = ValueDescriptions(
         KeyName('defaultAssociationName'): ValueDescription(defaultValue='Association'),
     }
 )
-sequenceDiagramPreferences: ValueDescriptions = ValueDescriptions(
+SEQUENCE_DIAGRAM_PREFERENCES: ValueDescriptions = ValueDescriptions(
     {
         KeyName('instanceYPosition'):  ValueDescription(defaultValue='50',                         deserializer=SecureConversions.secureInteger),
         KeyName('instanceDimensions'): ValueDescription(defaultValue=str(UmlDimensions(100, 400)), deserializer=UmlDimensions.deSerialize)
     }
 )
-associationsPreferences: ValueDescriptions = ValueDescriptions(
+ASSOCIATION_PREFERENCES: ValueDescriptions = ValueDescriptions(
     {
         KeyName('associationTextFontSize'): ValueDescription(defaultValue='12', deserializer=SecureConversions.secureInteger),
         KeyName('diamondSize'):             ValueDescription(defaultValue='7',  deserializer=SecureConversions.secureInteger),
-        KeyName('associationLabelSize'):    ValueDescription(defaultValue=DEFAULT_ASSOCIATION_LABEL_SIZE, deserializer=UmlDimensions.deSerialize),
+        KeyName('associationLabelSize'):    ValueDescription(defaultValue=DEFAULT_ASSOCIATION_LABEL_SIZE,   deserializer=UmlDimensions.deSerialize),
+        KeyName('associationLabelFormat'):  ValueDescription(defaultValue=DEFAULT_ASSOCIATION_LABEL_FORMAT, deserializer=UmlAssociationLabelFormat.toWxFormat),
     }
 )
 
-lollipopPreferences: ValueDescriptions = ValueDescriptions(
+LOLLIPOP_PREFERENCES: ValueDescriptions = ValueDescriptions(
     {
         KeyName('lollipopLineLength'):   ValueDescription(defaultValue='90',  deserializer=SecureConversions.secureInteger),
         KeyName('lollipopCircleRadius'): ValueDescription(defaultValue='4',   deserializer=SecureConversions.secureInteger),
@@ -121,7 +132,7 @@ lollipopPreferences: ValueDescriptions = ValueDescriptions(
         KeyName('horizontalOffset'):     ValueDescription(defaultValue='0.5', deserializer=SecureConversions.secureFloat),
     }
 )
-debugPreferences: ValueDescriptions = ValueDescriptions(
+DEBUG_PREFERENCES: ValueDescriptions = ValueDescriptions(
     {
         KeyName('debugDiagramFrame'):       ValueDescription(defaultValue='False', deserializer=SecureConversions.secureBoolean),
         KeyName('debugBasicShape'):         ValueDescription(defaultValue='False', deserializer=SecureConversions.secureBoolean),
@@ -134,13 +145,13 @@ debugPreferences: ValueDescriptions = ValueDescriptions(
 
 sections: Sections = Sections(
     {
-        SectionName('UMLShapes'):        UML_SHAPES_PROPERTIES,
-        SectionName('Diagram'):          DIAGRAM_PROPERTIES,
-        SectionName('Names'):            namePreferences,
-        SectionName('SequenceDiagrams'): sequenceDiagramPreferences,
-        SectionName('Associations'):     associationsPreferences,
-        SectionName('Lollipops'):        lollipopPreferences,
-        SectionName('Debug'):            debugPreferences,
+        SectionName('UMLShapes'):        UML_SHAPE_PREFERENCES,
+        SectionName('Diagram'):          DIAGRAM_PREFERENCES,
+        SectionName('Names'):            NAME_PREFERENCES,
+        SectionName('SequenceDiagrams'): SEQUENCE_DIAGRAM_PREFERENCES,
+        SectionName('Associations'):     ASSOCIATION_PREFERENCES,
+        SectionName('Lollipops'):        LOLLIPOP_PREFERENCES,
+        SectionName('Debug'):            DEBUG_PREFERENCES,
     }
 )
 
