@@ -24,6 +24,7 @@ from tests.demo.DlgUmlShapesPreferences import DlgUmlShapesPreferences
 from umlshapes.UmlDiagram import UmlDiagram
 from umlshapes.UmlUtils import UmlUtils
 from umlshapes.dialogs.DlgEditInterface import DlgEditInterface
+from umlshapes.frames.UmlFrame import UmlFrame
 
 from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 from umlshapes.pubsubengine.UmlPubSubEngine import UmlPubSubEngine
@@ -226,8 +227,8 @@ class DemoAppFrame(SizedFrame):
 
         self.logger.info(f'Diagram Modified - {modifiedFrameId=}')
 
-    def _onFrameLeftClick(self, clickedFrameId: str, umlPosition: UmlPosition):
-        self.logger.info(f'Frame {clickedFrameId}, clicked at {umlPosition=}')
+    def _onFrameLeftClick(self, frame: UmlFrame, umlPosition: UmlPosition):
+        self.logger.info(f'Frame {frame.id}, clicked at {umlPosition=}')
 
     # noinspection PyUnusedLocal
     def _onUmlShapePreferences(self, event: CommandEvent):

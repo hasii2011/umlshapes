@@ -85,7 +85,7 @@ class UmlFrame(DiagramFrame):
 
         self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.FRAME_LEFT_CLICK,
                                           frameId=self.id,
-                                          clickedFrameId=self.id,
+                                          frame=self,
                                           umlPosition=UmlPosition(x=x, y=y)
                                           )
         self.refresh()
