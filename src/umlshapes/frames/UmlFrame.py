@@ -7,6 +7,7 @@ from logging import getLogger
 from collections.abc import Iterable
 
 from wx import ClientDC
+from wx import CommandProcessor
 from wx import MouseEvent
 from wx import Window
 
@@ -41,6 +42,7 @@ class UmlFrame(DiagramFrame):
 
         super().__init__(parent=parent)
 
+        self._commandProcessor: CommandProcessor = CommandProcessor()
         self._maxWidth:  int  = self._preferences.virtualWindowWidth
         self._maxHeight: int = int(self._maxWidth / A4_FACTOR)  # 1.41 is for A4 support
 
@@ -52,6 +54,10 @@ class UmlFrame(DiagramFrame):
 
         self.setInfinite(True)
         self._currentReportInterval: int = self._preferences.trackMouseInterval
+
+    @property
+    def commandProcessor(self) -> CommandProcessor:
+        return self._commandProcessor
 
     @property
     def umlPubSubEngine(self) -> IUmlPubSubEngine:
