@@ -1,26 +1,42 @@
 
+from umlshapes.UmlUtils import UmlUtils
+
 from umlshapes.lib.ogl import Shape
+
+class InvalidOperationError(Exception):
+    pass
 
 
 class IDMixin:
-    clsId: int = 1000
+    """
+    This is a replacement ID from Shape.  Developers should use the
+    properties to get human readable IDs.
 
-    def __init__(self, umlShape: Shape):
+    In the future, I will prohibit the use of .GetId and .SetId
+    Today, I will stash strings into what Shape says is an integer
+    """
+    def __init__(self, shape: Shape):
 
-        self._umlShape: Shape = umlShape
-        self._umlShape.SetId(IDMixin.clsId)
-
-        IDMixin.clsId += 1
+        self._shape: Shape = shape
+        self._shape.SetId(UmlUtils.getID())
+        # print(f'{self._shape._id=}')
 
     @property
-    def id(self) -> int:
+    def id(self) -> str:
         """
         Syntactic sugar for external consumers;  Hide the underlying implementation
 
         Returns:  The UML generated ID
         """
-        return self._umlShape.GetId()
+        return self._shape.GetId()
 
     @id.setter
-    def id(self, newValue: int):
-        self._umlShape.SetId(newValue)
+    def id(self, newValue: str):
+        self._shape.SetId(newValue)
+
+    # def SetId(self, i):
+    #     raise InvalidOperationError('Use the id property')
+    #
+    # def GetId(self):
+    #     raise InvalidOperationError('Use the id property')
+

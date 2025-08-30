@@ -7,6 +7,7 @@ from codeallyadvanced.ui.UnitTestBaseW import UnitTestBaseW
 from pyutmodelv2.PyutActor import PyutActor
 
 from umlshapes.lib.ogl import OGLInitialize
+# from umlshapes.mixins.IDMixin import InvalidOperationError
 
 from umlshapes.shapes.UmlActor import UmlActor
 
@@ -37,6 +38,11 @@ class TestIDMixin(UnitTestBaseW):
         umlActor2:  UmlActor = UmlActor()
 
         self.assertFalse(umlActor.id == umlActor2.id, 'IDs should be unique')
+
+    # def testInvalidGetId(self):
+    #     umlActor: UmlActor = UmlActor()
+    #     self.assertRaises(InvalidOperationError, lambda: umlActor.GetId())
+
 
 def suite() -> TestSuite:
     import unittest
