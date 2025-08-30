@@ -1,18 +1,19 @@
 
 from umlshapes.lib.ogl import Shape
 
-from umlshapes.UmlUtils import UmlUtils
-
 
 class IDMixin:
+    clsId: int = 1000
+
     def __init__(self, umlShape: Shape):
 
         self._umlShape: Shape = umlShape
+        self._umlShape.SetId(IDMixin.clsId)
 
-        self._umlShape.SetId(UmlUtils.getID())
+        IDMixin.clsId += 1
 
     @property
-    def id(self) -> str:
+    def id(self) -> int:
         """
         Syntactic sugar for external consumers;  Hide the underlying implementation
 
@@ -21,5 +22,5 @@ class IDMixin:
         return self._umlShape.GetId()
 
     @id.setter
-    def id(self, newValue: str):
+    def id(self, newValue: int):
         self._umlShape.SetId(newValue)
