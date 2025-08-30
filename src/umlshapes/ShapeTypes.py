@@ -11,6 +11,7 @@ from pyutmodelv2.PyutUseCase import PyutUseCase
 from umlshapes.shapes.UmlActor import UmlActor
 from umlshapes.shapes.UmlClass import UmlClass
 from umlshapes.shapes.UmlNote import UmlNote
+from umlshapes.shapes.UmlText import UmlText
 from umlshapes.shapes.UmlUseCase import UmlUseCase
 
 
@@ -23,3 +24,5 @@ LinkableModelClass = Union[PyutClass, PyutActor, PyutUseCase, PyutNote]
 
 def linkableUmlShapesFactory() -> LinkableUmlShapes:
     return LinkableUmlShapes({})
+
+UmlShape = UmlActor | UmlClass | UmlNote | UmlText | UmlUseCase

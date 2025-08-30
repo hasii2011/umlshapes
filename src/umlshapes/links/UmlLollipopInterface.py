@@ -49,7 +49,7 @@ class UmlLollipopInterface(Shape, IDMixin):
         self._preferences:   UmlPreferences = UmlPreferences()
 
         super().__init__(canvas=canvas)
-        IDMixin.__init__(self, umlShape=self)
+        IDMixin.__init__(self, shape=self)
 
         self.logger: Logger = getLogger(__name__)
 

@@ -21,6 +21,7 @@ from umlshapes.UmlUtils import UmlUtils
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
 from umlshapes.mixins.IDMixin import IDMixin
+from umlshapes.mixins.EqualMixin import EqualMixin
 from umlshapes.mixins.TopLeftMixin import TopLeftMixin
 from umlshapes.mixins.ControlPointMixin import ControlPointMixin
 
@@ -52,9 +53,9 @@ class HeadComputations:
     adjustedY: int = 0
 
 
-class UmlActor(ControlPointMixin, RectangleShape, TopLeftMixin, IDMixin):
+class UmlActor(ControlPointMixin, RectangleShape, TopLeftMixin, EqualMixin, IDMixin):
 
-    def __init__(self, pyutActor: PyutActor = None, size: UmlDimensions = None):
+    def __init__(self, pyutActor: PyutActor | None = None, size: UmlDimensions = None):
         """
 
         Args:
@@ -65,7 +66,7 @@ class UmlActor(ControlPointMixin, RectangleShape, TopLeftMixin, IDMixin):
 
         self._preferences: UmlPreferences = UmlPreferences()
         if pyutActor is None:
-            self._pyutActor: PyutActor = PyutActor()
+            self._pyutActor: PyutActor = PyutActor(actorName=self._preferences.defaultNameActor)
         else:
             self._pyutActor = pyutActor
 
@@ -77,7 +78,8 @@ class UmlActor(ControlPointMixin, RectangleShape, TopLeftMixin, IDMixin):
         super().__init__(shape=self)
         RectangleShape.__init__(self, w=actorSize.width, h=actorSize.height)
         TopLeftMixin.__init__(self, umlShape=self, width=actorSize.width, height=actorSize.height)
-        IDMixin.__init__(self, umlShape=self)
+        EqualMixin.__init__(self, umlShape=self)
+        IDMixin.__init__(self, shape=self)
 
         self.SetFixedSize(actorSize.width, actorSize.height)
         self.SetDraggable(drag=True)

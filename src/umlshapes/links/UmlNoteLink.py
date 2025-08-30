@@ -76,7 +76,7 @@ class UmlNoteLink(UmlLink):
         sourceNote:       UmlNote  = self.sourceNote
         destinationClass: UmlClass = self.destinationClass
 
-        noteId:  str   = sourceNote.id
-        classId: str   = destinationClass.id
+        noteId:  str = sourceNote.id
+        classId: str = destinationClass.id
 
         return f'UmlNoteLink - from: id: {noteId} {sourceNote}  to: id: {classId} {destinationClass}'

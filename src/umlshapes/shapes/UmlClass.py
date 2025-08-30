@@ -39,6 +39,7 @@ from umlshapes.types.UmlDimensions import UmlDimensions
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
 from umlshapes.mixins.IDMixin import IDMixin
+from umlshapes.mixins.EqualMixin import EqualMixin
 from umlshapes.mixins.TopLeftMixin import TopLeftMixin
 from umlshapes.mixins.ControlPointMixin import ControlPointMixin
 
@@ -49,12 +50,12 @@ DUNDER_METHOD_INDICATOR: str = '__'
 CONSTRUCTOR_NAME:        str = '__init__'
 
 
-class UmlClass(ControlPointMixin, RectangleShape, TopLeftMixin, IDMixin):
+class UmlClass(ControlPointMixin, RectangleShape, TopLeftMixin, IDMixin, EqualMixin):
     """
 
     """
 
-    def __init__(self, pyutClass: PyutClass = None, size: UmlDimensions = None):
+    def __init__(self, pyutClass: PyutClass | None = None, size: UmlDimensions = None):
         """]
         Args:
             pyutClass:   A PyutClass Object
@@ -75,7 +76,8 @@ class UmlClass(ControlPointMixin, RectangleShape, TopLeftMixin, IDMixin):
         super().__init__(shape=self)
         RectangleShape.__init__(self, w=classSize.width, h=classSize.height)
         TopLeftMixin.__init__(self, umlShape=self, width=classSize.width, height=classSize.height)
-        IDMixin.__init__(self, umlShape=self)
+        IDMixin.__init__(self, shape=self)
+        EqualMixin.__init__(self, umlShape=self)
 
         self.logger: Logger = getLogger(__name__)
 

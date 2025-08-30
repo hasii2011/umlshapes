@@ -23,9 +23,10 @@ from pyutmodelv2.PyutText import PyutText
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
-from umlshapes.mixins.ControlPointMixin import ControlPointMixin
 from umlshapes.mixins.IDMixin import IDMixin
+from umlshapes.mixins.EqualMixin import EqualMixin
 from umlshapes.mixins.TopLeftMixin import TopLeftMixin
+from umlshapes.mixins.ControlPointMixin import ControlPointMixin
 
 from umlshapes.types.UmlColor import UmlColor
 from umlshapes.types.UmlDimensions import UmlDimensions
@@ -40,10 +41,10 @@ from umlshapes.UmlUtils import UmlUtils
 CONTROL_POINT_SIZE: int = 4         # Make this a preference
 
 
-class UmlText(ControlPointMixin, TextShape, TopLeftMixin, IDMixin):
+class UmlText(ControlPointMixin, TextShape, TopLeftMixin, IDMixin, EqualMixin):
     MARGIN: int = 5
 
-    def __init__(self, pyutText: PyutText, size: UmlDimensions = None):
+    def __init__(self, pyutText: PyutText | None = None, size: UmlDimensions = None):
         """
 
         Args:
@@ -61,13 +62,17 @@ class UmlText(ControlPointMixin, TextShape, TopLeftMixin, IDMixin):
         else:
             textSize = size
 
-        self._pyutText: PyutText = pyutText
+        if pyutText is None:
+            self._pyutText: PyutText = PyutText(content=self._preferences.textValue)
+        else:
+            self._pyutText = pyutText
 
         super().__init__(shape=self)
 
         TextShape.__init__(self, width=textSize.width, height=textSize.height)
         TopLeftMixin.__init__(self, umlShape=self, width=textSize.width, height=textSize.height)
-        IDMixin.__init__(self, umlShape=self)
+        IDMixin.__init__(self, shape=self)
+        EqualMixin.__init__(self, umlShape=self)
 
         self.shadowOffsetX = 0      #
         self.shadowOffsetY = 0      #
@@ -83,7 +88,7 @@ class UmlText(ControlPointMixin, TextShape, TopLeftMixin, IDMixin):
         self._redColor:   Colour = ColourDatabase().Find('Red')
         self._blackColor: Colour = ColourDatabase().Find('Black')
 
-        self.AddText(pyutText.content)
+        self.AddText(self._pyutText.content)
 
         self._initializeTextFont()
         self._menu: Menu = cast(Menu, None)

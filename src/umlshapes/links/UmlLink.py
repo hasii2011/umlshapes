@@ -52,7 +52,7 @@ class UmlLink(LineShape, IDMixin):
     def __init__(self, pyutLink: PyutLink):
 
         LineShape.__init__(self)
-        IDMixin.__init__(self, umlShape=self)
+        IDMixin.__init__(self, shape=self)
 
         self.linkLogger:   Logger         = getLogger(__name__)
         self._preferences: UmlPreferences = UmlPreferences()

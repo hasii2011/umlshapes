@@ -23,7 +23,7 @@ from umlshapes.frames.UseCaseDiagramFrame import UseCaseDiagramFrame
 
 class UmlUseCase(ControlPointMixin,  EllipseShape, TopLeftMixin, IDMixin):
 
-    def __init__(self, pyutUseCase: PyutUseCase = None, size: UmlDimensions = None):
+    def __init__(self, pyutUseCase: PyutUseCase | None = None, size: UmlDimensions = None):
 
         self.logger:       Logger         = getLogger(__name__)
         self._preferences: UmlPreferences = UmlPreferences()
@@ -41,12 +41,12 @@ class UmlUseCase(ControlPointMixin,  EllipseShape, TopLeftMixin, IDMixin):
 
         EllipseShape.__init__(self, w=useCaseSize.width, h=useCaseSize.height)
         TopLeftMixin.__init__(self, umlShape=self, width=useCaseSize.width, height=useCaseSize.height)
-        IDMixin.__init__(self, umlShape=self)
+        IDMixin.__init__(self, shape=self)
 
         self.SetDraggable(drag=True)
 
         self.SetFont(UmlUtils.defaultFont())
-        self.AddText(self.pyutUseCase.name)
+        self.AddText(self._pyutUseCase.name)
 
     @property
     def pyutUseCase(self) -> PyutUseCase:

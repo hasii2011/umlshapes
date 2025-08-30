@@ -19,6 +19,7 @@ from umlshapes.links.UmlNoteLink import UmlNoteLink
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
 from umlshapes.mixins.IDMixin import IDMixin
+from umlshapes.mixins.EqualMixin import EqualMixin
 from umlshapes.mixins.TopLeftMixin import TopLeftMixin
 from umlshapes.mixins.ControlPointMixin import ControlPointMixin
 
@@ -31,7 +32,7 @@ from umlshapes.frames.UseCaseDiagramFrame import UseCaseDiagramFrame
 from umlshapes.frames.SequenceDiagramFrame import SequenceDiagramFrame
 
 
-class UmlNote(ControlPointMixin, RectangleShape, TopLeftMixin, IDMixin):
+class UmlNote(ControlPointMixin, RectangleShape, TopLeftMixin, IDMixin, EqualMixin):
     """
     This is an UML object that represents a UML note in diagrams.
     A note may be linked only with a basic link
@@ -39,7 +40,7 @@ class UmlNote(ControlPointMixin, RectangleShape, TopLeftMixin, IDMixin):
 
     MARGIN: int = 10
 
-    def __init__(self, pyutNote: PyutNote = None, size: UmlDimensions = None):
+    def __init__(self, pyutNote: PyutNote | None = None, size: UmlDimensions = None):
         """
 
         Args:
@@ -62,7 +63,8 @@ class UmlNote(ControlPointMixin, RectangleShape, TopLeftMixin, IDMixin):
 
         RectangleShape.__init__(self, w=noteSize.width, h=noteSize.height)
         TopLeftMixin.__init__(self, umlShape=self, width=noteSize.width, height=noteSize.height)
-        IDMixin.__init__(self, umlShape=self)
+        IDMixin.__init__(self, shape=self)
+        EqualMixin.__init__(self, umlShape=self)
 
         self.logger: Logger = getLogger(__name__)
         self.SetBrush(Brush(Colour(255, 255, 230)))
