@@ -216,7 +216,7 @@ class DemoAppFrame(SizedFrame):
         eventEngine:    IUmlPubSubEngine      = umlFrame.umlPubSubEngine
         pyutInterfaces: PyutInterfaces       = eventHandler.getDefinedInterfaces()
 
-        with DlgEditInterface(parent=umlFrame, oglInterface2=umlLollipopInterface, eventEngine=eventEngine, pyutInterfaces=pyutInterfaces) as dlg:
+        with DlgEditInterface(parent=umlFrame, oglInterface2=umlLollipopInterface, umlPubSubEngine=eventEngine, pyutInterfaces=pyutInterfaces) as dlg:
             if dlg.ShowModal() == OK:
                 umlFrame.refresh()
 

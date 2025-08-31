@@ -61,7 +61,7 @@ class DlgEditClassCommon(BaseEditDialog):
     `onOk` the subclasses should retrieve the common attributes from _pyutModelCopy
     `onCancel` the subclasses should restore the common attributes from _pyutModel
     """
-    def __init__(self, parent, eventEngine: IUmlPubSubEngine, dlgTitle: str, pyutModel: Union[PyutClass, PyutInterface], editInterface: bool = False, ):
+    def __init__(self, parent, umlPubSubEngine: IUmlPubSubEngine, dlgTitle: str, pyutModel: Union[PyutClass, PyutInterface], editInterface: bool = False, ):
 
         super().__init__(parent, dlgTitle)
 
@@ -69,7 +69,7 @@ class DlgEditClassCommon(BaseEditDialog):
 
         self.ccLogger:       Logger          = getLogger(__name__)
         self._editInterface: bool            = editInterface
-        self._eventEngine:   IUmlPubSubEngine = eventEngine
+        self._eventEngine:   IUmlPubSubEngine = umlPubSubEngine
 
         self._pyutModel:     CommonClassType = pyutModel
         self._pyutModelCopy: CommonClassType = deepcopy(pyutModel)

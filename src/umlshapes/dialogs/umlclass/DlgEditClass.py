@@ -64,7 +64,7 @@ class DlgEditClass(DlgEditClassCommon):
     dialog, any modifications are lost.
 
     """
-    def __init__(self, parent: ClassDiagramFrame, eventEngine: IUmlPubSubEngine, pyutClass: PyutClass):
+    def __init__(self, parent: ClassDiagramFrame, umlPubSubEngine: IUmlPubSubEngine, pyutClass: PyutClass):
         """
 
         Args:
@@ -77,7 +77,7 @@ class DlgEditClass(DlgEditClassCommon):
         self.logger:       Logger               = getLogger(__name__)
         self._pyutClass:   PyutClass            = pyutClass
 
-        super().__init__(parent=parent, eventEngine=eventEngine, dlgTitle="Edit Class", pyutModel=self._pyutClass, editInterface=False)
+        super().__init__(parent=parent, umlPubSubEngine=umlPubSubEngine, dlgTitle="Edit Class", pyutModel=self._pyutClass, editInterface=False)
         self._oldClassName: str = pyutClass.name
 
         sizedPanel: SizedPanel = self.GetContentsPane()

@@ -45,7 +45,7 @@ class UmlLollipopInterfaceEventHandler(UmlBaseEventHandler):
 
         eventEngine:    IUmlPubSubEngine = umlFrame.umlPubSubEngine
         pyutInterfaces: PyutInterfaces = self.getDefinedInterfaces()
-        with DlgEditInterface(parent=umlFrame, oglInterface2=umlLollipopInterface, eventEngine=eventEngine, pyutInterfaces=pyutInterfaces, editMode=True) as dlg:
+        with DlgEditInterface(parent=umlFrame, oglInterface2=umlLollipopInterface, umlPubSubEngine=eventEngine, pyutInterfaces=pyutInterfaces, editMode=True) as dlg:
             if dlg.ShowModal() == OK:
                 umlFrame.refresh()
 

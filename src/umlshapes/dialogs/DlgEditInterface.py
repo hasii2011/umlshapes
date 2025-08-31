@@ -43,7 +43,7 @@ class DlgEditInterface(DlgEditClassCommon):
 
     clsLogger: Logger = getLogger(__name__)
 
-    def __init__(self, parent, eventEngine: IUmlPubSubEngine, oglInterface2: UmlLollipopInterface, pyutInterfaces: PyutInterfaces, editMode: bool = False):
+    def __init__(self, parent, umlPubSubEngine: IUmlPubSubEngine, oglInterface2: UmlLollipopInterface, pyutInterfaces: PyutInterfaces, editMode: bool = False):
 
         self._oglInterface2:     UmlLollipopInterface = oglInterface2
         self._pyutInterface:     PyutInterface = oglInterface2.pyutInterface
@@ -55,7 +55,7 @@ class DlgEditInterface(DlgEditClassCommon):
         self.editMode:           bool          = editMode
         self._implementor:       ClassName     = self._pyutInterface.implementors[0]
 
-        super().__init__(parent, eventEngine=eventEngine, dlgTitle='Edit Interface', pyutModel=self._pyutInterfaceCopy, editInterface=True)
+        super().__init__(parent, umlPubSubEngine=umlPubSubEngine, dlgTitle='Edit Interface', pyutModel=self._pyutInterfaceCopy, editInterface=True)
 
         self.logger: Logger = DlgEditInterface.clsLogger
 
