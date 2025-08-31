@@ -22,7 +22,7 @@ classifiers = [
 dependencies = [
     'wxPython~=4.2.3',
     'codeallybasic>=1.15.0',
-    'codeallyadvanced>=1.4.3',
+    'codeallyadvanced>=2.2.0',
     'pyutmodelv2>=2.2.6',
     'human_id==0.2.0',
     'Pypubsub==4.0.3',
