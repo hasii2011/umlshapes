@@ -227,9 +227,12 @@ class UmlClass(ControlPointMixin, RectangleShape, TopLeftMixin, IDMixin, EqualMi
 
         umlFrame:    UmlFrame = self.GetCanvas()
         dc:          ClientDC = ClientDC(umlFrame)
+        dc.SetFont(self._defaultFont)
+
         shapeHeight: int      = self._calculateMaxShapeHeight()
         shapeWidth:  int      = self._calculateMaxShapeWidth(dc)
 
+        self.logger.info(f'{shapeWidth=} {shapeHeight=}')
         shapeSize:   UmlDimensions = UmlDimensions(
             width=shapeWidth,
             height=shapeHeight
@@ -573,7 +576,8 @@ class UmlClass(ControlPointMixin, RectangleShape, TopLeftMixin, IDMixin, EqualMi
             currentHeight += singleLineHeight * len(pyutClass.methods)
 
         currentHeight += singleLineHeight   # Add space after last method
-        adjustedHeight: int = currentHeight - round(currentHeight * self._preferences.autoSizeHeightAdjustment)
+
+        adjustedHeight: int = currentHeight + round(currentHeight * self._preferences.autoSizeHeightAdjustment)
         return adjustedHeight
 
     def _calculateMaxShapeWidth(self, dc: DC) -> int:
@@ -582,12 +586,14 @@ class UmlClass(ControlPointMixin, RectangleShape, TopLeftMixin, IDMixin, EqualMi
         fieldsWidth:  int = self._calculateMaxFieldWidth(dc)
         methodsWidth: int = self._calculateMaxMethodWidth(dc)
 
+        # self.logger.info(f'{headerWidth=} {fieldsWidth=} {methodsWidth=}')
         currentMaxWidth: int = headerWidth
 
         currentMaxWidth = max(currentMaxWidth, fieldsWidth)
         currentMaxWidth = max(currentMaxWidth, methodsWidth)
 
-        adjustedMaxWidth: int = currentMaxWidth - round(currentMaxWidth * self._preferences.autoSizeWidthAdjustment)
+        # Put in a little for margin aesthetics
+        adjustedMaxWidth: int = currentMaxWidth + round(currentMaxWidth * self._preferences.autoSizeWidthAdjustment)
         return adjustedMaxWidth
 
     def _calculateMaxHeaderWidth(self, dc: DC) -> int:
