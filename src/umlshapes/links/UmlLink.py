@@ -24,11 +24,10 @@ from umlshapes.UmlUtils import UmlUtils
 
 from umlshapes.frames.UmlFrame import UmlFrame
 
-from umlshapes.mixins.IDMixin import IDMixin
-
 from umlshapes.links.LabelType import LabelType
 from umlshapes.links.UmlAssociationLabel import UmlAssociationLabel
 from umlshapes.links.eventhandlers.UmlAssociationLabelEventHandler import UmlAssociationLabelEventHandler
+from umlshapes.mixins.IdentifierMixin import IdentifierMixin
 
 from umlshapes.shapes.UmlLineControlPoint import UmlLineControlPoint
 from umlshapes.shapes.UmlLineControlPoint import UmlLineControlPointType
@@ -47,12 +46,15 @@ if TYPE_CHECKING:
     from umlshapes.ShapeTypes import LinkableUmlShape
 
 
-class UmlLink(LineShape, IDMixin):
-
+class UmlLink(IdentifierMixin, LineShape):
+    """
+    Notice that the IdentifierMixin is placed before any Shape mixin.
+    See Python left to right method resolution order (MRO)
+    """
     def __init__(self, pyutLink: PyutLink):
 
         LineShape.__init__(self)
-        IDMixin.__init__(self, shape=self)
+        IdentifierMixin.__init__(self)
 
         self.linkLogger:   Logger         = getLogger(__name__)
         self._preferences: UmlPreferences = UmlPreferences()
@@ -144,7 +146,7 @@ class UmlLink(LineShape, IDMixin):
 
     @spline.setter
     def spline(self, spline: bool):
-        self.SetSensitivityFilter(spline)
+        self.SetSpline(spline)
 
     def toggleSpline(self):
 
@@ -301,10 +303,10 @@ class UmlLink(LineShape, IDMixin):
 
     def __repr__(self) -> str:
 
-        srcShape: Shape = self.GetFrom()
-        dstShape: Shape = self.GetTo()
-        sourceId: int   = srcShape.GetId()
-        dstId:    int   = dstShape.GetId()
+        srcShape: IdentifierMixin = self.GetFrom()
+        dstShape: IdentifierMixin = self.GetTo()
+        sourceId: str   = srcShape.id
+        dstId:    str   = dstShape.id
 
         readable: str = (
             f'{osLineSep}'

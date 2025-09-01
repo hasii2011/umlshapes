@@ -21,10 +21,9 @@ from umlshapes.lib.ogl import TextShape
 
 from pyutmodelv2.PyutText import PyutText
 
+from umlshapes.mixins.IdentifierMixin import IdentifierMixin
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
-from umlshapes.mixins.IDMixin import IDMixin
-from umlshapes.mixins.EqualMixin import EqualMixin
 from umlshapes.mixins.TopLeftMixin import TopLeftMixin
 from umlshapes.mixins.ControlPointMixin import ControlPointMixin
 
@@ -41,7 +40,12 @@ from umlshapes.UmlUtils import UmlUtils
 CONTROL_POINT_SIZE: int = 4         # Make this a preference
 
 
-class UmlText(ControlPointMixin, TextShape, TopLeftMixin, IDMixin, EqualMixin):
+class UmlText(ControlPointMixin, IdentifierMixin, TextShape, TopLeftMixin):
+    """
+    Notice that the IdentifierMixin is placed before any Shape mixin.
+    See Python left to right method resolution order (MRO)
+
+    """
     MARGIN: int = 5
 
     def __init__(self, pyutText: PyutText | None = None, size: UmlDimensions = None):
@@ -69,10 +73,10 @@ class UmlText(ControlPointMixin, TextShape, TopLeftMixin, IDMixin, EqualMixin):
 
         super().__init__(shape=self)
 
+        ControlPointMixin.__init__(self, shape=self)
+        IdentifierMixin.__init__(self)
         TextShape.__init__(self, width=textSize.width, height=textSize.height)
         TopLeftMixin.__init__(self, umlShape=self, width=textSize.width, height=textSize.height)
-        IDMixin.__init__(self, shape=self)
-        EqualMixin.__init__(self, umlShape=self)
 
         self.shadowOffsetX = 0      #
         self.shadowOffsetY = 0      #

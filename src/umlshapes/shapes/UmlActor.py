@@ -20,14 +20,12 @@ from umlshapes.UmlUtils import UmlUtils
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
-from umlshapes.mixins.IDMixin import IDMixin
-from umlshapes.mixins.EqualMixin import EqualMixin
 from umlshapes.mixins.TopLeftMixin import TopLeftMixin
+from umlshapes.mixins.IdentifierMixin import IdentifierMixin
 from umlshapes.mixins.ControlPointMixin import ControlPointMixin
 
 from umlshapes.links.UmlAssociation import UmlAssociation
 
-from umlshapes.shapes.UmlClass import UmlClass
 from umlshapes.shapes.UmlUseCase import UmlUseCase
 
 from umlshapes.types.UmlDimensions import UmlDimensions
@@ -53,8 +51,11 @@ class HeadComputations:
     adjustedY: int = 0
 
 
-class UmlActor(ControlPointMixin, RectangleShape, TopLeftMixin, EqualMixin, IDMixin):
-
+class UmlActor(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin):
+    """
+        Notice that the IdentifierMixin is placed before any Shape mixin.
+        See Python left to right method resolution order (MRO)
+    """
     def __init__(self, pyutActor: PyutActor | None = None, size: UmlDimensions = None):
         """
 
@@ -76,10 +77,10 @@ class UmlActor(ControlPointMixin, RectangleShape, TopLeftMixin, EqualMixin, IDMi
             actorSize = size
 
         super().__init__(shape=self)
+        ControlPointMixin.__init__(self, shape=self)
+        IdentifierMixin.__init__(self)
         RectangleShape.__init__(self, w=actorSize.width, h=actorSize.height)
         TopLeftMixin.__init__(self, umlShape=self, width=actorSize.width, height=actorSize.height)
-        EqualMixin.__init__(self, umlShape=self)
-        IDMixin.__init__(self, shape=self)
 
         self.SetFixedSize(actorSize.width, actorSize.height)
         self.SetDraggable(drag=True)

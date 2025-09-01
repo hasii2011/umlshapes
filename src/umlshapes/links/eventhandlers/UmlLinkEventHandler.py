@@ -240,7 +240,8 @@ class UmlLinkEventHandler(UmlBaseEventHandler):
 
         line: UmlLink = self.GetShape()
 
-        line.SetSpline(not line.IsSpline())
+        # line.SetSpline(not line.IsSpline())
+        line.toggleSpline()
 
         frame: UmlFrame = self._getFrame()
         frame.Refresh()

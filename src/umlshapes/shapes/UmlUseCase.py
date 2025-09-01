@@ -12,17 +12,20 @@ from umlshapes.UmlUtils import UmlUtils
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
-from umlshapes.mixins.ControlPointMixin import ControlPointMixin
-from umlshapes.mixins.IDMixin import IDMixin
 from umlshapes.mixins.TopLeftMixin import TopLeftMixin
+from umlshapes.mixins.IdentifierMixin import IdentifierMixin
+from umlshapes.mixins.ControlPointMixin import ControlPointMixin
 
 from umlshapes.types.UmlDimensions import UmlDimensions
 
 from umlshapes.frames.UseCaseDiagramFrame import UseCaseDiagramFrame
 
 
-class UmlUseCase(ControlPointMixin,  EllipseShape, TopLeftMixin, IDMixin):
-
+class UmlUseCase(ControlPointMixin,  IdentifierMixin, EllipseShape, TopLeftMixin):
+    """
+    Notice that the IdentifierMixin is placed before any Shape mixin.
+    See Python left to right method resolution order (MRO)
+    """
     def __init__(self, pyutUseCase: PyutUseCase | None = None, size: UmlDimensions = None):
 
         self.logger:       Logger         = getLogger(__name__)
@@ -39,9 +42,10 @@ class UmlUseCase(ControlPointMixin,  EllipseShape, TopLeftMixin, IDMixin):
         else:
             useCaseSize = size
 
+        ControlPointMixin.__init__(self, shape=self)
         EllipseShape.__init__(self, w=useCaseSize.width, h=useCaseSize.height)
         TopLeftMixin.__init__(self, umlShape=self, width=useCaseSize.width, height=useCaseSize.height)
-        IDMixin.__init__(self, shape=self)
+        IdentifierMixin.__init__(self)
 
         self.SetDraggable(drag=True)
 

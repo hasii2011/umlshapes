@@ -1,7 +1,4 @@
 
-from logging import Logger
-from logging import getLogger
-
 from umlshapes.lib.ogl import CONTROL_POINT_DIAGONAL
 from umlshapes.lib.ogl import CONTROL_POINT_HORIZONTAL
 from umlshapes.lib.ogl import CONTROL_POINT_VERTICAL
@@ -24,7 +21,6 @@ class ControlPointMixin:
     """
     def __init__(self, shape: Shape):
 
-        self.cpLogger:     Logger         = getLogger(__name__)
         self._preferences: UmlPreferences = UmlPreferences()
         self._shape:       Shape          = shape
 

@@ -53,12 +53,12 @@ class UmlLollipopInterface(Shape, IDMixin):
 
         self.logger: Logger = getLogger(__name__)
 
-        self._lineCentum:       float = 0.1
-        self._defaultFont:      Font  = UmlUtils.defaultFont()
-        self._pixelSize:        Size  = self._defaultFont.GetPixelSize()
+        self._lineCentum:  float = 0.1
+        self._defaultFont: Font  = UmlUtils.defaultFont()
+        self._pixelSize:   Size  = self._defaultFont.GetPixelSize()
 
-        self._attachedTo:       UmlClass       = cast('UmlClass', None)
-        self._attachmentSide:   AttachmentSide = cast(AttachmentSide, None)
+        self._attachedTo:     UmlClass       = cast('UmlClass', None)
+        self._attachmentSide: AttachmentSide = cast(AttachmentSide, None)
 
     @property
     def umlFrame(self) -> 'ClassDiagramFrame':
@@ -279,7 +279,7 @@ class UmlLollipopInterface(Shape, IDMixin):
     def _isSameId(self, other: 'UmlLollipopInterface'):
 
         ans: bool = False
-        if self.GetId() == other.GetId():
+        if self.id == other.id:
             ans = True
         return ans
 
@@ -302,4 +302,4 @@ class UmlLollipopInterface(Shape, IDMixin):
             return False
 
     def __hash__(self):
-        return hash(self._pyutInterface.name) + hash(self.GetId())
+        return hash(self._pyutInterface.name) + hash(self.id)

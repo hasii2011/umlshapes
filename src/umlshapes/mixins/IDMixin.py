@@ -12,14 +12,13 @@ class IDMixin:
     This is a replacement ID from Shape.  Developers should use the
     properties to get human readable IDs.
 
-    In the future, I will prohibit the use of .GetId and .SetId
-    Today, I will stash strings into what Shape says is an integer
+    This is still implemented because Lollipop interface has its
+    own __equ__ implementation
     """
     def __init__(self, shape: Shape):
 
         self._shape: Shape = shape
         self._shape.SetId(UmlUtils.getID())
-        # print(f'{self._shape._id=}')
 
     @property
     def id(self) -> str:
@@ -33,10 +32,3 @@ class IDMixin:
     @id.setter
     def id(self, newValue: str):
         self._shape.SetId(newValue)
-
-    # def SetId(self, i):
-    #     raise InvalidOperationError('Use the id property')
-    #
-    # def GetId(self):
-    #     raise InvalidOperationError('Use the id property')
-
