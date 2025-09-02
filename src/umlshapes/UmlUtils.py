@@ -243,7 +243,7 @@ class UmlUtils:
 
     @classmethod
     def getID(cls) -> str:
-        return generate_id(separator='.')
+        return generate_id()
 
     @staticmethod
     def snapCoordinatesToGrid(x: int, y: int, gridInterval: int) -> Tuple[int, int]:
