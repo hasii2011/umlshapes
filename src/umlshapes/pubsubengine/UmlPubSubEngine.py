@@ -15,17 +15,14 @@ from umlshapes.frames.DiagramFrame import FrameId
 class UmlPubSubEngine(IUmlPubSubEngine, BasePubSubEngine):
     """
     The rationale for this class is to isolate the underlying implementation
-    of events.  Currently, it depends on the wxPython event loop.  This leaves
-    it open to other implementations;
-
-    Get one of these for each Window you want to listen on
+    of events.
     """
     def __init__(self):
-
+        super().__init__()
         self.logger: Logger = getLogger(__name__)
 
     def subscribe(self, messageType: UmlMessageType, frameId: FrameId, callback: Callable):
-        self._subscribe(topic=self._toTopic(messageType, frameId), callback=callback)
+        self._subscribe(topic=self._toTopic(messageType, frameId), listener=callback)
 
     def sendMessage(self, messageType: UmlMessageType, frameId: FrameId, **kwargs):
         self._sendMessage(topic=self._toTopic(messageType, frameId), **kwargs)

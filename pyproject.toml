@@ -21,7 +21,7 @@ classifiers = [
 
 dependencies = [
     'wxPython~=4.2.3',
-    'codeallybasic>=1.15.0',
+    'codeallybasic>=1.30.0',
     'codeallyadvanced>=2.2.0',
     'pyutmodelv2>=2.2.6',
     'human_id==0.2.0',
