@@ -83,7 +83,7 @@ class DemoAppFrame(SizedFrame):
         self._umlPubSubEngine.subscribe(UmlMessageType.UPDATE_APPLICATION_STATUS,
                                         frameId=FrameId(self._diagramFrame.id),
                                         callback=self._onUpdateApplicationStatus)
-        self._umlPubSubEngine.subscribe(UmlMessageType.DIAGRAM_MODIFIED,
+        self._umlPubSubEngine.subscribe(UmlMessageType.FRAME_MODIFIED,
                                         frameId=self._diagramFrame.id,
                                         callback=self._onDiagramModified)
 

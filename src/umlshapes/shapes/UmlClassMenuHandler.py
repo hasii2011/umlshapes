@@ -151,7 +151,7 @@ class UmlClassMenuHandler:
         else:
             event.Skip()
 
-        self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.DIAGRAM_MODIFIED, frameId=frameId, modifiedFrameId=frameId)
+        self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.FRAME_MODIFIED, frameId=frameId, modifiedFrameId=frameId)
 
     # noinspection PyUnusedLocal
     def _onDisplayParametersClick(self, event: CommandEvent):

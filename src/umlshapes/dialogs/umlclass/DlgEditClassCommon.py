@@ -26,8 +26,10 @@ from pyutmodelv2.enumerations.PyutStereotype import PyutStereotype
 from umlshapes.dialogs.umlclass.DlgEditDescription import DlgEditDescription
 from umlshapes.dialogs.umlclass.DlgEditMethod import DlgEditMethod
 from umlshapes.dialogs.umlclass.DlgEditStereotype import DlgEditStereotype
+from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
 
 from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
+from umlshapes.pubsubengine.UmlMessageType import UmlMessageType
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
@@ -38,19 +40,13 @@ from umlshapes.enhancedlistbox.CallbackAnswer import CallbackAnswer
 from umlshapes.enhancedlistbox.DownCallbackData import DownCallbackData
 from umlshapes.enhancedlistbox.UpCallbackData import UpCallbackData
 
-# noinspection SpellCheckingInspection
-"""
-# from pyut.ui.eventengine.IEventEngine import IEventEngine
-#
-# from pyut.ui.eventengine.EventType import EventType
-"""
-
 CommonClassType = Union[PyutClass, PyutInterface]
 
 
 class DlgEditClassCommon(BaseEditDialog):
     """
     This parent class is responsible for the comment attributes that Classes and Interfaces share.
+
     These are
         * Description
         * Methods
@@ -60,16 +56,24 @@ class DlgEditClassCommon(BaseEditDialog):
 
     `onOk` the subclasses should retrieve the common attributes from _pyutModelCopy
     `onCancel` the subclasses should restore the common attributes from _pyutModel
+
+    A big ask here is that the parent class that is provided for the UI is the actual
+    frame on which we are editing.
     """
-    def __init__(self, parent, umlPubSubEngine: IUmlPubSubEngine, dlgTitle: str, pyutModel: Union[PyutClass, PyutInterface], editInterface: bool = False, ):
+    def __init__(self, parent: ClassDiagramFrame, umlPubSubEngine: IUmlPubSubEngine, dlgTitle: str, pyutModel: Union[PyutClass, PyutInterface], editInterface: bool = False, ):
 
         super().__init__(parent, dlgTitle)
 
         self._parent = parent   #
 
-        self.ccLogger:       Logger          = getLogger(__name__)
-        self._editInterface: bool            = editInterface
-        self._eventEngine:   IUmlPubSubEngine = umlPubSubEngine
+
+        self._umlFrame: ClassDiagramFrame = parent  # another moniker
+
+        assert isinstance(self._umlFrame, ClassDiagramFrame), 'Developer error,  must be a class diagram frame'
+
+        self.ccLogger:         Logger           = getLogger(__name__)
+        self._editInterface:   bool             = editInterface
+        self._umlPubSubEngine: IUmlPubSubEngine = umlPubSubEngine
 
         self._pyutModel:     CommonClassType = pyutModel
         self._pyutModelCopy: CommonClassType = deepcopy(pyutModel)
@@ -235,8 +239,9 @@ class DlgEditClassCommon(BaseEditDialog):
             if dlg.ShowModal() == OK:
                 cast(PyutClass, self._pyutModelCopy).stereotype = dlg.value
 
-    def _setProjectModified(self):
+    def _indicateFrameModified(self):
         """
         """
-        # self._eventEngine.sendEvent(EventType.UMLDiagramModified)
-        pass
+        frame: ClassDiagramFrame = self._umlFrame
+
+        self._umlPubSubEngine.sendMessage(UmlMessageType.FRAME_MODIFIED, frameId=frame.id, modifiedFrameId=frame.id)

@@ -73,9 +73,8 @@ class DlgEditClass(DlgEditClassCommon):
         """
 
         assert isinstance(parent, ClassDiagramFrame), 'Developer error.  Must be a Uml Diagram Frame'
-        self._umlFrame:    ClassDiagramFrame = parent
-        self.logger:       Logger               = getLogger(__name__)
-        self._pyutClass:   PyutClass            = pyutClass
+        self.logger:       Logger    = getLogger(__name__)
+        self._pyutClass:   PyutClass = pyutClass
 
         super().__init__(parent=parent, umlPubSubEngine=umlPubSubEngine, dlgTitle="Edit Class", pyutModel=self._pyutClass, editInterface=False)
         self._oldClassName: str = pyutClass.name
@@ -250,7 +249,7 @@ class DlgEditClass(DlgEditClassCommon):
 
             umlClass.autoSize()
 
-        self._setProjectModified()
+        self._indicateFrameModified()
 
         # TODO:
         # if self._oldClassName != self._pyutClass.name:

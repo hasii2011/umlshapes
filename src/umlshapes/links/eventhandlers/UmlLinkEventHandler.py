@@ -218,7 +218,7 @@ class UmlLinkEventHandler(UmlBaseEventHandler):
 
         umlLink.selected = False
         frame.Refresh()
-        self._indicateDiagramModified()
+        self._indicateFrameModified()
 
     def _addBend(self, clickPoint: UmlPosition):
         """
@@ -234,7 +234,7 @@ class UmlLinkEventHandler(UmlBaseEventHandler):
 
         frame: UmlFrame = self.GetShape().GetCanvas()
         frame.Refresh()
-        self._indicateDiagramModified()
+        self._indicateFrameModified()
 
     def _toggleSpline(self):
 
@@ -245,12 +245,12 @@ class UmlLinkEventHandler(UmlBaseEventHandler):
 
         frame: UmlFrame = self._getFrame()
         frame.Refresh()
-        self._indicateDiagramModified()
+        self._indicateFrameModified()
 
-    def _indicateDiagramModified(self):
+    def _indicateFrameModified(self):
         frame: UmlFrame = self._getFrame()
         assert self._umlPubSubEngine is not None, 'Developer error;  Remember to inject the UML PubSub Engine'
-        self._umlPubSubEngine.sendMessage(UmlMessageType.DIAGRAM_MODIFIED, frameId=frame.id, modifiedFrameId=frame.id)
+        self._umlPubSubEngine.sendMessage(UmlMessageType.FRAME_MODIFIED, frameId=frame.id, modifiedFrameId=frame.id)
 
     def _getFrame(self) -> UmlFrame:
 

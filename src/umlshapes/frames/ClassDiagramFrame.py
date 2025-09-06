@@ -115,7 +115,7 @@ class ClassDiagramFrame(UmlFrame):
         self._requestingUmlClass         = NO_CLASS
 
         self.refresh()
-        self._umlPubSubEngine.sendMessage(UmlMessageType.DIAGRAM_MODIFIED,
+        self._umlPubSubEngine.sendMessage(UmlMessageType.FRAME_MODIFIED,
                                           frameId=self.id,
                                           modifiedFrameId=self.id
                                           )
