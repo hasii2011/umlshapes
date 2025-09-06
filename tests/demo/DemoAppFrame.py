@@ -82,14 +82,14 @@ class DemoAppFrame(SizedFrame):
 
         self._umlPubSubEngine.subscribe(UmlMessageType.UPDATE_APPLICATION_STATUS,
                                         frameId=FrameId(self._diagramFrame.id),
-                                        callback=self._onUpdateApplicationStatus)
+                                        callback=self._updateApplicationStatusListener)
         self._umlPubSubEngine.subscribe(UmlMessageType.FRAME_MODIFIED,
                                         frameId=self._diagramFrame.id,
-                                        callback=self._onDiagramModified)
+                                        callback=self._frameModifiedListener)
 
         self._umlPubSubEngine.subscribe(UmlMessageType.FRAME_LEFT_CLICK,
                                         frameId=self._diagramFrame.id,
-                                        callback=self._onFrameLeftClick)
+                                        callback=self._frameLeftClickListener)
 
     def _createApplicationMenuBar(self):
 
@@ -220,14 +220,14 @@ class DemoAppFrame(SizedFrame):
             if dlg.ShowModal() == OK:
                 umlFrame.refresh()
 
-    def _onUpdateApplicationStatus(self, message: str):
+    def _updateApplicationStatusListener(self, message: str):
         self.SetStatusText(text=message)
 
-    def _onDiagramModified(self, modifiedFrameId: str):
+    def _frameModifiedListener(self, modifiedFrameId: str):
 
-        self.logger.info(f'Diagram Modified - {modifiedFrameId=}')
+        self.logger.info(f'Frame Modified - {modifiedFrameId=}')
 
-    def _onFrameLeftClick(self, frame: UmlFrame, umlPosition: UmlPosition):
+    def _frameLeftClickListener(self, frame: UmlFrame, umlPosition: UmlPosition):
         self.logger.info(f'Frame {frame.id}, clicked at {umlPosition=}')
 
     # noinspection PyUnusedLocal

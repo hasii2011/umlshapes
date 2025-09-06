@@ -242,6 +242,5 @@ class DlgEditClassCommon(BaseEditDialog):
     def _indicateFrameModified(self):
         """
         """
-        frame: ClassDiagramFrame = self._umlFrame
-
-        self._umlPubSubEngine.sendMessage(UmlMessageType.FRAME_MODIFIED, frameId=frame.id, modifiedFrameId=frame.id)
+        self._umlFrame.frameModified = True
+        self._umlPubSubEngine.sendMessage(UmlMessageType.FRAME_MODIFIED, frameId=self._umlFrame.id, modifiedFrameId=self._umlFrame.id)

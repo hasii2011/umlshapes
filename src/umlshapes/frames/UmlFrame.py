@@ -54,6 +54,15 @@ class UmlFrame(DiagramFrame):
 
         self.setInfinite(True)
         self._currentReportInterval: int = self._preferences.trackMouseInterval
+        self._frameModified: bool = False
+
+    @property
+    def frameModified(self) -> bool:
+        return self._frameModified
+
+    @frameModified.setter
+    def frameModified(self, newValue: bool):
+        self._frameModified = newValue
 
     @property
     def commandProcessor(self) -> CommandProcessor:
