@@ -12,6 +12,7 @@ from wx import MOD_CMD
 from umlshapes.lib.ogl import Shape
 from umlshapes.lib.ogl import ShapeCanvas
 from umlshapes.lib.ogl import ShapeEvtHandler
+from umlshapes.pubsubengine.UmlMessageType import UmlMessageType
 
 from umlshapes.pubsubengine.UmlPubSubEngine import UmlPubSubEngine
 from umlshapes.types.Common import UmlShape
@@ -37,6 +38,19 @@ class UmlBaseEventHandler(ShapeEvtHandler):
     umlPubSubEngine = property(fget=None, fset=_setUmlPubSubEngine)
 
     def OnLeftClick(self, x: int, y: int, keys=0, attachment=0):
+        """
+        Keep things simple here by interacting more with OGL layer
+
+        Args:
+            x:
+            y:
+            keys:
+            attachment:
+
+        Returns:
+
+        """
+        from umlshapes.frames.UmlFrame import UmlFrame
 
         self._baseLogger.debug(f'({x},{y}), {keys=} {attachment=}')
         shape:  Shape       = self.GetShape()
@@ -49,7 +63,14 @@ class UmlBaseEventHandler(ShapeEvtHandler):
             pass
         else:
             self._unSelectAllShapesOnCanvas(shape, canvas, dc)
+
         shape.Select(True, dc)
+        if self._umlPubSubEngine is None:
+            self._baseLogger.warning(f'We do not have a pub sub engine for {shape}.  Seems like a developer error')
+        else:
+            self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.UML_SHAPE_SELECTED,
+                                              frameId=cast(UmlFrame,canvas).id,
+                                              umlShape=shape)
 
     def OnDrawOutline(self, dc: ClientDC, x: int, y: int, w: int, h: int):
         """

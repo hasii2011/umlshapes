@@ -27,7 +27,9 @@ from umlshapes.frames.UmlFrame import UmlFrame
 from umlshapes.links.LabelType import LabelType
 from umlshapes.links.UmlAssociationLabel import UmlAssociationLabel
 from umlshapes.links.eventhandlers.UmlAssociationLabelEventHandler import UmlAssociationLabelEventHandler
+
 from umlshapes.mixins.IdentifierMixin import IdentifierMixin
+from umlshapes.mixins.PubSubMixin import PubSubMixin
 
 from umlshapes.shapes.UmlLineControlPoint import UmlLineControlPoint
 from umlshapes.shapes.UmlLineControlPoint import UmlLineControlPointType
@@ -36,9 +38,9 @@ from umlshapes.shapes.eventhandlers.UmlLineControlPointEventHandler import UmlLi
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
+from umlshapes.types.Common import TAB
 from umlshapes.types.Common import EndPoints
 from umlshapes.types.Common import NAME_IDX
-from umlshapes.types.Common import TAB
 from umlshapes.types.UmlPosition import UmlPosition
 
 if TYPE_CHECKING:
@@ -46,15 +48,18 @@ if TYPE_CHECKING:
     from umlshapes.ShapeTypes import LinkableUmlShape
 
 
-class UmlLink(IdentifierMixin, LineShape):
+class UmlLink(IdentifierMixin, LineShape, PubSubMixin):
     """
     Notice that the IdentifierMixin is placed before any Shape mixin.
     See Python left to right method resolution order (MRO)
+
+    Some links may need the pubsub mixin so put it at the lowest level
     """
     def __init__(self, pyutLink: PyutLink):
 
         LineShape.__init__(self)
         IdentifierMixin.__init__(self)
+        PubSubMixin.__init__(self)
 
         self.linkLogger:   Logger         = getLogger(__name__)
         self._preferences: UmlPreferences = UmlPreferences()
@@ -292,6 +297,8 @@ class UmlLink(IdentifierMixin, LineShape):
 
         eventHandler.SetShape(umlAssociationLabel)
         eventHandler.SetPreviousHandler(umlAssociationLabel.GetEventHandler())
+
+        eventHandler.umlPubSubEngine = self._umlPubSubEngine
 
         umlAssociationLabel.SetEventHandler(eventHandler)
 

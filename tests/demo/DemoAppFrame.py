@@ -40,6 +40,7 @@ from umlshapes.preferences.UmlPreferences import UmlPreferences
 from umlshapes.shapes.UmlClass import UmlClass
 
 from umlshapes.types.Common import AttachmentSide
+from umlshapes.types.Common import UmlShape
 from umlshapes.types.UmlPosition import UmlPosition
 
 from tests.demo.DemoCommon import Identifiers
@@ -90,6 +91,11 @@ class DemoAppFrame(SizedFrame):
         self._umlPubSubEngine.subscribe(UmlMessageType.FRAME_LEFT_CLICK,
                                         frameId=self._diagramFrame.id,
                                         callback=self._frameLeftClickListener)
+
+        self._umlPubSubEngine.subscribe(UmlMessageType.UML_SHAPE_SELECTED,
+                                        frameId=self._diagramFrame.id,
+                                        callback=self._umlShapeListener)
+
 
     def _createApplicationMenuBar(self):
 
@@ -229,6 +235,9 @@ class DemoAppFrame(SizedFrame):
 
     def _frameLeftClickListener(self, frame: UmlFrame, umlPosition: UmlPosition):
         self.logger.info(f'Frame {frame.id}, clicked at {umlPosition=}')
+
+    def _umlShapeListener(self, umlShape: UmlShape):
+        self.logger.info(f'Shape was selected: {umlShape}')
 
     # noinspection PyUnusedLocal
     def _onUmlShapePreferences(self, event: CommandEvent):

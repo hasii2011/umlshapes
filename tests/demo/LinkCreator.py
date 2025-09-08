@@ -196,8 +196,10 @@ class LinkCreator:
         umlNoteLink.MakeLineControlPoints(2)
         umlNoteLink.sourceNote       = umlNote
         umlNoteLink.destinationClass = umlClass
+        umlNoteLink.umlPubSubEngine  = self._umlPubSubEngine
 
         umlNote.umlFrame  = self._diagramFrame
+
         umlClass.umlFrame = self._diagramFrame
         umlNote.addLink(umlNoteLink=umlNoteLink, umlClass=umlClass)
 
