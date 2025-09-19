@@ -15,7 +15,7 @@ class IUmlPubSubEngine(ABC):
     We will register a topic on a eventType.frameId.DiagramName
     """
     @abstractmethod
-    def subscribe(self, messageType: UmlMessageType, frameId: FrameId, callback: Callable):
+    def subscribe(self, messageType: UmlMessageType, frameId: FrameId, listener: Callable):
         pass
 
     @abstractmethod

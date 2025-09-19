@@ -21,8 +21,8 @@ class UmlPubSubEngine(IUmlPubSubEngine, BasePubSubEngine):
         super().__init__()
         self.logger: Logger = getLogger(__name__)
 
-    def subscribe(self, messageType: UmlMessageType, frameId: FrameId, callback: Callable):
-        self._subscribe(topic=self._toTopic(messageType, frameId), listener=callback)
+    def subscribe(self, messageType: UmlMessageType, frameId: FrameId, listener: Callable):
+        self._subscribe(topic=self._toTopic(messageType, frameId), listener=listener)
 
     def sendMessage(self, messageType: UmlMessageType, frameId: FrameId, **kwargs):
         self._sendMessage(topic=self._toTopic(messageType, frameId), **kwargs)

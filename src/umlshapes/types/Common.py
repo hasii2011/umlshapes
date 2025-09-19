@@ -114,7 +114,7 @@ UmlShape = Union[
 UmlRelationShips = Union[
     'UmlAssociation', 'UmlAggregation', 'UmlComposition', 'UmlInterface', 'UmlInheritance', 'UmlLollipopInterface',
 ]
-UmlShapeList = NewType('UmlShapeList', List[UmlShape])
+UmlShapeList = NewType('UmlShapeList', List[UmlShape | UmlRelationShips])
 
 NAME_IDX:                    int = 0
 SOURCE_CARDINALITY_IDX:      int = 1
