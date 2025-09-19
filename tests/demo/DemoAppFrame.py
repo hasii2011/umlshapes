@@ -5,8 +5,12 @@ from logging import getLogger
 from wx import DEFAULT_FRAME_STYLE
 from wx import EVT_MENU
 from wx import FRAME_FLOAT_ON_PARENT
+from wx import ID_COPY
 from wx import ID_EXIT
+from wx import ID_PASTE
 from wx import ID_PREFERENCES
+from wx import ID_REDO
+from wx import ID_SELECTALL
 
 from wx import Menu
 from wx import MenuBar
@@ -19,6 +23,8 @@ from wx.lib.sized_controls import SizedPanel
 from pyutmodelv2.PyutInterface import PyutInterface
 from pyutmodelv2.PyutInterface import PyutInterfaces
 from pyutmodelv2.PyutModelTypes import ClassName
+from wx.py.frame import ID_CUT
+from wx.py.frame import ID_UNDO
 
 from tests.demo.DlgUmlShapesPreferences import DlgUmlShapesPreferences
 from umlshapes.UmlDiagram import UmlDiagram
@@ -83,30 +89,44 @@ class DemoAppFrame(SizedFrame):
 
         self._umlPubSubEngine.subscribe(UmlMessageType.UPDATE_APPLICATION_STATUS,
                                         frameId=FrameId(self._diagramFrame.id),
-                                        callback=self._updateApplicationStatusListener)
+                                        listener=self._updateApplicationStatusListener)
         self._umlPubSubEngine.subscribe(UmlMessageType.FRAME_MODIFIED,
                                         frameId=self._diagramFrame.id,
-                                        callback=self._frameModifiedListener)
+                                        listener=self._frameModifiedListener)
 
         self._umlPubSubEngine.subscribe(UmlMessageType.FRAME_LEFT_CLICK,
                                         frameId=self._diagramFrame.id,
-                                        callback=self._frameLeftClickListener)
+                                        listener=self._frameLeftClickListener)
 
         self._umlPubSubEngine.subscribe(UmlMessageType.UML_SHAPE_SELECTED,
                                         frameId=self._diagramFrame.id,
-                                        callback=self._umlShapeListener)
+                                        listener=self._umlShapeListener)
 
 
     def _createApplicationMenuBar(self):
 
         menuBar:  MenuBar = MenuBar()
         fileMenu: Menu    = Menu()
+        editMenu: Menu    = Menu()
         viewMenu: Menu    = Menu()
 
         fileMenu.AppendSeparator()
         fileMenu.Append(ID_EXIT, '&Quit', "Quit Application")
         fileMenu.AppendSeparator()
         fileMenu.Append(ID_PREFERENCES, "P&references", "Uml preferences")
+
+        #
+        # Use all the stock properties
+        #
+        editMenu.Append(ID_UNDO)
+        editMenu.Append(ID_REDO)
+        editMenu.AppendSeparator()
+        editMenu.Append(ID_CUT)
+        editMenu.Append(ID_COPY)
+        editMenu.Append(ID_PASTE)
+        editMenu.AppendSeparator()
+        editMenu.Append(ID_SELECTALL)
+        editMenu.AppendSeparator()
 
         viewMenu.Append(id=Identifiers.ID_DISPLAY_UML_INTERFACE,   item='UML Interface',   helpString='Display Normal Interface')
         viewMenu.Append(id=Identifiers.ID_DISPLAY_UML_AGGREGATION, item='UML Aggregation', helpString='Display a aggregation Link')
@@ -123,6 +143,7 @@ class DemoAppFrame(SizedFrame):
         viewMenu.AppendSeparator()
 
         menuBar.Append(fileMenu, 'File')
+        menuBar.Append(editMenu, 'Edit')
         menuBar.Append(viewMenu, 'View')
 
         self.SetMenuBar(menuBar)
@@ -143,7 +164,12 @@ class DemoAppFrame(SizedFrame):
 
         self.Bind(EVT_MENU, self._onUmlShapePreferences, id=ID_PREFERENCES)
 
-        # self.Bind(EVT_MENU, self._onDisplayElement, id=self._ID_DISPLAY_SEQUENCE_DIAGRAM)
+        self.Bind(EVT_MENU, self._onEditMenu, id=ID_UNDO)
+        self.Bind(EVT_MENU, self._onEditMenu, id=ID_REDO)
+        self.Bind(EVT_MENU, self._onEditMenu, id=ID_CUT)
+        self.Bind(EVT_MENU, self._onEditMenu, id=ID_COPY)
+        self.Bind(EVT_MENU, self._onEditMenu, id=ID_PASTE)
+        self.Bind(EVT_MENU, self._onEditMenu, id=ID_SELECTALL)
 
     def _onDisplayElement(self, event: CommandEvent):
 
@@ -183,6 +209,30 @@ class DemoAppFrame(SizedFrame):
             #     self._displaySequenceDiagram()
             case _:
                 self.logger.error(f'WTH!  I am not handling that menu item')
+
+    def _onEditMenu(self, event: CommandEvent):
+
+        import wx       # So pattern matching works
+
+        eventId: int = event.GetId()
+        match eventId:
+
+            case wx.ID_UNDO:
+                self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.UNDO, frameId=self._diagramFrame.id)
+            case wx.ID_REDO:
+                self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.REDO, frameId=self._diagramFrame.id)
+            case wx.ID_CUT:
+                self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.CUT_SHAPES, frameId=self._diagramFrame.id)
+            case wx.ID_COPY:
+                self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.COPY_SHAPES, frameId=self._diagramFrame.id)
+            case wx.ID_PASTE:
+                self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.PASTE_SHAPES, frameId=self._diagramFrame.id)
+            case wx.ID_PASTE:
+                self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.PASTE_SHAPES, frameId=self._diagramFrame.id)
+            case wx.ID_SELECTALL:
+                self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.SELECT_ALL_SHAPES, frameId=self._diagramFrame.id)
+            case _:
+                self.logger.warning(f'Unknown event id {eventId}')
 
     def _createLollipopInterface(self, requestingUmlClass: UmlClass, perimeterPoint: UmlPosition):
         """

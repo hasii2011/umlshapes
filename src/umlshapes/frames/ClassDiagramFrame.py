@@ -47,7 +47,7 @@ class ClassDiagramFrame(UmlFrame):
 
         self._umlPubSubEngine.subscribe(messageType=UmlMessageType.REQUEST_LOLLIPOP_LOCATION,
                                         frameId=self.id,
-                                        callback=self._onRequestLollipopLocation)
+                                        listener=self._onRequestLollipopLocation)
         # self._oglEventEngine.registerListener(event=EVT_DIAGRAM_FRAME_MODIFIED,    callback=self._onDiagramModified)
         # self._oglEventEngine.registerListener(event=EVT_CUT_OGL_CLASS,             callback=self._onCutClass)
 
