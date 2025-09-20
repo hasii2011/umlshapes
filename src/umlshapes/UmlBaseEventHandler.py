@@ -87,6 +87,7 @@ class UmlBaseEventHandler(ShapeEvtHandler):
 
         umlShape: UmlShape = cast(UmlShape, shape)
         umlShape.size = UmlDimensions(width=w, height=h)
+        umlShape.umlFrame.refresh()
 
     def _unSelectAllShapesOnCanvas(self, shape: Shape, canvas: ShapeCanvas, dc: ClientDC):
 
