@@ -263,7 +263,7 @@ class DiagramPreferencesPanel(BasePreferencesPanel):
 
         newValue: bool = event.IsChecked()
         self.logger.debug(f'onEnableBackgroundGridChanged - {newValue=}')
-        self._preferences.backgroundGridEnabled = newValue
+        self._preferences.backGroundGridEnabled = newValue
         self._resetSnapToGridControl()
 
     def _onSnapToGridChanged(self, event: CommandEvent):

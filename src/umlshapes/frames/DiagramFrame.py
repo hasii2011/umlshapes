@@ -114,22 +114,19 @@ class DiagramFrame(ShapeCanvas):
         """
         return self._id
 
-    def refresh(self, eraseBackground: bool = True):
-
+    def refresh(self):
         w, h = self.GetSize()
+        x, y = self.CalcUnscrolledPosition(0, 0)
 
         dc: DC = self._createDC(w, h)
 
-        # noinspection PySimplifyBooleanCheck
-        if eraseBackground is True:
-            self.Redraw(dc)
-            client: ClientDC = ClientDC(self)
+        self.Redraw(dc)
+        client: ClientDC = ClientDC(self)
 
-            x, y = self.CalcUnscrolledPosition(0, 0)
-            client.Blit(0, 0, w, h, dc, x, y)
+        if self._umlPreferences.backGroundGridEnabled is True:
+            self._drawGrid(memDC=dc, width=w, height=h, startX=x, startY=y)
 
-        else:
-            self.RedrawWithBackground()
+        client.Blit(0, 0, w, h, dc, x, y)
 
     def RedrawWithBackground(self):
         """
@@ -279,7 +276,7 @@ class DiagramFrame(ShapeCanvas):
         # cache the bitmap, to avoid creating a new one at each refresh.
         # only recreate it if the size of the window has changed
         if (bm.GetWidth(), bm.GetHeight()) != (w, h):
-            bm = self.__workingBitmap = Bitmap(w, h)
+            bm = self._workingBitmap = Bitmap(w, h)
         dc.SelectObject(bm)
 
         dc.SetBackground(Brush(self.GetBackgroundColour()))
