@@ -60,6 +60,8 @@ class ClassPasteCommand(BasePasteCommand):
 
         self._umlFrame.Refresh()
 
+        self._umlClass = umlShape
+
         return True
 
     def Undo(self) -> bool:
@@ -74,7 +76,8 @@ class ClassPasteCommand(BasePasteCommand):
         # self._baseWxCreateLogger.info(f'Undo create {self._shape}')
         # umlDiagram.RemoveShape(self._shape)
         # umlFrame.refresh()
-
+        self._umlFrame.umlDiagram.RemoveShape(self._umlClass)
+        self._umlFrame.refresh()
         return True
 
     def _createPastedShape(self, pyutObject: PyutObject) -> UmlShape:
