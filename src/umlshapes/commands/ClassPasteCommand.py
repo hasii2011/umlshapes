@@ -8,7 +8,7 @@ from logging import getLogger
 from pyutmodelv2.PyutObject import PyutObject
 from pyutmodelv2.PyutClass import PyutClass
 
-from umlshapes.frames.commands.BasePasteCommand import BasePasteCommand
+from umlshapes.commands.BasePasteCommand import BasePasteCommand
 
 from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 

@@ -25,14 +25,14 @@ from wx import Window
 from pyutmodelv2.PyutObject import PyutObject
 from pyutmodelv2.PyutLink import PyutLinks
 
-from umlshapes.frames.commands.ActorPasteCommand import ActorPasteCommand
+from umlshapes.commands.ActorPasteCommand import ActorPasteCommand
 # from pyutmodelv2.PyutActor import PyutActor
 # from pyutmodelv2.PyutClass import PyutClass
 # from pyutmodelv2.PyutNote import PyutNote
 # from pyutmodelv2.PyutText import PyutText
 # from pyutmodelv2.PyutUseCase import PyutUseCase
 
-from umlshapes.frames.commands.ClassPasteCommand import ClassPasteCommand
+from umlshapes.commands.ClassPasteCommand import ClassPasteCommand
 from umlshapes.lib.ogl import Shape
 from umlshapes.lib.ogl import ShapeCanvas
 
