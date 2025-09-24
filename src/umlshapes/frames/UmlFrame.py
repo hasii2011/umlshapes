@@ -10,6 +10,7 @@ from collections.abc import Iterable
 
 from copy import deepcopy
 
+from pyutmodelv2.PyutActor import PyutActor
 from pyutmodelv2.PyutClass import PyutClass
 from pyutmodelv2.PyutLinkedObject import PyutLinkedObject
 from wx import ICON_ERROR
@@ -23,6 +24,8 @@ from wx import Window
 
 from pyutmodelv2.PyutObject import PyutObject
 from pyutmodelv2.PyutLink import PyutLinks
+
+from umlshapes.frames.commands.ActorPasteCommand import ActorPasteCommand
 # from pyutmodelv2.PyutActor import PyutActor
 # from pyutmodelv2.PyutClass import PyutClass
 # from pyutmodelv2.PyutNote import PyutNote
@@ -250,22 +253,32 @@ class UmlFrame(DiagramFrame):
             pyutObject:   PyutObject = clipboardObject
 
             if isinstance(pyutObject, PyutClass) is True:
-                pasteCommand: ClassPasteCommand = ClassPasteCommand(pyutObject=pyutObject,
-                                                                    umlPosition=UmlPosition(x=x, y=y),
-                                                                    umlFrame=self,
-                                                                    umlPubSubEngine=self._umlPubSubEngine
-                                                                    )
-                self._commandProcessor.Submit(pasteCommand)
-
-
-                numbObjectsPasted += 1
-                x += 50
-                y += 50
+                classPasteCommand: ClassPasteCommand = ClassPasteCommand(pyutObject=pyutObject,
+                                                                         umlPosition=UmlPosition(x=x, y=y),
+                                                                         umlFrame=self,
+                                                                         umlPubSubEngine=self._umlPubSubEngine
+                                                                         )
+                self._commandProcessor.Submit(classPasteCommand)
 
                 self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.FRAME_MODIFIED, frameId=self.id, modifiedFrameId=self.id)
-                self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.UPDATE_APPLICATION_STATUS,
-                                                  frameId=self.id,
-                                                  message=f'Pasted {len(self._clipboard)} shapes')
+            elif isinstance(pyutObject, PyutActor):
+                actorPasteCommand: ActorPasteCommand = ActorPasteCommand(pyutObject=pyutObject,
+                                                                         umlPosition=UmlPosition(x=x, y=y),
+                                                                         umlFrame=self,
+                                                                         umlPubSubEngine=self._umlPubSubEngine
+                                                                         )
+                self._commandProcessor.Submit(actorPasteCommand)
+            else:
+                continue
+
+            numbObjectsPasted += 1
+            x += 50
+            y += 50
+
+        self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.UPDATE_APPLICATION_STATUS,
+                                          frameId=self.id,
+                                          message=f'Pasted {len(self._clipboard)} shape')
+
 
     def selectAllShapes(self, ):
         self.ufLogger.warning(f'Paste is unimplemented')
@@ -278,10 +291,3 @@ class UmlFrame(DiagramFrame):
             s.Select(True)
 
         self.Refresh(False)
-
-    # def _setEventHandler(self, umlShape, eventHandler: 'UmlBaseEventHandler'):
-    #
-    #     eventHandler.SetShape(umlShape)        # cast(UmlBaseEventHandler, eventHandler).umlPubSubEngine = self._umlPubSubEngine
-    #     eventHandler.umlPubSubEngine = self._umlPubSubEngine
-    #     eventHandler.SetPreviousHandler(umlShape.GetEventHandler())
-    #     umlShape.SetEventHandler(eventHandler)

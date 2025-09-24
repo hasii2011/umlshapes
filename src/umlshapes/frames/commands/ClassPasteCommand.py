@@ -1,11 +1,9 @@
 
+from typing import cast
 from typing import TYPE_CHECKING
 
 from logging import Logger
 from logging import getLogger
-
-from datetime import datetime
-from typing import cast
 
 from pyutmodelv2.PyutObject import PyutObject
 from pyutmodelv2.PyutClass import PyutClass
@@ -28,9 +26,9 @@ class ClassPasteCommand(BasePasteCommand):
 
         Args:
             pyutObject:         We will build the appropriate UML Shape from this
-            umlPosition:        Where we will paste it
-            umlFrame:           Where we are pasting
-            umlPubSubEngine:    The event handlers need these injected
+            umlPosition:        The location to paste it to
+            umlFrame:           The UML Frame we are pasting to
+            umlPubSubEngine:    The event handler need this injected
         """
         from umlshapes.shapes.UmlClass import UmlClass
 
@@ -60,22 +58,12 @@ class ClassPasteCommand(BasePasteCommand):
 
         self._umlFrame.Refresh()
 
-        self._umlClass = umlShape
+        self._umlClass = umlShape   # type: ignore
 
         return True
 
     def Undo(self) -> bool:
 
-        # TODO TODO TODO TODO TODO TODO
-        # from umlshapes.frames.DiagramFrame import DiagramFrame
-        # from umlshapes.UmlDiagram import UmlDiagram
-        #
-        # umlFrame:   DiagramFrame = self._umlFrame
-        # umlDiagram: UmlDiagram   = umlFrame.umlDiagram
-        #
-        # self._baseWxCreateLogger.info(f'Undo create {self._shape}')
-        # umlDiagram.RemoveShape(self._shape)
-        # umlFrame.refresh()
         self._umlFrame.umlDiagram.RemoveShape(self._umlClass)
         self._umlFrame.refresh()
         return True
@@ -85,17 +73,10 @@ class ClassPasteCommand(BasePasteCommand):
         from umlshapes.shapes.UmlClass import UmlClass
         from umlshapes.shapes.eventhandlers.UmlClassEventHandler import UmlClassEventHandler
 
-        umlShape     = UmlClass(cast(PyutClass, pyutObject))
+        umlShape: UmlClass = UmlClass(cast(PyutClass, pyutObject))
         eventHandler = UmlClassEventHandler()
 
         self._setupEventHandler(umlShape=umlShape, eventHandler=eventHandler)
 
         return umlShape
-
-    @property
-    def timeStamp(self) -> int:
-
-        dt = datetime.now()
-
-        return dt.microsecond
 

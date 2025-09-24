@@ -1,12 +1,15 @@
-from abc import ABC
+
 from typing import TYPE_CHECKING
 from typing import cast
 
 from logging import Logger
 from logging import getLogger
 
+from abc import ABC
 from abc import ABCMeta
 from abc import abstractmethod
+
+from datetime import datetime
 
 from dataclasses import dataclass
 
@@ -51,6 +54,13 @@ class BasePasteCommand(Command, metaclass=AbstractCommandMeta):
         self.logger: Logger = getLogger(__name__)
 
         super().__init__(canUndo=True, name=name)
+
+    @property
+    def timeStamp(self) -> int:
+
+        dt = datetime.now()
+
+        return dt.microsecond
 
     class Meta(ABC):
         abstract = True
