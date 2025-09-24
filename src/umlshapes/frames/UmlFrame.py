@@ -13,6 +13,7 @@ from copy import deepcopy
 from pyutmodelv2.PyutActor import PyutActor
 from pyutmodelv2.PyutClass import PyutClass
 from pyutmodelv2.PyutLinkedObject import PyutLinkedObject
+from pyutmodelv2.PyutNote import PyutNote
 from wx import ICON_ERROR
 from wx import OK
 
@@ -33,6 +34,7 @@ from umlshapes.commands.ActorPasteCommand import ActorPasteCommand
 # from pyutmodelv2.PyutUseCase import PyutUseCase
 
 from umlshapes.commands.ClassPasteCommand import ClassPasteCommand
+from umlshapes.commands.NotePasteCommand import NotePasteCommand
 from umlshapes.lib.ogl import Shape
 from umlshapes.lib.ogl import ShapeCanvas
 
@@ -45,10 +47,8 @@ from umlshapes.UmlDiagram import UmlDiagram
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
-
 from umlshapes.types.Common import UmlShapeList
 from umlshapes.types.UmlPosition import UmlPosition
-
 
 A4_FACTOR:     float = 1.41
 
@@ -58,11 +58,6 @@ PIXELS_PER_UNIT_Y: int = 20
 PyutObjects = NewType('PyutObjects', List[PyutObject])
 
 BIG_NUM: int = 10000    # Hopefully, there are less than this number of shapes on frame
-
-# @dataclass
-# class PasteCreatorResults:
-#     umlShape:     UmlShape              = cast(UmlShape, None)
-#     eventHandler: 'UmlBaseEventHandler' = cast('UmlBaseEventHandler', None)
 
 
 class UmlFrame(DiagramFrame):
@@ -268,6 +263,13 @@ class UmlFrame(DiagramFrame):
                                                                          umlPubSubEngine=self._umlPubSubEngine
                                                                          )
                 self._commandProcessor.Submit(actorPasteCommand)
+            elif isinstance(pyutObject, PyutNote):
+                notePasteCommand: NotePasteCommand = NotePasteCommand(pyutObject=pyutObject,
+                                                                      umlPosition=UmlPosition(x=x, y=y),
+                                                                      umlFrame=self,
+                                                                      umlPubSubEngine=self._umlPubSubEngine
+                                                                      )
+                self._commandProcessor.Submit(notePasteCommand)
             else:
                 continue
 

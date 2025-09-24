@@ -5,22 +5,23 @@ from typing import TYPE_CHECKING
 from logging import Logger
 from logging import getLogger
 
+from pyutmodelv2.PyutNote import PyutNote
 from pyutmodelv2.PyutObject import PyutObject
-from pyutmodelv2.PyutClass import PyutClass
 
 from umlshapes.commands.BasePasteCommand import BasePasteCommand
 
 from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 
 from umlshapes.types.Common import UmlShape
+
 from umlshapes.types.UmlPosition import UmlPosition
 
 if TYPE_CHECKING:
     from umlshapes.frames.UmlFrame import UmlFrame
 
 
-class ClassPasteCommand(BasePasteCommand):
 
+class NotePasteCommand(BasePasteCommand):
     def __init__(self, pyutObject: PyutObject, umlPosition: UmlPosition, umlFrame: 'UmlFrame', umlPubSubEngine: IUmlPubSubEngine):
         """
 
@@ -30,47 +31,40 @@ class ClassPasteCommand(BasePasteCommand):
             umlFrame:           The UML Frame we are pasting to
             umlPubSubEngine:    The event handler need this injected
         """
-        from umlshapes.shapes.UmlClass import UmlClass
+        from umlshapes.shapes.UmlNote import UmlNote
 
         self.logger: Logger = getLogger(__name__)
 
-        self._name:            str              = f'ClassPasteCommand-{self.timeStamp}'
+        self._name: str = f'NotePasteCommand-{self.timeStamp}'
 
         super().__init__(name=self._name, pyutObject=pyutObject, umlPosition=umlPosition, umlFrame=umlFrame, umlPubSubEngine=umlPubSubEngine)
 
-        self._umlClass: UmlClass = cast(UmlClass, None)
+        self._umlNote: UmlNote = cast(UmlNote, None)
+
+    def Do(self) -> bool:
+        umlShape: UmlShape = self._createPastedShape(pyutObject=self._pyutObject)
+
+        self._setupUmlShape(umlShape=umlShape)
+        self._umlNote = umlShape  # type: ignore
+
+        return True
 
     def GetName(self) -> str:
         return self._name
 
-    def CanUndo(self):
-
-        return True
-
-    def Do(self) -> bool:
-
-        umlShape: UmlShape = self._createPastedShape(pyutObject=self._pyutObject)
-
-        self._setupUmlShape(umlShape=umlShape)
-        self._umlClass = umlShape   # type: ignore
-
-        return True
-
     def Undo(self) -> bool:
 
-        self._umlFrame.umlDiagram.RemoveShape(self._umlClass)
+        self._umlFrame.umlDiagram.RemoveShape(self._umlNote)
         self._umlFrame.refresh()
         return True
 
     def _createPastedShape(self, pyutObject: PyutObject) -> UmlShape:
+        from umlshapes.shapes.UmlNote import UmlNote
+        from umlshapes.shapes.eventhandlers.UmlActorEventHandler import UmlActorEventHandler
 
-        from umlshapes.shapes.UmlClass import UmlClass
-        from umlshapes.shapes.eventhandlers.UmlClassEventHandler import UmlClassEventHandler
-
-        umlShape: UmlClass = UmlClass(cast(PyutClass, pyutObject))
-        eventHandler = UmlClassEventHandler()
+        umlShape: UmlNote = UmlNote(cast(PyutNote, pyutObject))
+        eventHandler = UmlActorEventHandler()
 
         self._setupEventHandler(umlShape=umlShape, eventHandler=eventHandler)
 
         return umlShape
-

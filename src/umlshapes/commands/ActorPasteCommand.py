@@ -46,13 +46,7 @@ class ActorPasteCommand(BasePasteCommand):
         def Do(self) -> bool:
             umlShape: UmlShape = self._createPastedShape(pyutObject=self._pyutObject)
 
-            self._umlFrame.umlDiagram.AddShape(umlShape)
-            umlShape.position = self._umlPosition
-            umlShape.umlFrame = self._umlFrame
-            umlShape.Show(True)
-
-            self._umlFrame.Refresh()
-
+            self._setupUmlShape(umlShape=umlShape)
             self._umlActor = umlShape  # type: ignore
 
             return True

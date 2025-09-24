@@ -79,6 +79,15 @@ class BasePasteCommand(Command, metaclass=AbstractCommandMeta):
             """
             pass
 
+    def _setupUmlShape(self, umlShape: UmlShape):
+
+        self._umlFrame.umlDiagram.AddShape(umlShape)
+        umlShape.position = self._umlPosition
+        umlShape.umlFrame = self._umlFrame
+        umlShape.Show(True)
+
+        self._umlFrame.Refresh()
+
     def _setupEventHandler(self, umlShape, eventHandler: 'UmlBaseEventHandler'):
 
         eventHandler.SetShape(umlShape)
