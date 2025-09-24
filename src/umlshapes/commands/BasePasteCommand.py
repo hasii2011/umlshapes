@@ -79,6 +79,16 @@ class BasePasteCommand(Command, metaclass=AbstractCommandMeta):
             """
             pass
 
+    def _undo(self, umlShape: UmlShape):
+        """
+        Common code for basic Undo
+        Args:
+            umlShape:  The shape to remove from the frame
+
+        """
+        self._umlFrame.umlDiagram.RemoveShape(umlShape)
+        self._umlFrame.refresh()
+
     def _setupUmlShape(self, umlShape: UmlShape):
 
         self._umlFrame.umlDiagram.AddShape(umlShape)

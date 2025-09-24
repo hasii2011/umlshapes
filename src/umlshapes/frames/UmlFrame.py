@@ -10,10 +10,6 @@ from collections.abc import Iterable
 
 from copy import deepcopy
 
-from pyutmodelv2.PyutActor import PyutActor
-from pyutmodelv2.PyutClass import PyutClass
-from pyutmodelv2.PyutLinkedObject import PyutLinkedObject
-from pyutmodelv2.PyutNote import PyutNote
 from wx import ICON_ERROR
 from wx import OK
 
@@ -25,18 +21,20 @@ from wx import Window
 
 from pyutmodelv2.PyutObject import PyutObject
 from pyutmodelv2.PyutLink import PyutLinks
+from pyutmodelv2.PyutActor import PyutActor
+from pyutmodelv2.PyutClass import PyutClass
+from pyutmodelv2.PyutLinkedObject import PyutLinkedObject
+from pyutmodelv2.PyutNote import PyutNote
+from pyutmodelv2.PyutText import PyutText
+
+from umlshapes.commands.TextPasteCommand import TextPasteCommand
+from umlshapes.lib.ogl import Shape
+from umlshapes.lib.ogl import ShapeCanvas
 
 from umlshapes.commands.ActorPasteCommand import ActorPasteCommand
-# from pyutmodelv2.PyutActor import PyutActor
-# from pyutmodelv2.PyutClass import PyutClass
-# from pyutmodelv2.PyutNote import PyutNote
-# from pyutmodelv2.PyutText import PyutText
-# from pyutmodelv2.PyutUseCase import PyutUseCase
 
 from umlshapes.commands.ClassPasteCommand import ClassPasteCommand
 from umlshapes.commands.NotePasteCommand import NotePasteCommand
-from umlshapes.lib.ogl import Shape
-from umlshapes.lib.ogl import ShapeCanvas
 
 from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 from umlshapes.pubsubengine.UmlMessageType import UmlMessageType
@@ -270,6 +268,14 @@ class UmlFrame(DiagramFrame):
                                                                       umlPubSubEngine=self._umlPubSubEngine
                                                                       )
                 self._commandProcessor.Submit(notePasteCommand)
+            elif isinstance(pyutObject, PyutText):
+                textPasteCommand: TextPasteCommand = TextPasteCommand(pyutObject=pyutObject,
+                                                                      umlPosition=UmlPosition(x=x, y=y),
+                                                                      umlFrame=self,
+                                                                      umlPubSubEngine=self._umlPubSubEngine
+                                                                      )
+                self._commandProcessor.Submit(textPasteCommand)
+
             else:
                 continue
 

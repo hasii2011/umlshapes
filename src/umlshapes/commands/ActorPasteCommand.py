@@ -28,13 +28,12 @@ class ActorPasteCommand(BasePasteCommand):
                 pyutObject:         We will build the appropriate UML Shape from this
                 umlPosition:        The location to paste it to
                 umlFrame:           The UML Frame we are pasting to
-                umlPubSubEngine:    The event handler need this injected
+                umlPubSubEngine:    The event handler that is injected
             """
             from umlshapes.shapes.UmlActor import UmlActor
 
             self.logger: Logger = getLogger(__name__)
-
-            self._name: str = f'ActorPasteCommand-{self.timeStamp}'
+            self._name:   str   = f'ActorPasteCommand-{self.timeStamp}'
 
             super().__init__(name=self._name, pyutObject=pyutObject, umlPosition=umlPosition, umlFrame=umlFrame, umlPubSubEngine=umlPubSubEngine)
 

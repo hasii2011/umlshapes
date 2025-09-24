@@ -28,13 +28,12 @@ class ClassPasteCommand(BasePasteCommand):
             pyutObject:         We will build the appropriate UML Shape from this
             umlPosition:        The location to paste it to
             umlFrame:           The UML Frame we are pasting to
-            umlPubSubEngine:    The event handler need this injected
+            umlPubSubEngine:    The event handler that is injected
         """
         from umlshapes.shapes.UmlClass import UmlClass
 
         self.logger: Logger = getLogger(__name__)
-
-        self._name:            str              = f'ClassPasteCommand-{self.timeStamp}'
+        self._name:  str    = f'ClassPasteCommand-{self.timeStamp}'
 
         super().__init__(name=self._name, pyutObject=pyutObject, umlPosition=umlPosition, umlFrame=umlFrame, umlPubSubEngine=umlPubSubEngine)
 
@@ -57,9 +56,7 @@ class ClassPasteCommand(BasePasteCommand):
         return True
 
     def Undo(self) -> bool:
-
-        self._umlFrame.umlDiagram.RemoveShape(self._umlClass)
-        self._umlFrame.refresh()
+        self._undo(umlShape=self._umlClass)
         return True
 
     def _createPastedShape(self, pyutObject: PyutObject) -> UmlShape:

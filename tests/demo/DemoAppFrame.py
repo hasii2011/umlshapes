@@ -1,6 +1,7 @@
 
 from logging import Logger
 from logging import getLogger
+from typing import cast
 
 from wx import DEFAULT_FRAME_STYLE
 from wx import EVT_MENU
@@ -67,6 +68,8 @@ class DemoAppFrame(SizedFrame):
         sizedPanel.SetSizerProps(expand=True, proportion=1)
 
         self._umlPubSubEngine: UmlPubSubEngine = UmlPubSubEngine()
+        self._editMenu:        Menu            = cast(Menu, None)
+
         self._diagramFrame = ClassDiagramFrame(
             parent=sizedPanel,
             umlPubSubEngine=self._umlPubSubEngine,
@@ -76,6 +79,7 @@ class DemoAppFrame(SizedFrame):
         self._diagramFrame.SetSizerProps(expand=True, proportion=1)
 
         self._createApplicationMenuBar()
+        self._diagramFrame.commandProcessor.SetEditMenu(menu=self._editMenu)
 
         self.CreateStatusBar()  # should always do this when there's a resize border
         self.SetAutoLayout(True)
@@ -101,7 +105,6 @@ class DemoAppFrame(SizedFrame):
         self._umlPubSubEngine.subscribe(UmlMessageType.UML_SHAPE_SELECTED,
                                         frameId=self._diagramFrame.id,
                                         listener=self._umlShapeListener)
-
 
     def _createApplicationMenuBar(self):
 
@@ -149,6 +152,8 @@ class DemoAppFrame(SizedFrame):
         self.SetMenuBar(menuBar)
 
         # self.Bind(EVT_MENU, self._onOglPreferences, id=ID_PREFERENCES)
+
+        self._editMenu = editMenu
 
         self.Bind(EVT_MENU, self._onDisplayElement, id=Identifiers.ID_DISPLAY_UML_TEXT)
         self.Bind(EVT_MENU, self._onDisplayElement, id=Identifiers.ID_DISPLAY_UML_NOTE)
