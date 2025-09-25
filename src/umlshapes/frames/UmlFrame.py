@@ -10,6 +10,7 @@ from collections.abc import Iterable
 
 from copy import deepcopy
 
+from pyutmodelv2.PyutUseCase import PyutUseCase
 from wx import ICON_ERROR
 from wx import OK
 
@@ -28,6 +29,7 @@ from pyutmodelv2.PyutNote import PyutNote
 from pyutmodelv2.PyutText import PyutText
 
 from umlshapes.commands.TextPasteCommand import TextPasteCommand
+from umlshapes.commands.UseCasePasteCommand import UseCasePasteCommand
 from umlshapes.lib.ogl import Shape
 from umlshapes.lib.ogl import ShapeCanvas
 
@@ -275,6 +277,13 @@ class UmlFrame(DiagramFrame):
                                                                       umlPubSubEngine=self._umlPubSubEngine
                                                                       )
                 self._commandProcessor.Submit(textPasteCommand)
+            elif isinstance(pyutObject, PyutUseCase):
+                useCasePasteCommand: UseCasePasteCommand = UseCasePasteCommand(pyutObject=pyutObject,
+                                                                            umlPosition=UmlPosition(x=x, y=y),
+                                                                            umlFrame=self,
+                                                                            umlPubSubEngine=self._umlPubSubEngine
+                                                                            )
+                self._commandProcessor.Submit(useCasePasteCommand)
 
             else:
                 continue

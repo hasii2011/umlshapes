@@ -51,9 +51,7 @@ class ActorPasteCommand(BasePasteCommand):
             return True
 
         def Undo(self) -> bool:
-
-            self._umlFrame.umlDiagram.RemoveShape(self._umlActor)
-            self._umlFrame.refresh()
+            self._undo(umlShape=self._umlActor)
             return True
 
         def _createPastedShape(self, pyutObject: PyutObject) -> UmlShape:
@@ -66,4 +64,3 @@ class ActorPasteCommand(BasePasteCommand):
             self._setupEventHandler(umlShape=umlShape, eventHandler=eventHandler)
 
             return umlShape
-
