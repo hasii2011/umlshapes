@@ -33,18 +33,13 @@ class ClassPasteCommand(BasePasteCommand):
         from umlshapes.shapes.UmlClass import UmlClass
 
         self.logger: Logger = getLogger(__name__)
-        self._name:  str    = f'ClassPasteCommand-{self.timeStamp}'
 
-        super().__init__(name=self._name, pyutObject=pyutObject, umlPosition=umlPosition, umlFrame=umlFrame, umlPubSubEngine=umlPubSubEngine)
+        super().__init__(partialName='ClassPasteCommand', pyutObject=pyutObject, umlPosition=umlPosition, umlFrame=umlFrame, umlPubSubEngine=umlPubSubEngine)
 
         self._umlClass: UmlClass = cast(UmlClass, None)
 
     def GetName(self) -> str:
         return self._name
-
-    def CanUndo(self):
-
-        return True
 
     def Do(self) -> bool:
 
@@ -70,4 +65,3 @@ class ClassPasteCommand(BasePasteCommand):
         self._setupEventHandler(umlShape=umlShape, eventHandler=eventHandler)
 
         return umlShape
-

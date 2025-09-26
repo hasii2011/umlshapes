@@ -33,14 +33,10 @@ class UseCasePasteCommand(BasePasteCommand):
         from umlshapes.shapes.UmlUseCase import UmlUseCase
 
         self.logger: Logger = getLogger(__name__)
-        self._name:  str    = f'UseCasePasteCommand-{self.timeStamp}'
 
-        super().__init__(name=self._name, pyutObject=pyutObject, umlPosition=umlPosition, umlFrame=umlFrame, umlPubSubEngine=umlPubSubEngine)
+        super().__init__(partialName='UseCasePasteCommand', pyutObject=pyutObject, umlPosition=umlPosition, umlFrame=umlFrame, umlPubSubEngine=umlPubSubEngine)
 
         self._umlUseCase: UmlUseCase = cast(UmlUseCase, None)
-
-    def GetName(self) -> str:
-        return self._name
 
     def Do(self) -> bool:
         umlShape: UmlShape = self._createPastedShape(pyutObject=self._pyutObject)

@@ -33,14 +33,10 @@ class ActorPasteCommand(BasePasteCommand):
             from umlshapes.shapes.UmlActor import UmlActor
 
             self.logger: Logger = getLogger(__name__)
-            self._name:   str   = f'ActorPasteCommand-{self.timeStamp}'
 
-            super().__init__(name=self._name, pyutObject=pyutObject, umlPosition=umlPosition, umlFrame=umlFrame, umlPubSubEngine=umlPubSubEngine)
+            super().__init__(partialName='ActorPasteCommand', pyutObject=pyutObject, umlPosition=umlPosition, umlFrame=umlFrame, umlPubSubEngine=umlPubSubEngine)
 
             self._umlActor: UmlActor = cast(UmlActor, None)
-
-        def GetName(self) -> str:
-            return self._name
 
         def Do(self) -> bool:
             umlShape: UmlShape = self._createPastedShape(pyutObject=self._pyutObject)

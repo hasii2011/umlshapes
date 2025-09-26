@@ -32,15 +32,10 @@ class TextPasteCommand(BasePasteCommand):
         from umlshapes.shapes.UmlText import UmlText
 
         self.logger: Logger = getLogger(__name__)
-        self._name:  str    = f'TextPasteCommand-{self.timeStamp}'
 
-        super().__init__(name=self._name, pyutObject=pyutObject, umlPosition=umlPosition, umlFrame=umlFrame, umlPubSubEngine=umlPubSubEngine)
+        super().__init__(partialName='', pyutObject=pyutObject, umlPosition=umlPosition, umlFrame=umlFrame, umlPubSubEngine=umlPubSubEngine)
 
         self._umlText: UmlText = cast(UmlText, None)
-
-    def GetName(self) -> str:
-        return self._name
-
 
     def Do(self) -> bool:
         umlShape: UmlShape = self._createPastedShape(pyutObject=self._pyutObject)

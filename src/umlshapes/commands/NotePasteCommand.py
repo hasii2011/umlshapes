@@ -33,14 +33,10 @@ class NotePasteCommand(BasePasteCommand):
         from umlshapes.shapes.UmlNote import UmlNote
 
         self.logger: Logger = getLogger(__name__)
-        self._name:  str    = f'NotePasteCommand-{self.timeStamp}'
 
-        super().__init__(name=self._name, pyutObject=pyutObject, umlPosition=umlPosition, umlFrame=umlFrame, umlPubSubEngine=umlPubSubEngine)
+        super().__init__(partialName='NotePasteCommand', pyutObject=pyutObject, umlPosition=umlPosition, umlFrame=umlFrame, umlPubSubEngine=umlPubSubEngine)
 
         self._umlNote: UmlNote = cast(UmlNote, None)
-
-    def GetName(self) -> str:
-        return self._name
 
     def Do(self) -> bool:
         umlShape: UmlShape = self._createPastedShape(pyutObject=self._pyutObject)
