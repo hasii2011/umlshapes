@@ -1,4 +1,6 @@
 
+from typing import TYPE_CHECKING
+
 from umlshapes.lib.ogl import CONTROL_POINT_DIAGONAL
 from umlshapes.lib.ogl import CONTROL_POINT_HORIZONTAL
 from umlshapes.lib.ogl import CONTROL_POINT_VERTICAL
@@ -7,11 +9,13 @@ from umlshapes.lib.ogl import CircleShape
 from umlshapes.lib.ogl import EllipseShape
 from umlshapes.lib.ogl import Shape
 
-from umlshapes.frames.UmlFrame import UmlFrame
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
 from umlshapes.shapes.UmlControlPoint import UmlControlPoint
 from umlshapes.shapes.eventhandlers.UmlControlPointEventHandler import UmlControlPointEventHandler
+
+if TYPE_CHECKING:
+    from umlshapes.frames.UmlFrame import UmlFrame
 
 
 class ControlPointMixin:
@@ -26,6 +30,7 @@ class ControlPointMixin:
 
     def MakeControlPoints(self):
         from umlshapes.shapes.UmlActor import UmlActor
+        from umlshapes.frames.UmlFrame import UmlFrame
 
         """
         Make a list of control points (draggable handles) appropriate to
@@ -44,7 +49,7 @@ class ControlPointMixin:
         left:   int = -widthMin // 2
         right:  int = widthMin // 2 + (maxX - minX)
 
-        canvas: UmlFrame = self._shape.GetCanvas()
+        canvas: 'UmlFrame' = self._shape.GetCanvas()
         assert isinstance(canvas, UmlFrame), 'I only support this'
 
         umlControlPointSize: int = self._preferences.controlPointSize
@@ -81,7 +86,7 @@ class ControlPointMixin:
             control = UmlControlPoint(canvas, self._shape, umlControlPointSize, left, 0, CONTROL_POINT_HORIZONTAL)
             self._setupControlPoint(umlControlPoint=control)
 
-    def _makeOrthogonalControlPoints(self, canvas: UmlFrame, top: int, right: int, bottom: int, left: int):
+    def _makeOrthogonalControlPoints(self, canvas: 'UmlFrame', top: int, right: int, bottom: int, left: int):
 
         umlControlPointSize: int = self._preferences.controlPointSize
 
@@ -97,7 +102,7 @@ class ControlPointMixin:
         control = UmlControlPoint(canvas, self._shape, umlControlPointSize, left, 0, CONTROL_POINT_HORIZONTAL)
         self._setupControlPoint(umlControlPoint=control)
 
-    def _makeDiagonalControlPoints(self, canvas: UmlFrame, top: int, right: int, bottom: int, left: int):
+    def _makeDiagonalControlPoints(self, canvas: 'UmlFrame', top: int, right: int, bottom: int, left: int):
 
         umlControlPointSize: int = self._preferences.controlPointSize
 

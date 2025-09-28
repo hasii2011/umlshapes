@@ -68,6 +68,14 @@ class UmlUseCase(ControlPointMixin,  IdentifierMixin, EllipseShape, TopLeftMixin
     def umlFrame(self, frame: UseCaseDiagramFrame):
         self.SetCanvas(frame)
 
+    @property
+    def selected(self) -> bool:
+        return self.Selected()
+
+    @selected.setter
+    def selected(self, select: bool):
+        self.Select(select=select)
+
     def OnDraw(self, dc: MemoryDC):
         """
         Lots of work around code on retrieved values from Shape, since it

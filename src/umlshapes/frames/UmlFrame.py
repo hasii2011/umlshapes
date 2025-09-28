@@ -10,8 +10,7 @@ from collections.abc import Iterable
 
 from copy import deepcopy
 
-from pyutmodelv2.PyutClass import PyutClass
-from pyutmodelv2.PyutLinkedObject import PyutLinkedObject
+from pyutmodelv2.PyutUseCase import PyutUseCase
 from wx import ICON_ERROR
 from wx import OK
 
@@ -21,17 +20,28 @@ from wx import MessageDialog
 from wx import MouseEvent
 from wx import Window
 
-from pyutmodelv2.PyutObject import PyutObject
-from pyutmodelv2.PyutLink import PyutLinks
-# from pyutmodelv2.PyutActor import PyutActor
-# from pyutmodelv2.PyutClass import PyutClass
-# from pyutmodelv2.PyutNote import PyutNote
-# from pyutmodelv2.PyutText import PyutText
-# from pyutmodelv2.PyutUseCase import PyutUseCase
-
-from umlshapes.frames.commands.ClassPasteCommand import ClassPasteCommand
 from umlshapes.lib.ogl import Shape
 from umlshapes.lib.ogl import ShapeCanvas
+
+from pyutmodelv2.PyutObject import PyutObject
+from pyutmodelv2.PyutLink import PyutLinks
+from pyutmodelv2.PyutActor import PyutActor
+from pyutmodelv2.PyutClass import PyutClass
+from pyutmodelv2.PyutLinkedObject import PyutLinkedObject
+from pyutmodelv2.PyutNote import PyutNote
+from pyutmodelv2.PyutText import PyutText
+
+from umlshapes.commands.ActorCutCommand import ActorCutCommand
+from umlshapes.commands.ClassCutCommand import ClassCutCommand
+from umlshapes.commands.NoteCutCommand import NoteCutCommand
+from umlshapes.commands.TextCutCommand import TextCutCommand
+from umlshapes.commands.UseCaseCutCommand import UseCaseCutCommand
+
+from umlshapes.commands.TextPasteCommand import TextPasteCommand
+from umlshapes.commands.UseCasePasteCommand import UseCasePasteCommand
+from umlshapes.commands.ActorPasteCommand import ActorPasteCommand
+from umlshapes.commands.ClassPasteCommand import ClassPasteCommand
+from umlshapes.commands.NotePasteCommand import NotePasteCommand
 
 from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 from umlshapes.pubsubengine.UmlMessageType import UmlMessageType
@@ -42,10 +52,8 @@ from umlshapes.UmlDiagram import UmlDiagram
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
-
 from umlshapes.types.Common import UmlShapeList
 from umlshapes.types.UmlPosition import UmlPosition
-
 
 A4_FACTOR:     float = 1.41
 
@@ -55,11 +63,6 @@ PIXELS_PER_UNIT_Y: int = 20
 PyutObjects = NewType('PyutObjects', List[PyutObject])
 
 BIG_NUM: int = 10000    # Hopefully, there are less than this number of shapes on frame
-
-# @dataclass
-# class PasteCreatorResults:
-#     umlShape:     UmlShape              = cast(UmlShape, None)
-#     eventHandler: 'UmlBaseEventHandler' = cast('UmlBaseEventHandler', None)
 
 
 class UmlFrame(DiagramFrame):
@@ -184,50 +187,81 @@ class UmlFrame(DiagramFrame):
     def _redoListener(self):
         self._commandProcessor.Redo()
 
-    def _cutShapes(self, ):
-        self.ufLogger.warning(f'Cut is unimplemented')
-
-        selectedShapes: UmlShapeList = self.selectedShapes
-        if len(selectedShapes) == 0:
-            with MessageDialog(parent=None, message='No shapes selected', caption='Invalid Destination', style=OK | ICON_ERROR) as dlg:
-                dlg.ShowModal()
-        else:
-            pass
-
-    def _copyShapes(self, ):
+    def _cutShapes(self):
+        """
+        We don't need to copy anything to the clipboard.  The cut commands
+        know how to recreate them.  Notice we pass the full UML Shape to the command
+        for direct removal
+        """
         from umlshapes.shapes.UmlClass import UmlClass
         from umlshapes.shapes.UmlNote import UmlNote
         from umlshapes.shapes.UmlActor import UmlActor
-        from umlshapes.shapes.UmlUseCase import UmlUseCase
         from umlshapes.shapes.UmlText import UmlText
+        from umlshapes.shapes.UmlUseCase import UmlUseCase
 
         selectedShapes: UmlShapeList = self.selectedShapes
         if len(selectedShapes) == 0:
-            with MessageDialog(parent=None, message='No shapes selected', caption='Invalid Destination', style=OK | ICON_ERROR) as dlg:
+            with MessageDialog(parent=None, message='No shapes selected', caption='', style=OK | ICON_ERROR) as dlg:
                 dlg.ShowModal()
         else:
-            self._clipboard = PyutObjects([])
+            self._copyToInternalClipboard(selectedShapes=selectedShapes)    # In case we want to paste them back
+            for shape in selectedShapes:
+                if isinstance(shape, UmlClass) is True:
+                    umlClass:        UmlClass        = cast(UmlClass, shape)
+                    classCutCommand: ClassCutCommand = ClassCutCommand(umlClass=umlClass,
+                                                                       umlPosition=umlClass.position,
+                                                                       umlFrame=self,
+                                                                       umlPubSubEngine=self._umlPubSubEngine
+                                                                       )
+                    self._commandProcessor.Submit(classCutCommand)
+                elif isinstance(shape, UmlNote):
+                    umlNote:        UmlNote        = shape
+                    noteCutCommand: NoteCutCommand = NoteCutCommand(umlNote=umlNote,
+                                                                    umlPosition=umlNote.position,
+                                                                    umlFrame=self,
+                                                                    umlPubSubEngine=self._umlPubSubEngine
+                                                                    )
+                    self._commandProcessor.Submit(noteCutCommand)
+                elif isinstance(shape, UmlActor):
+                    umlActor: UmlActor = shape
+                    actorCutCommand: ActorCutCommand = ActorCutCommand(umlActor=umlActor,
+                                                                       umlPosition=umlActor.position,
+                                                                       umlFrame=self,
+                                                                       umlPubSubEngine=self._umlPubSubEngine
+                                                                       )
+                    self._commandProcessor.Submit(actorCutCommand)
+                elif isinstance(shape, UmlText):
+                    umlText: UmlText = shape
+                    textCutCommand: TextCutCommand = TextCutCommand(umlText=umlText,
+                                                                    umlPosition=umlText.position,
+                                                                    umlFrame=self,
+                                                                    umlPubSubEngine=self._umlPubSubEngine
+                                                                    )
+                    self._commandProcessor.Submit(textCutCommand)
+                elif isinstance(shape, UmlUseCase):
+                    umlUseCase: UmlUseCase = shape
+                    useCaseCutCommand: UseCaseCutCommand = UseCaseCutCommand(umlUseCase=umlUseCase,
+                                                                             umlPosition=umlUseCase.position,
+                                                                             umlFrame=self,
+                                                                             umlPubSubEngine=self._umlPubSubEngine
+                                                                             )
+                    self._commandProcessor.Submit(useCaseCutCommand)
 
-            # put a copy of the PyutObjects in the clipboard
-            for umlShape in selectedShapes:
-                pyutObject: PyutLinkedObject = cast(PyutLinkedObject, None)
+            self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.UPDATE_APPLICATION_STATUS,
+                                              frameId=self.id,
+                                              message=f'Cut {len(self._clipboard)} shapes')
 
-                if isinstance(umlShape, UmlClass):
-                    pyutObject = deepcopy(umlShape.pyutClass)
-                elif isinstance(umlShape, UmlNote):
-                    pyutObject = deepcopy(umlShape.pyutNote)
-                elif isinstance(umlShape, UmlText):
-                    pyutObject = deepcopy(umlShape.pyutText)
-                elif isinstance(umlShape, UmlActor):
-                    pyutObject = deepcopy(umlShape.pyutActor)
-                elif isinstance(umlShape, UmlUseCase):
-                    pyutObject = deepcopy(umlShape.pyutUseCase)
-                else:
-                    pass
-                if  pyutObject is not None:
-                    pyutObject.id += BIG_NUM
-                    pyutObject.links = PyutLinks([])              # we don't want to copy the links
-                    self._clipboard.append(pyutObject)
+    def _copyShapes(self):
+        """
+        Only copy the model objects to the clipboard.  Paste can then recreate them
+        """
+
+        selectedShapes: UmlShapeList = self.selectedShapes
+        if len(selectedShapes) == 0:
+            with MessageDialog(parent=None, message='No shapes selected', caption='', style=OK | ICON_ERROR) as dlg:
+                dlg.ShowModal()
+        else:
+            self._copyToInternalClipboard(selectedShapes=selectedShapes)
 
             self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.UPDATE_APPLICATION_STATUS,
                                               frameId=self.id,
@@ -242,7 +276,7 @@ class UmlFrame(DiagramFrame):
         """
         self.ufLogger.info(f'Pasting {len(self._clipboard)} shapes')
 
-        # put the objects in the clipboard and remove them from the diagram
+        # Get the objects out of the internal clipboard and let the appropriate command process them
         x: int = 100
         y: int = 100
         numbObjectsPasted: int = 0
@@ -250,22 +284,92 @@ class UmlFrame(DiagramFrame):
             pyutObject:   PyutObject = clipboardObject
 
             if isinstance(pyutObject, PyutClass) is True:
-                pasteCommand: ClassPasteCommand = ClassPasteCommand(pyutObject=pyutObject,
-                                                                    umlPosition=UmlPosition(x=x, y=y),
-                                                                    umlFrame=self,
-                                                                    umlPubSubEngine=self._umlPubSubEngine
-                                                                    )
-                self._commandProcessor.Submit(pasteCommand)
-
-
-                numbObjectsPasted += 1
-                x += 50
-                y += 50
+                classPasteCommand: ClassPasteCommand = ClassPasteCommand(pyutObject=pyutObject,
+                                                                         umlPosition=UmlPosition(x=x, y=y),
+                                                                         umlFrame=self,
+                                                                         umlPubSubEngine=self._umlPubSubEngine
+                                                                         )
+                self._commandProcessor.Submit(classPasteCommand)
 
                 self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.FRAME_MODIFIED, frameId=self.id, modifiedFrameId=self.id)
-                self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.UPDATE_APPLICATION_STATUS,
-                                                  frameId=self.id,
-                                                  message=f'Pasted {len(self._clipboard)} shapes')
+            elif isinstance(pyutObject, PyutActor):
+                actorPasteCommand: ActorPasteCommand = ActorPasteCommand(pyutObject=pyutObject,
+                                                                         umlPosition=UmlPosition(x=x, y=y),
+                                                                         umlFrame=self,
+                                                                         umlPubSubEngine=self._umlPubSubEngine
+                                                                         )
+                self._commandProcessor.Submit(actorPasteCommand)
+            elif isinstance(pyutObject, PyutNote):
+                notePasteCommand: NotePasteCommand = NotePasteCommand(pyutObject=pyutObject,
+                                                                      umlPosition=UmlPosition(x=x, y=y),
+                                                                      umlFrame=self,
+                                                                      umlPubSubEngine=self._umlPubSubEngine
+                                                                      )
+                self._commandProcessor.Submit(notePasteCommand)
+            elif isinstance(pyutObject, PyutText):
+                textPasteCommand: TextPasteCommand = TextPasteCommand(pyutObject=pyutObject,
+                                                                      umlPosition=UmlPosition(x=x, y=y),
+                                                                      umlFrame=self,
+                                                                      umlPubSubEngine=self._umlPubSubEngine
+                                                                      )
+                self._commandProcessor.Submit(textPasteCommand)
+            elif isinstance(pyutObject, PyutUseCase):
+                useCasePasteCommand: UseCasePasteCommand = UseCasePasteCommand(pyutObject=pyutObject,
+                                                                            umlPosition=UmlPosition(x=x, y=y),
+                                                                            umlFrame=self,
+                                                                            umlPubSubEngine=self._umlPubSubEngine
+                                                                            )
+                self._commandProcessor.Submit(useCasePasteCommand)
+
+            else:
+                continue
+
+            numbObjectsPasted += 1
+            x += 50
+            y += 50
+
+        self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.UPDATE_APPLICATION_STATUS,
+                                          frameId=self.id,
+                                          message=f'Pasted {len(self._clipboard)} shape')
+
+    def _copyToInternalClipboard(self, selectedShapes: UmlShapeList):
+        """
+        Makes a copy of the selected shape's data model and puts in our
+        internal clipboard
+
+        First clears the internal clipboard and then fills it up
+
+        Args:
+            selectedShapes:   The selected shapes
+        """
+        from umlshapes.shapes.UmlClass import UmlClass
+        from umlshapes.shapes.UmlNote import UmlNote
+        from umlshapes.shapes.UmlActor import UmlActor
+        from umlshapes.shapes.UmlUseCase import UmlUseCase
+        from umlshapes.shapes.UmlText import UmlText
+
+        self._clipboard = PyutObjects([])
+
+        # put a copy of the PyutObjects in the clipboard
+        for umlShape in selectedShapes:
+            pyutObject: PyutLinkedObject = cast(PyutLinkedObject, None)
+
+            if isinstance(umlShape, UmlClass):
+                pyutObject = deepcopy(umlShape.pyutClass)
+            elif isinstance(umlShape, UmlNote):
+                pyutObject = deepcopy(umlShape.pyutNote)
+            elif isinstance(umlShape, UmlText):
+                pyutObject = deepcopy(umlShape.pyutText)
+            elif isinstance(umlShape, UmlActor):
+                pyutObject = deepcopy(umlShape.pyutActor)
+            elif isinstance(umlShape, UmlUseCase):
+                pyutObject = deepcopy(umlShape.pyutUseCase)
+            else:
+                pass
+            if pyutObject is not None:
+                pyutObject.id += BIG_NUM
+                pyutObject.links = PyutLinks([])  # we don't want to copy the links
+                self._clipboard.append(pyutObject)
 
     def selectAllShapes(self, ):
         self.ufLogger.warning(f'Paste is unimplemented')
@@ -278,10 +382,3 @@ class UmlFrame(DiagramFrame):
             s.Select(True)
 
         self.Refresh(False)
-
-    # def _setEventHandler(self, umlShape, eventHandler: 'UmlBaseEventHandler'):
-    #
-    #     eventHandler.SetShape(umlShape)        # cast(UmlBaseEventHandler, eventHandler).umlPubSubEngine = self._umlPubSubEngine
-    #     eventHandler.umlPubSubEngine = self._umlPubSubEngine
-    #     eventHandler.SetPreviousHandler(umlShape.GetEventHandler())
-    #     umlShape.SetEventHandler(eventHandler)
