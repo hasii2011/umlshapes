@@ -1,4 +1,5 @@
 
+from typing import cast
 from typing import TYPE_CHECKING
 
 from logging import Logger
@@ -10,6 +11,7 @@ from wx import TRANSPARENT_BRUSH
 from umlshapes.lib.ogl import RectangleShape
 
 from umlshapes.mixins.TopLeftMixin import TopLeftMixin
+from umlshapes.types.UmlPosition import UmlPosition
 
 if TYPE_CHECKING:
     from umlshapes.frames.DiagramFrame import DiagramFrame
@@ -24,7 +26,9 @@ class ShapeSelector(RectangleShape, TopLeftMixin):
         RectangleShape.__init__(self, w=width, h=height)
         TopLeftMixin.__init__(self, umlShape=self, width=width, height=height)
 
-        self._moving: bool = False
+        self._moving:           bool        = False
+        self._originalPosition: UmlPosition = cast(UmlPosition, None)
+
         self.SetCentreResize(False)
         self.SetBrush(TRANSPARENT_BRUSH)
 
@@ -35,6 +39,14 @@ class ShapeSelector(RectangleShape, TopLeftMixin):
     @diagramFrame.setter
     def diagramFrame(self, frame: 'DiagramFrame'):
         self.SetCanvas(frame)
+
+    @property
+    def originalPosition(self) -> UmlPosition:
+        return self._originalPosition
+
+    @originalPosition.setter
+    def originalPosition(self, value: UmlPosition):
+        self._originalPosition = value
 
     @property
     def moving(self) -> bool:

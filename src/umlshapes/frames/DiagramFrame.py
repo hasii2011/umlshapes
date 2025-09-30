@@ -39,6 +39,7 @@ from umlshapes.lib.ogl import ShapeCanvas
 
 from umlshapes.UmlUtils import UmlUtils
 from umlshapes.types.UmlColor import UmlColor
+from umlshapes.types.UmlDimensions import UmlDimensions
 from umlshapes.types.UmlPenStyle import UmlPenStyle
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
@@ -175,7 +176,6 @@ class DiagramFrame(ShapeCanvas):
 
     def OnEndDragLeft(self, x, y, keys = 0):
 
-        self._dfLogger.info(f'Removing selector')
         self.Unbind(EVT_MOTION, handler=self._onSelectorMove)
         self.umlDiagram.RemoveShape(self._selector)
         self.refresh()
@@ -330,15 +330,10 @@ class DiagramFrame(ShapeCanvas):
         # if not event.ControlDown():
         #     self.DeselectAllShapes()
         # x, y = event.GetX(), event.GetY()   # event position has been modified
-
-        # if not event.ControlDown():
-        #     self.DeselectAllShapes()
-        self._dfLogger.info('Create selector')
         selector: ShapeSelector = ShapeSelector(width=0, height=0)     # RectangleShape(x, y, 0, 0)
         selector.position = UmlPosition(x, y)
+        selector.originalPosition = selector.position
 
-        # rect.SetDrawFrame(True)
-        # rect.brush  = TRANSPARENT_BRUSH
         selector.moving = True
         selector.diagramFrame = self
 
@@ -364,7 +359,9 @@ class DiagramFrame(ShapeCanvas):
             x0 = umlPosition.x
             y0 = umlPosition.y
 
-            self._selector.SetSize(x - x0, y - y0)
+            # self._selector.SetSize(x - x0, y - y0)
+            self._selector.size = UmlDimensions(width=x - x0, height=y - y0)
+            self._selector.position = self._selector.originalPosition
 
             self.refresh()
 
