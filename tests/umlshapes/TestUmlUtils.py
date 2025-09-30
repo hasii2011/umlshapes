@@ -9,6 +9,7 @@ from umlshapes.UmlUtils import UmlUtils
 from umlshapes.mixins.TopLeftMixin import Rectangle
 
 from umlshapes.types.Common import AttachmentSide
+from umlshapes.types.UmlPosition import UmlPoint
 from umlshapes.types.UmlPosition import UmlPosition
 from umlshapes.types.UmlPosition import UmlPositions
 
@@ -25,6 +26,13 @@ TOP_RELATIVE_POSITION_Y: int = 0
 
 RIGHT_RELATIVE_POSITION_X: int = 200
 RIGHT_RELATIVE_POSITION_Y: int = 200
+
+BOUNDING_RECTANGLE: Rectangle = Rectangle(
+    left=100,
+    top=100,
+    right=500,
+    bottom=500
+)
 
 
 class TestUmlUtils(UnitTestBase):
@@ -49,6 +57,58 @@ class TestUmlUtils(UnitTestBase):
 
     def tearDown(self):
         super().tearDown()
+
+    def testIsPointInsideRectangleTrue(self):
+        """
+        Just inside the rectangle
+        """
+
+        umlPoint: UmlPoint = UmlPoint(x=BOUNDING_RECTANGLE.left + 5, y=BOUNDING_RECTANGLE.top + 9)
+
+        ans: bool = UmlUtils.isPointInsideRectangle(point=umlPoint, rectangle=BOUNDING_RECTANGLE)
+        self.assertTrue(ans, 'oops the point should be in the rectangle')
+
+    def testIsPointInsideRectangleFalse(self):
+        """
+        Just outside the rectangle
+        """
+
+        umlPoint: UmlPoint = UmlPoint(x=BOUNDING_RECTANGLE.right + 5, y=BOUNDING_RECTANGLE.bottom + 9)
+
+        ans: bool = UmlUtils.isPointInsideRectangle(point=umlPoint, rectangle=BOUNDING_RECTANGLE)
+        self.assertFalse(ans, 'oops the point should be outside the rectangle')
+
+    def testIsShapeInRectangleTrue(self):
+        boundingRectangle: Rectangle = Rectangle(
+            left=100,
+            top=100,
+            right=500,
+            bottom=500
+        )
+        testShape: Rectangle = Rectangle(
+            left=120,
+            top=120,
+            right=200,
+            bottom=200
+        )
+        ans: bool = UmlUtils.isShapeInRectangle(boundingRectangle=boundingRectangle, shapeRectangle=testShape)
+        self.assertTrue(ans, 'Hey!!  This shape is wholly contained')
+
+    def testIsPartialShapeInRectangleFalse(self):
+        boundingRectangle: Rectangle = Rectangle(
+            left=100,
+            top=100,
+            right=500,
+            bottom=500
+        )
+        testShape: Rectangle = Rectangle(
+            left=300,
+            top=300,
+            right=400,
+            bottom=700
+        )
+        ans: bool = UmlUtils.isShapeInRectangle(boundingRectangle=boundingRectangle, shapeRectangle=testShape)
+        self.assertFalse(ans, 'Hey!!  This shape is not wholly contained')
 
     def testBasicDistance(self):
         pt1: UmlPosition = UmlPosition(x=2, y=3)

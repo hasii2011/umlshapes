@@ -45,6 +45,7 @@ from umlshapes.types.Common import AttachmentSide
 from umlshapes.types.Common import LollipopCoordinates
 from umlshapes.types.UmlColor import UmlColor
 from umlshapes.types.UmlFontFamily import UmlFontFamily
+from umlshapes.types.UmlPosition import UmlPoint
 from umlshapes.types.UmlPosition import UmlPosition
 from umlshapes.types.UmlPosition import UmlPositions
 
@@ -61,6 +62,57 @@ class UmlUtils:
     DEFAULT_FONT:     Font = cast(Font, None)
 
     DEFAULT_BACKGROUND_BRUSH: Brush = cast(Brush, None)
+
+    @classmethod
+    def isShapeInRectangle(cls, boundingRectangle: Rectangle, shapeRectangle: Rectangle) -> bool:
+        """
+
+        Args:
+            boundingRectangle:  The bounding rectangle
+            shapeRectangle:     The shape we need to find out if bound rectangle fully contains it
+
+        Returns:  `True` if all the vertices of the shape rectangle are contained inside the bounding
+        rectangle,  Else `False`
+
+        """
+
+        ans: bool = False
+        leftTopVertex:     UmlPoint = UmlPoint(x=shapeRectangle.left,  y=shapeRectangle.top)
+        rightTopVertex:    UmlPoint = UmlPoint(x=shapeRectangle.right, y=shapeRectangle.top)
+        leftBottomVertex:  UmlPoint = UmlPoint(x=shapeRectangle.left,  y=shapeRectangle.bottom)
+        rightBottomVertex: UmlPoint = UmlPoint(x=shapeRectangle.right, y=shapeRectangle.bottom)
+
+        if (UmlUtils.isPointInsideRectangle(point=leftTopVertex,     rectangle=boundingRectangle) is True and
+            UmlUtils.isPointInsideRectangle(point=rightTopVertex,    rectangle=boundingRectangle) is True and
+            UmlUtils.isPointInsideRectangle(point=leftBottomVertex,  rectangle=boundingRectangle) is True and
+            UmlUtils.isPointInsideRectangle(point=rightBottomVertex, rectangle=boundingRectangle) is True
+        ):
+
+            ans = True
+
+        return ans
+
+    @classmethod
+    def isPointInsideRectangle(cls, point: UmlPoint, rectangle: Rectangle):
+        """
+
+        Args:
+            point:
+            rectangle:
+
+        Returns:  `True` if all the point is contained inside the bounding
+        rectangle,  Else `False`
+
+        """
+
+        x: int = point.x
+        y: int = point.y
+        xMin: int = rectangle.left
+        yMin: int = rectangle.top
+        xMax: int = rectangle.right
+        yMax: int = rectangle.bottom
+
+        return xMin <= x <= xMax and yMin <= y <= yMax
 
     @classmethod
     def distance(cls, pt1: UmlPosition, pt2: UmlPosition) -> float:

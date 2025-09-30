@@ -10,7 +10,7 @@ from collections.abc import Iterable
 
 from copy import deepcopy
 
-from pyutmodelv2.PyutUseCase import PyutUseCase
+from wx import EVT_MOTION
 from wx import ICON_ERROR
 from wx import OK
 
@@ -20,16 +20,20 @@ from wx import MessageDialog
 from wx import MouseEvent
 from wx import Window
 
+from umlshapes.UmlUtils import UmlUtils
 from umlshapes.lib.ogl import Shape
 from umlshapes.lib.ogl import ShapeCanvas
+
+from umlshapes.frames.ShapeSelector import ShapeSelector
 
 from pyutmodelv2.PyutObject import PyutObject
 from pyutmodelv2.PyutLink import PyutLinks
 from pyutmodelv2.PyutActor import PyutActor
 from pyutmodelv2.PyutClass import PyutClass
-from pyutmodelv2.PyutLinkedObject import PyutLinkedObject
 from pyutmodelv2.PyutNote import PyutNote
 from pyutmodelv2.PyutText import PyutText
+from pyutmodelv2.PyutUseCase import PyutUseCase
+from pyutmodelv2.PyutLinkedObject import PyutLinkedObject
 
 from umlshapes.commands.ActorCutCommand import ActorCutCommand
 from umlshapes.commands.ClassCutCommand import ClassCutCommand
@@ -52,7 +56,10 @@ from umlshapes.UmlDiagram import UmlDiagram
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
+from umlshapes.types.Common import UmlShape
 from umlshapes.types.Common import UmlShapeList
+
+from umlshapes.types.UmlDimensions import UmlDimensions
 from umlshapes.types.UmlPosition import UmlPosition
 
 A4_FACTOR:     float = 1.41
@@ -171,6 +178,29 @@ class UmlFrame(DiagramFrame):
             else:
                 self._currentReportInterval -= 1
 
+    def OnDragLeft(self, draw, x, y, keys=0):
+        self.ufLogger.debug(f'{draw=} - x,y=({x},{y}) - {keys=}')
+        if self._selector is None:
+            self._beginSelect(x=x, y=y)
+
+    def OnEndDragLeft(self, x, y, keys = 0):
+
+        from umlshapes.shapes.UmlControlPoint import UmlControlPoint
+
+        self.Unbind(EVT_MOTION, handler=self._onSelectorMove)
+        self.umlDiagram.RemoveShape(self._selector)
+
+        for s in self.umlDiagram.shapes:
+            if not isinstance(s, UmlControlPoint):
+                shape: UmlShape = cast(UmlShape, s)
+                if UmlUtils.isShapeInRectangle(boundingRectangle=self._selector.rectangle, shapeRectangle=shape.rectangle) is True:
+                    shape.selected = True
+
+        self.refresh()
+        self._selector = cast(ShapeSelector, None)
+
+        return True
+
     def _setupListeners(self):
         self._umlPubSubEngine.subscribe(messageType=UmlMessageType.UNDO, frameId=self.id, listener=self._undoListener)
         self._umlPubSubEngine.subscribe(messageType=UmlMessageType.REDO, frameId=self.id, listener=self._redoListener)
@@ -179,7 +209,7 @@ class UmlFrame(DiagramFrame):
         self._umlPubSubEngine.subscribe(messageType=UmlMessageType.COPY_SHAPES,  frameId=self.id, listener=self._copyShapes)
         self._umlPubSubEngine.subscribe(messageType=UmlMessageType.PASTE_SHAPES, frameId=self.id, listener=self._pasteShapes)
 
-        self._umlPubSubEngine.subscribe(messageType=UmlMessageType.SELECT_ALL_SHAPES, frameId=self.id, listener=self.selectAllShapes)
+        self._umlPubSubEngine.subscribe(messageType=UmlMessageType.SELECT_ALL_SHAPES, frameId=self.id, listener=self._selectAllShapes)
 
     def _undoListener(self):
         self._commandProcessor.Undo()
@@ -332,6 +362,9 @@ class UmlFrame(DiagramFrame):
                                           frameId=self.id,
                                           message=f'Pasted {len(self._clipboard)} shape')
 
+    def _selectAllShapes(self):
+        self.ufLogger.warning(f'Select all is unimplemented')
+
     def _copyToInternalClipboard(self, selectedShapes: UmlShapeList):
         """
         Makes a copy of the selected shape's data model and puts in our
@@ -371,9 +404,6 @@ class UmlFrame(DiagramFrame):
                 pyutObject.links = PyutLinks([])  # we don't want to copy the links
                 self._clipboard.append(pyutObject)
 
-    def selectAllShapes(self, ):
-        self.ufLogger.warning(f'Paste is unimplemented')
-
     def _unSelectAllShapesOnCanvas(self):
 
         shapes:  Iterable = self.umlDiagram.shapes
@@ -382,3 +412,63 @@ class UmlFrame(DiagramFrame):
             s.Select(True)
 
         self.Refresh(False)
+
+    def _beginSelect(self, x: int, y: int):
+        """
+        Create a selector box and manage it.
+
+        Args:
+            x:
+            y:
+
+        Returns:
+
+        """
+        # if not event.ControlDown():
+        #     self.DeselectAllShapes()
+        # x, y = event.GetX(), event.GetY()   # event position has been modified
+        selector: ShapeSelector = ShapeSelector(width=0, height=0)     # RectangleShape(x, y, 0, 0)
+        selector.position = UmlPosition(x, y)
+        selector.originalPosition = selector.position
+
+        selector.moving = True
+        selector.diagramFrame = self
+
+        diagram: UmlDiagram = self.umlDiagram
+        diagram.AddShape(selector)
+
+        selector.Show(True)
+
+        self._selector = selector
+
+        self.Bind(EVT_MOTION, self._onSelectorMove)
+
+    def _onSelectorMove(self, event: MouseEvent):
+        # from wx import Rect as WxRect
+
+        if self._selector is not None:
+            eventPosition: UmlPosition = self._getEventPosition(event)
+            umlPosition:   UmlPosition = self._selector.position
+
+            x: int = eventPosition.x
+            y: int = eventPosition.y
+
+            x0 = umlPosition.x
+            y0 = umlPosition.y
+
+            # self._selector.SetSize(x - x0, y - y0)
+            self._selector.size = UmlDimensions(width=x - x0, height=y - y0)
+            self._selector.position = self._selector.originalPosition
+
+            self.refresh()
+
+    def _getEventPosition(self, event: MouseEvent) -> UmlPosition:
+        """
+        Return the position of a click in the diagram.
+        Args:
+            event:   The mouse event
+
+        Returns: The UML Position
+        """
+        x, y = self._convertEventCoordinates(event)
+        return UmlPosition(x=x, y=y)

@@ -18,6 +18,9 @@ if TYPE_CHECKING:
 
 
 class ShapeSelector(RectangleShape, TopLeftMixin):
+    """
+    Used to draw a selection boundary around shapes
+    """
 
     def __init__(self, width: int= 0, height: int = 0):
 

@@ -5,12 +5,20 @@ from typing import Tuple
 
 from dataclasses import dataclass
 
-
 @dataclass
-class UmlPosition:
-
+class UmlPoint:
     x: int = 0
     y: int = 0
+
+
+@dataclass
+class UmlPosition(UmlPoint):
+    """
+    Syntactic sugar to be able to reuse a UML Point
+    """
+
+    # x: int = 0
+    # y: int = 0
 
     @classmethod
     def tupleToOglPosition(cls, position: Tuple[int, int]) -> 'UmlPosition':
