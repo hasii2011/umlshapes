@@ -8,6 +8,7 @@ from logging import getLogger
 
 from enum import Enum
 
+from wx import EVT_MOTION
 from wx import Point
 from wx import VERTICAL
 from wx import HORIZONTAL
@@ -33,6 +34,7 @@ from wx import SystemSettings
 
 from wx import Window
 
+from umlshapes.frames.ShapeSelector import ShapeSelector
 from umlshapes.lib.ogl import ShapeCanvas
 
 from umlshapes.UmlUtils import UmlUtils
@@ -40,6 +42,7 @@ from umlshapes.types.UmlColor import UmlColor
 from umlshapes.types.UmlPenStyle import UmlPenStyle
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
+from umlshapes.types.UmlPosition import UmlPosition
 
 if TYPE_CHECKING:
     from umlshapes.UmlDiagram import UmlDiagram
@@ -96,6 +99,8 @@ class DiagramFrame(ShapeCanvas):
         self._isInfinite: bool    = False    # Indicates if the frame is infinite
         # The ShapeCanvas ID is an integer;  use our own
         self._id: FrameId = FrameId(UmlUtils.getID())
+
+        self._selector: ShapeSelector = cast(ShapeSelector, None)
 
     @property
     def umlDiagram(self) -> 'UmlDiagram':
@@ -162,6 +167,21 @@ class DiagramFrame(ShapeCanvas):
                 self.Scroll(noUnitX // 2, noUnitY // 2)   # set the scrollbars position in the middle of their scale
             else:
                 self.Scroll(0, 0)
+
+    def OnDragLeft(self, draw, x, y, keys=0):
+        self._dfLogger.info(f'{draw=} - x,y=({x},{y}) - {keys=}')
+        if self._selector is None:
+            self._beginSelect(x=x, y=y)
+
+    def OnEndDragLeft(self, x, y, keys = 0):
+
+        self._dfLogger.info(f'Removing selector')
+        self.Unbind(EVT_MOTION, handler=self._onSelectorMove)
+        self.umlDiagram.RemoveShape(self._selector)
+        self.refresh()
+        self._selector = cast(ShapeSelector, None)
+
+        return True
 
     def OnPaint(self, event: PaintEvent):
         """
@@ -295,3 +315,73 @@ class DiagramFrame(ShapeCanvas):
         else:
             color = UmlColor.toWxColor(self._umlPreferences.backGroundColor)
             self.SetBackgroundColour(color)
+
+    def _beginSelect(self, x: int, y: int):
+        """
+        Create a selector box and manage it.
+
+        Args:
+            x:
+            y:
+
+        Returns:
+
+        """
+        # if not event.ControlDown():
+        #     self.DeselectAllShapes()
+        # x, y = event.GetX(), event.GetY()   # event position has been modified
+
+        # if not event.ControlDown():
+        #     self.DeselectAllShapes()
+        self._dfLogger.info('Create selector')
+        selector: ShapeSelector = ShapeSelector(width=0, height=0)     # RectangleShape(x, y, 0, 0)
+        selector.position = UmlPosition(x, y)
+
+        # rect.SetDrawFrame(True)
+        # rect.brush  = TRANSPARENT_BRUSH
+        selector.moving = True
+        selector.diagramFrame = self
+
+        diagram: UmlDiagram = self.umlDiagram
+        diagram.AddShape(selector)
+
+        selector.Show(True)
+
+        self._selector = selector
+
+        self.Bind(EVT_MOTION, self._onSelectorMove)
+
+    def _onSelectorMove(self, event: MouseEvent):
+        # from wx import Rect as WxRect
+
+        if self._selector is not None:
+            eventPosition: UmlPosition = self._getEventPosition(event)
+            umlPosition:   UmlPosition = self._selector.position
+
+            x: int = eventPosition.x
+            y: int = eventPosition.y
+
+            x0 = umlPosition.x
+            y0 = umlPosition.y
+
+            self._selector.SetSize(x - x0, y - y0)
+
+            self.refresh()
+
+    def _getEventPosition(self, event: MouseEvent) -> UmlPosition:
+        """
+        Return the position of a click in the diagram.
+        Args:
+            event:   The mouse event
+
+        Returns: The UML Position
+        """
+        x, y = self._convertEventCoordinates(event)
+        return UmlPosition(x=x, y=y)
+
+    def _convertEventCoordinates(self, event: MouseEvent):
+
+        xView, yView   = self.GetViewStart()
+        xDelta, yDelta = self.GetScrollPixelsPerUnit()
+
+        return event.GetX() + (xView * xDelta), event.GetY() + (yView * yDelta)
