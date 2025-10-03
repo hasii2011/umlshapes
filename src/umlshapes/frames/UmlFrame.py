@@ -214,9 +214,11 @@ class UmlFrame(DiagramFrame):
 
     def _undoListener(self):
         self._commandProcessor.Undo()
+        self.frameModified = True
 
     def _redoListener(self):
         self._commandProcessor.Redo()
+        self.frameModified = True
 
     def _cutShapesListener(self):
         """
@@ -277,6 +279,8 @@ class UmlFrame(DiagramFrame):
                                                                              umlPubSubEngine=self._umlPubSubEngine
                                                                              )
                     self._commandProcessor.Submit(useCaseCutCommand)
+
+            self.frameModified = True
 
             self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.UPDATE_APPLICATION_STATUS,
                                               frameId=self.id,
@@ -359,6 +363,7 @@ class UmlFrame(DiagramFrame):
             x += 50
             y += 50
 
+        self.frameModified = True
         self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.UPDATE_APPLICATION_STATUS,
                                           frameId=self.id,
                                           message=f'Pasted {len(self._clipboard)} shape')
