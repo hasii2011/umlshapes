@@ -518,9 +518,10 @@ class UmlFrame(DiagramFrame):
         from umlshapes.shapes.UmlControlPoint import UmlControlPoint
         from umlshapes.links.UmlAssociationLabel import UmlAssociationLabel
         from umlshapes.links.UmlLollipopInterface import UmlLollipopInterface
+        from umlshapes.shapes.UmlLineControlPoint import UmlLineControlPoint
 
         ignore: bool = False
-        if isinstance(shapeToCheck, UmlControlPoint) or isinstance(shapeToCheck, UmlLink) or isinstance(shapeToCheck, UmlAssociationLabel) or isinstance(shapeToCheck, UmlLollipopInterface):
+        if isinstance(shapeToCheck, UmlControlPoint) or isinstance(shapeToCheck, UmlLink) or isinstance(shapeToCheck, UmlAssociationLabel) or isinstance(shapeToCheck, UmlLollipopInterface) or isinstance(shapeToCheck, UmlLineControlPoint):
             ignore = True
 
         return ignore

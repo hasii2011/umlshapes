@@ -56,10 +56,6 @@ class UmlNoteLink(UmlLink):
 
         assert dc is not None, 'Where is my DC'
 
-        if self._linkName is None:
-            self._linkName = self._createLinkName()
-            self._setupAssociationLabel(umlAssociationLabel=self._linkName)
-
         if self.Selected() is True:
             self.SetPen(UmlUtils.redDashedPen())
         else:
