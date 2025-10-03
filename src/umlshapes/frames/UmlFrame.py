@@ -382,18 +382,21 @@ class UmlFrame(DiagramFrame):
         Args:
             deltaXY:
         """
+        from umlshapes.links.UmlLink import UmlLink
+
         self.ufLogger.debug(f'{deltaXY=}')
         shapes = self.selectedShapes
         for s in shapes:
             umlShape: UmlShape = cast(UmlShape, s)
-            if umlShape.moveMaster is False:
-                umlShape.position = UmlPosition(
-                    x = umlShape.position.x + deltaXY.deltaX,
-                    y = umlShape.position.y + deltaXY.deltaY
-                )
-                dc: ClientDC = ClientDC(umlShape.umlFrame)
-                umlShape.umlFrame.PrepareDC(dc)
-                umlShape.MoveLinks(dc)
+            if not isinstance(umlShape, UmlLink):
+                if umlShape.moveMaster is False:
+                    umlShape.position = UmlPosition(
+                        x = umlShape.position.x + deltaXY.deltaX,
+                        y = umlShape.position.y + deltaXY.deltaY
+                    )
+                    dc: ClientDC = ClientDC(umlShape.umlFrame)
+                    umlShape.umlFrame.PrepareDC(dc)
+                    umlShape.MoveLinks(dc)
 
     def _copyToInternalClipboard(self, selectedShapes: UmlShapeList):
         """
