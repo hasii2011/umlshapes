@@ -76,7 +76,6 @@ class UmlActor(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
         else:
             actorSize = size
 
-        super().__init__(shape=self)
         ControlPointMixin.__init__(self, shape=self)
         IdentifierMixin.__init__(self)
         RectangleShape.__init__(self, w=actorSize.width, h=actorSize.height)

@@ -28,7 +28,7 @@ from umlshapes.pubsubengine.UmlMessageType import UmlMessageType
 
 from umlshapes.frames.UmlFrame import UmlFrame
 
-from umlshapes.links.DeltaXY import DeltaXY
+from umlshapes.types.DeltaXY import DeltaXY
 from umlshapes.links.LabelType import LabelType
 from umlshapes.links.UmlAssociationLabel import UmlAssociationLabel
 

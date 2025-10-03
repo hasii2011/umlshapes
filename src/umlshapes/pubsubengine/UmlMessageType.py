@@ -11,6 +11,7 @@ class UmlMessageType(Enum):
     CREATE_LOLLIPOP    = 'Create Lollipop'
     FRAME_LEFT_CLICK   = 'Frame Left Click'
     FRAME_MODIFIED     = 'Frame Modified'
+    SHAPE_MOVING       = 'Shape Moving'         # Only the 'master' shape issues this message
 
 
     REQUEST_LOLLIPOP_LOCATION = 'Request Lollipop Location'

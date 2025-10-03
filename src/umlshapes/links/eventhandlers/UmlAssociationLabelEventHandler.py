@@ -4,7 +4,7 @@ from typing import cast
 from logging import Logger
 from logging import getLogger
 
-from umlshapes.links.DeltaXY import DeltaXY
+from umlshapes.types.DeltaXY import DeltaXY
 from umlshapes.links.LabelType import LabelType
 
 from umlshapes.links.UmlAssociationLabel import UmlAssociationLabel

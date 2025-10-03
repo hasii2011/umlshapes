@@ -10,8 +10,7 @@ class IdentifierMixin:
     This is a replacement ID from Shape.  Developers should use the
     properties to get human readable IDs.
 
-    In the future, I will prohibit the use of .GetId and .SetId
-    Today, I will stash strings into what Shape says is an integer
+    Today, I will stash strings into a protected variable
     """
     def __init__(self):
 

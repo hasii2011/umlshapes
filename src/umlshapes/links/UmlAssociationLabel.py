@@ -11,7 +11,7 @@ from wx import MemoryDC
 from umlshapes.lib.ogl import TextShape
 
 from umlshapes.UmlUtils import UmlUtils
-from umlshapes.links.DeltaXY import DeltaXY
+from umlshapes.types.DeltaXY import DeltaXY
 from umlshapes.links.LabelType import LabelType
 
 if TYPE_CHECKING:

@@ -58,6 +58,7 @@ from umlshapes.preferences.UmlPreferences import UmlPreferences
 
 from umlshapes.types.Common import UmlShape
 from umlshapes.types.Common import UmlShapeList
+from umlshapes.types.DeltaXY import DeltaXY
 
 from umlshapes.types.UmlDimensions import UmlDimensions
 from umlshapes.types.UmlPosition import UmlPosition
@@ -179,7 +180,7 @@ class UmlFrame(DiagramFrame):
                 self._currentReportInterval -= 1
 
     def OnDragLeft(self, draw, x, y, keys=0):
-        self.ufLogger.debug(f'{draw=} - x,y=({x},{y}) - {keys=}')
+        self.ufLogger.info(f'{draw=} - x,y=({x},{y}) - {keys=}')
         if self._selector is None:
             self._beginSelect(x=x, y=y)
 
@@ -210,6 +211,7 @@ class UmlFrame(DiagramFrame):
         self._umlPubSubEngine.subscribe(messageType=UmlMessageType.PASTE_SHAPES, frameId=self.id, listener=self._pasteShapes)
 
         self._umlPubSubEngine.subscribe(messageType=UmlMessageType.SELECT_ALL_SHAPES, frameId=self.id, listener=self._selectAllShapes)
+        self._umlPubSubEngine.subscribe(messageType=UmlMessageType.SHAPE_MOVING, frameId=self.id, listener=self._shapeMovingListener)
 
     def _undoListener(self):
         self._commandProcessor.Undo()
@@ -364,6 +366,27 @@ class UmlFrame(DiagramFrame):
 
     def _selectAllShapes(self):
         self.ufLogger.warning(f'Select all is unimplemented')
+
+    def _shapeMovingListener(self, deltaXY: DeltaXY):
+        """
+        The move master is sending the message;  We don't need to move
+        Args:
+            deltaXY:
+
+        Returns:
+
+        """
+
+        self.ufLogger.info(f'{deltaXY=}')
+        shapes = self.selectedShapes
+        for s in shapes:
+            umlShape: UmlShape = cast(UmlShape, s)
+            if umlShape.moveMaster is False:
+                umlShape.position = UmlPosition(
+                    x = umlShape.position.x + deltaXY.deltaX,
+                    y = umlShape.position.y + deltaXY.deltaY
+                )
+
 
     def _copyToInternalClipboard(self, selectedShapes: UmlShapeList):
         """

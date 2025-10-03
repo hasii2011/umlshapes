@@ -12,13 +12,18 @@ from wx import MOD_CMD
 from umlshapes.lib.ogl import Shape
 from umlshapes.lib.ogl import ShapeCanvas
 from umlshapes.lib.ogl import ShapeEvtHandler
-from umlshapes.pubsubengine.UmlMessageType import UmlMessageType
 
+from umlshapes.pubsubengine.UmlMessageType import UmlMessageType
 from umlshapes.pubsubengine.UmlPubSubEngine import UmlPubSubEngine
+
 from umlshapes.types.Common import UmlShape
+from umlshapes.types.DeltaXY import DeltaXY
+from umlshapes.types.UmlPosition import UmlPosition
 from umlshapes.types.UmlDimensions import UmlDimensions
 
 ShapeList = NewType('ShapeList', List[Shape])
+
+NO_POSITION = cast(UmlPosition, None)
 
 
 class UmlBaseEventHandler(ShapeEvtHandler):
@@ -29,13 +34,42 @@ class UmlBaseEventHandler(ShapeEvtHandler):
 
         super().__init__(shape=shape)
 
-        self._umlPubSubEngine: UmlPubSubEngine = cast(UmlPubSubEngine, None)
+        self._umlPubSubEngine:  UmlPubSubEngine = cast(UmlPubSubEngine, None)
+        self._previousPosition: UmlPosition     = NO_POSITION
 
     def _setUmlPubSubEngine(self, umlPubSubEngine: UmlPubSubEngine):
         self._umlPubSubEngine = umlPubSubEngine
 
     # noinspection PyTypeChecker
     umlPubSubEngine = property(fget=None, fset=_setUmlPubSubEngine)
+
+    def OnDragLeft(self, draw, x, y, keys = 0, attachment = 0):
+
+        # self._baseLogger.info(f'{draw=} x,y:({x},{y}) {attachment=}')
+        umlShape: UmlShape = cast(UmlShape, self.GetShape())
+
+        if self._previousPosition is NO_POSITION:
+            self._previousPosition = UmlPosition(x=x, y=y)
+            umlShape.moveMaster = True
+        else:
+            deltaXY: DeltaXY = DeltaXY(
+                deltaX=x - self._previousPosition.x,
+                deltaY=y - self._previousPosition.y
+            )
+            self._previousPosition = UmlPosition(x=x, y=y)
+
+            self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.SHAPE_MOVING, frameId=umlShape.umlFrame.id, deltaXY=deltaXY)
+
+        super().OnDragLeft(draw, x, y, keys, attachment)
+
+    def OnEndDragLeft(self, x, y, keys=0, attachment=0):
+
+        # self._baseLogger.info(f'x,y:({x},{y}) {keys=} {attachment=}')
+        self._previousPosition = NO_POSITION
+        umlShape: UmlShape = cast(UmlShape, self.GetShape())
+        umlShape.moveMaster = False
+
+        super().OnEndDragLeft(x, y, keys, attachment)
 
     def OnLeftClick(self, x: int, y: int, keys=0, attachment=0):
         """

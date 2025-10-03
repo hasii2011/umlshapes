@@ -55,7 +55,7 @@ class UmlClass(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
     See Python left to right method resolution order (MRO)
     """
     def __init__(self, pyutClass: PyutClass | None = None, size: UmlDimensions = None):
-        """]
+        """
         Args:
             pyutClass:   A PyutClass Object
             size:       An initial size that overrides the default
@@ -72,7 +72,6 @@ class UmlClass(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
         else:
             classSize = size
 
-        super().__init__(shape=self)
         ControlPointMixin.__init__(self, shape=self)
         IdentifierMixin.__init__(self)
         RectangleShape.__init__(self, w=classSize.width, h=classSize.height)
@@ -92,8 +91,18 @@ class UmlClass(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
         self._textHeight:   int      = cast(int, None)
         self._margin:       int      = self._preferences.classTextMargin
 
+        self._moveMaster: bool = False
+
         self.SetDraggable(drag=True)
         self.SetCentreResize(False)
+
+    @property
+    def moveMaster(self) -> bool:
+        return self._moveMaster
+
+    @moveMaster.setter
+    def moveMaster(self, newValue: bool):
+        self._moveMaster = newValue
 
     @property
     def pyutClass(self) -> PyutClass:
