@@ -181,18 +181,17 @@ class UmlFrame(DiagramFrame):
 
     def OnDragLeft(self, draw, x, y, keys=0):
         self.ufLogger.info(f'{draw=} - x,y=({x},{y}) - {keys=}')
+
         if self._selector is None:
             self._beginSelect(x=x, y=y)
 
     def OnEndDragLeft(self, x, y, keys = 0):
 
-        from umlshapes.shapes.UmlControlPoint import UmlControlPoint
-
         self.Unbind(EVT_MOTION, handler=self._onSelectorMove)
         self.umlDiagram.RemoveShape(self._selector)
 
         for s in self.umlDiagram.shapes:
-            if not isinstance(s, UmlControlPoint):
+            if self._ignoreShape(shapeToCheck=s) is False:
                 shape: UmlShape = cast(UmlShape, s)
                 if UmlUtils.isShapeInRectangle(boundingRectangle=self._selector.rectangle, shapeRectangle=shape.rectangle) is True:
                     shape.selected = True
@@ -206,12 +205,12 @@ class UmlFrame(DiagramFrame):
         self._umlPubSubEngine.subscribe(messageType=UmlMessageType.UNDO, frameId=self.id, listener=self._undoListener)
         self._umlPubSubEngine.subscribe(messageType=UmlMessageType.REDO, frameId=self.id, listener=self._redoListener)
 
-        self._umlPubSubEngine.subscribe(messageType=UmlMessageType.CUT_SHAPES,   frameId=self.id, listener=self._cutShapes)
-        self._umlPubSubEngine.subscribe(messageType=UmlMessageType.COPY_SHAPES,  frameId=self.id, listener=self._copyShapes)
-        self._umlPubSubEngine.subscribe(messageType=UmlMessageType.PASTE_SHAPES, frameId=self.id, listener=self._pasteShapes)
+        self._umlPubSubEngine.subscribe(messageType=UmlMessageType.CUT_SHAPES,   frameId=self.id, listener=self._cutShapesListener)
+        self._umlPubSubEngine.subscribe(messageType=UmlMessageType.COPY_SHAPES,  frameId=self.id, listener=self._copyShapesListener)
+        self._umlPubSubEngine.subscribe(messageType=UmlMessageType.PASTE_SHAPES, frameId=self.id, listener=self._pasteShapesListener)
 
-        self._umlPubSubEngine.subscribe(messageType=UmlMessageType.SELECT_ALL_SHAPES, frameId=self.id, listener=self._selectAllShapes)
-        self._umlPubSubEngine.subscribe(messageType=UmlMessageType.SHAPE_MOVING, frameId=self.id, listener=self._shapeMovingListener)
+        self._umlPubSubEngine.subscribe(messageType=UmlMessageType.SELECT_ALL_SHAPES, frameId=self.id, listener=self._selectAllShapesListener)
+        self._umlPubSubEngine.subscribe(messageType=UmlMessageType.SHAPE_MOVING,      frameId=self.id, listener=self._shapeMovingListener)
 
     def _undoListener(self):
         self._commandProcessor.Undo()
@@ -219,7 +218,7 @@ class UmlFrame(DiagramFrame):
     def _redoListener(self):
         self._commandProcessor.Redo()
 
-    def _cutShapes(self):
+    def _cutShapesListener(self):
         """
         We don't need to copy anything to the clipboard.  The cut commands
         know how to recreate them.  Notice we pass the full UML Shape to the command
@@ -283,7 +282,7 @@ class UmlFrame(DiagramFrame):
                                               frameId=self.id,
                                               message=f'Cut {len(self._clipboard)} shapes')
 
-    def _copyShapes(self):
+    def _copyShapesListener(self):
         """
         Only copy the model objects to the clipboard.  Paste can then recreate them
         """
@@ -299,7 +298,7 @@ class UmlFrame(DiagramFrame):
                                               frameId=self.id,
                                               message=f'Copied {len(self._clipboard)} shapes')
 
-    def _pasteShapes(self):
+    def _pasteShapesListener(self):
         """
         We don't do links
 
@@ -364,20 +363,26 @@ class UmlFrame(DiagramFrame):
                                           frameId=self.id,
                                           message=f'Pasted {len(self._clipboard)} shape')
 
-    def _selectAllShapes(self):
-        self.ufLogger.warning(f'Select all is unimplemented')
+    def _selectAllShapesListener(self):
+        from umlshapes.shapes.UmlClass import UmlClass
+        from umlshapes.shapes.UmlText import UmlText
+        from umlshapes.shapes.UmlActor import UmlActor
+        from umlshapes.shapes.UmlNote import UmlNote
+        from umlshapes.shapes.UmlUseCase import UmlUseCase
+
+        for s in self.umlDiagram.shapes:
+            if isinstance(s, UmlActor | UmlClass| UmlNote | UmlText | UmlUseCase):
+                umlShape: UmlShape = s
+                umlShape.selected = True
+        self.refresh()
 
     def _shapeMovingListener(self, deltaXY: DeltaXY):
         """
-        The move master is sending the message;  We don't need to move
+        The move master is sending the message;  We don't need to move it
         Args:
             deltaXY:
-
-        Returns:
-
         """
-
-        self.ufLogger.info(f'{deltaXY=}')
+        self.ufLogger.debug(f'{deltaXY=}')
         shapes = self.selectedShapes
         for s in shapes:
             umlShape: UmlShape = cast(UmlShape, s)
@@ -386,7 +391,9 @@ class UmlFrame(DiagramFrame):
                     x = umlShape.position.x + deltaXY.deltaX,
                     y = umlShape.position.y + deltaXY.deltaY
                 )
-
+                dc: ClientDC = ClientDC(umlShape.umlFrame)
+                umlShape.umlFrame.PrepareDC(dc)
+                umlShape.MoveLinks(dc)
 
     def _copyToInternalClipboard(self, selectedShapes: UmlShapeList):
         """
@@ -495,3 +502,22 @@ class UmlFrame(DiagramFrame):
         """
         x, y = self._convertEventCoordinates(event)
         return UmlPosition(x=x, y=y)
+
+    def _ignoreShape(self, shapeToCheck):
+        """
+
+        Args:
+            shapeToCheck:  The shape to check
+
+        Returns: True if the shape is one of our ignore shapes
+        """
+        from umlshapes.links.UmlLink import UmlLink
+        from umlshapes.shapes.UmlControlPoint import UmlControlPoint
+        from umlshapes.links.UmlAssociationLabel import UmlAssociationLabel
+        from umlshapes.links.UmlLollipopInterface import UmlLollipopInterface
+
+        ignore: bool = False
+        if isinstance(shapeToCheck, UmlControlPoint) or isinstance(shapeToCheck, UmlLink) or isinstance(shapeToCheck, UmlAssociationLabel) or isinstance(shapeToCheck, UmlLollipopInterface):
+            ignore = True
+
+        return ignore

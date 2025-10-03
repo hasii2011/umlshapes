@@ -305,6 +305,8 @@ class LinkCreator:
         umlNote.position = notePosition
 
         eventHandler: UmlNoteEventHandler = UmlNoteEventHandler()
+
+        eventHandler.umlPubSubEngine = self._umlPubSubEngine
         eventHandler.SetShape(umlNote)
         eventHandler.SetPreviousHandler(umlNote.GetEventHandler())
         umlNote.SetEventHandler(eventHandler)

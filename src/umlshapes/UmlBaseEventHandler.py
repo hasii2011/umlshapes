@@ -45,6 +45,7 @@ class UmlBaseEventHandler(ShapeEvtHandler):
 
     def OnDragLeft(self, draw, x, y, keys = 0, attachment = 0):
 
+        from umlshapes.links.UmlAssociationLabel import UmlAssociationLabel
         # self._baseLogger.info(f'{draw=} x,y:({x},{y}) {attachment=}')
         umlShape: UmlShape = cast(UmlShape, self.GetShape())
 
@@ -52,13 +53,15 @@ class UmlBaseEventHandler(ShapeEvtHandler):
             self._previousPosition = UmlPosition(x=x, y=y)
             umlShape.moveMaster = True
         else:
-            deltaXY: DeltaXY = DeltaXY(
-                deltaX=x - self._previousPosition.x,
-                deltaY=y - self._previousPosition.y
-            )
-            self._previousPosition = UmlPosition(x=x, y=y)
+            if not isinstance(umlShape, UmlAssociationLabel):
 
-            self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.SHAPE_MOVING, frameId=umlShape.umlFrame.id, deltaXY=deltaXY)
+                deltaXY: DeltaXY = DeltaXY(
+                    deltaX=x - self._previousPosition.x,
+                    deltaY=y - self._previousPosition.y
+                )
+                self._previousPosition = UmlPosition(x=x, y=y)
+
+                self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.SHAPE_MOVING, frameId=umlShape.umlFrame.id, deltaXY=deltaXY)
 
         super().OnDragLeft(draw, x, y, keys, attachment)
 

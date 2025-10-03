@@ -11,11 +11,14 @@ class IdentifierMixin:
     properties to get human readable IDs.
 
     Today, I will stash strings into a protected variable
+
+    For now keep the move master property since I do not want to create yet another mixin
+
     """
     def __init__(self):
 
         self._identifier: str = UmlUtils.getID()
-        # print(f'{self._shape._id=}')
+        self._moveMaster: bool = False
 
     @property
     def id(self) -> str:
@@ -43,3 +46,10 @@ class IdentifierMixin:
     def GetId(self):
         raise InvalidOperationError('Use the id property')
 
+    @property
+    def moveMaster(self) -> bool:
+        return self._moveMaster
+
+    @moveMaster.setter
+    def moveMaster(self, newValue: bool):
+        self._moveMaster = newValue

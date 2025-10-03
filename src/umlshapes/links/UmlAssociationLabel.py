@@ -24,6 +24,9 @@ from umlshapes.mixins.TopLeftMixin import TopLeftMixin
 
 from umlshapes.types.UmlDimensions import UmlDimensions
 
+if TYPE_CHECKING:
+    from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
+
 
 class UmlAssociationLabel(ControlPointMixin, TextShape, TopLeftMixin):
 
@@ -81,6 +84,14 @@ class UmlAssociationLabel(ControlPointMixin, TextShape, TopLeftMixin):
             self.SetTextColour('Black')
 
         super().OnDrawContents(dc=dc)
+
+    @property
+    def umlFrame(self) -> 'ClassDiagramFrame':
+        return self.GetCanvas()
+
+    @umlFrame.setter
+    def umlFrame(self, frame: 'ClassDiagramFrame'):
+        self.SetCanvas(frame)
 
     @property
     def parent(self) -> 'UmlLink':

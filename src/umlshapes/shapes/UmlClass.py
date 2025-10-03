@@ -91,18 +91,8 @@ class UmlClass(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
         self._textHeight:   int      = cast(int, None)
         self._margin:       int      = self._preferences.classTextMargin
 
-        self._moveMaster: bool = False
-
         self.SetDraggable(drag=True)
         self.SetCentreResize(False)
-
-    @property
-    def moveMaster(self) -> bool:
-        return self._moveMaster
-
-    @moveMaster.setter
-    def moveMaster(self, newValue: bool):
-        self._moveMaster = newValue
 
     @property
     def pyutClass(self) -> PyutClass:
