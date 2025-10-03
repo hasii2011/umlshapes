@@ -3,8 +3,6 @@ from typing import List
 
 from enum import Enum
 
-from codeallybasic.DynamicConfiguration import StringList
-
 from umlshapes.lib.ogl import FORMAT_CENTRE_HORIZ
 from umlshapes.lib.ogl import FORMAT_CENTRE_VERT
 from umlshapes.lib.ogl import FORMAT_NONE

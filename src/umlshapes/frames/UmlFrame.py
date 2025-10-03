@@ -388,12 +388,13 @@ class UmlFrame(DiagramFrame):
             deltaXY:
         """
         from umlshapes.links.UmlLink import UmlLink
+        from umlshapes.links.UmlAssociationLabel import UmlAssociationLabel
 
         self.ufLogger.debug(f'{deltaXY=}')
         shapes = self.selectedShapes
         for s in shapes:
             umlShape: UmlShape = cast(UmlShape, s)
-            if not isinstance(umlShape, UmlLink):
+            if not isinstance(umlShape, UmlLink) and not isinstance(umlShape, UmlAssociationLabel):
                 if umlShape.moveMaster is False:
                     umlShape.position = UmlPosition(
                         x = umlShape.position.x + deltaXY.deltaX,

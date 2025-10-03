@@ -7,6 +7,7 @@ from logging import getLogger
 
 from wx import Font
 from wx import MemoryDC
+from wx import TRANSPARENT_BRUSH
 
 from umlshapes.lib.ogl import TextShape
 
@@ -60,6 +61,8 @@ class UmlAssociationLabel(ControlPointMixin, TextShape, TopLeftMixin):
         self.SetFont(font)
 
         self.AddText(label)
+
+        self.SetBrush(TRANSPARENT_BRUSH)
 
         self.SetDraggable(drag=True)
         self.Show(show=True)
