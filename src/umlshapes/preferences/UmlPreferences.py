@@ -1,13 +1,11 @@
 
-from typing import List
-
 from logging import Logger
 from logging import getLogger
 
-from codeallybasic.DynamicConfiguration import StringList
 from codeallybasic.SecureConversions import SecureConversions
 from codeallybasic.SingletonV3 import SingletonV3
 
+from umlshapes.types.DeltaXY import DeltaXY
 from umlshapes.types.UmlColor import UmlColor
 from umlshapes.types.UmlDimensions import UmlDimensions
 from umlshapes.types.UmlPenStyle import UmlPenStyle
@@ -21,6 +19,8 @@ from codeallybasic.DynamicConfiguration import SectionName
 from codeallybasic.DynamicConfiguration import Sections
 from codeallybasic.DynamicConfiguration import ValueDescription
 from codeallybasic.DynamicConfiguration import ValueDescriptions
+
+from umlshapes.types.UmlPosition import UmlPosition
 
 MODULE_NAME:           str = 'umlshapes'
 PREFERENCES_FILE_NAME: str = f'{MODULE_NAME}.ini'
@@ -47,7 +47,12 @@ DEFAULT_ASSOCIATION_LABEL_FORMAT: str = (
     f'{UmlAssociationLabelFormat.FORMAT_CENTER_VERTICAL.value}'
 )
 
-
+PASTE_PREFERENCES: ValueDescriptions = ValueDescriptions(
+    {
+    KeyName('pasteStart'):   ValueDescription(defaultValue=str(UmlPosition(150, 150)), deserializer=UmlPosition.deSerialize),
+    KeyName('pasteDeltaXY'): ValueDescription(defaultValue=str(DeltaXY(100, 100)),     deserializer=DeltaXY.deSerialize),
+    }
+)
 UML_SHAPE_PREFERENCES: ValueDescriptions = ValueDescriptions(
     {
         KeyName('textValue'):            ValueDescription(defaultValue='fac America magna iterum'),
@@ -146,6 +151,7 @@ DEBUG_PREFERENCES: ValueDescriptions = ValueDescriptions(
 sections: Sections = Sections(
     {
         SectionName('UMLShapes'):        UML_SHAPE_PREFERENCES,
+        SectionName('Paste'):            PASTE_PREFERENCES,
         SectionName('Diagram'):          DIAGRAM_PREFERENCES,
         SectionName('Names'):            NAME_PREFERENCES,
         SectionName('SequenceDiagrams'): SEQUENCE_DIAGRAM_PREFERENCES,

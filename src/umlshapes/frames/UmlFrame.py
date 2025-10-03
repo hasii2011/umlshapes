@@ -312,8 +312,10 @@ class UmlFrame(DiagramFrame):
         self.ufLogger.info(f'Pasting {len(self._clipboard)} shapes')
 
         # Get the objects out of the internal clipboard and let the appropriate command process them
-        x: int = 100
-        y: int = 100
+        pasteStart:   UmlPosition = self._preferences.pasteStart
+        pasteDeltaXY: DeltaXY     = self._preferences.pasteDeltaXY
+        x: int = pasteStart.x
+        y: int = pasteStart.y
         numbObjectsPasted: int = 0
         for clipboardObject in self._clipboard:
             pyutObject:   PyutObject = clipboardObject
@@ -360,8 +362,8 @@ class UmlFrame(DiagramFrame):
                 continue
 
             numbObjectsPasted += 1
-            x += 50
-            y += 50
+            x += pasteDeltaXY.deltaX
+            y += pasteDeltaXY.deltaY
 
         self.frameModified = True
         self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.UPDATE_APPLICATION_STATUS,
