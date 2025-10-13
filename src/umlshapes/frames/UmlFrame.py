@@ -101,6 +101,13 @@ class UmlFrame(DiagramFrame):
 
         self._setupListeners()
 
+    def markFrameSaved(self):
+        """
+        Clears the commands an ensures that CommandProcess.isDirty() is rationale
+        """
+        self.commandProcessor.MarkAsSaved(),
+        self.commandProcessor.ClearCommands()
+
     @property
     def frameModified(self) -> bool:
         return self._frameModified
@@ -180,7 +187,7 @@ class UmlFrame(DiagramFrame):
                 self._currentReportInterval -= 1
 
     def OnDragLeft(self, draw, x, y, keys=0):
-        self.ufLogger.info(f'{draw=} - x,y=({x},{y}) - {keys=}')
+        self.ufLogger.debug(f'{draw=} - x,y=({x},{y}) - {keys=}')
 
         if self._selector is None:
             self._beginSelect(x=x, y=y)

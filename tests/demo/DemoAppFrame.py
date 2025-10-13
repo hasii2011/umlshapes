@@ -1,22 +1,25 @@
 
-from logging import Logger
-from logging import getLogger
 from typing import cast
 
-from wx import DEFAULT_FRAME_STYLE
+from logging import Logger
+from logging import getLogger
+
+from wx import OK
 from wx import EVT_MENU
-from wx import FRAME_FLOAT_ON_PARENT
+from wx import ID_CUT
+from wx import ID_UNDO
 from wx import ID_COPY
 from wx import ID_EXIT
 from wx import ID_PASTE
 from wx import ID_PREFERENCES
 from wx import ID_REDO
 from wx import ID_SELECTALL
+from wx import DEFAULT_FRAME_STYLE
+from wx import FRAME_FLOAT_ON_PARENT
 
 from wx import Menu
 from wx import MenuBar
 from wx import CommandEvent
-from wx import OK
 
 from wx.lib.sized_controls import SizedFrame
 from wx.lib.sized_controls import SizedPanel
@@ -24,10 +27,7 @@ from wx.lib.sized_controls import SizedPanel
 from pyutmodelv2.PyutInterface import PyutInterface
 from pyutmodelv2.PyutInterface import PyutInterfaces
 from pyutmodelv2.PyutModelTypes import ClassName
-from wx.py.frame import ID_CUT
-from wx.py.frame import ID_UNDO
 
-from tests.demo.DlgUmlShapesPreferences import DlgUmlShapesPreferences
 from umlshapes.UmlDiagram import UmlDiagram
 from umlshapes.UmlUtils import UmlUtils
 from umlshapes.dialogs.DlgEditInterface import DlgEditInterface
@@ -53,6 +53,8 @@ from umlshapes.types.UmlPosition import UmlPosition
 from tests.demo.DemoCommon import Identifiers
 from tests.demo.LinkCreator import LinkCreator
 from tests.demo.ShapeCreator import ShapeCreator
+
+from tests.demo.DlgUmlShapesPreferences import DlgUmlShapesPreferences
 
 FRAME_WIDTH:  int = 1024
 FRAME_HEIGHT: int = 720

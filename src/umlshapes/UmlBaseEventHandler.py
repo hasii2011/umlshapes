@@ -44,6 +44,18 @@ class UmlBaseEventHandler(ShapeEvtHandler):
     umlPubSubEngine = property(fget=None, fset=_setUmlPubSubEngine)
 
     def OnDragLeft(self, draw, x, y, keys = 0, attachment = 0):
+        """
+        Move this shape, then subsequently send messages to move the other
+        selected shapes (if any)
+
+        Args:
+            draw:
+            x:          new x position
+            y:          new y position
+            keys:
+            attachment:
+
+        """
 
         from umlshapes.links.UmlAssociationLabel import UmlAssociationLabel
         from umlshapes.links.UmlLink import UmlLink
@@ -53,6 +65,7 @@ class UmlBaseEventHandler(ShapeEvtHandler):
         if self._previousPosition is NO_POSITION:
             self._previousPosition = UmlPosition(x=x, y=y)
             umlShape.moveMaster = True
+            self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.FRAME_MODIFIED, frameId=umlShape.umlFrame.id, modifiedFrameId=umlShape.umlFrame.id)
         else:
             if not isinstance(umlShape, UmlAssociationLabel) and not isinstance(umlShape, UmlLink):
 
