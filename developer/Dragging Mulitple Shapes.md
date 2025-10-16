@@ -13,6 +13,8 @@ The current implementation requires interactions betweent the specific shape's e
 
 ## Mini Design
 
+![DraggingShapes](./DraggingShapes.png)
+
 ### UmlBaseEventHandler
 
 Since all UML Shapes have their own event handler and subclass from the UmlBaseEventHandler that is the perfect place to implement the appropriate code in the `.OnDragLeft` and `.OnEndDragLeft` handlers.
