@@ -43,25 +43,34 @@ class DlgEditInterface(DlgEditClassCommon):
 
     clsLogger: Logger = getLogger(__name__)
 
-    def __init__(self, parent, umlPubSubEngine: IUmlPubSubEngine, oglInterface2: UmlLollipopInterface, pyutInterfaces: PyutInterfaces, editMode: bool = False):
+    def __init__(self, parent, umlPubSubEngine: IUmlPubSubEngine, lollipopInterface: UmlLollipopInterface, pyutInterfaces: PyutInterfaces, editMode: bool = False):
+        """
 
-        self._oglInterface2:     UmlLollipopInterface = oglInterface2
-        self._pyutInterface:     PyutInterface = oglInterface2.pyutInterface
-        self._pyutInterfaceCopy: PyutInterface = deepcopy(oglInterface2.pyutInterface)
+        Args:
+            parent:             parent window
+            umlPubSubEngine:    the pub/sub engine
+            lollipopInterface:  The created UmlLollipop interface
+            pyutInterfaces:     The list of Pyut Interfaces on the board
+            editMode:           Set to true when we are editing, Not on initial creation
+        """
 
-        self._interfaces:           PyutInterfaces     = pyutInterfaces
-        self._pyutInterfacesDict:   PyutInterfacesDict = self._toDictionary(pyutInterfaces)
+        self._lollipopInterface: UmlLollipopInterface = lollipopInterface
+        self._pyutInterface:     PyutInterface        = lollipopInterface.pyutInterface
+        self._pyutInterfaceCopy: PyutInterface        = deepcopy(lollipopInterface.pyutInterface)
 
-        self.editMode:           bool          = editMode
-        self._implementor:       ClassName     = self._pyutInterface.implementors[0]
+        self._interfaces:         PyutInterfaces     = pyutInterfaces
+        self._pyutInterfacesDict: PyutInterfacesDict = self._toDictionary(pyutInterfaces)
+
+        self.editMode:     bool      = editMode
+        self._implementor: ClassName = self._pyutInterface.implementors[0]
 
         super().__init__(parent, umlPubSubEngine=umlPubSubEngine, dlgTitle='Edit Interface', pyutModel=self._pyutInterfaceCopy, editInterface=True)
 
         self.logger: Logger = DlgEditInterface.clsLogger
 
-        self._interfaceNameControl: ComboBox           = cast(ComboBox, None)
+        self._interfaceNameControl: ComboBox = cast(ComboBox, None)
 
-        sizedPanel:                 SizedPanel     = self.GetContentsPane()
+        sizedPanel: SizedPanel = self.GetContentsPane()
 
         self._layoutInterfaceNameSelectionControl(parent=sizedPanel)
         self._layoutMethodControls(parent=sizedPanel)
@@ -81,12 +90,12 @@ class DlgEditInterface(DlgEditClassCommon):
 
         interfaceNames: List[str] = self._toInterfaceNames(self._interfaces)
 
-        cb:        ComboBox = ComboBox(parent=interfaceNameBox,
-                                       id=ID_ANY,
-                                       size=Size(200, -1),
-                                       choices=interfaceNames,
-                                       style=CB_DROPDOWN | TE_PROCESS_ENTER | CB_SORT
-                                       )
+        cb: ComboBox = ComboBox(parent=interfaceNameBox,
+                                id=ID_ANY,
+                                size=Size(200, -1),
+                                choices=interfaceNames,
+                                style=CB_DROPDOWN | TE_PROCESS_ENTER | CB_SORT
+                                )
         if self.editMode is True:
             if len(self._pyutInterfaceCopy.name) > 0:
                 cb.SetValue(self._pyutInterfaceCopy.name)
@@ -163,7 +172,7 @@ class DlgEditInterface(DlgEditClassCommon):
             self._pyutInterface.description = self._pyutModelCopy.description
             self.logger.debug(f'Using new interface. {self._pyutInterface.name=} {self._pyutInterface.id=}')
 
-        self._oglInterface2.pyutInterface = self._pyutInterface
+        self._lollipopInterface.pyutInterface = self._pyutInterface
         self.SetReturnCode(OK)
         self.EndModal(OK)
 

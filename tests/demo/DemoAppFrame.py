@@ -75,7 +75,6 @@ class DemoAppFrame(SizedFrame):
         self._diagramFrame = ClassDiagramFrame(
             parent=sizedPanel,
             umlPubSubEngine=self._umlPubSubEngine,
-            createLollipopCallback=self._createLollipopInterface
         )
         # noinspection PyUnresolvedReferences
         self._diagramFrame.SetSizerProps(expand=True, proportion=1)
@@ -107,6 +106,9 @@ class DemoAppFrame(SizedFrame):
         self._umlPubSubEngine.subscribe(UmlMessageType.UML_SHAPE_SELECTED,
                                         frameId=self._diagramFrame.id,
                                         listener=self._umlShapeListener)
+        self._umlPubSubEngine.subscribe(UmlMessageType.CREATE_LOLLIPOP,
+                                        frameId=self._diagramFrame.id,
+                                        listener=self._createLollipopInterfaceListener)
 
     def _createApplicationMenuBar(self):
 
@@ -241,10 +243,12 @@ class DemoAppFrame(SizedFrame):
             case _:
                 self.logger.warning(f'Unknown event id {eventId}')
 
-    def _createLollipopInterface(self, requestingUmlClass: UmlClass, perimeterPoint: UmlPosition):
+    def _createLollipopInterfaceListener(self, requestingFrame: ClassDiagramFrame, requestingUmlClass: UmlClass, pyutInterfaces: PyutInterfaces, perimeterPoint: UmlPosition):
         """
+        In an application this code belongs in a Command
 
         Args:
+            requestingFrame:        Treat this as an opaque object
             requestingUmlClass:
             perimeterPoint:
         """
@@ -252,7 +256,7 @@ class DemoAppFrame(SizedFrame):
         interfaceName: str = f'{self._preferences.defaultNameInterface}{self._pyutInterfaceCount}'
         self._pyutInterfaceCount += 1
 
-        pyutInterface:        PyutInterface        = PyutInterface(interfaceName)
+        pyutInterface: PyutInterface = PyutInterface(interfaceName)
         pyutInterface.addImplementor(ClassName(requestingUmlClass.pyutClass.name))
 
         umlLollipopInterface: UmlLollipopInterface = UmlLollipopInterface(pyutInterface=pyutInterface)
@@ -264,8 +268,8 @@ class DemoAppFrame(SizedFrame):
 
         self.logger.debug(f'{umlLollipopInterface.attachmentSide=} {umlLollipopInterface.lineCentum=}')
 
-        umlLollipopInterface.umlFrame = self._diagramFrame
-        diagram: UmlDiagram = self._diagramFrame.umlDiagram
+        umlLollipopInterface.umlFrame = requestingFrame
+        diagram: UmlDiagram = requestingFrame.umlDiagram    # And then I break the opaqueness
 
         diagram.AddShape(umlLollipopInterface)
         umlLollipopInterface.Show(show=True)
@@ -275,13 +279,13 @@ class DemoAppFrame(SizedFrame):
         eventHandler.SetPreviousHandler(umlLollipopInterface.GetEventHandler())
         umlLollipopInterface.SetEventHandler(eventHandler)
 
-        umlFrame:       ClassDiagramFrame = self._diagramFrame
-        eventEngine:    IUmlPubSubEngine      = umlFrame.umlPubSubEngine
-        pyutInterfaces: PyutInterfaces       = eventHandler.getDefinedInterfaces()
+        pubsubEngine: IUmlPubSubEngine  = requestingFrame.umlPubSubEngine
 
-        with DlgEditInterface(parent=umlFrame, oglInterface2=umlLollipopInterface, umlPubSubEngine=eventEngine, pyutInterfaces=pyutInterfaces) as dlg:
+        # Update with our generated one
+        pyutInterfaces.append(pyutInterface)
+        with DlgEditInterface(parent=requestingFrame, lollipopInterface=umlLollipopInterface, umlPubSubEngine=pubsubEngine, pyutInterfaces=pyutInterfaces) as dlg:
             if dlg.ShowModal() == OK:
-                umlFrame.refresh()
+                requestingFrame.refresh()
 
     def _updateApplicationStatusListener(self, message: str):
         self.SetStatusText(text=message)

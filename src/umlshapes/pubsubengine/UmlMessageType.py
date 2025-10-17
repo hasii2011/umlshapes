@@ -8,12 +8,12 @@ class UmlMessageType(Enum):
     """
     UML_SHAPE_SELECTED = 'Uml Shape Selected'
     CUT_UML_CLASS      = 'Cut Uml Class'        # Issued from UmlClassCtxMenuHandler
-    CREATE_LOLLIPOP    = 'Create Lollipop'
     FRAME_LEFT_CLICK   = 'Frame Left Click'
     FRAME_MODIFIED     = 'Frame Modified'
     SHAPE_MOVING       = 'Shape Moving'         # Only the 'master' shape issues this message
 
 
+    CREATE_LOLLIPOP           = 'Create Lollipop'
     REQUEST_LOLLIPOP_LOCATION = 'Request Lollipop Location'
     UPDATE_APPLICATION_STATUS = 'Update Application Status'
 
