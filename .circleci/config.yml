@@ -18,7 +18,7 @@ jobs:
     executor: python/default
     steps:
       - checkout:
-          method: blobless
+          method: full
       - restore_cache:
           key: &deps1-cache deps1-{{ .Branch }}-{{ checksum "pyproject.toml" }}
       - run:
