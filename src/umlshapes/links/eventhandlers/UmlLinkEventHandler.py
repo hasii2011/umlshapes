@@ -28,12 +28,12 @@ from umlshapes.pubsubengine.UmlMessageType import UmlMessageType
 
 from umlshapes.frames.UmlFrame import UmlFrame
 
-from umlshapes.types.DeltaXY import DeltaXY
 from umlshapes.links.LabelType import LabelType
 from umlshapes.links.UmlAssociationLabel import UmlAssociationLabel
 
 from umlshapes.UmlBaseEventHandler import UmlBaseEventHandler
 
+from umlshapes.types.DeltaXY import DeltaXY
 from umlshapes.types.Common import NAME_IDX
 from umlshapes.types.UmlPosition import UmlPosition
 from umlshapes.types.UmlPosition import UmlPositions
@@ -47,8 +47,12 @@ EditableLinkTypes: List[PyutLinkType] = [PyutLinkType.ASSOCIATION, PyutLinkType.
 MENU_ADD_BEND_ID:      int = wxNewIdRef()
 MENU_REMOVE_BEND_ID:   int = wxNewIdRef()
 MENU_TOGGLE_SPLINE_ID: int = wxNewIdRef()
+MENU_STRAIGHTEN_ID:    int = wxNewIdRef()
 
 LineControlPoints = NewType('LineControlPoints', List[Point])
+
+MINIMUM_CP_TO_ALLOW_BEND:       int = 2
+MINIMUM_CP_TO_ALLOW_STRAIGHTEN: int = 3     # Stole this from the straighten code; Is this good?
 
 
 class UmlLinkEventHandler(UmlBaseEventHandler):
@@ -109,10 +113,16 @@ class UmlLinkEventHandler(UmlBaseEventHandler):
         cPoints: List[Point] = line.GetLineControlPoints()
 
         bendItem: MenuItem = self._contextMenu.FindItemById(MENU_REMOVE_BEND_ID)
-        if len(cPoints) > 2:
+        if len(cPoints) > MINIMUM_CP_TO_ALLOW_BEND:
             bendItem.Enable(enable=True)
         else:
             bendItem.Enable(enable=False)
+
+        straightenItem: MenuItem = self._contextMenu.FindItemById(MENU_STRAIGHTEN_ID)
+        if len(cPoints) < MINIMUM_CP_TO_ALLOW_STRAIGHTEN:
+            straightenItem.Enable(enable=False)
+        else:
+            straightenItem.Enable(enable=True)
 
         self._contextMenu.Unbind(EVT_MENU)
         clickPosition: UmlPosition = UmlPosition(x=x, y=y)
@@ -146,6 +156,7 @@ class UmlLinkEventHandler(UmlBaseEventHandler):
         menu.Append(MENU_ADD_BEND_ID,      'Add Bend',      'Add Bend at right click point')
         menu.Append(MENU_REMOVE_BEND_ID,   'Remove Bend',   'Remove Bend closest to click point')
         menu.Append(MENU_TOGGLE_SPLINE_ID, 'Toggle Spline', 'Best with at least one bend')
+        menu.Append(MENU_STRAIGHTEN_ID,    'Straighten',    'Wonder what this does')
 
         return menu
 
@@ -164,6 +175,11 @@ class UmlLinkEventHandler(UmlBaseEventHandler):
 
         elif eventId == MENU_TOGGLE_SPLINE_ID:
             self._toggleSpline()
+        elif eventId == MENU_STRAIGHTEN_ID:
+            link: UmlLink = self.GetShape()
+            link.Straighten()
+            link.umlFrame.refresh()
+            self._indicateFrameModified()
 
     def _computeRelativePosition(self, labelX: int, labelY: int, linkDelta: DeltaXY):
 
