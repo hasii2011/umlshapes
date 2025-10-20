@@ -1,7 +1,6 @@
 
 from typing import List
 from typing import NewType
-from typing import TYPE_CHECKING
 from typing import Tuple
 from typing import cast
 
