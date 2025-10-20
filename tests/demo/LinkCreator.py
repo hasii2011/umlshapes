@@ -116,6 +116,7 @@ class LinkCreator:
         umlAssociation: UmlAssociation = associationDescription.associationClass(pyutLink=pyutLink)
 
         umlAssociation.umlFrame = self._diagramFrame
+        umlAssociation.umlPubSubEngine = self._umlPubSubEngine
         umlAssociation.MakeLineControlPoints(n=2)       # Make this configurable
 
         sourceUmlClass.addLink(umlLink=umlAssociation, destinationClass=destinationUmlClass)
