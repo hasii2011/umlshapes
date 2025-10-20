@@ -1,5 +1,4 @@
 
-from typing import Callable
 from typing import cast
 
 from logging import Logger
@@ -24,9 +23,6 @@ from umlshapes.shapes.UmlClass import UmlClass
 from umlshapes.types.UmlPosition import UmlPosition
 
 NO_CLASS: UmlClass = cast(UmlClass, None)
-
-CreateLollipopCallback = Callable[[UmlClass, UmlPosition], None]
-
 
 class ClassDiagramFrame(UmlFrame):
 

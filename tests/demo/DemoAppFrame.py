@@ -250,6 +250,7 @@ class DemoAppFrame(SizedFrame):
         Args:
             requestingFrame:        Treat this as an opaque object
             requestingUmlClass:
+            pyutInterfaces:
             perimeterPoint:
         """
 

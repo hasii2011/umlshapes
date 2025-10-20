@@ -51,6 +51,13 @@ from umlshapes.types.UmlPosition import UmlPositions
 
 
 class UmlUtils:
+    """
+    The class variables are NOT meant to be used directly.  They
+    are a cache for the class methods.
+
+    TODO:   Perhaps introduce an initialize method to get them set
+    and make the class methods private.
+    """
 
     clsLogger: Logger = getLogger(__name__)
 

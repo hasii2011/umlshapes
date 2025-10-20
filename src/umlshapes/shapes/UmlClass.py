@@ -131,6 +131,11 @@ class UmlClass(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
 
     def OnDraw(self, dc: MemoryDC):
 
+        if self.selected is True:
+            self.SetPen(UmlUtils.redDashedPen())
+        else:
+            self.SetPen(UmlUtils.blackSolidPen())
+
         super().OnDraw(dc)
 
         w: int = self.size.width
