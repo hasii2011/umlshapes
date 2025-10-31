@@ -40,6 +40,8 @@ UmlLinkGenre  = UmlInheritance | UmlInterface | UmlAssociation | UmlComposition 
 UmlAssociationGenre = UmlAssociation | UmlComposition | UmlAggregation
 
 UmlShapes = NewType('UmlShapes', List[UmlShapeGenre | UmlLinkGenre])
+UmlLinks  = NewType('UmlLinks',  List[UmlLinkGenre])
+
 
 def umlShapesFactory() -> UmlShapes:
     return UmlShapes([])
