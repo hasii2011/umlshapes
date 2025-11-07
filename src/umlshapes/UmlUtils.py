@@ -1,4 +1,3 @@
-
 from typing import cast
 from typing import List
 from typing import Tuple
@@ -45,6 +44,7 @@ from umlshapes.types.Common import AttachmentSide
 from umlshapes.types.Common import LollipopCoordinates
 from umlshapes.types.UmlColor import UmlColor
 from umlshapes.types.UmlFontFamily import UmlFontFamily
+from umlshapes.types.UmlLine import UmlLine
 from umlshapes.types.UmlPosition import UmlPoint
 from umlshapes.types.UmlPosition import UmlPosition
 from umlshapes.types.UmlPosition import UmlPositions
@@ -100,7 +100,25 @@ class UmlUtils:
         return ans
 
     @classmethod
-    def isPointInsideRectangle(cls, point: UmlPoint, rectangle: Rectangle):
+    def isLineWhollyContainedByRectangle(cls, boundingRectangle: Rectangle, umlLine: UmlLine) -> bool:
+        """
+        To determine if a line segment is wholly contained within a rectangle we check if both endpoints of
+        the line segment are inside the rectangle.
+
+        Args:
+            umlLine:    The line segment
+            boundingRectangle:  The bounding rectangle
+
+        Returns: `True` if the entire line is inside the rectangle, else `False`
+        """
+        answer: bool = False
+        if cls.isPointInsideRectangle(umlLine.start, boundingRectangle) is True and cls.isPointInsideRectangle(umlLine.end, boundingRectangle) is True:
+            answer = True
+
+        return answer
+
+    @classmethod
+    def isPointInsideRectangle(cls, point: UmlPoint, rectangle: Rectangle) -> bool:
         """
 
         Args:

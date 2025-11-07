@@ -20,12 +20,6 @@ from wx import MessageDialog
 from wx import MouseEvent
 from wx import Window
 
-from umlshapes.UmlUtils import UmlUtils
-from umlshapes.lib.ogl import Shape
-from umlshapes.lib.ogl import ShapeCanvas
-
-from umlshapes.frames.ShapeSelector import ShapeSelector
-
 from pyutmodelv2.PyutObject import PyutObject
 from pyutmodelv2.PyutLink import PyutLinks
 from pyutmodelv2.PyutActor import PyutActor
@@ -34,6 +28,11 @@ from pyutmodelv2.PyutNote import PyutNote
 from pyutmodelv2.PyutText import PyutText
 from pyutmodelv2.PyutUseCase import PyutUseCase
 from pyutmodelv2.PyutLinkedObject import PyutLinkedObject
+
+from umlshapes.lib.ogl import Shape
+from umlshapes.lib.ogl import ShapeCanvas
+
+from umlshapes.frames.ShapeSelector import ShapeSelector
 
 from umlshapes.commands.ActorCutCommand import ActorCutCommand
 from umlshapes.commands.ClassCutCommand import ClassCutCommand
@@ -52,6 +51,8 @@ from umlshapes.pubsubengine.UmlMessageType import UmlMessageType
 
 from umlshapes.frames.DiagramFrame import DiagramFrame
 
+from umlshapes.UmlUtils import UmlUtils
+
 from umlshapes.UmlDiagram import UmlDiagram
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
@@ -59,9 +60,10 @@ from umlshapes.preferences.UmlPreferences import UmlPreferences
 from umlshapes.types.Common import UmlShape
 from umlshapes.types.Common import UmlShapeList
 from umlshapes.types.DeltaXY import DeltaXY
-
-from umlshapes.types.UmlDimensions import UmlDimensions
+from umlshapes.types.UmlLine import UmlLine
+from umlshapes.types.UmlPosition import UmlPoint
 from umlshapes.types.UmlPosition import UmlPosition
+from umlshapes.types.UmlDimensions import UmlDimensions
 
 A4_FACTOR:     float = 1.41
 
@@ -194,14 +196,23 @@ class UmlFrame(DiagramFrame):
 
     def OnEndDragLeft(self, x, y, keys = 0):
 
+        from umlshapes.links.UmlLink import UmlLink
+
         self.Unbind(EVT_MOTION, handler=self._onSelectorMove)
         self.umlDiagram.RemoveShape(self._selector)
 
         for s in self.umlDiagram.shapes:
             if self._ignoreShape(shapeToCheck=s) is False:
-                shape: UmlShape = cast(UmlShape, s)
-                if UmlUtils.isShapeInRectangle(boundingRectangle=self._selector.rectangle, shapeRectangle=shape.rectangle) is True:
-                    shape.selected = True
+                if isinstance(s, UmlLink):
+                    umlLink: UmlLink = s
+                    x1,y1,x2,y2 = umlLink.GetEnds()
+                    umlLine: UmlLine = UmlLine(start=UmlPoint(x=x1,y=y1), end=UmlPoint(x=x2, y=y2))
+                    if UmlUtils.isLineWhollyContainedByRectangle(boundingRectangle=self._selector.rectangle, umlLine=umlLine) is True:
+                        umlLink.selected = True
+                else:
+                    shape: UmlShape = cast(UmlShape, s)
+                    if UmlUtils.isShapeInRectangle(boundingRectangle=self._selector.rectangle, shapeRectangle=shape.rectangle) is True:
+                        shape.selected = True
 
         self.refresh()
         self._selector = cast(ShapeSelector, None)
@@ -529,14 +540,16 @@ class UmlFrame(DiagramFrame):
 
         Returns: True if the shape is one of our ignore shapes
         """
-        from umlshapes.links.UmlLink import UmlLink
         from umlshapes.shapes.UmlControlPoint import UmlControlPoint
         from umlshapes.links.UmlAssociationLabel import UmlAssociationLabel
         from umlshapes.links.UmlLollipopInterface import UmlLollipopInterface
         from umlshapes.shapes.UmlLineControlPoint import UmlLineControlPoint
 
         ignore: bool = False
-        if isinstance(shapeToCheck, UmlControlPoint) or isinstance(shapeToCheck, UmlLink) or isinstance(shapeToCheck, UmlAssociationLabel) or isinstance(shapeToCheck, UmlLollipopInterface) or isinstance(shapeToCheck, UmlLineControlPoint):
+
+        if (isinstance(shapeToCheck, UmlControlPoint) or isinstance(shapeToCheck, UmlAssociationLabel) or
+                isinstance(shapeToCheck, UmlLollipopInterface) or isinstance(shapeToCheck, UmlLineControlPoint)
+        ):
             ignore = True
 
         return ignore

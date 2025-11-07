@@ -9,6 +9,7 @@ from umlshapes.UmlUtils import UmlUtils
 from umlshapes.mixins.TopLeftMixin import Rectangle
 
 from umlshapes.types.Common import AttachmentSide
+from umlshapes.types.UmlLine import UmlLine
 from umlshapes.types.UmlPosition import UmlPoint
 from umlshapes.types.UmlPosition import UmlPosition
 from umlshapes.types.UmlPosition import UmlPositions
@@ -57,6 +58,30 @@ class TestUmlUtils(UnitTestBase):
 
     def tearDown(self):
         super().tearDown()
+
+    def testIsLineWhollyContainedByRectangleTrue(self):
+
+        rectangle: Rectangle = Rectangle(left=100, top=100, right=400, bottom=400)
+        umlLine:   UmlLine   = UmlLine(start=UmlPoint(x=200, y=200), end=UmlPoint(x=300, y=300))
+
+        answer: bool = UmlUtils.isLineWhollyContainedByRectangle(umlLine=umlLine, boundingRectangle=rectangle)
+        self.assertTrue(answer, 'The line is inside the rectangle')
+
+    def testIsLineWhollyContainedByRectangleFalseEndPointBelow(self):
+
+        rectangle: Rectangle = Rectangle(left=100, top=100, right=400, bottom=400)
+        umlLine:   UmlLine   = UmlLine(start=UmlPoint(x=200, y=200), end=UmlPoint(x=500, y=500))
+
+        answer: bool = UmlUtils.isLineWhollyContainedByRectangle(umlLine=umlLine, boundingRectangle=rectangle)
+        self.assertFalse(answer, 'The line end is outside the rectangle')
+
+    def testIsLineWhollyContainedByRectangleFalseStartPointAbove(self):
+
+        rectangle: Rectangle = Rectangle(left=100, top=100, right=50, bottom=50)
+        umlLine:   UmlLine   = UmlLine(start=UmlPoint(x=200, y=200), end=UmlPoint(x=300, y=300))
+
+        answer: bool = UmlUtils.isLineWhollyContainedByRectangle(umlLine=umlLine, boundingRectangle=rectangle)
+        self.assertFalse(answer, 'The line start is outside the rectangle')
 
     def testIsPointInsideRectangleTrue(self):
         """
