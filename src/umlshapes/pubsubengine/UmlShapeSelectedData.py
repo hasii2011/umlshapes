@@ -5,11 +5,11 @@ from dataclasses import dataclass
 
 from wx import Point
 
-from umlshapes.types.Common import UmlShape
+from umlshapes.ShapeTypes import UmlShapeGenre
 
 
 @dataclass
 class UmlShapeSelectedData:
 
-    shape:    UmlShape = cast(UmlShape, None)
-    position: Point    = cast(Point, None)
+    shape:    UmlShapeGenre = cast(UmlShapeGenre, None)
+    position: Point         = cast(Point, None)

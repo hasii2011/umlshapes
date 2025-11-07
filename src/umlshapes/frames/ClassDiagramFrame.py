@@ -64,14 +64,14 @@ class ClassDiagramFrame(UmlFrame):
 
         Returns:  The interfaces that are on the board
         """
-        from umlshapes.types.Common import UmlShapeList
+        from umlshapes.ShapeTypes import UmlShapes
         from umlshapes.links.UmlInterface import UmlInterface
         from umlshapes.links.UmlLollipopInterface import UmlLollipopInterface
 
         # umlLollipopInterface: UmlLollipopInterface = self.GetShape()
         # umlFrame:             ClassDiagramFrame = umlLollipopInterface.GetCanvas()
 
-        umlShapes:      UmlShapeList   = self.umlShapes
+        umlShapes:      UmlShapes      = self.umlShapes
         pyutInterfaces: PyutInterfaces = PyutInterfaces([])
 
         for umlShape in umlShapes:

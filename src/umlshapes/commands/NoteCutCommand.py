@@ -11,12 +11,12 @@ from pyutmodelv2.PyutObject import PyutObject
 from umlshapes.commands.BaseCutCommand import BaseCutCommand
 from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 
-from umlshapes.types.Common import UmlShape
 from umlshapes.types.UmlPosition import UmlPosition
 
 if TYPE_CHECKING:
     from umlshapes.frames.UmlFrame import UmlFrame
     from umlshapes.shapes.UmlNote import UmlNote
+    from umlshapes.ShapeTypes import UmlShapeGenre
 
 
 class NoteCutCommand(BaseCutCommand):
@@ -38,15 +38,16 @@ class NoteCutCommand(BaseCutCommand):
         return True
 
     def Undo(self) -> bool:
+        from umlshapes.ShapeTypes import UmlShapeGenre
 
-        umlShape: UmlShape = self._createCutShape(pyutObject=self._pyutObject)
+        umlShape: UmlShapeGenre = self._createCutShape(pyutObject=self._pyutObject)
 
         self._setupUmlShape(umlShape=umlShape)
         self._umlNote = umlShape   # type: ignore
 
         return True
 
-    def _createCutShape(self, pyutObject: PyutObject) -> UmlShape:
+    def _createCutShape(self, pyutObject: PyutObject) -> 'UmlShapeGenre':
 
         from umlshapes.shapes.UmlNote import UmlNote
         from umlshapes.shapes.eventhandlers.UmlNoteEventHandler import UmlNoteEventHandler

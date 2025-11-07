@@ -12,12 +12,12 @@ from umlshapes.commands.BasePasteCommand import BasePasteCommand
 
 from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 
-from umlshapes.types.Common import UmlShape
 
 from umlshapes.types.UmlPosition import UmlPosition
 
 if TYPE_CHECKING:
     from umlshapes.frames.UmlFrame import UmlFrame
+    from umlshapes.ShapeTypes import UmlShapeGenre
 
 
 class UseCasePasteCommand(BasePasteCommand):
@@ -39,7 +39,9 @@ class UseCasePasteCommand(BasePasteCommand):
         self._umlUseCase: UmlUseCase = cast(UmlUseCase, None)
 
     def Do(self) -> bool:
-        umlShape: UmlShape = self._createPastedShape(pyutObject=self._pyutObject)
+        from umlshapes.ShapeTypes import UmlShapeGenre
+
+        umlShape: UmlShapeGenre = self._createPastedShape(pyutObject=self._pyutObject)
 
         self._setupUmlShape(umlShape=umlShape)
         self._umlUseCase = umlShape  # type: ignore
@@ -50,7 +52,7 @@ class UseCasePasteCommand(BasePasteCommand):
         self._undo(umlShape=self._umlUseCase)
         return True
 
-    def _createPastedShape(self, pyutObject: PyutObject) -> UmlShape:
+    def _createPastedShape(self, pyutObject: PyutObject) -> 'UmlShapeGenre':
         from umlshapes.shapes.UmlUseCase import UmlUseCase
         from umlshapes.shapes.eventhandlers.UmlUseCaseEventHandler import UmlUseCaseEventHandler
 

@@ -1,22 +1,7 @@
 from unittest import TestSuite
 from unittest import main as unitTestMain
 
-from unittest.mock import Mock
-from unittest.mock import PropertyMock
-
 from codeallybasic.UnitTestBase import UnitTestBase
-from pyutmodelv2.PyutClass import PyutClass
-from pyutmodelv2.PyutInterface import PyutInterface
-from pyutmodelv2.PyutInterface import PyutInterfaces
-from pyutmodelv2.PyutLink import PyutLink
-from pyutmodelv2.enumerations.PyutLinkType import PyutLinkType
-
-from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
-from umlshapes.links.UmlInterface import UmlInterface
-from umlshapes.links.UmlLollipopInterface import UmlLollipopInterface
-from umlshapes.links.eventhandlers.UmlLollipopInterfaceEventHandler import UmlLollipopInterfaceEventHandler
-from umlshapes.shapes.UmlClass import UmlClass
-from umlshapes.types.Common import UmlShapeList
 
 
 class TestLollipopInterfaceEventHandler(UnitTestBase):

@@ -10,13 +10,14 @@ from wx import Command
 from pyutmodelv2.PyutObject import PyutObject
 
 from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
-from umlshapes.types.Common import UmlShape
+
 from umlshapes.types.UmlPosition import UmlPosition
 
 from umlshapes.UmlBaseEventHandler import UmlBaseEventHandler
 
 if TYPE_CHECKING:
     from umlshapes.frames.UmlFrame import UmlFrame
+    from umlshapes.ShapeTypes import UmlShapeGenre
 
 class BaseCommand(Command):
 
@@ -54,7 +55,7 @@ class BaseCommand(Command):
         eventHandler.SetPreviousHandler(umlShape.GetEventHandler())
         umlShape.SetEventHandler(eventHandler)
 
-    def _setupUmlShape(self, umlShape: UmlShape):
+    def _setupUmlShape(self, umlShape: 'UmlShapeGenre'):
 
         self._umlFrame.umlDiagram.AddShape(umlShape)
         umlShape.position = self._umlPosition
@@ -63,6 +64,6 @@ class BaseCommand(Command):
 
         self._umlFrame.Refresh()
 
-    def _removeShape(self, umlShape: UmlShape):
+    def _removeShape(self, umlShape: 'UmlShapeGenre'):
         self._umlFrame.umlDiagram.RemoveShape(umlShape)
         self._umlFrame.refresh()

@@ -11,12 +11,12 @@ from pyutmodelv2.PyutObject import PyutObject
 from umlshapes.commands.BasePasteCommand import BasePasteCommand
 
 from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
-from umlshapes.types.Common import UmlShape
 
 from umlshapes.types.UmlPosition import UmlPosition
 
 if TYPE_CHECKING:
     from umlshapes.frames.UmlFrame import UmlFrame
+    from umlshapes.ShapeTypes import UmlShapeGenre
 
 
 class ActorPasteCommand(BasePasteCommand):
@@ -39,7 +39,9 @@ class ActorPasteCommand(BasePasteCommand):
             self._umlActor: UmlActor = cast(UmlActor, None)
 
         def Do(self) -> bool:
-            umlShape: UmlShape = self._createPastedShape(pyutObject=self._pyutObject)
+            from umlshapes.ShapeTypes import UmlShapeGenre
+
+            umlShape: UmlShapeGenre = self._createPastedShape(pyutObject=self._pyutObject)
 
             self._setupUmlShape(umlShape=umlShape)
             self._umlActor = umlShape  # type: ignore
@@ -50,7 +52,7 @@ class ActorPasteCommand(BasePasteCommand):
             self._undo(umlShape=self._umlActor)
             return True
 
-        def _createPastedShape(self, pyutObject: PyutObject) -> UmlShape:
+        def _createPastedShape(self, pyutObject: PyutObject) -> 'UmlShapeGenre':
             from umlshapes.shapes.UmlActor import UmlActor
             from umlshapes.shapes.eventhandlers.UmlActorEventHandler import UmlActorEventHandler
 

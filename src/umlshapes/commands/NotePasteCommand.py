@@ -12,13 +12,11 @@ from umlshapes.commands.BasePasteCommand import BasePasteCommand
 
 from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 
-from umlshapes.types.Common import UmlShape
-
 from umlshapes.types.UmlPosition import UmlPosition
 
 if TYPE_CHECKING:
     from umlshapes.frames.UmlFrame import UmlFrame
-
+    from umlshapes.ShapeTypes import UmlShapeGenre
 
 class NotePasteCommand(BasePasteCommand):
     def __init__(self, pyutObject: PyutObject, umlPosition: UmlPosition, umlFrame: 'UmlFrame', umlPubSubEngine: IUmlPubSubEngine):
@@ -39,7 +37,9 @@ class NotePasteCommand(BasePasteCommand):
         self._umlNote: UmlNote = cast(UmlNote, None)
 
     def Do(self) -> bool:
-        umlShape: UmlShape = self._createPastedShape(pyutObject=self._pyutObject)
+        from umlshapes.ShapeTypes import UmlShapeGenre
+
+        umlShape: UmlShapeGenre = self._createPastedShape(pyutObject=self._pyutObject)
 
         self._setupUmlShape(umlShape=umlShape)
         self._umlNote = umlShape  # type: ignore
@@ -50,7 +50,7 @@ class NotePasteCommand(BasePasteCommand):
         self._undo(umlShape=self._umlNote)
         return True
 
-    def _createPastedShape(self, pyutObject: PyutObject) -> UmlShape:
+    def _createPastedShape(self, pyutObject: PyutObject) -> 'UmlShapeGenre':
         from umlshapes.shapes.UmlNote import UmlNote
         from umlshapes.shapes.eventhandlers.UmlNoteEventHandler import UmlNoteEventHandler
 

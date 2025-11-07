@@ -22,11 +22,9 @@ from pyutmodelv2.PyutClass import PyutClass
 from pyutmodelv2.PyutField import PyutField
 from pyutmodelv2.PyutParameter import PyutParameter
 
-from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
-from umlshapes.types.Common import UmlShapeList
+from umlshapes.ShapeTypes import UmlShapes
 
-if TYPE_CHECKING:
-    from umlshapes.shapes.UmlClass import UmlClass
+from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 
 from umlshapes.dialogs.umlclass.DlgEditClassCommon import DlgEditClassCommon
 from umlshapes.dialogs.DlgEditField import DlgEditField
@@ -42,11 +40,8 @@ from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
-# noinspection SpellCheckingInspection
-"""
-from pyut.ui.eventengine.EventType import EventType
-from pyut.ui.eventengine.IEventEngine import IEventEngine
-"""
+if TYPE_CHECKING:
+    from umlshapes.shapes.UmlClass import UmlClass
 
 
 class DlgEditClass(DlgEditClassCommon):
@@ -280,7 +275,7 @@ class DlgEditClass(DlgEditClassCommon):
         assert len(oglClasses) == 1, 'Cannot have more then one ogl class per pyut class'
         return oglClasses.pop(0)
 
-    def _getUmlShapes(self) -> UmlShapeList:
+    def _getUmlShapes(self) -> UmlShapes:
         """
         The frame may contain no UML shapes.
 

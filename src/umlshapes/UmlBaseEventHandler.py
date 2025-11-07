@@ -16,7 +16,6 @@ from umlshapes.lib.ogl import ShapeEvtHandler
 from umlshapes.pubsubengine.UmlMessageType import UmlMessageType
 from umlshapes.pubsubengine.UmlPubSubEngine import UmlPubSubEngine
 
-from umlshapes.types.Common import UmlShape
 from umlshapes.types.DeltaXY import DeltaXY
 from umlshapes.types.UmlPosition import UmlPosition
 from umlshapes.types.UmlDimensions import UmlDimensions
@@ -60,7 +59,9 @@ class UmlBaseEventHandler(ShapeEvtHandler):
         from umlshapes.links.UmlAssociationLabel import UmlAssociationLabel
         from umlshapes.links.UmlLink import UmlLink
         # self._baseLogger.info(f'{draw=} x,y:({x},{y}) {attachment=}')
-        umlShape: UmlShape = cast(UmlShape, self.GetShape())
+        from umlshapes.ShapeTypes import UmlShapeGenre
+
+        umlShape: UmlShapeGenre = cast(UmlShapeGenre, self.GetShape())
 
         if self._previousPosition is NO_POSITION:
             self._previousPosition = UmlPosition(x=x, y=y)
@@ -80,10 +81,11 @@ class UmlBaseEventHandler(ShapeEvtHandler):
         super().OnDragLeft(draw, x, y, keys, attachment)
 
     def OnEndDragLeft(self, x, y, keys=0, attachment=0):
+        from umlshapes.ShapeTypes import UmlShapeGenre
 
         # self._baseLogger.info(f'x,y:({x},{y}) {keys=} {attachment=}')
         self._previousPosition = NO_POSITION
-        umlShape: UmlShape = cast(UmlShape, self.GetShape())
+        umlShape: UmlShapeGenre = cast(UmlShapeGenre, self.GetShape())
         umlShape.moveMaster = False
 
         super().OnEndDragLeft(x, y, keys, attachment)
@@ -133,10 +135,12 @@ class UmlBaseEventHandler(ShapeEvtHandler):
             w:
             h:
         """
+        from umlshapes.ShapeTypes import UmlShapeGenre
+
         shape: Shape  = self.GetShape()
         shape.Move(dc=dc, x=x, y=y, display=True)
 
-        umlShape: UmlShape = cast(UmlShape, shape)
+        umlShape: UmlShapeGenre = cast(UmlShapeGenre, shape)
         umlShape.size = UmlDimensions(width=w, height=h)
         umlShape.umlFrame.refresh()
 

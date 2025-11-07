@@ -2,6 +2,7 @@
 from typing import List
 from typing import NewType
 from typing import cast
+from typing import TYPE_CHECKING
 
 from logging import Logger
 from logging import getLogger
@@ -57,13 +58,14 @@ from umlshapes.UmlDiagram import UmlDiagram
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
-from umlshapes.types.Common import UmlShape
-from umlshapes.types.Common import UmlShapeList
 from umlshapes.types.DeltaXY import DeltaXY
 from umlshapes.types.UmlLine import UmlLine
 from umlshapes.types.UmlPosition import UmlPoint
 from umlshapes.types.UmlPosition import UmlPosition
 from umlshapes.types.UmlDimensions import UmlDimensions
+
+if TYPE_CHECKING:
+    from umlshapes.ShapeTypes import UmlShapes
 
 A4_FACTOR:     float = 1.41
 
@@ -127,20 +129,22 @@ class UmlFrame(DiagramFrame):
         return self._umlPubSubEngine
 
     @property
-    def umlShapes(self) -> UmlShapeList:
+    def umlShapes(self) -> 'UmlShapes':
 
         diagram: UmlDiagram = self.GetDiagram()
         return diagram.GetShapeList()
 
     @property
-    def selectedShapes(self) -> UmlShapeList:
+    def selectedShapes(self) -> 'UmlShapes':
+        from umlshapes.ShapeTypes import UmlShapes
 
-        selectedShapes: UmlShapeList = UmlShapeList([])
-        umlshapes:      UmlShapeList = self.umlShapes
+        selectedShapes: UmlShapes = UmlShapes([])
+        umlshapes:      UmlShapes = self.umlShapes
 
         for shape in umlshapes:
             if shape.Selected() is True:
                 selectedShapes.append(shape)
+
         return selectedShapes
 
     def OnLeftClick(self, x, y, keys=0):
@@ -210,7 +214,8 @@ class UmlFrame(DiagramFrame):
                     if UmlUtils.isLineWhollyContainedByRectangle(boundingRectangle=self._selector.rectangle, umlLine=umlLine) is True:
                         umlLink.selected = True
                 else:
-                    shape: UmlShape = cast(UmlShape, s)
+                    from umlshapes.ShapeTypes import UmlShapeGenre
+                    shape: UmlShapeGenre = cast(UmlShapeGenre, s)
                     if UmlUtils.isShapeInRectangle(boundingRectangle=self._selector.rectangle, shapeRectangle=shape.rectangle) is True:
                         shape.selected = True
 
@@ -250,7 +255,7 @@ class UmlFrame(DiagramFrame):
         from umlshapes.shapes.UmlText import UmlText
         from umlshapes.shapes.UmlUseCase import UmlUseCase
 
-        selectedShapes: UmlShapeList = self.selectedShapes
+        selectedShapes: UmlShapes = self.selectedShapes
         if len(selectedShapes) == 0:
             with MessageDialog(parent=None, message='No shapes selected', caption='', style=OK | ICON_ERROR) as dlg:
                 dlg.ShowModal()
@@ -309,7 +314,7 @@ class UmlFrame(DiagramFrame):
         Only copy the model objects to the clipboard.  Paste can then recreate them
         """
 
-        selectedShapes: UmlShapeList = self.selectedShapes
+        selectedShapes: UmlShapes = self.selectedShapes
         if len(selectedShapes) == 0:
             with MessageDialog(parent=None, message='No shapes selected', caption='', style=OK | ICON_ERROR) as dlg:
                 dlg.ShowModal()
@@ -394,10 +399,11 @@ class UmlFrame(DiagramFrame):
         from umlshapes.shapes.UmlActor import UmlActor
         from umlshapes.shapes.UmlNote import UmlNote
         from umlshapes.shapes.UmlUseCase import UmlUseCase
+        from umlshapes.ShapeTypes import UmlShapeGenre
 
         for s in self.umlDiagram.shapes:
             if isinstance(s, UmlActor | UmlClass| UmlNote | UmlText | UmlUseCase):
-                umlShape: UmlShape = s
+                umlShape: UmlShapeGenre = s
                 umlShape.selected = True
         self.refresh()
 
@@ -409,11 +415,12 @@ class UmlFrame(DiagramFrame):
         """
         from umlshapes.links.UmlLink import UmlLink
         from umlshapes.links.UmlAssociationLabel import UmlAssociationLabel
+        from umlshapes.ShapeTypes import UmlShapeGenre
 
         self.ufLogger.debug(f'{deltaXY=}')
         shapes = self.selectedShapes
         for s in shapes:
-            umlShape: UmlShape = cast(UmlShape, s)
+            umlShape: UmlShapeGenre = cast(UmlShapeGenre, s)
             if not isinstance(umlShape, UmlLink) and not isinstance(umlShape, UmlAssociationLabel):
                 if umlShape.moveMaster is False:
                     umlShape.position = UmlPosition(
@@ -424,7 +431,7 @@ class UmlFrame(DiagramFrame):
                     umlShape.umlFrame.PrepareDC(dc)
                     umlShape.MoveLinks(dc)
 
-    def _copyToInternalClipboard(self, selectedShapes: UmlShapeList):
+    def _copyToInternalClipboard(self, selectedShapes: 'UmlShapes'):
         """
         Makes a copy of the selected shape's data model and puts in our
         internal clipboard

@@ -13,7 +13,6 @@ from wx import CommandEvent
 from wx import NewIdRef as wxNewIdRef
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
-from umlshapes.types.Common import UmlShapeList
 
 from umlshapes.shapes.UmlClass import UmlClass
 
@@ -88,9 +87,10 @@ class UmlClassCtxMenuHandler:
                 self.logger.error('Unhandled Menu ID')
 
     def _autoSize(self):
+        from umlshapes.ShapeTypes import UmlShapes
 
         umlFrame:  ClassDiagramFrame = self._frame
-        umlShapes: UmlShapeList        = umlFrame.umlShapes
+        umlShapes: UmlShapes         = umlFrame.umlShapes
 
         for umlShape in umlShapes:
             if isinstance(umlShape, UmlClass):

@@ -28,6 +28,7 @@ from pyutmodelv2.PyutInterface import PyutInterface
 from pyutmodelv2.PyutInterface import PyutInterfaces
 from pyutmodelv2.PyutModelTypes import ClassName
 
+from umlshapes.ShapeTypes import UmlShapeGenre
 from umlshapes.UmlDiagram import UmlDiagram
 from umlshapes.UmlUtils import UmlUtils
 from umlshapes.dialogs.DlgEditInterface import DlgEditInterface
@@ -47,7 +48,6 @@ from umlshapes.preferences.UmlPreferences import UmlPreferences
 from umlshapes.shapes.UmlClass import UmlClass
 
 from umlshapes.types.Common import AttachmentSide
-from umlshapes.types.Common import UmlShape
 from umlshapes.types.UmlPosition import UmlPosition
 
 from tests.demo.DemoCommon import Identifiers
@@ -298,7 +298,7 @@ class DemoAppFrame(SizedFrame):
     def _frameLeftClickListener(self, frame: UmlFrame, umlPosition: UmlPosition):
         self.logger.info(f'Frame {frame.id}, clicked at {umlPosition=}')
 
-    def _umlShapeListener(self, umlShape: UmlShape):
+    def _umlShapeListener(self, umlShape: UmlShapeGenre):
         self.logger.info(f'Shape was selected: {umlShape}')
 
     # noinspection PyUnusedLocal

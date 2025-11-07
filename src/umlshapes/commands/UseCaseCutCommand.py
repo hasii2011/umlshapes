@@ -1,21 +1,23 @@
 
+from typing import cast
 from typing import TYPE_CHECKING
 
 from logging import Logger
 from logging import getLogger
-from typing import cast
 
 from pyutmodelv2.PyutObject import PyutObject
 from pyutmodelv2.PyutUseCase import PyutUseCase
 
 from umlshapes.commands.BaseCutCommand import BaseCutCommand
+
 from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
-from umlshapes.types.Common import UmlShape
+
 from umlshapes.types.UmlPosition import UmlPosition
 
 if TYPE_CHECKING:
     from umlshapes.frames.UmlFrame import UmlFrame
     from umlshapes.shapes.UmlUseCase import UmlUseCase
+    from umlshapes.ShapeTypes import UmlShapeGenre
 
 
 class UseCaseCutCommand(BaseCutCommand):
@@ -45,21 +47,21 @@ class UseCaseCutCommand(BaseCutCommand):
         return True
 
     def Undo(self) -> bool:
+        from umlshapes.ShapeTypes import UmlShapeGenre
 
-        umlShape: UmlShape = self._createCutShape(pyutObject=self._pyutObject)
+        umlShape: UmlShapeGenre = self._createCutShape(pyutObject=self._pyutObject)
 
         self._setupUmlShape(umlShape=umlShape)
         self._umlUseCase = umlShape   # type: ignore
 
         return True
 
-    def _createCutShape(self, pyutObject: PyutObject) -> UmlShape:
+    def _createCutShape(self, pyutObject: PyutObject) -> 'UmlShapeGenre':
 
         from umlshapes.shapes.UmlUseCase import UmlUseCase
         from umlshapes.shapes.eventhandlers.UmlUseCaseEventHandler import UmlUseCaseEventHandler
 
-        umlShape:     UmlUseCase             \
-            = UmlUseCase(cast(PyutUseCase, pyutObject))
+        umlShape:     UmlUseCase             = UmlUseCase(cast(PyutUseCase, pyutObject))
         eventHandler: UmlUseCaseEventHandler = UmlUseCaseEventHandler()
 
         self._setupEventHandler(umlShape=umlShape, eventHandler=eventHandler)

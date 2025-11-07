@@ -12,7 +12,7 @@ from dataclasses import dataclass
 from wx import ID_OK
 from wx import OK
 
-from umlshapes.UmlBaseEventHandler import UmlBaseEventHandler
+from umlshapes.ShapeTypes import UmlShapeGenre
 from umlshapes.lib.ogl import ShapeEvtHandler
 
 from pyutmodelv2.PyutActor import PyutActor
@@ -42,6 +42,7 @@ from umlshapes.dialogs.DlgEditUseCase import DlgEditUseCase
 from umlshapes.pubsubengine.UmlPubSubEngine import UmlPubSubEngine
 from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
 from umlshapes.preferences.UmlPreferences import UmlPreferences
+from umlshapes.UmlBaseEventHandler import UmlBaseEventHandler
 
 from umlshapes.shapes.UmlActor import UmlActor
 from umlshapes.shapes.UmlClass import UmlClass
@@ -56,7 +57,6 @@ from umlshapes.shapes.eventhandlers.UmlTextEventHandler import UmlTextEventHandl
 from umlshapes.shapes.eventhandlers.UmlUseCaseEventHandler import UmlUseCaseEventHandler
 
 from umlshapes.types.Common import ModelObject
-from umlshapes.types.Common import UmlShape
 
 from umlshapes.types.UmlPosition import UmlPosition
 
@@ -73,7 +73,7 @@ InvokeEditDialog = Callable[[ModelObject], None]
 
 @dataclass
 class ShapeDescription:
-    umlShape:         type[UmlShape]        = cast(type[UmlShape], None)
+    umlShape:         type[UmlShapeGenre]   = cast(type[UmlShapeGenre], None)
     modelClass:       type[ModelObject]     = cast(type[ModelObject], None)
     createModel:      CreateModel           = cast(CreateModel, None)
     invokeEditDialog: InvokeEditDialog      = cast(InvokeEditDialog, None)
@@ -159,7 +159,7 @@ class ShapeCreator:
             modelClass = shapeDescription.modelClass(defaultValue)
         shapeDescription.instanceCounter += 1
 
-        umlShape: UmlShape = shapeDescription.umlShape(modelClass)      # type: ignore
+        umlShape: UmlShapeGenre = shapeDescription.umlShape(modelClass)      # type: ignore
 
         umlPosition: UmlPosition = self._computePosition()
         umlShape.umlFrame = self._diagramFrame
