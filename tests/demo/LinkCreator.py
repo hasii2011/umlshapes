@@ -68,9 +68,8 @@ class LinkCreator:
     """
     Not those kinds, dork
     """
-    def __init__(self, diagramFrame: ClassDiagramFrame, umlPubSubEngine: UmlPubSubEngine):
+    def __init__(self, umlPubSubEngine: UmlPubSubEngine):
 
-        self._diagramFrame:    ClassDiagramFrame = diagramFrame
         self._umlPubSubEngine: UmlPubSubEngine   = umlPubSubEngine
 
         self.logger:           Logger         = getLogger(__name__)
@@ -101,11 +100,11 @@ class LinkCreator:
             }
         )
 
-    def displayAssociation(self, idReference: ID_REFERENCE):
+    def displayAssociation(self, idReference: ID_REFERENCE, diagramFrame: ClassDiagramFrame):
 
         associationDescription: AssociationDescription = self._associations[idReference]
 
-        sourceUmlClass, destinationUmlClass = self._createClassPair()
+        sourceUmlClass, destinationUmlClass = self._createClassPair(diagramFrame=diagramFrame)
         self.logger.info(f'{sourceUmlClass.id=} {destinationUmlClass.id=}')
 
         pyutLink = self._createAssociationPyutLink()
@@ -115,13 +114,13 @@ class LinkCreator:
 
         umlAssociation: UmlAssociation = associationDescription.associationClass(pyutLink=pyutLink)
 
-        umlAssociation.umlFrame = self._diagramFrame
+        umlAssociation.umlFrame = diagramFrame
         umlAssociation.umlPubSubEngine = self._umlPubSubEngine
         umlAssociation.MakeLineControlPoints(n=2)       # Make this configurable
 
         sourceUmlClass.addLink(umlLink=umlAssociation, destinationClass=destinationUmlClass)
 
-        self._diagramFrame.umlDiagram.AddShape(umlAssociation)
+        diagramFrame.umlDiagram.AddShape(umlAssociation)
         umlAssociation.Show(True)
 
         eventHandler: UmlAssociationEventHandler = UmlAssociationEventHandler(umlAssociation=umlAssociation)
@@ -130,23 +129,23 @@ class LinkCreator:
         eventHandler.SetPreviousHandler(umlAssociation.GetEventHandler())
         umlAssociation.SetEventHandler(eventHandler)
 
-    def displayUmlInheritance(self):
+    def displayUmlInheritance(self, diagramFrame: ClassDiagramFrame):
         """
         """
-        baseUmlClass, subUmlClass = self._createClassPair()
+        baseUmlClass, subUmlClass = self._createClassPair(diagramFrame=diagramFrame)
         baseUmlClass.pyutClass.name = 'Base Class'
         subUmlClass.pyutClass.name  = 'SubClass'
 
         pyutInheritance: PyutLink = self._createInheritancePyutLink(baseUmlClass=baseUmlClass, subUmlClass=subUmlClass)
 
         umlInheritance: UmlInheritance = UmlInheritance(pyutLink=pyutInheritance, baseClass=baseUmlClass, subClass=subUmlClass)
-        umlInheritance.umlFrame = self._diagramFrame
+        umlInheritance.umlFrame = diagramFrame
         umlInheritance.MakeLineControlPoints(n=2)       # Make this configurable
 
         # REMEMBER:   from subclass to base class
         subUmlClass.addLink(umlLink=umlInheritance, destinationClass=baseUmlClass)
 
-        self._diagramFrame.umlDiagram.AddShape(umlInheritance)
+        diagramFrame.umlDiagram.AddShape(umlInheritance)
         umlInheritance.Show(True)
 
         eventHandler: UmlLinkEventHandler = UmlLinkEventHandler(umlLink=umlInheritance)
@@ -154,9 +153,9 @@ class LinkCreator:
         eventHandler.SetPreviousHandler(umlInheritance.GetEventHandler())
         umlInheritance.SetEventHandler(eventHandler)
 
-    def displayUmlInterface(self):
+    def displayUmlInterface(self, diagramFrame: ClassDiagramFrame):
 
-        interfaceClass, implementingClass = self._createClassPair()
+        interfaceClass, implementingClass = self._createClassPair(diagramFrame=diagramFrame)
 
         interfaceClass.pyutClass.name     = f'InterfaceClass-{self._classCounter}'
         self._classCounter += 1
@@ -169,12 +168,12 @@ class LinkCreator:
         pyutInterface.source       = interfaceClass.pyutClass
 
         umlInterface: UmlInterface = UmlInterface(pyutLink=pyutInterface, interfaceClass=interfaceClass, implementingClass=implementingClass)
-        umlInterface.umlFrame = self._diagramFrame
+        umlInterface.umlFrame = diagramFrame
         umlInterface.MakeLineControlPoints(n=2)
 
         implementingClass.addLink(umlLink=umlInterface, destinationClass=interfaceClass)
 
-        self._diagramFrame.umlDiagram.AddShape(umlInterface)
+        diagramFrame.umlDiagram.AddShape(umlInterface)
         umlInterface.Show(True)
 
         eventHandler: UmlLinkEventHandler = UmlLinkEventHandler(umlLink=umlInterface)
@@ -182,7 +181,7 @@ class LinkCreator:
         eventHandler.SetPreviousHandler(umlInterface.GetEventHandler())
         umlInterface.SetEventHandler(eventHandler)
 
-    def displayNoteLink(self):
+    def displayNoteLink(self, diagramFrame: ClassDiagramFrame):
         classPosition: UmlPosition = UmlPosition(x=450, y=100)
 
         umlNote: UmlNote = self._createUmlNote()
@@ -190,7 +189,7 @@ class LinkCreator:
         pyutClass: PyutClass = self._createSimplePyutClass(classCounter=self._classCounter)
         umlClass:  UmlClass  = UmlClass(pyutClass=pyutClass, size=UmlDimensions(100, 50))
 
-        self._displayUmlClass(umlClass=umlClass, umlPosition=classPosition)
+        self._displayUmlClass(umlClass=umlClass, umlPosition=classPosition, diagramFrame=diagramFrame)
 
         pyutLink:    PyutLink    = PyutLink(linkType=PyutLinkType.NOTELINK)
         umlNoteLink: UmlNoteLink = UmlNoteLink(pyutLink=pyutLink)
@@ -199,14 +198,14 @@ class LinkCreator:
         umlNoteLink.destinationClass = umlClass
         umlNoteLink.umlPubSubEngine  = self._umlPubSubEngine
 
-        umlNote.umlFrame  = self._diagramFrame
+        umlNote.umlFrame  = diagramFrame
 
-        umlClass.umlFrame = self._diagramFrame
+        umlClass.umlFrame = diagramFrame
         umlNote.addLink(umlNoteLink=umlNoteLink, umlClass=umlClass)
 
-        self._diagramFrame.umlDiagram.AddShape(umlNote)
-        self._diagramFrame.umlDiagram.AddShape(umlClass)
-        self._diagramFrame.umlDiagram.AddShape(umlNoteLink)
+        diagramFrame.umlDiagram.AddShape(umlNote)
+        diagramFrame.umlDiagram.AddShape(umlClass)
+        diagramFrame.umlDiagram.AddShape(umlNoteLink)
 
         umlNote.Show(True)
         umlNoteLink.Show(True)
@@ -216,9 +215,9 @@ class LinkCreator:
 
         umlNote.addLink(umlNoteLink=umlNoteLink, umlClass=umlClass)
 
-        self._diagramFrame.refresh()
+        diagramFrame.refresh()
 
-    def _createClassPair(self) -> Tuple[UmlClass, UmlClass]:
+    def _createClassPair(self, diagramFrame: ClassDiagramFrame) -> Tuple[UmlClass, UmlClass]:
 
         sourcePosition:       UmlPosition = UmlPosition(x=100, y=100)       # fix this should be input
         destinationPosition:  UmlPosition = UmlPosition(x=200, y=300)
@@ -231,8 +230,8 @@ class LinkCreator:
         sourceUmlClass:      UmlClass = UmlClass(pyutClass=sourcePyutClass)
         destinationUmlClass: UmlClass = UmlClass(pyutClass=destinationPyutClass)
 
-        self._displayUmlClass(umlClass=sourceUmlClass, umlPosition=sourcePosition)
-        self._displayUmlClass(umlClass=destinationUmlClass, umlPosition=destinationPosition)
+        self._displayUmlClass(umlClass=sourceUmlClass, umlPosition=sourcePosition, diagramFrame=diagramFrame)
+        self._displayUmlClass(umlClass=destinationUmlClass, umlPosition=destinationPosition, diagramFrame=diagramFrame)
 
         self._associateClassEventHandler(umlClass=sourceUmlClass)
         self._associateClassEventHandler(umlClass=destinationUmlClass)
@@ -314,14 +313,14 @@ class LinkCreator:
 
         return umlNote
 
-    def _displayUmlClass(self, umlClass: UmlClass, umlPosition: UmlPosition):
+    def _displayUmlClass(self, umlClass: UmlClass, umlPosition: UmlPosition, diagramFrame: ClassDiagramFrame):
 
-        diagram: UmlDiagram = self._diagramFrame.umlDiagram
+        diagram: UmlDiagram = diagramFrame.umlDiagram
 
         umlClass.position = umlPosition
-        umlClass.umlFrame = self._diagramFrame
+        umlClass.umlFrame = diagramFrame
 
         diagram.AddShape(umlClass)
         umlClass.Show(show=True)
 
-        self._diagramFrame.refresh()
+        diagramFrame.refresh()

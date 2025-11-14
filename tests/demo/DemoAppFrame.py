@@ -16,10 +16,13 @@ from wx import ID_REDO
 from wx import ID_SELECTALL
 from wx import DEFAULT_FRAME_STYLE
 from wx import FRAME_FLOAT_ON_PARENT
+from wx import EVT_NOTEBOOK_PAGE_CHANGED
 
 from wx import Menu
 from wx import MenuBar
+from wx import Notebook
 from wx import CommandEvent
+from wx import BookCtrlEvent
 
 from wx.lib.sized_controls import SizedFrame
 from wx.lib.sized_controls import SizedPanel
@@ -31,13 +34,14 @@ from pyutmodelv2.PyutModelTypes import ClassName
 from umlshapes.ShapeTypes import UmlShapeGenre
 from umlshapes.UmlDiagram import UmlDiagram
 from umlshapes.UmlUtils import UmlUtils
+
 from umlshapes.dialogs.DlgEditInterface import DlgEditInterface
-from umlshapes.frames.UmlFrame import UmlFrame
 
 from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 from umlshapes.pubsubengine.UmlPubSubEngine import UmlPubSubEngine
 from umlshapes.pubsubengine.UmlMessageType import UmlMessageType
 
+from umlshapes.frames.UmlFrame import UmlFrame
 from umlshapes.frames.DiagramFrame import FrameId
 from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
 
@@ -72,43 +76,41 @@ class DemoAppFrame(SizedFrame):
         self._umlPubSubEngine: UmlPubSubEngine = UmlPubSubEngine()
         self._editMenu:        Menu            = cast(Menu, None)
 
-        self._diagramFrame = ClassDiagramFrame(
-            parent=sizedPanel,
+        self._noteBook: Notebook = Notebook(parent=sizedPanel)
+        self._noteBook.SetSizerProps(expand=True, proportion=1)
+
+        self._diagramFrame1 = ClassDiagramFrame(
+            parent=self._noteBook,
             umlPubSubEngine=self._umlPubSubEngine,
         )
-        # noinspection PyUnresolvedReferences
-        self._diagramFrame.SetSizerProps(expand=True, proportion=1)
+        self._diagramFrame2 = ClassDiagramFrame(
+            parent=self._noteBook,
+            umlPubSubEngine=self._umlPubSubEngine,
+        )
+
+        self._noteBook.AddPage(page=self._diagramFrame1, text='Frame 1', select=True)
+        self._noteBook.AddPage(page=self._diagramFrame2, text='Frame 2')
+
+        self._currentFrame: ClassDiagramFrame = self._diagramFrame1
 
         self._createApplicationMenuBar()
-        self._diagramFrame.commandProcessor.SetEditMenu(menu=self._editMenu)
+        self._diagramFrame1.commandProcessor.SetEditMenu(menu=self._editMenu)
+        self._diagramFrame2.commandProcessor.SetEditMenu(menu=self._editMenu)
 
         self.CreateStatusBar()  # should always do this when there's a resize border
         self.SetAutoLayout(True)
         self.Show(True)
 
-        self._shapeCreator: ShapeCreator   = ShapeCreator(diagramFrame=self._diagramFrame, umlPubSubEngine=self._umlPubSubEngine)
-        self._linkCreator:  LinkCreator    = LinkCreator(diagramFrame=self._diagramFrame, umlPubSubEngine=self._umlPubSubEngine)
+        self._shapeCreator: ShapeCreator   = ShapeCreator(umlPubSubEngine=self._umlPubSubEngine)
+        self._linkCreator:  LinkCreator    = LinkCreator(umlPubSubEngine=self._umlPubSubEngine)
         self._preferences:  UmlPreferences = UmlPreferences()
 
         self._pyutInterfaceCount: int = 0
 
-        self._umlPubSubEngine.subscribe(UmlMessageType.UPDATE_APPLICATION_STATUS,
-                                        frameId=FrameId(self._diagramFrame.id),
-                                        listener=self._updateApplicationStatusListener)
-        self._umlPubSubEngine.subscribe(UmlMessageType.FRAME_MODIFIED,
-                                        frameId=self._diagramFrame.id,
-                                        listener=self._frameModifiedListener)
+        self._subscribeFrameToRelevantFrameTopics(frameId=self._diagramFrame1.id)
+        self._subscribeFrameToRelevantFrameTopics(frameId=self._diagramFrame2.id)
 
-        self._umlPubSubEngine.subscribe(UmlMessageType.FRAME_LEFT_CLICK,
-                                        frameId=self._diagramFrame.id,
-                                        listener=self._frameLeftClickListener)
-
-        self._umlPubSubEngine.subscribe(UmlMessageType.UML_SHAPE_SELECTED,
-                                        frameId=self._diagramFrame.id,
-                                        listener=self._umlShapeListener)
-        self._umlPubSubEngine.subscribe(UmlMessageType.CREATE_LOLLIPOP,
-                                        frameId=self._diagramFrame.id,
-                                        listener=self._createLollipopInterfaceListener)
+        self.Bind(EVT_NOTEBOOK_PAGE_CHANGED, self._onFrameDisplayedChanged)
 
     def _createApplicationMenuBar(self):
 
@@ -189,31 +191,31 @@ class DemoAppFrame(SizedFrame):
         # noinspection PyUnreachableCode
         match menuId:
             case Identifiers.ID_DISPLAY_UML_CLASS:
-                shapeCreator.displayShape(Identifiers.ID_DISPLAY_UML_CLASS)
+                shapeCreator.displayShape(Identifiers.ID_DISPLAY_UML_CLASS, self._currentFrame)
                 self.SetStatusText('See the shape !!')
             case Identifiers.ID_DISPLAY_UML_TEXT:
-                shapeCreator.displayShape(Identifiers.ID_DISPLAY_UML_TEXT)
+                shapeCreator.displayShape(Identifiers.ID_DISPLAY_UML_TEXT, self._currentFrame)
             case Identifiers.ID_DISPLAY_UML_NOTE:
-                shapeCreator.displayShape(Identifiers.ID_DISPLAY_UML_NOTE)
+                shapeCreator.displayShape(Identifiers.ID_DISPLAY_UML_NOTE, self._currentFrame)
             case Identifiers.ID_DISPLAY_UML_USE_CASE:
-                shapeCreator.displayShape(Identifiers.ID_DISPLAY_UML_USE_CASE)
+                shapeCreator.displayShape(Identifiers.ID_DISPLAY_UML_USE_CASE, self._currentFrame)
             case Identifiers.ID_DISPLAY_UML_ACTOR:
-                shapeCreator.displayShape(Identifiers.ID_DISPLAY_UML_ACTOR)
+                shapeCreator.displayShape(Identifiers.ID_DISPLAY_UML_ACTOR, self._currentFrame)
 
             case Identifiers.ID_DISPLAY_UML_ASSOCIATION:
-                linkCreator.displayAssociation(idReference=Identifiers.ID_DISPLAY_UML_ASSOCIATION)
+                linkCreator.displayAssociation(idReference=Identifiers.ID_DISPLAY_UML_ASSOCIATION, diagramFrame=self._currentFrame)
             case Identifiers.ID_DISPLAY_UML_COMPOSITION:
-                linkCreator.displayAssociation(idReference=Identifiers.ID_DISPLAY_UML_COMPOSITION)
+                linkCreator.displayAssociation(idReference=Identifiers.ID_DISPLAY_UML_COMPOSITION, diagramFrame=self._currentFrame)
             case Identifiers.ID_DISPLAY_UML_AGGREGATION:
-                linkCreator.displayAssociation(idReference=Identifiers.ID_DISPLAY_UML_AGGREGATION)
+                linkCreator.displayAssociation(idReference=Identifiers.ID_DISPLAY_UML_AGGREGATION, diagramFrame=self._currentFrame)
 
             case Identifiers.ID_DISPLAY_UML_NOTE_LINK:
-                linkCreator.displayNoteLink()
+                linkCreator.displayNoteLink(diagramFrame=self._currentFrame)
 
             case Identifiers.ID_DISPLAY_UML_INHERITANCE:
-                linkCreator.displayUmlInheritance()
+                linkCreator.displayUmlInheritance(diagramFrame=self._currentFrame)
             case Identifiers.ID_DISPLAY_UML_INTERFACE:
-                linkCreator.displayUmlInterface()
+                linkCreator.displayUmlInterface(diagramFrame=self._currentFrame)
             # case self._ID_DISPLAY_SEQUENCE_DIAGRAM:
             #     self._displaySequenceDiagram()
             case _:
@@ -224,22 +226,23 @@ class DemoAppFrame(SizedFrame):
         import wx       # So pattern matching works
 
         eventId: int = event.GetId()
+        frameId: FrameId = self._currentFrame.id
         match eventId:
 
             case wx.ID_UNDO:
-                self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.UNDO, frameId=self._diagramFrame.id)
+                self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.UNDO, frameId=frameId)
             case wx.ID_REDO:
-                self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.REDO, frameId=self._diagramFrame.id)
+                self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.REDO, frameId=frameId)
             case wx.ID_CUT:
-                self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.CUT_SHAPES, frameId=self._diagramFrame.id)
+                self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.CUT_SHAPES, frameId=frameId)
             case wx.ID_COPY:
-                self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.COPY_SHAPES, frameId=self._diagramFrame.id)
+                self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.COPY_SHAPES, frameId=frameId)
             case wx.ID_PASTE:
-                self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.PASTE_SHAPES, frameId=self._diagramFrame.id)
+                self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.PASTE_SHAPES, frameId=frameId)
             case wx.ID_PASTE:
-                self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.PASTE_SHAPES, frameId=self._diagramFrame.id)
+                self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.PASTE_SHAPES, frameId=frameId)
             case wx.ID_SELECTALL:
-                self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.SELECT_ALL_SHAPES, frameId=self._diagramFrame.id)
+                self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.SELECT_ALL_SHAPES, frameId=frameId)
             case _:
                 self.logger.warning(f'Unknown event id {eventId}')
 
@@ -307,3 +310,33 @@ class DemoAppFrame(SizedFrame):
         with DlgUmlShapesPreferences(parent=self) as dlg:
             if dlg.ShowModal() == OK:
                 self.logger.info(f'Pressed Ok')
+
+    # noinspection PyUnusedLocal
+    def _onFrameDisplayedChanged(self, event: BookCtrlEvent):
+
+        self._currentFrame = cast(ClassDiagramFrame, self._noteBook.GetCurrentPage())
+
+        self._currentFrame.commandProcessor.SetMenuStrings()
+
+        self.logger.info(f'{self._currentFrame.id=}')
+
+    def _subscribeFrameToRelevantFrameTopics(self, frameId: FrameId):
+
+        self._umlPubSubEngine.subscribe(UmlMessageType.UPDATE_APPLICATION_STATUS,
+                                        frameId=frameId,
+                                        listener=self._updateApplicationStatusListener)
+        self._umlPubSubEngine.subscribe(UmlMessageType.FRAME_MODIFIED,
+                                        frameId=frameId,
+                                        listener=self._frameModifiedListener)
+
+        self._umlPubSubEngine.subscribe(UmlMessageType.FRAME_LEFT_CLICK,
+                                        frameId=frameId,
+                                        listener=self._frameLeftClickListener)
+
+        self._umlPubSubEngine.subscribe(UmlMessageType.UML_SHAPE_SELECTED,
+                                        frameId=frameId,
+                                        listener=self._umlShapeListener)
+
+        self._umlPubSubEngine.subscribe(UmlMessageType.CREATE_LOLLIPOP,
+                                        frameId=frameId,
+                                        listener=self._createLollipopInterfaceListener)

@@ -68,7 +68,7 @@ from tests.demo.DemoCommon import INITIAL_Y
 from tests.demo.DemoCommon import Identifiers
 
 CreateModel      = Callable[[], ModelObject]
-InvokeEditDialog = Callable[[ModelObject], None]
+InvokeEditDialog = Callable[[ModelObject, ClassDiagramFrame], None]
 
 
 @dataclass
@@ -87,11 +87,10 @@ ShapesToCreate = NewType('ShapesToCreate', Dict[ID_REFERENCE, ShapeDescription])
 
 class ShapeCreator:
 
-    def __init__(self, diagramFrame: ClassDiagramFrame, umlPubSubEngine: UmlPubSubEngine):
+    def __init__(self, umlPubSubEngine: UmlPubSubEngine):
 
         self.logger: Logger = getLogger(__name__)
 
-        self._diagramFrame:    ClassDiagramFrame = diagramFrame
         self._umlPubSubEngine: UmlPubSubEngine   = umlPubSubEngine
 
         self._currentPosition: UmlPosition = UmlPosition(x=INITIAL_X, y=INITIAL_Y)
@@ -148,7 +147,7 @@ class ShapeCreator:
             }
         )
 
-    def displayShape(self, idReference: ID_REFERENCE):
+    def displayShape(self, idReference: ID_REFERENCE, diagramFrame: ClassDiagramFrame,):
 
         shapeDescription: ShapeDescription = self._shapes[idReference]
 
@@ -162,10 +161,10 @@ class ShapeCreator:
         umlShape: UmlShapeGenre = shapeDescription.umlShape(modelClass)      # type: ignore
 
         umlPosition: UmlPosition = self._computePosition()
-        umlShape.umlFrame = self._diagramFrame
+        umlShape.umlFrame = diagramFrame
         umlShape.position = umlPosition
 
-        diagram: UmlDiagram = self._diagramFrame.umlDiagram
+        diagram: UmlDiagram = diagramFrame.umlDiagram
 
         diagram.AddShape(umlShape)
         umlShape.Show(True)
@@ -176,10 +175,10 @@ class ShapeCreator:
         eventHandler.SetPreviousHandler(umlShape.GetEventHandler())
         umlShape.SetEventHandler(eventHandler)
 
-        self._diagramFrame.refresh()
+        diagramFrame.refresh()
         if shapeDescription.invokeEditDialog is not None:
-            shapeDescription.invokeEditDialog(modelClass)
-            self._diagramFrame.refresh()
+            shapeDescription.invokeEditDialog(modelClass, diagramFrame)
+            diagramFrame.refresh()
 
     def _computePosition(self) -> UmlPosition:
 
@@ -244,36 +243,36 @@ class ShapeCreator:
 
         return pyutParameters
 
-    def _invokeEditNoteDialog(self, pyutNote: PyutNote):
+    def _invokeEditNoteDialog(self, pyutNote: PyutNote, diagramFrame: ClassDiagramFrame):
 
         self.logger.info(f'{pyutNote=}')
 
-        with DlgEditNote(self._diagramFrame, pyutNote=pyutNote) as dlg:
+        with DlgEditNote(diagramFrame, pyutNote=pyutNote) as dlg:
             if dlg.ShowModal() == OK:
                 self.logger.info(f'UpdatedNote: {pyutNote}')
 
-    def _invokeEditTextDialog(self, pyutText: PyutText):
+    def _invokeEditTextDialog(self, pyutText: PyutText, diagramFrame: ClassDiagramFrame,):
 
         self.logger.info(f'{pyutText=}')
 
-        with DlgEditText(self._diagramFrame, pyutText=pyutText) as dlg:
+        with DlgEditText(diagramFrame, pyutText=pyutText) as dlg:
             if dlg.ShowModal() == OK:
                 self.logger.info(f'Updated text: {pyutText}')
 
-    def _invokeEditUseCaseDialog(self, pyutUseCase: PyutUseCase):
+    def _invokeEditUseCaseDialog(self, pyutUseCase: PyutUseCase, diagramFrame: ClassDiagramFrame,):
 
         self.logger.info(f'{pyutUseCase=}')
 
-        with DlgEditUseCase(self._diagramFrame, useCaseName=pyutUseCase.name) as dlg:
+        with DlgEditUseCase(diagramFrame, useCaseName=pyutUseCase.name) as dlg:
             if dlg.ShowModal() == ID_OK:
                 pyutUseCase.name = dlg.useCaseName
                 self.logger.info(f'Updated use case: {pyutUseCase}')
             else:
                 self.logger.warning('Not Ok')
 
-    def _invokeEditActorDialog(self, pyutActor: PyutActor) -> None:
+    def _invokeEditActorDialog(self, pyutActor: PyutActor, diagramFrame: ClassDiagramFrame,) -> None:
 
-        with DlgEditActor(self._diagramFrame, actorName=pyutActor.name) as dlg:
+        with DlgEditActor(diagramFrame, actorName=pyutActor.name) as dlg:
             if dlg.ShowModal() == ID_OK:
                 pyutActor.name = dlg.actorName
                 self.logger.info(f'Updated note: {pyutActor}')
