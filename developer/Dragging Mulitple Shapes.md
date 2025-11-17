@@ -7,7 +7,7 @@ Each individual shape type currently takes responsibility for dragging itself ac
 
 Actually, the base wxPtyhon event handler does the dragging and positioning.  However, it does not provide enough feedback.  The developer does not see the shape dragged.  The user drags the shape and stops.  The *dragged* shape magically appears at the new positions.  The effect is quite disturbing.  
 
-Since each shape *drags* itself, when the user selects multiple shape only the latest selected shape drags.
+Since each shape *drags* itself, when the user selects multiple shapes only the latest selected shape drags.
 
 The current implementation requires interactions betweent the specific shape's event handler and a listener in the `UmlFrame`
 
@@ -30,3 +30,11 @@ When the user stops dragging this method essentially initializes the state for t
 ### UmlFrame
 
 The master shape is issuing *SHAPE_MOVING* messages.  Someone has to be listening for those and respond.  That listener is in the UmlFrame class.  That class knows which shapes are currently selected.  It takes the delta XY positions and applies the deltas to the currently selected shapes.  That causes those shapes to synchronously move with the *master* shape.
+
+
+
+
+
+## Conclusion
+
+That is a masterful implementation. 
