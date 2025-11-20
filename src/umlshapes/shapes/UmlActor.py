@@ -6,11 +6,10 @@ from logging import getLogger
 
 from dataclasses import dataclass
 
+from umlmodel.Actor import Actor
 from wx import DC
 from wx import MemoryDC
 from wx import RED
-
-from pyutmodelv2.PyutActor import PyutActor
 
 from umlshapes.lib.ogl import FORMAT_CENTRE_HORIZ
 from umlshapes.lib.ogl import FORMAT_CENTRE_VERT
@@ -56,20 +55,20 @@ class UmlActor(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
         Notice that the IdentifierMixin is placed before any Shape mixin.
         See Python left to right method resolution order (MRO)
     """
-    def __init__(self, pyutActor: PyutActor | None = None, size: UmlDimensions = None):
+    def __init__(self, actor: Actor | None = None, size: UmlDimensions = None):
         """
 
         Args:
-            pyutActor:
+            actor:
             size:       An initial size that overrides the default
         """
         self.logger: Logger = getLogger(__name__)
 
         self._preferences: UmlPreferences = UmlPreferences()
-        if pyutActor is None:
-            self._pyutActor: PyutActor = PyutActor(actorName=self._preferences.defaultNameActor)
+        if actor is None:
+            self._actor: Actor = Actor(actorName=self._preferences.defaultNameActor)
         else:
-            self._pyutActor = pyutActor
+            self._actor = actor
 
         if size is None:
             actorSize: UmlDimensions = self._preferences.actorSize
@@ -88,12 +87,12 @@ class UmlActor(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
         self.SetFormatMode(mode=FORMAT_CENTRE_HORIZ | FORMAT_CENTRE_VERT)
 
     @property
-    def pyutActor(self) -> PyutActor:
-        return self._pyutActor
+    def modelActor(self) -> Actor:
+        return self._actor
 
-    @pyutActor.setter
-    def pyutActor(self, value: PyutActor):
-        self._pyutActor = value
+    @modelActor.setter
+    def modelActor(self, value: Actor):
+        self._actor = value
 
     @property
     def selected(self) -> bool:
@@ -301,19 +300,19 @@ class UmlActor(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
             x:
         """
 
-        textWidth, textHeight = dc.GetTextExtent(self.pyutActor.name)
+        textWidth, textHeight = dc.GetTextExtent(self.modelActor.name)
 
         y = round(centerY + NAME_Y_ADJUSTMENT * height - MARGIN - 0.1 * actorHeight)
 
         if self.Selected() is True:
             dc.SetTextForeground(RED)
 
-        dc.DrawText(self.pyutActor.name, round(x - 0.5 * textWidth), y)
+        dc.DrawText(self.modelActor.name, round(x - 0.5 * textWidth), y)
 
     def __str__(self) -> str:
-        return self.pyutActor.name
+        return self.modelActor.name
 
     def __repr__(self):
 
-        strMe: str = f"[UmlActor - umlId: `{self.id} `modelId: '{self.pyutActor.id}']"
+        strMe: str = f"[UmlActor - umlId: `{self.id} `modelId: '{self.modelActor.id}']"
         return strMe

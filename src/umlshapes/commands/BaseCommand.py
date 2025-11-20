@@ -5,9 +5,8 @@ from logging import getLogger
 
 from datetime import datetime
 
+from umlmodel.BaseAttributes import BaseAttributes
 from wx import Command
-
-from pyutmodelv2.PyutObject import PyutObject
 
 from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 
@@ -21,10 +20,10 @@ if TYPE_CHECKING:
 
 class BaseCommand(Command):
 
-    def __init__(self, partialName: str, pyutObject: PyutObject, umlPosition: UmlPosition, umlFrame: 'UmlFrame', umlPubSubEngine: IUmlPubSubEngine):
+    def __init__(self, partialName: str, baseAttributes: BaseAttributes, umlPosition: UmlPosition, umlFrame: 'UmlFrame', umlPubSubEngine: IUmlPubSubEngine):
         from umlshapes.frames.UmlFrame import UmlFrame
 
-        self._pyutObject:      PyutObject     = pyutObject
+        self._baseAttributes:  BaseAttributes     = baseAttributes
         self._umlPosition:     UmlPosition    = umlPosition
         self._umlFrame:        UmlFrame       = umlFrame
         self._umlPubSubEngine: IUmlPubSubEngine = umlPubSubEngine

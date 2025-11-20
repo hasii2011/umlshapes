@@ -9,9 +9,9 @@ from wx import Window
 
 from wx.lib.sized_controls import SizedPanel
 
-from pyutmodelv2.PyutNote import PyutNote
-
 from umlshapes.dialogs.BaseEditDialog import BaseEditDialog
+
+from umlmodel.Note import Note
 
 
 class DlgEditNote(BaseEditDialog):
@@ -26,16 +26,16 @@ class DlgEditNote(BaseEditDialog):
                 self._eventEngine.sendEvent(EventType.UMLDiagramModified)
 
     """
-    def __init__(self, parent: Window, pyutNote: PyutNote):
+    def __init__(self, parent: Window, note: Note):
         """
 
         Args:
             parent:      parent window to center on
-            pyutNote:    Model object we are editing
+            note:    Model object we are editing
         """
         super().__init__(parent, title="Edit Note")
 
-        self._pyutNote: PyutNote = pyutNote
+        self._pyutNote: Note = note
 
         sizedPanel: SizedPanel = self.GetContentsPane()
 

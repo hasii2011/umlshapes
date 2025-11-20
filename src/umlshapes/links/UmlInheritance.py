@@ -4,9 +4,9 @@ from logging import getLogger
 
 from os import linesep as osLineSep
 
-from pyutmodelv2.PyutLink import PyutLink
-
 from umlshapes.lib.ogl import ARROW_ARROW
+
+from umlmodel.Link import Link
 
 from umlshapes.links.UmlLink import UmlLink
 from umlshapes.shapes.UmlClass import UmlClass
@@ -20,15 +20,15 @@ class UmlInheritance(UmlLink):
     srcId == SubClass
     dstId == Base Class.  (arrow here)
     """
-    def __init__(self, pyutLink: PyutLink, baseClass: UmlClass, subClass: UmlClass):
+    def __init__(self, link: Link, baseClass: UmlClass, subClass: UmlClass):
         """
 
         Args:
-            pyutLink:
+            link:
             baseClass:
             subClass:
         """
-        super().__init__(pyutLink=pyutLink)
+        super().__init__(link=link)
 
         self.inheritanceLogger: Logger = getLogger(__name__)
 

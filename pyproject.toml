@@ -23,17 +23,18 @@ dependencies = [
     'wxPython~=4.2.3',
     'codeallybasic>=1.30.0',
     'codeallyadvanced>=2.2.0',
-    'pyutmodelv2>=2.2.6',
+    'umlmodel>=3.3.0',
     'human_id==0.2.0',
     'Pypubsub==4.0.3',
 ]
 
 [project.optional-dependencies]
 test = [
-  'mypy==1.17.1',
-  'mypy-extensions==1.1.0',
-  'types-Deprecated==1.2.9.20240311',
-  'html-testRunner~=1.2.1',
+    'mypy==1.17.1',
+    'mypy-extensions==1.1.0',
+    'types-Deprecated==1.2.9.20240311',
+    'html-testRunner~=1.2.1',
+    'pyautogui==0.9.54'
 ]
 
 deploy = [

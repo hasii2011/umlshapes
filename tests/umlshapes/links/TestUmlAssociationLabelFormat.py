@@ -1,8 +1,7 @@
-from cmath import acosh
+
 from unittest import TestSuite
 from unittest import main as unitTestMain
 
-from codeallybasic.DynamicConfiguration import StringList
 from codeallybasic.UnitTestBase import UnitTestBase
 
 from umlshapes.lib.ogl import FORMAT_CENTRE_HORIZ

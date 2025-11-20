@@ -25,14 +25,12 @@ from wx import Button
 
 from wx.lib.sized_controls import SizedPanel
 
-from pyutmodelv2.PyutMethod import PyutMethod
-from pyutmodelv2.PyutMethod import SourceCode
-from pyutmodelv2.PyutMethod import PyutParameters
-
-from pyutmodelv2.PyutParameter import PyutParameter
-from pyutmodelv2.PyutType import PyutType
-
-from pyutmodelv2.enumerations.PyutVisibility import PyutVisibility
+from umlmodel.Method import Method
+from umlmodel.Method import Parameters
+from umlmodel.Method import SourceCode
+from umlmodel.Parameter import Parameter
+from umlmodel.ReturnType import ReturnType
+from umlmodel.enumerations.Visibility import Visibility
 
 from umlshapes.dialogs.BaseEditDialog import BaseEditDialog
 from umlshapes.dialogs.BaseEditDialog import CustomDialogButton
@@ -51,15 +49,15 @@ from umlshapes.enhancedlistbox.UpCallbackData import UpCallbackData
 
 class DlgEditMethod(BaseEditDialog):
 
-    def __init__(self, parent,  pyutMethod: PyutMethod, editInterface: bool = False):
+    def __init__(self, parent, method: Method, editInterface: bool = False):
 
         super().__init__(parent, title="Edit Method")
 
         self.logger:         Logger = getLogger(__name__)
         self._editInterface: bool   = editInterface
 
-        self._pyutMethod:     PyutMethod = pyutMethod
-        self._pyutMethodCopy: PyutMethod = deepcopy(pyutMethod)
+        self._pyutMethod:     Method = method
+        self._pyutMethodCopy: Method = deepcopy(method)
 
         self._rdbVisibility:    RadioBox = cast(RadioBox, None)
         self._methodName:       TextCtrl = cast(TextCtrl, None)
@@ -148,19 +146,19 @@ class DlgEditMethod(BaseEditDialog):
 
     def _parameterAddCallback (self) -> CallbackAnswer:
         # TODO Use default parameter name when available
-        pyutParameter: PyutParameter  = PyutParameter(name='parameter1')
-        answer:        CallbackAnswer = self._editParameter(pyutParameter=pyutParameter)
+        parameter: Parameter  = Parameter(name='parameter1')
+        answer:        CallbackAnswer = self._editParameter(pyutParameter=parameter)
         if answer.valid is True:
-            self._pyutMethodCopy.parameters.append(pyutParameter)
+            self._pyutMethodCopy.parameters.append(parameter)
 
         return answer
 
     def _parameterEditCallback (self, selection: int) -> CallbackAnswer:
 
-        pyutParameter: PyutParameter = self._pyutMethodCopy.parameters[selection]
+        pyutParameter: Parameter = self._pyutMethodCopy.parameters[selection]
         return self._editParameter(pyutParameter=pyutParameter)
 
-    def _editParameter(self, pyutParameter: PyutParameter) -> CallbackAnswer:
+    def _editParameter(self, pyutParameter: Parameter) -> CallbackAnswer:
 
         answer:        CallbackAnswer = CallbackAnswer()
         with DlgEditParameter(parent=self, parameterToEdit=pyutParameter) as dlg:
@@ -173,13 +171,13 @@ class DlgEditMethod(BaseEditDialog):
         return answer
 
     def _parameterRemoveCallback (self, selection: int):
-        pyutParameters: PyutParameters = self._pyutMethodCopy.parameters
+        pyutParameters: Parameters = self._pyutMethodCopy.parameters
         pyutParameters.pop(selection)
 
     def _parameterUpCallback (self, selection: int) -> UpCallbackData:
 
-        pyutParameters: PyutParameters = self._pyutMethodCopy.parameters
-        pyutParameter:  PyutParameter  = pyutParameters[selection]
+        pyutParameters: Parameters = self._pyutMethodCopy.parameters
+        pyutParameter:  Parameter  = pyutParameters[selection]
         pyutParameters.pop(selection)
         pyutParameters.insert(selection-1, pyutParameter)
 
@@ -192,8 +190,8 @@ class DlgEditMethod(BaseEditDialog):
     # noinspection PyUnusedLocal
     def _parameterDownCallback (self, selection: int) -> DownCallbackData:
 
-        parameters:    PyutParameters = self._pyutMethodCopy.parameters
-        pyutParameter: PyutParameter  = parameters[selection]
+        parameters:    Parameters = self._pyutMethodCopy.parameters
+        pyutParameter: Parameter  = parameters[selection]
         parameters.pop(selection)
         parameters.insert(selection + 1, pyutParameter)
 
@@ -243,13 +241,13 @@ class DlgEditMethod(BaseEditDialog):
 
         self._pyutMethod.modifiers = self._pyutMethodCopy.modifiers
 
-        returnType: PyutType = PyutType(self._MethodReturnType.GetValue())
+        returnType: ReturnType = ReturnType(self._MethodReturnType.GetValue())
         self._pyutMethod.returnType = returnType
         self._pyutMethod.parameters = self._pyutMethodCopy.parameters
 
         if self._editInterface is False:
             visStr:      str               = self._rdbVisibility.GetStringSelection()
-            visibility: PyutVisibility = PyutVisibility.toEnum(visStr)
+            visibility: Visibility = Visibility.toEnum(visStr)
             self._pyutMethod.visibility = visibility
 
         self._pyutMethod.sourceCode = self._pyutMethodCopy.sourceCode

@@ -4,11 +4,10 @@ from typing import cast
 from logging import Logger
 from logging import getLogger
 
+from umlmodel.Interface import Interface
+from umlmodel.Interface import Interfaces
+from umlmodel.ModelTypes import ClassName
 from wx import Window
-
-from pyutmodelv2.PyutInterface import PyutInterface
-from pyutmodelv2.PyutInterface import PyutInterfaces
-from pyutmodelv2.PyutModelTypes import ClassName
 
 from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 from umlshapes.pubsubengine.UmlMessageType import UmlMessageType
@@ -55,7 +54,7 @@ class ClassDiagramFrame(UmlFrame):
         Returns: the mode we are in
         """
         return self._requestingLollipopLocation
-    def getDefinedInterfaces(self) -> PyutInterfaces:
+    def getDefinedInterfaces(self) -> Interfaces:
         """
         This will not only look for lollipop interfaces but will find UmlInterfaces.
         It will convert those PyutLink's to PyutInterfaces
@@ -71,31 +70,31 @@ class ClassDiagramFrame(UmlFrame):
         # umlLollipopInterface: UmlLollipopInterface = self.GetShape()
         # umlFrame:             ClassDiagramFrame = umlLollipopInterface.GetCanvas()
 
-        umlShapes:      UmlShapes      = self.umlShapes
-        pyutInterfaces: PyutInterfaces = PyutInterfaces([])
+        umlShapes:  UmlShapes      = self.umlShapes
+        interfaces: Interfaces = Interfaces([])
 
         for umlShape in umlShapes:
 
             if isinstance(umlShape, UmlLollipopInterface):
                 lollipopInterface: UmlLollipopInterface = umlShape
-                pyutInterface:     PyutInterface = lollipopInterface.pyutInterface
+                interface:     Interface = lollipopInterface.modelInterface
 
-                if pyutInterface.name != '' or len(pyutInterface.name) > 0:
-                    if pyutInterface not in pyutInterfaces:
-                        pyutInterfaces.append(pyutInterface)
+                if interface.name != '' or len(interface.name) > 0:
+                    if interface not in interfaces:
+                        interfaces.append(interface)
             elif isinstance(umlShape, UmlInterface):
                 umlInterface: UmlInterface = umlShape
-                interface:    UmlClass     = umlInterface.interfaceClass
-                implementor:  UmlClass     = umlInterface.implementingClass
+                interfaceClass: UmlClass = umlInterface.interfaceClass
+                implementor:    UmlClass = umlInterface.implementingClass
                 #
                 # Convert to PyutInterface
                 #
-                pyutInterface = PyutInterface(name=interface.pyutClass.name)
-                pyutInterface.addImplementor(ClassName(implementor.pyutClass.name))
+                interface = Interface(name=interfaceClass.modelClass.name)
+                interface.addImplementor(ClassName(implementor.modelClass.name))
 
-                pyutInterfaces.append(pyutInterface)
+                interfaces.append(interface)
 
-        return pyutInterfaces
+        return interfaces
 
 
     def OnLeftClick(self, x, y, keys=0):

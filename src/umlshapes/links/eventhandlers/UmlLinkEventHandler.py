@@ -6,6 +6,8 @@ from typing import TYPE_CHECKING
 from logging import Logger
 from logging import getLogger
 
+from umlmodel.Link import Link
+from umlmodel.enumerations.LinkType import LinkType
 from wx import DC
 from wx import EVT_MENU
 from wx import Menu
@@ -16,9 +18,6 @@ from wx import CommandEvent
 from wx import Point
 
 from wx import NewIdRef as wxNewIdRef
-
-from pyutmodelv2.PyutLink import PyutLink
-from pyutmodelv2.enumerations.PyutLinkType import PyutLinkType
 
 from umlshapes.lib.ogl import LineShape
 
@@ -42,7 +41,7 @@ if TYPE_CHECKING:
     from umlshapes.links.UmlLink import UmlLink
     from umlshapes.links.UmlAssociation import UmlAssociation
 
-EditableLinkTypes: List[PyutLinkType] = [PyutLinkType.ASSOCIATION, PyutLinkType.AGGREGATION, PyutLinkType.COMPOSITION]
+EditableLinkTypes: List[LinkType] = [LinkType.ASSOCIATION, LinkType.AGGREGATION, LinkType.COMPOSITION]
 
 MENU_ADD_BEND_ID:      int = wxNewIdRef()
 MENU_REMOVE_BEND_ID:   int = wxNewIdRef()
@@ -86,16 +85,16 @@ class UmlLinkEventHandler(UmlBaseEventHandler):
         super().OnLeftDoubleClick(x=x, y=y, keys=keys, attachment=attachment)
 
         umlLink:  UmlAssociation = self.GetShape()
-        pyutLink: PyutLink       = umlLink.pyutLink
+        pyutLink: Link           = umlLink.modelLink
         umlFrame: UmlFrame       = umlLink.GetCanvas()
 
         if self._isLinkEditable(linkType=pyutLink.linkType):
 
-            with DlgEditLink(parent=umlFrame, pyutLink=pyutLink) as dlg:
+            with DlgEditLink(parent=umlFrame, link=pyutLink) as dlg:
                 if dlg.ShowModal() == OK:
                     umlFrame.refresh()
                     self.logger.info(f'{pyutLink=}')
-                    self._updateAssociationLabels(umlLink=umlLink, pyutLink=dlg.value)
+                    self._updateAssociationLabels(umlLink=umlLink, modelLink=dlg.value)
 
     def OnRightClick(self, x: int, y: int, keys: int = 0, attachment: int = 0):
         """
@@ -190,13 +189,13 @@ class UmlLinkEventHandler(UmlBaseEventHandler):
         self.logger.debug(f'labelX,labelY=({labelX},{labelY})  deltaX,deltaY=({linkDelta.deltaX},{linkDelta.deltaY})')
         return newNamePosition
 
-    def _updateAssociationLabels(self, umlLink: 'UmlAssociation', pyutLink: PyutLink):
+    def _updateAssociationLabels(self, umlLink: 'UmlAssociation', modelLink: Link):
 
-        umlLink.sourceCardinality.label      = pyutLink.sourceCardinality
-        umlLink.destinationCardinality.label = pyutLink.destinationCardinality
-        umlLink.associationName.label        = pyutLink.name
+        umlLink.sourceCardinality.label      = modelLink.sourceCardinality
+        umlLink.destinationCardinality.label = modelLink.destinationCardinality
+        umlLink.associationName.label        = modelLink.name
 
-    def _isLinkEditable(self, linkType: PyutLinkType) -> bool:
+    def _isLinkEditable(self, linkType: LinkType) -> bool:
         """
 
         Args:

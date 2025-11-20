@@ -15,9 +15,9 @@ from wx import Font
 from wx import MemoryDC
 from wx import Size
 
-from umlshapes.lib.ogl import Shape
+from umlmodel.Interface import Interface
 
-from pyutmodelv2.PyutInterface import PyutInterface
+from umlshapes.lib.ogl import Shape
 
 from umlshapes.UmlUtils import UmlUtils
 from umlshapes.mixins.IDMixin import IDMixin
@@ -38,15 +38,15 @@ class UmlLollipopInterface(Shape, IDMixin):
     """
     Lollipops are tasty !!
     """
-    def __init__(self, pyutInterface: PyutInterface, canvas: Optional['ClassDiagramFrame'] = None):
+    def __init__(self, interface: Interface, canvas: Optional['ClassDiagramFrame'] = None):
         """
 
         Args:
-            pyutInterface:  The data model
+            interface:  The data model
             canvas:         The diagram frame we are on
         """
-        self._pyutInterface: PyutInterface  = pyutInterface
-        self._preferences:   UmlPreferences = UmlPreferences()
+        self._modelInterface: Interface      = interface
+        self._preferences:    UmlPreferences = UmlPreferences()
 
         super().__init__(canvas=canvas)
         IDMixin.__init__(self, shape=self)
@@ -69,12 +69,12 @@ class UmlLollipopInterface(Shape, IDMixin):
         self.SetCanvas(frame)
 
     @property
-    def pyutInterface(self) -> PyutInterface:
-        return self._pyutInterface
+    def modelInterface(self) -> Interface:
+        return self._modelInterface
 
-    @pyutInterface.setter
-    def pyutInterface(self, pyutInterface: PyutInterface):
-        self._pyutInterface = pyutInterface
+    @modelInterface.setter
+    def modelInterface(self, interface: Interface):
+        self._modelInterface = interface
 
     @property
     def attachedTo(self) -> 'UmlClass':
@@ -135,7 +135,7 @@ class UmlLollipopInterface(Shape, IDMixin):
 
         dc.DrawCircle(lollipopCoordinates.endCoordinates.x, lollipopCoordinates.endCoordinates.y, self._preferences.lollipopCircleRadius)
 
-        extentSize: Size = dc.GetTextExtent(self.pyutInterface.name)
+        extentSize: Size = dc.GetTextExtent(self.modelInterface.name)
 
         interfaceNamePosition: UmlPosition = self._determineInterfaceNamePosition(
             start=lollipopCoordinates.startCoordinates,
@@ -143,7 +143,7 @@ class UmlLollipopInterface(Shape, IDMixin):
             pixelSize=self._pixelSize,
             textSize=extentSize
         )
-        dc.DrawText(self.pyutInterface.name, interfaceNamePosition.x, interfaceNamePosition.y)
+        dc.DrawText(self.modelInterface.name, interfaceNamePosition.x, interfaceNamePosition.y)
 
     def HitTest(self, x, y):
         """
@@ -272,7 +272,7 @@ class UmlLollipopInterface(Shape, IDMixin):
     def _isSameName(self, other: 'UmlLollipopInterface') -> bool:
 
         ans: bool = False
-        if self.pyutInterface.name == other.pyutInterface.name:
+        if self.modelInterface.name == other.modelInterface.name:
             ans = True
         return ans
 
@@ -288,7 +288,7 @@ class UmlLollipopInterface(Shape, IDMixin):
 
     def __repr__(self):
 
-        strMe: str = f'UmlLollipopInterface - "{self._pyutInterface.name}"'
+        strMe: str = f'UmlLollipopInterface - "{self._modelInterface.name}"'
         return strMe
 
     def __eq__(self, other: object):
@@ -302,4 +302,4 @@ class UmlLollipopInterface(Shape, IDMixin):
             return False
 
     def __hash__(self):
-        return hash(self._pyutInterface.name) + hash(self.id)
+        return hash(self._modelInterface.name) + hash(self.id)

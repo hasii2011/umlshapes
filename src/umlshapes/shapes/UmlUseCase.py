@@ -2,11 +2,10 @@
 from logging import Logger
 from logging import getLogger
 
+from umlmodel.UseCase import UseCase
 from wx import MemoryDC
 
 from umlshapes.lib.ogl import EllipseShape
-
-from pyutmodelv2.PyutUseCase import PyutUseCase
 
 from umlshapes.UmlUtils import UmlUtils
 
@@ -26,15 +25,15 @@ class UmlUseCase(ControlPointMixin,  IdentifierMixin, EllipseShape, TopLeftMixin
     Notice that the IdentifierMixin is placed before any Shape mixin.
     See Python left to right method resolution order (MRO)
     """
-    def __init__(self, pyutUseCase: PyutUseCase | None = None, size: UmlDimensions = None):
+    def __init__(self, useCase: UseCase | None = None, size: UmlDimensions = None):
 
         self.logger:       Logger         = getLogger(__name__)
         self._preferences: UmlPreferences = UmlPreferences()
 
-        if pyutUseCase is None:
-            self._pyutUseCase: PyutUseCase = PyutUseCase()
+        if useCase is None:
+            self._modelUseCase: UseCase = UseCase()
         else:
-            self.pyutUseCase = pyutUseCase
+            self.modelUseCase = useCase
 
         super().__init__(shape=self)
         if size is None:
@@ -50,15 +49,15 @@ class UmlUseCase(ControlPointMixin,  IdentifierMixin, EllipseShape, TopLeftMixin
         self.SetDraggable(drag=True)
 
         self.SetFont(UmlUtils.defaultFont())
-        self.AddText(self._pyutUseCase.name)
+        self.AddText(self._modelUseCase.name)
 
     @property
-    def pyutUseCase(self) -> PyutUseCase:
-        return self._pyutUseCase
+    def modelUseCase(self) -> UseCase:
+        return self._modelUseCase
 
-    @pyutUseCase.setter
-    def pyutUseCase(self, value: PyutUseCase):
-        self._pyutUseCase = value
+    @modelUseCase.setter
+    def modelUseCase(self, value: UseCase):
+        self._modelUseCase = value
 
     @property
     def umlFrame(self) -> UseCaseDiagramFrame:
@@ -85,7 +84,7 @@ class UmlUseCase(ControlPointMixin,  IdentifierMixin, EllipseShape, TopLeftMixin
             dc:
         """
         self.ClearText()
-        self.AddText(self.pyutUseCase.name)
+        self.AddText(self.modelUseCase.name)
 
         super().OnDraw(dc)
 
@@ -152,7 +151,7 @@ class UmlUseCase(ControlPointMixin,  IdentifierMixin, EllipseShape, TopLeftMixin
         self._controlPoints[3]._yoffset = 0
 
     def __str__(self) -> str:
-        return self.pyutUseCase.name
+        return self.modelUseCase.name
 
     def __repr__(self) -> str:
-        return f"[UmlUseCase - umlId: `{self.id} `modelId: '{self.pyutUseCase.id}']"
+        return f"[UmlUseCase - umlId: `{self.id} `modelId: '{self.modelUseCase.id}']"

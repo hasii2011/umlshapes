@@ -16,10 +16,10 @@ from wx import Font
 from wx import MemoryDC
 from wx import Menu
 
+from umlmodel.Text import Text
+
 from umlshapes.lib.ogl import Shape
 from umlshapes.lib.ogl import TextShape
-
-from pyutmodelv2.PyutText import PyutText
 
 from umlshapes.mixins.IdentifierMixin import IdentifierMixin
 from umlshapes.preferences.UmlPreferences import UmlPreferences
@@ -37,8 +37,6 @@ from umlshapes.frames.SequenceDiagramFrame import SequenceDiagramFrame
 
 from umlshapes.UmlUtils import UmlUtils
 
-CONTROL_POINT_SIZE: int = 4         # Make this a preference
-
 
 class UmlText(ControlPointMixin, IdentifierMixin, TextShape, TopLeftMixin):
     """
@@ -48,12 +46,12 @@ class UmlText(ControlPointMixin, IdentifierMixin, TextShape, TopLeftMixin):
     """
     MARGIN: int = 5
 
-    def __init__(self, pyutText: PyutText | None = None, size: UmlDimensions = None):
+    def __init__(self, text: Text | None = None, size: UmlDimensions = None):
         """
 
         Args:
-            pyutText:
-            size:       An initial size that overrides the default
+            text:   Data model text instance
+            size:   An initial size that overrides the default
         """
 
         self.logger: Logger = getLogger(__name__)
@@ -66,10 +64,10 @@ class UmlText(ControlPointMixin, IdentifierMixin, TextShape, TopLeftMixin):
         else:
             textSize = size
 
-        if pyutText is None:
-            self._pyutText: PyutText = PyutText(content=self._preferences.textValue)
+        if text is None:
+            self._modelText: Text = Text(content=self._preferences.textValue)
         else:
-            self._pyutText = pyutText
+            self._modelText = text
 
         super().__init__(shape=self)
 
@@ -92,7 +90,7 @@ class UmlText(ControlPointMixin, IdentifierMixin, TextShape, TopLeftMixin):
         self._redColor:   Colour = ColourDatabase().Find('Red')
         self._blackColor: Colour = ColourDatabase().Find('Black')
 
-        self.AddText(self._pyutText.content)
+        self.AddText(self._modelText.content)
 
         self._initializeTextFont()
         self._menu: Menu = cast(Menu, None)
@@ -141,12 +139,12 @@ class UmlText(ControlPointMixin, IdentifierMixin, TextShape, TopLeftMixin):
         return self._redColor
 
     @property
-    def pyutText(self):
-        return self._pyutText
+    def modelText(self) -> Text:
+        return self._modelText
 
-    @pyutText.setter
-    def pyutText(self, pyutText: PyutText):
-        self._pyutText = pyutText
+    @modelText.setter
+    def modelText(self, text: Text):
+        self._modelText = text
 
     @property
     def textSize(self) -> int:
@@ -191,7 +189,7 @@ class UmlText(ControlPointMixin, IdentifierMixin, TextShape, TopLeftMixin):
     def OnDraw(self, dc: MemoryDC):
 
         self.ClearText()
-        self.AddText(self.pyutText.content)
+        self.AddText(self.modelText.content)
 
         dc.SetBrush(self._brush)
 
@@ -239,9 +237,9 @@ class UmlText(ControlPointMixin, IdentifierMixin, TextShape, TopLeftMixin):
         self.SetFont(self._textFont)
 
     def __str__(self) -> str:
-        return self.pyutText.content
+        return self.modelText.content
 
     def __repr__(self):
 
-        strMe: str = f"[UmlText - umlId: `{self.id} `modelId: '{self.pyutText.id}']"
+        strMe: str = f"[UmlText - umlId: `{self.id} `modelId: '{self.modelText.id}']"
         return strMe

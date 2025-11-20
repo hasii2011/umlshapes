@@ -1,6 +1,5 @@
 
 from typing import Callable
-from typing import NewType
 
 from logging import Logger
 from logging import getLogger

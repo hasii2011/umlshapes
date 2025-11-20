@@ -6,17 +6,17 @@ from enum import Enum
 
 from dataclasses import dataclass
 
-from pyutmodelv2.PyutActor import PyutActor
-from pyutmodelv2.PyutClass import PyutClass
-from pyutmodelv2.PyutInterface import PyutInterface
-from pyutmodelv2.PyutLink import PyutLink
-from pyutmodelv2.PyutNote import PyutNote
-from pyutmodelv2.PyutText import PyutText
-from pyutmodelv2.PyutUseCase import PyutUseCase
+from umlmodel.Actor import Actor
+from umlmodel.Class import Class
+from umlmodel.Link import Link
+from umlmodel.Note import Note
+from umlmodel.Text import Text
+from umlmodel.UseCase import UseCase
+from umlmodel.Interface import Interface
 
 from umlshapes.types.UmlPosition import UmlPosition
 
-ModelObject = Union[PyutText, PyutNote, PyutActor, PyutClass, PyutUseCase, PyutLink, PyutInterface]
+ModelObject = Union[Text, Note, Actor, Class, UseCase, Link, Interface]
 
 
 NOT_SET_INT: int = cast(int, None)
