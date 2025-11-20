@@ -3,11 +3,9 @@ from unittest import TestSuite
 from unittest import main as unitTestMain
 
 from codeallyadvanced.ui.UnitTestBaseW import UnitTestBaseW
+from umlmodel.Actor import Actor
 
-from pyutmodelv2.PyutActor import PyutActor
-
-from umlshapes.lib.ogl import OGLInitialize
-# from umlshapes.mixins.IDMixin import InvalidOperationError
+from umlshapes.lib.ogl import OGLInitialize# from umlshapes.mixins.IDMixin import InvalidOperationError
 
 from umlshapes.shapes.UmlActor import UmlActor
 
@@ -32,8 +30,8 @@ class TestIDMixin(UnitTestBaseW):
 
     def testUniqueIds(self):
 
-        pyutActor: PyutActor = PyutActor(actorName='John Wilkes Booth')
-        umlActor:  UmlActor = UmlActor(pyutActor=pyutActor)
+        actor:    Actor    = Actor(actorName='John Wilkes Booth')
+        umlActor: UmlActor = UmlActor(actor=actor)
 
         umlActor2:  UmlActor = UmlActor()
 

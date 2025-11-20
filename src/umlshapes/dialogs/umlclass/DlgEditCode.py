@@ -1,6 +1,7 @@
 
 from os import linesep as osLineSep
 
+from umlmodel.Method import SourceCode
 from wx import BOTH
 from wx import CANCEL
 from wx import CAPTION
@@ -22,8 +23,6 @@ from wx.lib.sized_controls import SizedDialog
 
 from wx import NewIdRef as wxNewIdRef
 from wx.lib.sized_controls import SizedPanel
-
-from pyutmodelv2.PyutMethod import SourceCode
 
 TXT_CODE: int = wxNewIdRef()
 

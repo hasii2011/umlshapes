@@ -6,6 +6,9 @@ from logging import getLogger
 
 from dataclasses import dataclass
 
+from umlmodel.Class import Class
+from umlmodel.enumerations.DisplayMethods import DisplayMethods
+from umlmodel.enumerations.DisplayParameters import DisplayParameters
 from wx import Bitmap
 
 from wx import ITEM_CHECK
@@ -17,11 +20,6 @@ from wx import Menu
 from wx import MenuItem
 
 from wx import NewIdRef as wxNewIdRef
-
-from pyutmodelv2.PyutClass import PyutClass
-
-from pyutmodelv2.enumerations.PyutDisplayParameters import PyutDisplayParameters
-from pyutmodelv2.enumerations.PyutDisplayMethods import PyutDisplayMethods
 
 from umlshapes.UmlUtils import UmlUtils
 
@@ -81,7 +79,7 @@ class UmlClassMenuHandler:
 
     def popupMenu(self, x: int, y: int):
 
-        pyutClass: PyutClass = self._umlClass.pyutClass
+        pyutClass: Class = self._umlClass.modelClass
 
         self._setMenuItemValues(pyutClass)
 
@@ -125,7 +123,7 @@ class UmlClassMenuHandler:
         Args:
             event:
         """
-        pyutClass: PyutClass = self._umlClass.pyutClass
+        pyutClass: Class = self._umlClass.modelClass
         eventId:   int       = event.GetId()
         frameId:   FrameId   = self._getFrameId()
 
@@ -164,18 +162,18 @@ class UmlClassMenuHandler:
         Args:
             event:
         """
-        pyutClass:         PyutClass             = self._umlClass.pyutClass
-        displayParameters: PyutDisplayParameters = pyutClass.displayParameters
+        pyutClass:         Class             = self._umlClass.modelClass
+        displayParameters: DisplayParameters = pyutClass.displayParameters
         self.logger.debug(f'{displayParameters=}')
 
         # noinspection PyUnreachableCode
         match displayParameters:
-            case PyutDisplayParameters.UNSPECIFIED:
-                pyutClass.displayParameters = PyutDisplayParameters.WITH_PARAMETERS
-            case PyutDisplayParameters.WITH_PARAMETERS:
-                pyutClass.displayParameters = PyutDisplayParameters.WITHOUT_PARAMETERS
-            case PyutDisplayParameters.WITHOUT_PARAMETERS:
-                pyutClass.displayParameters = PyutDisplayParameters.UNSPECIFIED
+            case DisplayParameters.UNSPECIFIED:
+                pyutClass.displayParameters = DisplayParameters.DISPLAY_PARAMETERS
+            case DisplayParameters.DISPLAY_PARAMETERS:
+                pyutClass.displayParameters = DisplayParameters.DO_NOT_DISPLAY_PARAMETERS
+            case DisplayParameters.DO_NOT_DISPLAY_PARAMETERS:
+                pyutClass.displayParameters = DisplayParameters.UNSPECIFIED
             case _:
                 assert False, 'Unknown display type'
 
@@ -189,8 +187,8 @@ class UmlClassMenuHandler:
         Args:
             event:
         """
-        pyutClass:          PyutClass          = self._umlClass.pyutClass
-        displayConstructor: PyutDisplayMethods = pyutClass.displayConstructor
+        pyutClass:          Class          = self._umlClass.modelClass
+        displayConstructor: DisplayMethods = pyutClass.displayConstructor
 
         pyutClass.displayConstructor = self._nextDisplayValue(pyutDisplayValue=displayConstructor)
         self._umlClass.autoSize()
@@ -202,14 +200,14 @@ class UmlClassMenuHandler:
         Args:
             event:
         """
-        pyutClass:            PyutClass          = self._umlClass.pyutClass
-        displayDunderMethods: PyutDisplayMethods = pyutClass.displayDunderMethods
+        pyutClass:            Class          = self._umlClass.modelClass
+        displayDunderMethods: DisplayMethods = pyutClass.displayDunderMethods
 
         pyutClass.displayDunderMethods = self._nextDisplayValue(pyutDisplayValue=displayDunderMethods)
         self._umlClass.autoSize()
         self.logger.debug(f'{displayDunderMethods=}')
 
-    def _setMenuItemValues(self, pyutClass: PyutClass):
+    def _setMenuItemValues(self, pyutClass: Class):
 
         self._toggleStereotype.Check(pyutClass.displayStereoType)
         self._toggleFields.Check(pyutClass.showFields)
@@ -219,18 +217,18 @@ class UmlClassMenuHandler:
         self._setTheTriStateDisplayConstructorMenuItem(pyutClass=pyutClass)
         self._setTheTriStateDisplayDunderMethodsMenuItem(pyutClass=pyutClass)
 
-    def _setTheTriStateDisplayParametersMenuItem(self, pyutClass: PyutClass):
+    def _setTheTriStateDisplayParametersMenuItem(self, pyutClass: Class):
 
-        displayParameters:    PyutDisplayParameters = pyutClass.displayParameters
-        itemToggleParameters: MenuItem              = self._toggleParameters
+        displayParameters:    DisplayParameters = pyutClass.displayParameters
+        itemToggleParameters: MenuItem          = self._toggleParameters
 
         # noinspection PyUnreachableCode
         match displayParameters:
-            case PyutDisplayParameters.UNSPECIFIED:
+            case DisplayParameters.UNSPECIFIED:
                 triStateData: TriStateData = TriStateData(bitMap=UmlUtils.unspecifiedDisplayIcon(), menuText='Unspecified Parameter Display')
-            case PyutDisplayParameters.WITH_PARAMETERS:
+            case DisplayParameters.DISPLAY_PARAMETERS:
                 triStateData = TriStateData(bitMap=UmlUtils.displayIcon(), menuText='Display Parameters')
-            case PyutDisplayParameters.WITHOUT_PARAMETERS:
+            case DisplayParameters.DO_NOT_DISPLAY_PARAMETERS:
                 triStateData = TriStateData(bitMap=UmlUtils.doNotDisplayIcon(), menuText='Do Not Display Parameters')
             case _:
                 self.logger.warning(f'Unknown Parameter Display type: {displayParameters}')
@@ -240,10 +238,10 @@ class UmlClassMenuHandler:
         itemToggleParameters.SetBitmap(triStateData.bitMap)
         itemToggleParameters.SetItemLabel(triStateData.menuText)
 
-    def _setTheTriStateDisplayConstructorMenuItem(self, pyutClass: PyutClass):
+    def _setTheTriStateDisplayConstructorMenuItem(self, pyutClass: Class):
 
-        displayConstructor:    PyutDisplayMethods = pyutClass.displayConstructor
-        itemToggleConstructor: MenuItem           = self._toggleConstructor
+        displayConstructor:    DisplayMethods = pyutClass.displayConstructor
+        itemToggleConstructor: MenuItem       = self._toggleConstructor
 
         triStateData: TriStateData = self._getTriStateData(pyutDisplayValue=displayConstructor, displayName='Constructor')
 
@@ -251,10 +249,10 @@ class UmlClassMenuHandler:
         itemToggleConstructor.SetBitmap(triStateData.bitMap)
         itemToggleConstructor.SetItemLabel(triStateData.menuText)
 
-    def _setTheTriStateDisplayDunderMethodsMenuItem(self, pyutClass: PyutClass):
+    def _setTheTriStateDisplayDunderMethodsMenuItem(self, pyutClass: Class):
 
-        displayDunderMethods:  PyutDisplayMethods = pyutClass.displayDunderMethods
-        itemToggleConstructor: MenuItem           = self._toggleDunderMethods
+        displayDunderMethods:  DisplayMethods = pyutClass.displayDunderMethods
+        itemToggleConstructor: MenuItem       = self._toggleDunderMethods
 
         triStateData: TriStateData = self._getTriStateData(pyutDisplayValue=displayDunderMethods, displayName='Dunder Methods')
 
@@ -262,31 +260,31 @@ class UmlClassMenuHandler:
         itemToggleConstructor.SetBitmap(triStateData.bitMap)
         itemToggleConstructor.SetItemLabel(triStateData.menuText)
 
-    def _getTriStateData(self, pyutDisplayValue: PyutDisplayMethods, displayName: str) -> TriStateData:
+    def _getTriStateData(self, pyutDisplayValue: DisplayMethods, displayName: str) -> TriStateData:
 
         # noinspection PyUnreachableCode
         match pyutDisplayValue:
 
-            case PyutDisplayMethods.UNSPECIFIED:
+            case DisplayMethods.UNSPECIFIED:
                 return TriStateData(bitMap=UmlUtils.unspecifiedDisplayIcon(), menuText=f'Unspecified {displayName} Display')
-            case PyutDisplayMethods.DISPLAY:
+            case DisplayMethods.DISPLAY:
                 return TriStateData(bitMap=UmlUtils.displayIcon(), menuText=f'Display {displayName}')
-            case PyutDisplayMethods.DO_NOT_DISPLAY:
+            case DisplayMethods.DO_NOT_DISPLAY:
                 return TriStateData(bitMap=UmlUtils.doNotDisplayIcon(), menuText=f'Do Not Display {displayName}')
             case _:
                 self.logger.warning(f'Unknown Method Display type: {pyutDisplayValue}')
                 assert False, 'Developer error'
 
-    def _nextDisplayValue(self, pyutDisplayValue: PyutDisplayMethods) -> PyutDisplayMethods:
+    def _nextDisplayValue(self, pyutDisplayValue: DisplayMethods) -> DisplayMethods:
 
         # noinspection PyUnreachableCode
         match pyutDisplayValue:
-            case PyutDisplayMethods.UNSPECIFIED:
-                return PyutDisplayMethods.DISPLAY
-            case PyutDisplayMethods.DISPLAY:
-                return PyutDisplayMethods.DO_NOT_DISPLAY
-            case PyutDisplayMethods.DO_NOT_DISPLAY:
-                return PyutDisplayMethods.UNSPECIFIED
+            case DisplayMethods.UNSPECIFIED:
+                return DisplayMethods.DISPLAY
+            case DisplayMethods.DISPLAY:
+                return DisplayMethods.DO_NOT_DISPLAY
+            case DisplayMethods.DO_NOT_DISPLAY:
+                return DisplayMethods.UNSPECIFIED
             case _:
                 assert False, "Unknown method display type"
 

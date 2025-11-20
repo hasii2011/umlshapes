@@ -25,7 +25,7 @@ from wx import Pen
 
 from wx import NewIdRef as wxNewIdRef
 
-from pyutmodelv2.PyutText import PyutText
+from umlmodel.Text import Text
 
 from umlshapes.lib.ogl import Shape
 from umlshapes.lib.ogl import ShapeCanvas
@@ -101,11 +101,11 @@ class UmlTextEventHandler(UmlBaseEventHandler):
         super().OnLeftDoubleClick(x=x, y=y, keys=keys, attachment=attachment)
 
         umlText:  UmlText  = self.GetShape()
-        pyutText: PyutText = umlText.pyutText
+        pyutText: Text     = umlText.modelText
 
         umlFrame:  ClassDiagramFrame  = umlText.GetCanvas()
 
-        with DlgEditText(parent=umlFrame, pyutText=pyutText,) as dlg:
+        with DlgEditText(parent=umlFrame, text=pyutText, ) as dlg:
             if dlg.ShowModal() == OK:
                 umlFrame.refresh()
 

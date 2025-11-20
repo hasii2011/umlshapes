@@ -2,9 +2,8 @@
 from logging import Logger
 from logging import getLogger
 
+from umlmodel.Actor import Actor
 from wx import ID_OK
-
-from pyutmodelv2.PyutActor import PyutActor
 
 from umlshapes.dialogs.DlgEditActor import DlgEditActor
 from umlshapes.frames.UmlFrame import UmlFrame
@@ -28,14 +27,14 @@ class UmlActorEventHandler(UmlBaseEventHandler):
 
         super().OnLeftDoubleClick(x=x, y=y, keys=keys, attachment=attachment)
 
-        umlActor:  UmlActor  = self.GetShape()
-        pyutActor: PyutActor = umlActor.pyutActor
+        umlActor:   UmlActor = self.GetShape()
+        modelActor: Actor    = umlActor.modelActor
 
         umlFrame:  UmlFrame  = umlActor.GetCanvas()
 
-        with DlgEditActor(parent=umlFrame, actorName=pyutActor.name,) as dlg:
+        with DlgEditActor(parent=umlFrame, actorName=modelActor.name,) as dlg:
             if dlg.ShowModal() == ID_OK:
-                pyutActor.name = dlg.actorName
+                modelActor.name = dlg.actorName
                 umlFrame.refresh()
 
         umlActor.selected = False

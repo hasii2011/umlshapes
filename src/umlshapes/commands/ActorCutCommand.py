@@ -5,8 +5,8 @@ from typing import TYPE_CHECKING
 from logging import Logger
 from logging import getLogger
 
-from pyutmodelv2.PyutActor import PyutActor
-from pyutmodelv2.PyutObject import PyutObject
+from umlmodel.Actor import Actor
+from umlmodel.BaseAttributes import BaseAttributes
 
 from umlshapes.commands.BaseCutCommand import BaseCutCommand
 from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
@@ -38,7 +38,7 @@ class ActorCutCommand(BaseCutCommand):
         """
         from umlshapes.shapes.UmlActor import UmlActor
 
-        super().__init__(partialName='ActorCutCommand', pyutObject=umlActor.pyutActor, umlPosition=umlPosition, umlFrame=umlFrame, umlPubSubEngine=umlPubSubEngine)
+        super().__init__(partialName='ActorCutCommand', baseAttributes=umlActor.modelActor, umlPosition=umlPosition, umlFrame=umlFrame, umlPubSubEngine=umlPubSubEngine)
 
         self.logger: Logger = getLogger(__name__)
 
@@ -53,19 +53,19 @@ class ActorCutCommand(BaseCutCommand):
     def Undo(self) -> bool:
         from umlshapes.ShapeTypes import UmlShapeGenre
 
-        umlShape: UmlShapeGenre = self._createCutShape(pyutObject=self._pyutObject)
+        umlShape: UmlShapeGenre = self._createCutShape(baseAttributes=self._baseAttributes)
 
         self._setupUmlShape(umlShape=umlShape)
         self._umlActor = umlShape   # type: ignore
 
         return True
 
-    def _createCutShape(self, pyutObject: PyutObject) -> 'UmlShapeGenre':
+    def _createCutShape(self, baseAttributes: BaseAttributes) -> 'UmlShapeGenre':
 
         from umlshapes.shapes.UmlActor import UmlActor
         from umlshapes.shapes.eventhandlers.UmlActorEventHandler import UmlActorEventHandler
 
-        umlShape:     UmlActor             = UmlActor(cast(PyutActor, pyutObject))
+        umlShape:     UmlActor             = UmlActor(cast(Actor, baseAttributes))
         eventHandler: UmlActorEventHandler = UmlActorEventHandler()
 
         self._setupEventHandler(umlShape=umlShape, eventHandler=eventHandler)

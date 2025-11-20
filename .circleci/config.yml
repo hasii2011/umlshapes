@@ -39,7 +39,7 @@ jobs:
             pip install setuptools
             pip install html-testRunner==1.2.1
             pip install codeallybasic==1.30.0
-            pip install pyutmodelv2==2.2.6
+            pip install umlmodel==3.3.0
             pip install six==1.16.0
             pip install attrdict3
             pip install -v -U -f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-24.04  wxPython

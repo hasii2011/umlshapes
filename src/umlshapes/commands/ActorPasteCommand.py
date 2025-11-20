@@ -5,8 +5,8 @@ from typing import TYPE_CHECKING
 from logging import Logger
 from logging import getLogger
 
-from pyutmodelv2.PyutActor import PyutActor
-from pyutmodelv2.PyutObject import PyutObject
+from umlmodel.Actor import Actor
+from umlmodel.BaseAttributes import BaseAttributes
 
 from umlshapes.commands.BasePasteCommand import BasePasteCommand
 
@@ -21,11 +21,11 @@ if TYPE_CHECKING:
 
 class ActorPasteCommand(BasePasteCommand):
 
-        def __init__(self, pyutObject: PyutObject, umlPosition: UmlPosition, umlFrame: 'UmlFrame', umlPubSubEngine: IUmlPubSubEngine):
+        def __init__(self, baseAttributes: BaseAttributes, umlPosition: UmlPosition, umlFrame: 'UmlFrame', umlPubSubEngine: IUmlPubSubEngine):
             """
 
             Args:
-                pyutObject:         We will build the appropriate UML Shape from this
+                baseAttributes:         We will build the appropriate UML Shape from this
                 umlPosition:        The location to paste it to
                 umlFrame:           The UML Frame we are pasting to
                 umlPubSubEngine:    The event handler that is injected
@@ -34,14 +34,14 @@ class ActorPasteCommand(BasePasteCommand):
 
             self.logger: Logger = getLogger(__name__)
 
-            super().__init__(partialName='ActorPasteCommand', pyutObject=pyutObject, umlPosition=umlPosition, umlFrame=umlFrame, umlPubSubEngine=umlPubSubEngine)
+            super().__init__(partialName='ActorPasteCommand', baseAttributes=baseAttributes, umlPosition=umlPosition, umlFrame=umlFrame, umlPubSubEngine=umlPubSubEngine)
 
             self._umlActor: UmlActor = cast(UmlActor, None)
 
         def Do(self) -> bool:
             from umlshapes.ShapeTypes import UmlShapeGenre
 
-            umlShape: UmlShapeGenre = self._createPastedShape(pyutObject=self._pyutObject)
+            umlShape: UmlShapeGenre = self._createPastedShape(pyutObject=self._baseAttributes)
 
             self._setupUmlShape(umlShape=umlShape)
             self._umlActor = umlShape  # type: ignore
@@ -52,11 +52,11 @@ class ActorPasteCommand(BasePasteCommand):
             self._undo(umlShape=self._umlActor)
             return True
 
-        def _createPastedShape(self, pyutObject: PyutObject) -> 'UmlShapeGenre':
+        def _createPastedShape(self, pyutObject: BaseAttributes) -> 'UmlShapeGenre':
             from umlshapes.shapes.UmlActor import UmlActor
             from umlshapes.shapes.eventhandlers.UmlActorEventHandler import UmlActorEventHandler
 
-            umlShape:     UmlActor             = UmlActor(cast(PyutActor, pyutObject))
+            umlShape:     UmlActor             = UmlActor(cast(Actor, pyutObject))
             eventHandler: UmlActorEventHandler = UmlActorEventHandler()
 
             self._setupEventHandler(umlShape=umlShape, eventHandler=eventHandler)

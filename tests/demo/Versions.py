@@ -13,7 +13,7 @@ from wx import __version__ as wxVersion
 
 from codeallybasic.SingletonV3 import SingletonV3
 
-from pyutmodelv2 import __version__ as dataModelVersion
+from umlshapes import __version__ as dataModelVersion
 from umlshapes import __version__ as __umlShapesVersion__
 
 # noinspection PyPackageRequirements

@@ -5,8 +5,8 @@ from typing import TYPE_CHECKING
 from logging import Logger
 from logging import getLogger
 
-from pyutmodelv2.PyutNote import PyutNote
-from pyutmodelv2.PyutObject import PyutObject
+from umlmodel.BaseAttributes import BaseAttributes
+from umlmodel.Note import Note
 
 from umlshapes.commands.BaseCutCommand import BaseCutCommand
 from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
@@ -26,7 +26,7 @@ class NoteCutCommand(BaseCutCommand):
 
         self.logger: Logger = getLogger(__name__)
 
-        super().__init__(partialName='ClassCutCommand', pyutObject=umlNote.pyutNote, umlPosition=umlPosition, umlFrame=umlFrame, umlPubSubEngine=umlPubSubEngine)
+        super().__init__(partialName='ClassCutCommand', baseAttributes=umlNote.modelNote, umlPosition=umlPosition, umlFrame=umlFrame, umlPubSubEngine=umlPubSubEngine)
 
         self._umlNote: UmlNote = umlNote
 
@@ -40,19 +40,19 @@ class NoteCutCommand(BaseCutCommand):
     def Undo(self) -> bool:
         from umlshapes.ShapeTypes import UmlShapeGenre
 
-        umlShape: UmlShapeGenre = self._createCutShape(pyutObject=self._pyutObject)
+        umlShape: UmlShapeGenre = self._createCutShape(umlBase=self._baseAttributes)
 
         self._setupUmlShape(umlShape=umlShape)
         self._umlNote = umlShape   # type: ignore
 
         return True
 
-    def _createCutShape(self, pyutObject: PyutObject) -> 'UmlShapeGenre':
+    def _createCutShape(self, umlBase: BaseAttributes) -> 'UmlShapeGenre':
 
         from umlshapes.shapes.UmlNote import UmlNote
         from umlshapes.shapes.eventhandlers.UmlNoteEventHandler import UmlNoteEventHandler
 
-        umlShape:     UmlNote             = UmlNote(cast(PyutNote, pyutObject))
+        umlShape:     UmlNote             = UmlNote(cast(Note, umlBase))
         eventHandler: UmlNoteEventHandler = UmlNoteEventHandler()
 
         self._setupEventHandler(umlShape=umlShape, eventHandler=eventHandler)

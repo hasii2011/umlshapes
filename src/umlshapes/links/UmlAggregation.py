@@ -2,19 +2,19 @@
 from logging import Logger
 from logging import getLogger
 
-from pyutmodelv2.PyutLink import PyutLink
-
 from wx import MemoryDC
 from wx import BLACK_BRUSH
+
+from umlmodel.Link import Link
 
 from umlshapes.links.UmlLink import UmlLink
 from umlshapes.links.UmlAssociation import UmlAssociation
 
 
 class UmlAggregation(UmlAssociation):
-    def __init__(self, pyutLink: PyutLink):
+    def __init__(self, link: Link):
 
-        super().__init__(pyutLink=pyutLink)
+        super().__init__(link=link)
         self.aggregationLogger: Logger = getLogger(__name__)
 
     def OnDraw(self, dc: MemoryDC):

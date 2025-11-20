@@ -4,7 +4,7 @@ from logging import getLogger
 
 from wx import OK
 
-from pyutmodelv2.PyutInterface import PyutInterfaces
+from umlmodel.Interface import Interfaces
 
 from umlshapes.dialogs.DlgEditInterface import DlgEditInterface
 
@@ -38,9 +38,9 @@ class UmlLollipopInterfaceEventHandler(UmlBaseEventHandler):
 
         self.logger.info(f'{umlLollipopInterface=}')
 
-        eventEngine:    IUmlPubSubEngine = umlFrame.umlPubSubEngine
-        pyutInterfaces: PyutInterfaces  = umlFrame.getDefinedInterfaces()
+        eventEngine: IUmlPubSubEngine = umlFrame.umlPubSubEngine
+        interfaces:  Interfaces  = umlFrame.getDefinedInterfaces()
 
-        with DlgEditInterface(parent=umlFrame, lollipopInterface=umlLollipopInterface, umlPubSubEngine=eventEngine, pyutInterfaces=pyutInterfaces, editMode=True) as dlg:
+        with DlgEditInterface(parent=umlFrame, lollipopInterface=umlLollipopInterface, umlPubSubEngine=eventEngine, interfaces=interfaces, editMode=True) as dlg:
             if dlg.ShowModal() == OK:
                 umlFrame.refresh()

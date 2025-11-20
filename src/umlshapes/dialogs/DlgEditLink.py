@@ -24,9 +24,8 @@ from wx.lib.embeddedimage import PyEmbeddedImage
 from wx.lib.sized_controls import SizedDialog
 from wx.lib.sized_controls import SizedPanel
 
-from pyutmodelv2.PyutLink import PyutLink
-
-from pyutmodelv2.enumerations.PyutLinkType import PyutLinkType
+from umlmodel.Link import Link
+from umlmodel.enumerations.LinkType import LinkType
 
 
 class DlgEditLink (SizedDialog):
@@ -41,17 +40,17 @@ class DlgEditLink (SizedDialog):
     The input PyutLink is only updated on Ok;  Else if the dialog is
     "canceled" any updated values are discarded
     """
-    def __init__(self, parent, pyutLink: PyutLink):
+    def __init__(self, parent, link: Link):
         """
         """
         super().__init__(parent, ID_ANY, "Edit Link", style=RESIZE_BORDER | CAPTION | CLOSE_BOX | STAY_ON_TOP)
 
         self.logger: Logger = getLogger(__name__)
 
-        self._pyutLink:     PyutLink = pyutLink
+        self._modelLink: Link = link
 
         sizedPanel: SizedPanel = self.GetContentsPane()
-        self._imgArrow: StaticBitmap = self._linkImage(sizedPanel, pyutLink.linkType)
+        self._imgArrow: StaticBitmap = self._linkImage(sizedPanel, link.linkType)
 
         gridPanel: SizedPanel = SizedPanel(parent=sizedPanel)
         gridPanel.SetSizerType("grid", {"cols": 3})   # 3-column grid layout
@@ -74,7 +73,7 @@ class DlgEditLink (SizedDialog):
         self.SetButtonSizer(buttonContainer)
         # btnOk.SetDefault()
 
-        self._setValues(pyutLink.name, pyutLink.sourceCardinality, pyutLink.destinationCardinality)
+        self._setValues(link.name, link.sourceCardinality, link.destinationCardinality)
 
         #  button events
         self.Bind(EVT_BUTTON, self._onCmdOk,     id=ID_OK)
@@ -86,20 +85,20 @@ class DlgEditLink (SizedDialog):
         self.SetMinSize(self.GetSize())
 
     @property
-    def value(self) -> PyutLink:
-        self._pyutLink.name = self._relationship.GetValue()
+    def value(self) -> Link:
+        self._modelLink.name = self._relationship.GetValue()
 
-        self._pyutLink.sourceCardinality      = self._sourceCardinality.GetValue()
-        self._pyutLink.destinationCardinality = self._destinationCardinality.GetValue()
+        self._modelLink.sourceCardinality      = self._sourceCardinality.GetValue()
+        self._modelLink.destinationCardinality = self._destinationCardinality.GetValue()
 
-        return self._pyutLink
+        return self._modelLink
 
     def _createDialogButtonsContainer(self, buttons=OK) -> Sizer:
 
         hs: Sizer = self.CreateSeparatedButtonSizer(buttons)
         return hs
 
-    def _linkImage(self, parent: SizedPanel, linkType: PyutLinkType) -> StaticBitmap:
+    def _linkImage(self, parent: SizedPanel, linkType: LinkType) -> StaticBitmap:
         """
         Provide an example image in linkImage
         """
@@ -107,9 +106,9 @@ class DlgEditLink (SizedDialog):
         from codeallyadvanced.resources.images.icons.embedded16.ImgToolboxRelationshipAggregation import embeddedImage as ImgToolboxRelationshipAggregation
         from codeallyadvanced.resources.images.icons.embedded16.ImgToolboxRelationshipComposition import embeddedImage as ImgToolboxRelationshipComposition
         linkTypeToImage = {
-            PyutLinkType.ASSOCIATION: ImgToolboxRelationshipAssociation,
-            PyutLinkType.AGGREGATION: ImgToolboxRelationshipAggregation,
-            PyutLinkType.COMPOSITION: ImgToolboxRelationshipComposition,
+            LinkType.ASSOCIATION: ImgToolboxRelationshipAssociation,
+            LinkType.AGGREGATION: ImgToolboxRelationshipAggregation,
+            LinkType.COMPOSITION: ImgToolboxRelationshipComposition,
         }
         embeddedImage: PyEmbeddedImage = linkTypeToImage[linkType]
         linkImage:     StaticBitmap    = StaticBitmap(parent, ID_ANY, embeddedImage.GetBitmap())

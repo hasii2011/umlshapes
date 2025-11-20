@@ -1,17 +1,19 @@
+from typing import cast
 
 from wx import CommandEvent
 from wx import Window
 
 from codeallybasic.SecureConversions import SecureConversions
-from pyutmodelv2.PyutParameter import PyutParameter
-from pyutmodelv2.PyutType import PyutType
+
+from umlmodel.Parameter import Parameter
+from umlmodel.ParameterType import ParameterType
 
 from umlshapes.dialogs.BaseEditParamFieldDialog import BaseEditParamFieldDialog
 
 
 class DlgEditParameter(BaseEditParamFieldDialog):
 
-    def __init__(self, parent: Window, parameterToEdit: PyutParameter):
+    def __init__(self, parent: Window, parameterToEdit: Parameter):
         """
         The Dialog to edit PyutParameters
         Args:
@@ -20,10 +22,10 @@ class DlgEditParameter(BaseEditParamFieldDialog):
         """
         super().__init__(parent, title="Edit Parameter", layoutField=False)
 
-        self._parameterToEdit: PyutParameter = parameterToEdit
+        self._parameterToEdit: Parameter = parameterToEdit
 
         self._name.SetValue(self._parameterToEdit.name)
-        paramType: PyutType = self._parameterToEdit.type
+        paramType: ParameterType = self._parameterToEdit.type   # type: ignore
         self._type.SetValue(paramType.value)
         self._defaultValue.SetValue(SecureConversions.secureString(self._parameterToEdit.defaultValue))
 
@@ -47,7 +49,7 @@ class DlgEditParameter(BaseEditParamFieldDialog):
             return
 
         self._parameterToEdit.name = nameValue
-        paramType: PyutType = PyutType(self._type.GetValue())
+        paramType: ParameterType = ParameterType(self._type.GetValue())
         self._parameterToEdit.type = paramType
         if self._defaultValue.GetValue() != "":
             self._parameterToEdit.defaultValue = self._defaultValue.GetValue()

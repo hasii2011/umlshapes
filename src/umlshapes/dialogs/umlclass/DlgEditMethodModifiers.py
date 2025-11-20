@@ -21,21 +21,21 @@ from wx.adv import EditableListBox
 
 from wx.lib.sized_controls import SizedPanel
 
-from pyutmodelv2.PyutMethod import PyutModifiers
-from pyutmodelv2.PyutModifier import PyutModifier
+from umlmodel.Method import Modifiers
+from umlmodel.Modifier import Modifier
 
 from umlshapes.dialogs.BaseEditDialog import BaseEditDialog
 
 
 class DlgEditMethodModifiers(BaseEditDialog):
 
-    def __init__(self, parent, pyutModifiers: PyutModifiers):
+    def __init__(self, parent, pyutModifiers: Modifiers):
 
         super().__init__(parent, title='Edit Method Modifiers')
 
-        self.logger:             Logger        = getLogger(__name__)
-        self._pyutModifiers:     PyutModifiers = pyutModifiers
-        self._pyutModifiersCopy: PyutModifiers = deepcopy(pyutModifiers)
+        self.logger:             Logger     = getLogger(__name__)
+        self._modelModifiers:     Modifiers = pyutModifiers
+        self._modelModifiersCopy: Modifiers = deepcopy(pyutModifiers)
 
         self._elb: EditableListBox = cast(EditableListBox, None)
         sizedPanel: SizedPanel = self.GetContentsPane()
@@ -44,7 +44,7 @@ class DlgEditMethodModifiers(BaseEditDialog):
         self._layoutStandardOkCancelButtonSizer()
 
     @property
-    def pyutModifiers(self) -> PyutModifiers:
+    def modifiers(self) -> Modifiers:
         return self._stringToPyutModifiers()
 
     def _layoutEditableListBox(self, parent: SizedPanel):
@@ -66,16 +66,17 @@ class DlgEditMethodModifiers(BaseEditDialog):
         """
 
         stringList: List[str] = []
-        for pyutModifier in self._pyutModifiersCopy:
+        for pyutModifier in self._modelModifiersCopy:
             stringList.append(pyutModifier.name)
 
         return stringList
 
-    def _stringToPyutModifiers(self) -> PyutModifiers:
-        pyutModifiers: PyutModifiers = PyutModifiers([])
+    def _stringToPyutModifiers(self) -> Modifiers:
+
+        pyutModifiers: Modifiers = Modifiers([])
         strList:       List[str]     = self._elb.GetStrings()
         for modifierString in strList:
-            pyutModifier: PyutModifier = PyutModifier(name=modifierString)
+            pyutModifier: Modifier = Modifier(name=modifierString)
             pyutModifiers.append(pyutModifier)
 
         return pyutModifiers

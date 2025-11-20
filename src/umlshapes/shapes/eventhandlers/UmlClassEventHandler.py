@@ -4,9 +4,8 @@ from typing import cast
 from logging import Logger
 from logging import getLogger
 
+from umlmodel.Class import Class
 from wx import OK
-
-from pyutmodelv2.PyutClass import PyutClass
 
 from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
 from umlshapes.preferences.UmlPreferences import UmlPreferences
@@ -78,11 +77,11 @@ class UmlClassEventHandler(UmlBaseEventHandler):
 
         super().OnLeftDoubleClick(x=x, y=y, keys=keys, attachment=attachment)
 
-        umlClass:  UmlClass  = self.GetShape()
-        pyutClass: PyutClass = umlClass.pyutClass
+        umlClass:   UmlClass = self.GetShape()
+        modelClass: Class    = umlClass.modelClass
         umlFrame:  ClassDiagramFrame  = umlClass.GetCanvas()
 
         eventEngine: IUmlPubSubEngine = umlFrame.umlPubSubEngine
-        with DlgEditClass(parent=umlFrame, pyutClass=pyutClass, umlPubSubEngine=eventEngine) as dlg:
+        with DlgEditClass(parent=umlFrame, pyutClass=modelClass, umlPubSubEngine=eventEngine) as dlg:
             if dlg.ShowModal() == OK:
                 umlFrame.refresh()

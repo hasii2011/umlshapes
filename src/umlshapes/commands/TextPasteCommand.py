@@ -5,8 +5,8 @@ from typing import cast
 from logging import Logger
 from logging import getLogger
 
-from pyutmodelv2.PyutObject import PyutObject
-from pyutmodelv2.PyutText import PyutText
+from umlmodel.BaseAttributes import BaseAttributes
+from umlmodel.Text import Text
 
 from umlshapes.commands.BasePasteCommand import BasePasteCommand
 
@@ -20,11 +20,11 @@ if TYPE_CHECKING:
 
 
 class TextPasteCommand(BasePasteCommand):
-    def __init__(self, pyutObject: PyutObject, umlPosition: UmlPosition, umlFrame: 'UmlFrame', umlPubSubEngine: IUmlPubSubEngine):
+    def __init__(self, baseAttributes: BaseAttributes, umlPosition: UmlPosition, umlFrame: 'UmlFrame', umlPubSubEngine: IUmlPubSubEngine):
         """
 
         Args:
-            pyutObject:         We will build the appropriate UML Shape from this
+            baseAttributes:         We will build the appropriate UML Shape from this
             umlPosition:        The location to paste it to
             umlFrame:           The UML Frame we are pasting to
             umlPubSubEngine:    The event handler that is injected
@@ -33,14 +33,14 @@ class TextPasteCommand(BasePasteCommand):
 
         self.logger: Logger = getLogger(__name__)
 
-        super().__init__(partialName='', pyutObject=pyutObject, umlPosition=umlPosition, umlFrame=umlFrame, umlPubSubEngine=umlPubSubEngine)
+        super().__init__(partialName='', baseAttributes=baseAttributes, umlPosition=umlPosition, umlFrame=umlFrame, umlPubSubEngine=umlPubSubEngine)
 
         self._umlText: UmlText = cast(UmlText, None)
 
     def Do(self) -> bool:
         from umlshapes.ShapeTypes import UmlShapeGenre
 
-        umlShape: UmlShapeGenre = self._createPastedShape(pyutObject=self._pyutObject)
+        umlShape: UmlShapeGenre = self._createPastedShape(baseAttributes=self._baseAttributes)
 
         self._setupUmlShape(umlShape=umlShape)
         self._umlText = umlShape  # type: ignore
@@ -51,11 +51,11 @@ class TextPasteCommand(BasePasteCommand):
         self._undo(umlShape=self._umlText)
         return True
 
-    def _createPastedShape(self, pyutObject: PyutObject) -> 'UmlShapeGenre':
+    def _createPastedShape(self, baseAttributes: BaseAttributes) -> 'UmlShapeGenre':
         from umlshapes.shapes.UmlText import UmlText
         from umlshapes.shapes.eventhandlers.UmlTextEventHandler import UmlTextEventHandler
 
-        umlShape:     UmlText             = UmlText(cast(PyutText, pyutObject))
+        umlShape:     UmlText             = UmlText(cast(Text, baseAttributes))
         eventHandler: UmlTextEventHandler = UmlTextEventHandler()
 
         self._setupEventHandler(umlShape=umlShape, eventHandler=eventHandler)

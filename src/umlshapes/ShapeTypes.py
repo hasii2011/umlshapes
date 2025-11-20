@@ -4,10 +4,10 @@ from typing import List
 from typing import NewType
 from typing import Union
 
-from pyutmodelv2.PyutActor import PyutActor
-from pyutmodelv2.PyutClass import PyutClass
-from pyutmodelv2.PyutNote import PyutNote
-from pyutmodelv2.PyutUseCase import PyutUseCase
+from umlmodel.Actor import Actor
+from umlmodel.Class import Class
+from umlmodel.Note import Note
+from umlmodel.UseCase import UseCase
 
 from umlshapes.links.UmlInterface import UmlInterface
 from umlshapes.links.UmlAggregation import UmlAggregation
@@ -26,7 +26,7 @@ LinkableUmlShape = UmlClass | UmlNote | UmlActor | UmlUseCase
 
 LinkableUmlShapes = NewType('LinkableUmlShapes', Dict[int, LinkableUmlShape])
 
-LinkableModelClass = Union[PyutClass, PyutActor, PyutUseCase, PyutNote]
+LinkableModelClass = Union[Class, Actor, UseCase, Note]
 
 
 def linkableUmlShapesFactory() -> LinkableUmlShapes:
