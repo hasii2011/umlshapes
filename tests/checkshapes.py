@@ -4,6 +4,9 @@ import pyautogui
 from pyautogui import click
 from pyautogui import moveTo
 from pyautogui import dragTo
+from pyautogui import screenshot
+
+from PIL.Image import Image
 
 pyautogui.PAUSE=0.5
 DRAG_DURATION: float = 1.0
@@ -60,8 +63,25 @@ def testText():
     click(185, 220, button=LEFT)
     dragTo(940, 280, duration=DRAG_DURATION, button=LEFT)
 
+def testClass():
+    pullDownViewMenu()
+    # Show Class
+    click(235, 200, button=LEFT)
+    # Select Class  Does not pop edit up dialog
+    click(200, 230, button=LEFT)
+    dragTo(645, 550, duration=DRAG_DURATION, button=LEFT)
+
+def takeCompletionScreenShot():
+
+    doneImage: Image = pyautogui.screenshot(region=(18, 39, 1030, 730), imageFilename='diagrammer.png')
+
+    doneImage.save('testShapes.png')
+
+
 makeAppActive()
 testActor()
 testUseCase()
 testNote()
 testText()
+testClass()
+takeCompletionScreenShot()
