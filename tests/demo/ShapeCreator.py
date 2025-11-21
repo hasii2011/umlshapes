@@ -183,11 +183,19 @@ class ShapeCreator:
             diagramFrame.refresh()
 
     def _computePosition(self) -> UmlPosition:
+        """
+        TODO: Put in an option to compute position or just put at a fixed
+        place.  For UI testing we want fixed
+
+        Returns:
+
+        """
 
         currentPosition: UmlPosition = UmlPosition(x=self._currentPosition.x, y=self._currentPosition.y)
 
-        self._currentPosition.x += INCREMENT_X
-        self._currentPosition.y += INCREMENT_Y
+
+        # self._currentPosition.x += INCREMENT_X
+        # self._currentPosition.y += INCREMENT_Y
 
         return currentPosition
 
