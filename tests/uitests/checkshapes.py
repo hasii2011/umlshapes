@@ -1,16 +1,28 @@
 #!/usr/bin/env python
+from pathlib import Path
 
 import pyautogui
+from codeallybasic.Basic import Basic
+from codeallybasic.Basic import RunResult
+from codeallybasic.UnitTestBase import UnitTestBase
 from pyautogui import click
 from pyautogui import moveTo
 from pyautogui import dragTo
-from pyautogui import screenshot
-
 from PIL.Image import Image
 
-pyautogui.PAUSE=0.5
-DRAG_DURATION: float = 1.0
-LEFT: str = 'left'
+# Hmm why is this coming from here
+from pymsgbox import alert
+
+
+pyautogui.PAUSE = 0.5
+
+DRAG_DURATION: float = 0.5
+LEFT:          str   = 'left'
+SHAPES_IMAGE_FILENAME:   str = f'testShapes.png'
+VERIFICATION_IMAGE_PATH: str = f'/tmp/{SHAPES_IMAGE_FILENAME}'
+
+# noinspection SpellCheckingInspection
+GOLDEN_IMAGE_PACKAGE:   str = 'tests.uitests.goldenImages'
 
 def makeAppActive():
     # Make UML Diagrammer Active
@@ -24,7 +36,7 @@ def pullDownViewMenu():
 def testActor():
     pullDownViewMenu()
     # Show Actor
-    click(274, 300, button=LEFT)
+    click(260, 290, button=LEFT)
     # Click Ok
     click(630, 440, button=LEFT)
     # Select Actor Shape
@@ -73,15 +85,46 @@ def testClass():
 
 def takeCompletionScreenShot():
 
-    doneImage: Image = pyautogui.screenshot(region=(18, 39, 1030, 730), imageFilename='diagrammer.png')
+    cleanupImage: Path = Path(VERIFICATION_IMAGE_PATH)
+    cleanupImage.unlink(missing_ok=True)
+    doneImage: Image = pyautogui.screenshot(region=(18, 39, 1030, 730))
 
-    doneImage.save('testShapes.png')
+    doneImage.save(VERIFICATION_IMAGE_PATH)
+
+def wasTestSuccessful() -> bool:
+    answer: bool = False
+
+    path: str = UnitTestBase.getFullyQualifiedResourceFileName(package=GOLDEN_IMAGE_PACKAGE, fileName=SHAPES_IMAGE_FILENAME)
+
+    diffCmd: str = (
+        'diff '
+        f'{VERIFICATION_IMAGE_PATH} '
+        f'{path}'
+    )
+    result: RunResult = Basic.runCommand(programToRun=diffCmd)
+    if result.returnCode == 0:
+        answer = True
+
+    return answer
 
 
-makeAppActive()
-testActor()
-testUseCase()
-testNote()
-testText()
-testClass()
-takeCompletionScreenShot()
+if __name__ == '__main__':
+
+    makeAppActive()
+    testActor()
+    testUseCase()
+    testNote()
+    testText()
+    testClass()
+    takeCompletionScreenShot()
+
+    success: bool = wasTestSuccessful()
+
+    if success is True:
+        title:   str = 'Success'
+        message: str = 'You are a great programmer'
+    else:
+        title   = 'Failure'
+        message = 'You have failed as a programmer'
+
+    alert(text=message, title=title, button='OK')
