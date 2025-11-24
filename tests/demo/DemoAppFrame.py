@@ -2,11 +2,13 @@
 from typing import cast
 
 from logging import Logger
+
 from logging import getLogger
 
-from umlmodel.Interface import Interface
-from umlmodel.Interface import Interfaces
-from umlmodel.ModelTypes import ClassName
+from pathlib import Path
+
+
+from wx import EVT_CLOSE
 from wx import OK
 from wx import EVT_MENU
 from wx import ID_CUT
@@ -31,6 +33,9 @@ from wx import Point
 from wx.lib.sized_controls import SizedFrame
 from wx.lib.sized_controls import SizedPanel
 
+from umlmodel.Interface import Interface
+from umlmodel.Interface import Interfaces
+from umlmodel.ModelTypes import ClassName
 from umlshapes.ShapeTypes import UmlShapeGenre
 from umlshapes.UmlDiagram import UmlDiagram
 from umlshapes.UmlUtils import UmlUtils
@@ -59,6 +64,8 @@ from tests.demo.LinkCreator import LinkCreator
 from tests.demo.ShapeCreator import ShapeCreator
 
 from tests.demo.DlgUmlShapesPreferences import DlgUmlShapesPreferences
+
+DEMO_RUNNING_INDICATOR: str = '/tmp/DemoRunning.txt'
 
 FRAME_WIDTH:  int = 1024
 FRAME_HEIGHT: int = 720
@@ -114,6 +121,18 @@ class DemoAppFrame(SizedFrame):
         self._subscribeFrameToRelevantFrameTopics(frameId=self._diagramFrame2.id)
 
         self.Bind(EVT_NOTEBOOK_PAGE_CHANGED, self._onFrameDisplayedChanged)
+        self.Bind(EVT_CLOSE,    self.Close)
+
+        iAmRunningPath: Path = Path(DEMO_RUNNING_INDICATOR)
+        iAmRunningPath.touch()
+
+    def Close(self, force: bool = False) -> bool:
+        iAmRunningPath: Path = Path(DEMO_RUNNING_INDICATOR)
+        iAmRunningPath.unlink(missing_ok=True)
+
+        self.Destroy()
+
+        return True
 
     def _createApplicationMenuBar(self):
 

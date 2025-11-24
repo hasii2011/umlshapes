@@ -1,28 +1,47 @@
 #!/usr/bin/env python
+
 from pathlib import Path
 
+from PIL import ImageGrab
+
 import pyautogui
-from codeallybasic.Basic import Basic
-from codeallybasic.Basic import RunResult
-from codeallybasic.UnitTestBase import UnitTestBase
 from pyautogui import click
 from pyautogui import moveTo
 from pyautogui import dragTo
-from PIL.Image import Image
+
 
 # Hmm why is this coming from here
 from pymsgbox import alert
+
+from codeallybasic.Basic import Basic
+from codeallybasic.Basic import RunResult
+from codeallybasic.UnitTestBase import UnitTestBase
 
 
 pyautogui.PAUSE = 0.5
 
 DRAG_DURATION: float = 0.5
 LEFT:          str   = 'left'
+
+FIND_ME_IMAGE:           str = f'FindMe.png'
 SHAPES_IMAGE_FILENAME:   str = f'testShapes.png'
 VERIFICATION_IMAGE_PATH: str = f'/tmp/{SHAPES_IMAGE_FILENAME}'
 
 # noinspection SpellCheckingInspection
 GOLDEN_IMAGE_PACKAGE:   str = 'tests.uitests.goldenImages'
+
+DEMO_RUNNING_INDICATOR: Path = Path('/tmp/DemoRunning.txt')
+
+BEYOND_COMPARE_SUCCESS:     int = 0
+BEYOND_COMPARE_BINARY_SAME: int = 1
+
+def isAppRunning() -> bool:
+    answer: bool = False
+
+    if DEMO_RUNNING_INDICATOR.exists() is True:
+        answer = True
+
+    return answer
 
 def makeAppActive():
     # Make UML Diagrammer Active
@@ -84,25 +103,37 @@ def testClass():
     dragTo(645, 550, duration=DRAG_DURATION, button=LEFT)
 
 def takeCompletionScreenShot():
+    left:   int = 18
+    top:    int = 39
+    right:  int = 1030
+    bottom: int = 730
 
-    cleanupImage: Path = Path(VERIFICATION_IMAGE_PATH)
-    cleanupImage.unlink(missing_ok=True)
-    doneImage: Image = pyautogui.screenshot(region=(18, 39, 1030, 730))
+    bbox = (left, top, right, bottom)
 
-    doneImage.save(VERIFICATION_IMAGE_PATH)
+    # Capture the specified region
+    screenshot = ImageGrab.grab(bbox)
+    screenshot.save(VERIFICATION_IMAGE_PATH, 'png')
+    #
+    # cleanupImage: Path = Path(VERIFICATION_IMAGE_PATH)
+    # cleanupImage.unlink(missing_ok=True)
+    # doneImage: Image = pyautogui.screenshot(region=(18, 39, 1030, 730))
+    #
+    # doneImage.save(VERIFICATION_IMAGE_PATH)
 
 def wasTestSuccessful() -> bool:
     answer: bool = False
 
     path: str = UnitTestBase.getFullyQualifiedResourceFileName(package=GOLDEN_IMAGE_PACKAGE, fileName=SHAPES_IMAGE_FILENAME)
 
+    # noinspection SpellCheckingInspection
     diffCmd: str = (
-        'diff '
+        '/usr/local/bin/bcomp '
         f'{VERIFICATION_IMAGE_PATH} '
         f'{path}'
     )
     result: RunResult = Basic.runCommand(programToRun=diffCmd)
-    if result.returnCode == 0:
+    print(f'{result.returnCode=}')
+    if result.returnCode == BEYOND_COMPARE_SUCCESS or result.returnCode == BEYOND_COMPARE_BINARY_SAME:
         answer = True
 
     return answer
@@ -110,21 +141,24 @@ def wasTestSuccessful() -> bool:
 
 if __name__ == '__main__':
 
-    makeAppActive()
-    testActor()
-    testUseCase()
-    testNote()
-    testText()
-    testClass()
-    takeCompletionScreenShot()
-
-    success: bool = wasTestSuccessful()
-
-    if success is True:
-        title:   str = 'Success'
-        message: str = 'You are a great programmer'
+    if isAppRunning() is False:
+        alert(text='The demo app is not running', title='Hey, bonehead', button='OK')
     else:
-        title   = 'Failure'
-        message = 'You have failed as a programmer'
+        makeAppActive()
+        testActor()
+        testUseCase()
+        testNote()
+        testText()
+        testClass()
+        takeCompletionScreenShot()
 
-    alert(text=message, title=title, button='OK')
+        success: bool = wasTestSuccessful()
+
+        if success is True:
+            title:   str = 'Success'
+            message: str = 'You are a great programmer'
+        else:
+            title   = 'Failure'
+            message = 'You have failed as a programmer'
+
+        alert(text=message, title=title, button='OK')
