@@ -5,7 +5,7 @@ from logging import getLogger
 from wx import DC
 from wx import OK
 
-from pyutmodelv2.PyutNote import PyutNote
+from umlmodel.Note import Note
 
 from umlshapes.UmlBaseEventHandler import UmlBaseEventHandler
 from umlshapes.dialogs.DlgEditNote import DlgEditNote
@@ -25,12 +25,12 @@ class UmlNoteEventHandler(UmlBaseEventHandler):
 
         super().OnLeftDoubleClick(x=x, y=y, keys=keys, attachment=attachment)
 
-        umlNote:  UmlNote  = self.GetShape()
-        pyutNote: PyutNote = umlNote.pyutNote
+        umlNote:   UmlNote = self.GetShape()
+        modelNote: Note    = umlNote.modelNote
 
         umlFrame:  UmlFrame  = umlNote.GetCanvas()
 
-        with DlgEditNote(parent=umlFrame, pyutNote=pyutNote,) as dlg:
+        with DlgEditNote(parent=umlFrame, note=modelNote, ) as dlg:
             if dlg.ShowModal() == OK:
                 umlFrame.refresh()
 

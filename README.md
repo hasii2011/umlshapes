@@ -10,8 +10,15 @@
 
 # Introduction
 
-This is version 2 of the [Pyut](https://github.com/hasii2011/pyut) [Ogl Module](https://github.com/hasii2011/ogl).  This versions removes the internal miniogl code and
-relies on wxPython's wx.lib.ogl package.
+This is version 2 of the [Pyut](https://github.com/hasii2011/pyut) [Ogl Module](https://github.com/hasii2011/ogl).  
+
+This version removes the internal miniogl code and relies on wxPython's wx.lib.ogl package.
+
+
+
+This is the external graphical shapes module for the UML Diagrammer that allows for development of extensions for the UML Diagrammer
+
+This project depends on umlmodel and wxPython
 
 ```bash
 pip install umlshapes

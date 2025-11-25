@@ -1,4 +1,3 @@
-
 from wx import EVT_TEXT
 from wx import TE_MULTILINE
 
@@ -8,10 +7,9 @@ from wx import Window
 
 from wx.lib.sized_controls import SizedPanel
 
-
-from pyutmodelv2.PyutText import PyutText
-
 from umlshapes.dialogs.BaseEditDialog import BaseEditDialog
+
+from umlmodel.Text import Text
 
 
 class DlgEditText(BaseEditDialog):
@@ -29,20 +27,20 @@ class DlgEditText(BaseEditDialog):
                 return f'Cancelled'
 
     """
-    def __init__(self, parent: Window, pyutText: PyutText):
+    def __init__(self, parent: Window, text: Text):
         """
 
         Args:
             parent:             parent window to center on
-            pyutText:           Model object we are editing
+            text:           Model object we are editing
         """
         super().__init__(parent, title='Diagram Text')
 
         sizedPanel: SizedPanel = self.GetContentsPane()
 
-        self.pyutText: PyutText = pyutText
+        self._modelText: Text = text
 
-        self._txtCtrl: TextCtrl = TextCtrl(sizedPanel, value=self.pyutText.content, style=TE_MULTILINE)
+        self._txtCtrl: TextCtrl = TextCtrl(sizedPanel, value=self._modelText.content, style=TE_MULTILINE)
         self._txtCtrl.SetSizerProps(expand=True, proportion=1)
         self._txtCtrl.SetFocus()
 
@@ -59,4 +57,4 @@ class DlgEditText(BaseEditDialog):
         Args:
             event:
         """
-        self.pyutText.content = event.GetString()
+        self._modelText.content = event.GetString()

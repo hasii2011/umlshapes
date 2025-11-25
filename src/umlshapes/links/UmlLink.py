@@ -12,12 +12,12 @@ from os import linesep as osLineSep
 from wx import Point
 from wx import MemoryDC
 
+from umlmodel.Link import Link
+
 from umlshapes.lib.ogl import FORMAT_SIZE_TO_CONTENTS
 
 from umlshapes.lib.ogl import LineShape
 from umlshapes.lib.ogl import Shape
-
-from pyutmodelv2.PyutLink import PyutLink
 
 from umlshapes.UmlDiagram import UmlDiagram
 from umlshapes.UmlUtils import UmlUtils
@@ -55,7 +55,7 @@ class UmlLink(IdentifierMixin, LineShape, PubSubMixin):
 
     Some links may need the pubsub mixin so put it at the lowest level
     """
-    def __init__(self, pyutLink: PyutLink):
+    def __init__(self, link: Link):
 
         LineShape.__init__(self)
         IdentifierMixin.__init__(self)
@@ -64,7 +64,7 @@ class UmlLink(IdentifierMixin, LineShape, PubSubMixin):
         self.linkLogger:   Logger         = getLogger(__name__)
         self._preferences: UmlPreferences = UmlPreferences()
 
-        self._pyutLink: PyutLink            = pyutLink
+        self._pyutLink: Link                = link
         self._linkName: UmlAssociationLabel = cast(UmlAssociationLabel, None)
 
         self.SetFormatMode(mode=FORMAT_SIZE_TO_CONTENTS)
@@ -99,11 +99,11 @@ class UmlLink(IdentifierMixin, LineShape, PubSubMixin):
         return self._controlPoints
 
     @property
-    def pyutLink(self) -> PyutLink:
+    def modelLink(self) -> Link:
         return self._pyutLink
 
-    @pyutLink.setter
-    def pyutLink(self, pyutLink: PyutLink):
+    @modelLink.setter
+    def modelLink(self, pyutLink: Link):
         self._pyutLink = pyutLink
 
     @property
@@ -259,7 +259,7 @@ class UmlLink(IdentifierMixin, LineShape, PubSubMixin):
     def _createLinkName(self) -> UmlAssociationLabel:
 
         labelX, labelY = self.GetLabelPosition(position=NAME_IDX)
-        return self._createAssociationLabel(x=labelX, y=labelY, text=self.pyutLink.name, labelType=LabelType.ASSOCIATION_NAME)
+        return self._createAssociationLabel(x=labelX, y=labelY, text=self.modelLink.name, labelType=LabelType.ASSOCIATION_NAME)
 
     def _createAssociationLabel(self, x: int, y: int, text: str, labelType: LabelType) -> UmlAssociationLabel:
 

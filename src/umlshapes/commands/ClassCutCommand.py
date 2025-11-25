@@ -5,8 +5,8 @@ from typing import cast
 from logging import Logger
 from logging import getLogger
 
-from pyutmodelv2.PyutClass import PyutClass
-from pyutmodelv2.PyutObject import PyutObject
+from umlmodel.Class import Class
+from umlmodel.BaseAttributes import BaseAttributes
 
 from umlshapes.commands.BaseCutCommand import BaseCutCommand
 
@@ -35,7 +35,7 @@ class ClassCutCommand(BaseCutCommand):
 
         self.logger: Logger = getLogger(__name__)
 
-        super().__init__(partialName='ClassCutCommand', pyutObject=umlClass.pyutClass, umlPosition=umlPosition, umlFrame=umlFrame, umlPubSubEngine=umlPubSubEngine)
+        super().__init__(partialName='ClassCutCommand', baseAttributes=umlClass.modelClass, umlPosition=umlPosition, umlFrame=umlFrame, umlPubSubEngine=umlPubSubEngine)
 
         self._umlClass: UmlClass = umlClass
 
@@ -47,19 +47,19 @@ class ClassCutCommand(BaseCutCommand):
 
     def Undo(self) -> bool:
 
-        umlShape: UmlShapeGenre = self._createCutShape(pyutObject=self._pyutObject)
+        umlShape: UmlShapeGenre = self._createCutShape(umlBase=self._baseAttributes)
 
         self._setupUmlShape(umlShape=umlShape)
         self._umlClass = umlShape   # type: ignore
 
         return True
 
-    def _createCutShape(self, pyutObject: PyutObject) -> 'UmlShapeGenre':
+    def _createCutShape(self, umlBase: BaseAttributes) -> 'UmlShapeGenre':
 
         from umlshapes.shapes.UmlClass import UmlClass
         from umlshapes.shapes.eventhandlers.UmlClassEventHandler import UmlClassEventHandler
 
-        umlShape: UmlClass = UmlClass(cast(PyutClass, pyutObject))
+        umlShape: UmlClass = UmlClass(cast(Class, umlBase))
         eventHandler = UmlClassEventHandler()
 
         self._setupEventHandler(umlShape=umlShape, eventHandler=eventHandler)

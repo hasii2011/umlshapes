@@ -4,10 +4,10 @@ from unittest import main as unitTestMain
 
 from codeallyadvanced.ui.UnitTestBaseW import UnitTestBaseW
 
-from pyutmodelv2.PyutActor import PyutActor
-from pyutmodelv2.PyutClass import PyutClass
-from pyutmodelv2.PyutLink import PyutLink
-from pyutmodelv2.PyutNote import PyutNote
+from umlmodel.Actor import Actor
+from umlmodel.Class import Class
+from umlmodel.Link import Link
+from umlmodel.Note import Note
 
 from umlshapes.lib.ogl import OGLInitialize
 from umlshapes.links.UmlLink import UmlLink
@@ -40,8 +40,8 @@ class TestIdentifierMixin(UnitTestBaseW):
 
     def testUmlActorEquality(self):
 
-        pyutActor: PyutActor = PyutActor(actorName='John Wayne')
-        umlActor:  UmlActor  = UmlActor(pyutActor=pyutActor)
+        actor:     Actor    = Actor(actorName='John Wayne')
+        umlActor:  UmlActor = UmlActor(actor=actor)
 
         umlActor2: UmlActor = umlActor
 
@@ -49,27 +49,27 @@ class TestIdentifierMixin(UnitTestBaseW):
 
     def testUmlActorInEquality(self):
 
-        pyutActor: PyutActor = PyutActor(actorName='John Wayne')
-        umlActor:  UmlActor  = UmlActor(pyutActor=pyutActor)
+        modelActor: Actor    = Actor(actorName='John Wayne')
+        umlActor:   UmlActor = UmlActor(actor=modelActor)
 
-        pyutActor2: PyutActor = PyutActor(actorName='John Wayne II')
-        umlActor2:  UmlActor  = UmlActor(pyutActor=pyutActor2)
+        modelActor2: Actor    = Actor(actorName='John Wayne II')
+        umlActor2:   UmlActor = UmlActor(actor=modelActor2)
 
         self.assertFalse(umlActor == umlActor2, 'My __equ__ is not working')
 
     def testUmlClassInEquality(self):
 
-        pyutClass: PyutClass = PyutClass(name='BogusClass')
-        umlClass:  UmlClass  = UmlClass(pyutClass=pyutClass)
+        modelClass: Class   = Class(name='BogusClass')
+        umlClass:  UmlClass = UmlClass(modelClass=modelClass)
 
-        pyutClass2: PyutClass = PyutClass(name='BogusClass2')
-        umlClass2: UmlClass   = UmlClass(pyutClass=pyutClass2)
+        modelClass2: Class  = Class(name='BogusClass2')
+        umlClass2: UmlClass = UmlClass(modelClass=modelClass2)
 
         self.assertFalse(umlClass == umlClass2, 'Class equality not working')
 
     def testUmlNoteEquality(self):
-        pyutNote: PyutNote = PyutNote(content='I am a note')
-        umlNote:  UmlNote  = UmlNote(pyutNote=pyutNote)
+        modelNote: Note    = Note(content='I am a note')
+        umlNote:   UmlNote = UmlNote(note=modelNote)
 
         umlNote2: UmlNote = umlNote
 
@@ -89,8 +89,8 @@ class TestIdentifierMixin(UnitTestBaseW):
 
     def testUniqueIds(self):
 
-        pyutActor: PyutActor = PyutActor(actorName='John Wilkes Booth')
-        umlActor:  UmlActor  = UmlActor(pyutActor=pyutActor)
+        modelActor: Actor    = Actor(actorName='John Wilkes Booth')
+        umlActor:   UmlActor = UmlActor(actor=modelActor)
 
         umlActor2:  UmlActor = UmlActor()
 
@@ -141,8 +141,8 @@ class TestIdentifierMixin(UnitTestBaseW):
 
     def testUmlLinkInvalidGetId(self):
 
-        pyutLink: PyutLink = PyutLink()
-        umlLink:  UmlLink  = UmlLink(pyutLink=pyutLink)
+        modelLink: Link   = Link()
+        umlLink:  UmlLink = UmlLink(link=modelLink)
         try:
             umlLink.GetId()
             self.assertFalse(True, 'Where is our exception')

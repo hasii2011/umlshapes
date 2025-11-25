@@ -2,8 +2,13 @@
 from typing import cast
 
 from logging import Logger
+
 from logging import getLogger
 
+from pathlib import Path
+
+
+from wx import EVT_CLOSE
 from wx import OK
 from wx import EVT_MENU
 from wx import ID_CUT
@@ -23,14 +28,14 @@ from wx import MenuBar
 from wx import Notebook
 from wx import CommandEvent
 from wx import BookCtrlEvent
+from wx import Point
 
 from wx.lib.sized_controls import SizedFrame
 from wx.lib.sized_controls import SizedPanel
 
-from pyutmodelv2.PyutInterface import PyutInterface
-from pyutmodelv2.PyutInterface import PyutInterfaces
-from pyutmodelv2.PyutModelTypes import ClassName
-
+from umlmodel.Interface import Interface
+from umlmodel.Interface import Interfaces
+from umlmodel.ModelTypes import ClassName
 from umlshapes.ShapeTypes import UmlShapeGenre
 from umlshapes.UmlDiagram import UmlDiagram
 from umlshapes.UmlUtils import UmlUtils
@@ -59,6 +64,8 @@ from tests.demo.LinkCreator import LinkCreator
 from tests.demo.ShapeCreator import ShapeCreator
 
 from tests.demo.DlgUmlShapesPreferences import DlgUmlShapesPreferences
+
+DEMO_RUNNING_INDICATOR: str = '/tmp/DemoRunning.txt'
 
 FRAME_WIDTH:  int = 1024
 FRAME_HEIGHT: int = 720
@@ -99,6 +106,9 @@ class DemoAppFrame(SizedFrame):
 
         self.CreateStatusBar()  # should always do this when there's a resize border
         self.SetAutoLayout(True)
+
+        self.SetPosition(pt=Point(x=20, y=40))
+
         self.Show(True)
 
         self._shapeCreator: ShapeCreator   = ShapeCreator(umlPubSubEngine=self._umlPubSubEngine)
@@ -111,6 +121,18 @@ class DemoAppFrame(SizedFrame):
         self._subscribeFrameToRelevantFrameTopics(frameId=self._diagramFrame2.id)
 
         self.Bind(EVT_NOTEBOOK_PAGE_CHANGED, self._onFrameDisplayedChanged)
+        self.Bind(EVT_CLOSE,    self.Close)
+
+        iAmRunningPath: Path = Path(DEMO_RUNNING_INDICATOR)
+        iAmRunningPath.touch()
+
+    def Close(self, force: bool = False) -> bool:
+        iAmRunningPath: Path = Path(DEMO_RUNNING_INDICATOR)
+        iAmRunningPath.unlink(missing_ok=True)
+
+        self.Destroy()
+
+        return True
 
     def _createApplicationMenuBar(self):
 
@@ -246,24 +268,24 @@ class DemoAppFrame(SizedFrame):
             case _:
                 self.logger.warning(f'Unknown event id {eventId}')
 
-    def _createLollipopInterfaceListener(self, requestingFrame: ClassDiagramFrame, requestingUmlClass: UmlClass, pyutInterfaces: PyutInterfaces, perimeterPoint: UmlPosition):
+    def _createLollipopInterfaceListener(self, requestingFrame: ClassDiagramFrame, requestingUmlClass: UmlClass, interfaces: Interfaces, perimeterPoint: UmlPosition):
         """
         In an application this code belongs in a Command
 
         Args:
             requestingFrame:        Treat this as an opaque object
             requestingUmlClass:
-            pyutInterfaces:
+            interfaces:
             perimeterPoint:
         """
 
         interfaceName: str = f'{self._preferences.defaultNameInterface}{self._pyutInterfaceCount}'
         self._pyutInterfaceCount += 1
 
-        pyutInterface: PyutInterface = PyutInterface(interfaceName)
-        pyutInterface.addImplementor(ClassName(requestingUmlClass.pyutClass.name))
+        pyutInterface: Interface = Interface(interfaceName)
+        pyutInterface.addImplementor(ClassName(requestingUmlClass.modelClass.name))
 
-        umlLollipopInterface: UmlLollipopInterface = UmlLollipopInterface(pyutInterface=pyutInterface)
+        umlLollipopInterface: UmlLollipopInterface = UmlLollipopInterface(interface=pyutInterface)
         umlLollipopInterface.attachedTo            = requestingUmlClass
 
         attachmentSide: AttachmentSide      = UmlUtils.attachmentSide(x=perimeterPoint.x, y=perimeterPoint.y, rectangle=requestingUmlClass.rectangle)
@@ -286,8 +308,8 @@ class DemoAppFrame(SizedFrame):
         pubsubEngine: IUmlPubSubEngine  = requestingFrame.umlPubSubEngine
 
         # Update with our generated one
-        pyutInterfaces.append(pyutInterface)
-        with DlgEditInterface(parent=requestingFrame, lollipopInterface=umlLollipopInterface, umlPubSubEngine=pubsubEngine, pyutInterfaces=pyutInterfaces) as dlg:
+        interfaces.append(pyutInterface)
+        with DlgEditInterface(parent=requestingFrame, lollipopInterface=umlLollipopInterface, umlPubSubEngine=pubsubEngine, interfaces=interfaces) as dlg:
             if dlg.ShowModal() == OK:
                 requestingFrame.refresh()
 

@@ -2,6 +2,7 @@
 from logging import Logger
 from logging import getLogger
 
+from umlmodel.Note import Note
 from wx import Brush
 from wx import Colour
 from wx import MemoryDC
@@ -9,8 +10,6 @@ from wx import MemoryDC
 from umlshapes.lib.ogl import FORMAT_CENTRE_HORIZ
 from umlshapes.lib.ogl import FORMAT_CENTRE_VERT
 from umlshapes.lib.ogl import RectangleShape
-
-from pyutmodelv2.PyutNote import PyutNote
 
 from umlshapes.UmlUtils import UmlUtils
 
@@ -43,19 +42,19 @@ class UmlNote(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin):
 
     MARGIN: int = 10
 
-    def __init__(self, pyutNote: PyutNote | None = None, size: UmlDimensions = None):
+    def __init__(self, note: Note | None = None, size: UmlDimensions = None):
         """
 
         Args:
-            pyutNote:   A PyutNote Object
+            note:   A PyutNote Object
             size:       An initial size that overrides the default
         """
         self._preferences: UmlPreferences = UmlPreferences()
 
-        if pyutNote is None:
-            self._pyutNote: PyutNote = PyutNote()
+        if note is None:
+            self._modelNote: Note = Note()
         else:
-            self._pyutNote = pyutNote
+            self._modelNote = note
 
         super().__init__(shape=self)
 
@@ -87,12 +86,12 @@ class UmlNote(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin):
         self.Select(select=select)
 
     @property
-    def pyutNote(self):
-        return self._pyutNote
+    def modelNote(self) -> Note:
+        return self._modelNote
 
-    @pyutNote.setter
-    def pyutNote(self, newNote: PyutNote):
-        self._pyutNote = newNote
+    @modelNote.setter
+    def modelNote(self, newNote: Note):
+        self._modelNote = newNote
 
     @property
     def umlFrame(self) -> ClassDiagramFrame | UseCaseDiagramFrame | SequenceDiagramFrame:
@@ -126,7 +125,7 @@ class UmlNote(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin):
         self._drawNoteNotch(dc, w=w, baseX=baseX, baseY=baseY)
 
         try:
-            noteContent = self.pyutNote.content
+            noteContent = self.modelNote.content
             lines = UmlUtils.lineSplitter(noteContent, dc, w - 2 * UmlNote.MARGIN)
         except (ValueError, Exception) as e:
             self.logger.error(f"Unable to display note - {e}")
@@ -154,12 +153,12 @@ class UmlNote(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin):
         dc.DrawLine(x1, y1, x2, y2)
 
     def __str__(self) -> str:
-        pyutNote: PyutNote = self._pyutNote
-        if pyutNote is None:
+        modelNote: Note = self._modelNote
+        if modelNote is None:
             return f'Anonymous Note'
         else:
-            return f'{pyutNote.content}'
+            return f'{modelNote.content}'
 
     def __repr__(self):
 
-        return f'UmlNote - umlId: `{self.id}` modelId: {self.pyutNote.id}'
+        return f'UmlNote - umlId: `{self.id}` modelId: {self.modelNote.id}'

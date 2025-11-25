@@ -6,7 +6,7 @@ from os import linesep as osLineSep
 
 from wx import MemoryDC
 
-from pyutmodelv2.PyutLink import PyutLink
+from umlmodel.Link import Link
 
 from umlshapes.lib.ogl import ARROW_ARROW
 from umlshapes.lib.ogl import LineShape
@@ -19,18 +19,18 @@ from umlshapes.types.Common import TAB
 
 class UmlInterface(UmlLink):
 
-    def __init__(self, pyutLink: PyutLink, interfaceClass: UmlClass, implementingClass: UmlClass):
+    def __init__(self, link: Link, interfaceClass: UmlClass, implementingClass: UmlClass):
         """
 
         Args:
-            pyutLink:
+            link:
             interfaceClass:
             implementingClass:
         """
 
         self.interfaceLogger: Logger = getLogger(__name__)
 
-        super().__init__(pyutLink=pyutLink)
+        super().__init__(link=link)
 
         self.AddArrow(type=ARROW_ARROW)
 

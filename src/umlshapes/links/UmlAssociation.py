@@ -24,11 +24,11 @@ from wx import Point
 from wx import MemoryDC
 from wx import Pen
 
-from pyutmodelv2.PyutLink import PyutLink
+from umlmodel.Link import Link
 
 from umlshapes.links.LabelType import LabelType
-from umlshapes.links.UmlAssociationLabel import UmlAssociationLabel
 from umlshapes.links.UmlLink import UmlLink
+from umlshapes.links.UmlAssociationLabel import UmlAssociationLabel
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
@@ -49,9 +49,9 @@ class UmlAssociation(UmlLink):
 
     clsDiamondSize: int = UmlPreferences().diamondSize
 
-    def __init__(self, pyutLink: PyutLink):
+    def __init__(self, link: Link):
 
-        super().__init__(pyutLink=pyutLink)
+        super().__init__(link=link)
 
         self.associationLogger: Logger = getLogger(__name__)
 
@@ -128,12 +128,12 @@ class UmlAssociation(UmlLink):
     def _createDestinationCardinality(self) -> UmlAssociationLabel:
 
         dstCardX, dstCardY = self.GetLabelPosition(position=DESTINATION_CARDINALITY_IDX)
-        return self._createAssociationLabel(x=dstCardX, y=dstCardY, text=self.pyutLink.destinationCardinality, labelType=LabelType.DESTINATION_CARDINALITY)
+        return self._createAssociationLabel(x=dstCardX, y=dstCardY, text=self.modelLink.destinationCardinality, labelType=LabelType.DESTINATION_CARDINALITY)
 
     def _createSourceCardinality(self) -> UmlAssociationLabel:
 
         srcCardX, srcCardY = self.GetLabelPosition(position=SOURCE_CARDINALITY_IDX)
-        return self._createAssociationLabel(x=srcCardX, y=srcCardY, text=self.pyutLink.sourceCardinality, labelType=LabelType.SOURCE_CARDINALITY)
+        return self._createAssociationLabel(x=srcCardX, y=srcCardY, text=self.modelLink.sourceCardinality, labelType=LabelType.SOURCE_CARDINALITY)
 
     def _drawDiamond(self, dc: DC, filled: bool = False):
         """

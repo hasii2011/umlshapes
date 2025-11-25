@@ -7,7 +7,7 @@ from logging import getLogger
 
 from wx import MemoryDC
 
-from pyutmodelv2.PyutLink import PyutLink
+from umlmodel.Link import Link
 
 from umlshapes.lib.ogl import LineShape
 
@@ -26,9 +26,9 @@ class UmlNoteLink(UmlLink):
     A note link, with dashed line and no arrows.
     Developers should NOT use the UmlLink sourceShape or destination shape properties
     """
-    def __init__(self, pyutLink: PyutLink):
+    def __init__(self, link: Link):
 
-        super().__init__(pyutLink=pyutLink)
+        super().__init__(link=link)
 
         self.logger: Logger = getLogger(__name__)
 

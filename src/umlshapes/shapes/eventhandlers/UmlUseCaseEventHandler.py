@@ -4,7 +4,7 @@ from logging import getLogger
 
 from wx import ID_OK
 
-from pyutmodelv2.PyutUseCase import PyutUseCase
+from umlmodel.UseCase import UseCase
 
 from umlshapes.UmlBaseEventHandler import UmlBaseEventHandler
 from umlshapes.dialogs.DlgEditUseCase import DlgEditUseCase
@@ -26,12 +26,12 @@ class UmlUseCaseEventHandler(UmlBaseEventHandler):
 
         super().OnLeftDoubleClick(x=x, y=y, keys=keys, attachment=attachment)
 
-        umlUseCase:  UmlUseCase  = self.GetShape()
-        pyutUseCase: PyutUseCase = umlUseCase.pyutUseCase
+        umlUseCase:   UmlUseCase = self.GetShape()
+        modelUseCase: UseCase    = umlUseCase.modelUseCase
 
         umlFrame:  UmlFrame  = umlUseCase.GetCanvas()
 
-        with DlgEditUseCase(umlFrame, useCaseName=pyutUseCase.name) as dlg:
+        with DlgEditUseCase(umlFrame, useCaseName=modelUseCase.name) as dlg:
             if dlg.ShowModal() == ID_OK:
-                pyutUseCase.name = dlg.useCaseName
+                modelUseCase.name = dlg.useCaseName
                 umlFrame.refresh()

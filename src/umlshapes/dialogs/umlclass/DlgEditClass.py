@@ -16,11 +16,11 @@ from wx import StaticText
 from wx import TextCtrl
 from wx import CheckBox
 
-from wx.lib.sized_controls import SizedPanel
+from umlmodel.Class import Class
+from umlmodel.Field import Field
+from umlmodel.Parameter import Parameter
 
-from pyutmodelv2.PyutClass import PyutClass
-from pyutmodelv2.PyutField import PyutField
-from pyutmodelv2.PyutParameter import PyutParameter
+from wx.lib.sized_controls import SizedPanel
 
 from umlshapes.ShapeTypes import UmlShapes
 
@@ -59,7 +59,7 @@ class DlgEditClass(DlgEditClassCommon):
     dialog, any modifications are lost.
 
     """
-    def __init__(self, parent: ClassDiagramFrame, umlPubSubEngine: IUmlPubSubEngine, pyutClass: PyutClass):
+    def __init__(self, parent: ClassDiagramFrame, umlPubSubEngine: IUmlPubSubEngine, pyutClass: Class):
         """
 
         Args:
@@ -68,16 +68,17 @@ class DlgEditClass(DlgEditClassCommon):
         """
 
         assert isinstance(parent, ClassDiagramFrame), 'Developer error.  Must be a Uml Diagram Frame'
-        self.logger:       Logger    = getLogger(__name__)
-        self._pyutClass:   PyutClass = pyutClass
 
-        super().__init__(parent=parent, umlPubSubEngine=umlPubSubEngine, dlgTitle="Edit Class", pyutModel=self._pyutClass, editInterface=False)
+        self.logger:      Logger = getLogger(__name__)
+        self._modelClass: Class  = pyutClass
+
+        super().__init__(parent=parent, umlPubSubEngine=umlPubSubEngine, dlgTitle="Edit Class", pyutModel=self._modelClass, editInterface=False)
         self._oldClassName: str = pyutClass.name
 
         sizedPanel: SizedPanel = self.GetContentsPane()
         sizedPanel.SetSizerProps(expand=True, proportion=1)
 
-        self._pyutFields: EnhancedListBox = cast(EnhancedListBox, None)
+        self._enhancedListBox: EnhancedListBox = cast(EnhancedListBox, None)
 
         self._layoutNameControls(parent=sizedPanel)
 
@@ -116,7 +117,7 @@ class DlgEditClass(DlgEditClassCommon):
         callbacks.upCallback     = self._fieldUpCallback
         callbacks.downCallback   = self._fieldDownCallback
 
-        self._pyutFields = EnhancedListBox(parent=parent, title='Fields:', callbacks=callbacks)
+        self._enhancedListBox = EnhancedListBox(parent=parent, title='Fields:', callbacks=callbacks)
 
     def _layoutMethodDisplayOptions(self, parent: SizedPanel):
 
@@ -133,7 +134,7 @@ class DlgEditClass(DlgEditClassCommon):
         """
         dupParams = []
         for parameter in parameters:
-            duplicate: PyutParameter = PyutParameter(name=parameter.name, type=parameter.type, defaultValue=parameter.defaultValue)
+            duplicate: Parameter = Parameter(name=parameter.name, type=parameter.type, defaultValue=parameter.defaultValue)
             dupParams.append(duplicate)
         return dupParams
 
@@ -143,36 +144,36 @@ class DlgEditClass(DlgEditClassCommon):
 
         """
         # Fill Class name
-        self._className.SetValue(self._pyutModelCopy.name)
+        self._className.SetValue(self._modeInterfaceCopy.name)
 
         fieldItems: EnhancedListBoxItems = EnhancedListBoxItems([])
-        for field in self._pyutModelCopy.fields:
+        for field in self._modeInterfaceCopy.fields:
             fieldItems.append(str(field))     # Depends on a reasonable __str__ implementation
-        self._pyutFields.setItems(fieldItems)
+        self._enhancedListBox.setItems(fieldItems)
 
         self._fillMethodList()
 
         # Fill display properties
-        self._chkShowFields.SetValue(self._pyutModelCopy.showFields)
-        self._chkShowMethods.SetValue(self._pyutModelCopy.showMethods)
-        self._chkShowStereotype.SetValue(cast(PyutClass, self._pyutModelCopy).displayStereoType)
+        self._chkShowFields.SetValue(self._modeInterfaceCopy.showFields)
+        self._chkShowMethods.SetValue(self._modeInterfaceCopy.showMethods)
+        self._chkShowStereotype.SetValue(cast(Class, self._modeInterfaceCopy).displayStereoType)
 
     def _fieldAddCallback(self) -> CallbackAnswer:
         # TODO Use default field name when available
-        field:  PyutField      = PyutField(name='FieldName')
+        field:  Field          = Field(name='FieldName')
         answer: CallbackAnswer = CallbackAnswer()
         with DlgEditField(parent=self, fieldToEdit=field) as dlg:
             if dlg.ShowModal() == OK:
                 answer.item  = str(field)
                 answer.valid = True
-                self._pyutModelCopy.fields.append(field)
+                self._modeInterfaceCopy.fields.append(field)
             else:
                 answer.valid = False
         return answer
 
     def _fieldEditCallback(self, selection: int) -> CallbackAnswer:
 
-        field:  PyutField      = self._pyutModelCopy.fields[selection]
+        field:  Field          = self._modeInterfaceCopy.fields[selection]
         answer: CallbackAnswer = CallbackAnswer()
         with DlgEditField(parent=self, fieldToEdit=field) as dlg:
             if dlg.ShowModal() == OK:
@@ -184,13 +185,13 @@ class DlgEditClass(DlgEditClassCommon):
 
     def _fieldRemoveCallback(self, selection: int):
 
-        fields: List[PyutField] = self._pyutModelCopy.fields
+        fields: List[Field] = self._modeInterfaceCopy.fields
         fields.pop(selection)
 
     def _fieldUpCallback(self, selection: int) -> UpCallbackData:
 
-        fields: List[PyutField] = self._pyutModelCopy.fields
-        field:   PyutField      = fields[selection]
+        fields: List[Field] = self._modeInterfaceCopy.fields
+        field:  Field       = fields[selection]
 
         fields.pop(selection)
         fields.insert(selection - 1, field)
@@ -204,8 +205,8 @@ class DlgEditClass(DlgEditClassCommon):
 
     def _fieldDownCallback(self, selection: int) -> DownCallbackData:
 
-        fields: List[PyutField] = self._pyutModelCopy.fields
-        field:  PyutField       = fields[selection]
+        fields: List[Field] = self._modeInterfaceCopy.fields
+        field:  Field       = fields[selection]
         fields.pop(selection)
         fields.insert(selection + 1, field)
 
@@ -220,27 +221,27 @@ class DlgEditClass(DlgEditClassCommon):
         """
         Activated when button OK is clicked.
         """
-        self._pyutClass.stereotype = cast(PyutClass, self._pyutModelCopy).stereotype
+        self._modelClass.stereotype = cast(Class, self._modeInterfaceCopy).stereotype
         # Adds all fields in a list
-        self._pyutClass.fields = self._pyutModelCopy.fields
+        self._modelClass.fields = self._modeInterfaceCopy.fields
 
         # Update display properties
-        self._pyutClass.showFields        = self._chkShowFields.GetValue()
-        self._pyutClass.showMethods       = self._chkShowMethods.GetValue()
-        self._pyutClass.displayStereoType = self._chkShowStereotype.GetValue()
+        self._modelClass.showFields        = self._chkShowFields.GetValue()
+        self._modelClass.showMethods       = self._chkShowMethods.GetValue()
+        self._modelClass.displayStereoType = self._chkShowStereotype.GetValue()
 
         #
         # Get common stuff from base class
         #
-        self._pyutClass.name        = self._pyutModelCopy.name
-        self._pyutClass.methods     = self._pyutModelCopy.methods
-        self._pyutClass.fields      = self._pyutModelCopy.fields
-        self._pyutClass.description = self._pyutModelCopy.description
+        self._modelClass.name        = self._modeInterfaceCopy.name
+        self._modelClass.methods     = self._modeInterfaceCopy.methods
+        self._modelClass.fields      = self._modeInterfaceCopy.fields
+        self._modelClass.description = self._modeInterfaceCopy.description
 
         prefs: UmlPreferences = UmlPreferences()
 
         if prefs.autoResizeShapesOnEdit is True:
-            umlClass: 'UmlClass' = self._getAssociatedOglClass(self._pyutClass)
+            umlClass: 'UmlClass' = self._getAssociatedUmlClass(self._modelClass)
 
             umlClass.autoSize()
 
@@ -258,7 +259,7 @@ class DlgEditClass(DlgEditClassCommon):
         self.SetReturnCode(CANCEL)
         self.EndModal(CANCEL)
 
-    def _getAssociatedOglClass(self, pyutClass: PyutClass) -> 'UmlClass':
+    def _getAssociatedUmlClass(self, pyutClass: Class) -> 'UmlClass':
         """
         Return the OglClass that represents pyutClass
 
@@ -269,11 +270,12 @@ class DlgEditClass(DlgEditClassCommon):
         """
         from umlshapes.shapes.UmlClass import UmlClass
 
-        oglClasses: List[UmlClass] = [po for po in self._getUmlShapes() if isinstance(po, UmlClass) and po.pyutClass is pyutClass]
+        umlClasses: List[UmlClass] = [po for po in self._getUmlShapes() if isinstance(po, UmlClass) and po.modelClass is pyutClass]
 
         # This will pop in the TestADialog application since it has no frame
-        assert len(oglClasses) == 1, 'Cannot have more then one ogl class per pyut class'
-        return oglClasses.pop(0)
+        assert len(umlClasses) == 1, 'Cannot have more then one UML Class per model class'
+
+        return umlClasses.pop(0)
 
     def _getUmlShapes(self) -> UmlShapes:
         """

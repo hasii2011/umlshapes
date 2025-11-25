@@ -13,14 +13,13 @@ from wx import Font
 from wx import MemoryDC
 from wx import Size
 
-from pyutmodelv2.PyutClass import PyutClass
-from pyutmodelv2.PyutMethod import PyutMethod
-from pyutmodelv2.PyutMethod import PyutMethods
-from pyutmodelv2.PyutField import PyutFields
-
-from pyutmodelv2.enumerations.PyutStereotype import PyutStereotype
-from pyutmodelv2.enumerations.PyutDisplayMethods import PyutDisplayMethods
-from pyutmodelv2.enumerations.PyutDisplayParameters import PyutDisplayParameters
+from umlmodel.Class import Class
+from umlmodel.Field import Fields
+from umlmodel.Method import Method
+from umlmodel.Method import Methods
+from umlmodel.enumerations.DisplayMethods import DisplayMethods
+from umlmodel.enumerations.DisplayParameters import DisplayParameters
+from umlmodel.enumerations.Stereotype import Stereotype
 
 from umlshapes.lib.ogl import RectangleShape
 
@@ -54,18 +53,18 @@ class UmlClass(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
     Notice that the IdentifierMixin is placed before any Shape mixin.
     See Python left to right method resolution order (MRO)
     """
-    def __init__(self, pyutClass: PyutClass | None = None, size: UmlDimensions = None):
+    def __init__(self, modelClass: Class | None = None, size: UmlDimensions = None):
         """
         Args:
-            pyutClass:   A PyutClass Object
+            modelClass: A model Class Object
             size:       An initial size that overrides the default
         """
         self._preferences: UmlPreferences = UmlPreferences()
 
-        if pyutClass is None:
-            self._pyutClass: PyutClass = PyutClass()
+        if modelClass is None:
+            self._modelClass: Class = Class()
         else:
-            self._pyutClass = pyutClass
+            self._modelClass = modelClass
 
         if size is None:
             classSize: UmlDimensions = self._preferences.classDimensions
@@ -95,16 +94,16 @@ class UmlClass(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
         self.SetCentreResize(False)
 
     @property
-    def pyutClass(self) -> PyutClass:
+    def modelClass(self) -> Class:
         """
 
         Returns:  The associated model class
         """
-        return self._pyutClass
+        return self._modelClass
 
-    @pyutClass.setter
-    def pyutClass(self, pyutClass: PyutClass):
-        self._pyutClass = pyutClass
+    @modelClass.setter
+    def modelClass(self, modelClass: Class):
+        self._modelClass = modelClass
 
     @property
     def umlFrame(self) -> 'ClassDiagramFrame':
@@ -156,14 +155,14 @@ class UmlClass(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
         drawingYOffset = self._drawClassHeader(dc=dc, leftX=x, leftY=y, shapeWidth=w)
 
         # noinspection PySimplifyBooleanCheck
-        if self.pyutClass.showFields is True:
+        if self.modelClass.showFields is True:
             dc.DrawLine(x, y + drawingYOffset, x + w, y + drawingYOffset)
             drawingYOffset = self._drawClassFields(dc, leftX=x, leftY=y, startYOffset=drawingYOffset)
 
         dc.DrawLine(x, y + drawingYOffset, x + w, y + drawingYOffset)
 
         # noinspection PySimplifyBooleanCheck
-        if self.pyutClass.showMethods is True:
+        if self.modelClass.showMethods is True:
             self._drawClassMethods(dc=dc, leftX=x, leftY=y, startYOffset=drawingYOffset)
 
         self._endClipping(dc=dc)
@@ -299,7 +298,7 @@ class UmlClass(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
             x:  Shape top left X
             y:  Shape top left Y
         """
-        className: str = self.pyutClass.name
+        className: str = self.modelClass.name
         #
         # Draw the class name
         nameWidth: int = self.textWidth(dc, className)
@@ -352,8 +351,8 @@ class UmlClass(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
         y:       int = leftY
         yOffset: int = startYOffset
 
-        textHeight: int       = self._textHeight
-        pyutClass:  PyutClass = self.pyutClass
+        textHeight: int   = self._textHeight
+        pyutClass:  Class = self.modelClass
 
         # Add space above
         if len(pyutClass.fields) > 0:
@@ -389,20 +388,20 @@ class UmlClass(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
         textHeight: int = self._textHeight
 
         # Add space above
-        pyutClass: PyutClass = self.pyutClass
+        pyutClass: Class = self.modelClass
         if len(pyutClass.methods) > 0:
             yOffset += textHeight
 
         for method in pyutClass.methods:
             # noinspection PySimplifyBooleanCheck
-            if self._eligibleToDraw(pyutClass=pyutClass, pyutMethod=method) is True:
+            if self._eligibleToDraw(modelClass=pyutClass, method=method) is True:
 
-                displayParameters: PyutDisplayParameters = pyutClass.displayParameters
+                displayParameters: DisplayParameters = pyutClass.displayParameters
                 self._drawMethod(dc, method, displayParameters, leftX=leftX, leftY=leftY, startYOffset=yOffset)
 
                 yOffset += textHeight
 
-    def _drawMethod(self, dc: MemoryDC, pyutMethod: PyutMethod, displayParameters: PyutDisplayParameters, leftX: int, leftY: int, startYOffset: int):
+    def _drawMethod(self, dc: MemoryDC, pyutMethod: Method, displayParameters: DisplayParameters, leftX: int, leftY: int, startYOffset: int):
         """
         If the preference is not set at the individual class level, then defer to global preference; Otherwise,
         respect the class level preference
@@ -422,64 +421,64 @@ class UmlClass(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
 
         dc.DrawText(methodStr, x + self._margin, y + startYOffset)
 
-    def _eligibleToDraw(self, pyutClass: PyutClass, pyutMethod: PyutMethod):
+    def _eligibleToDraw(self, modelClass: Class, method: Method):
         """
         Is it one of those 'special' dunder methods?
 
         Args:
-            pyutClass: The class we need to check
-            pyutMethod: The particular method we are asked about
+            modelClass: The class we need to check
+            method:     The particular method we are asked about
 
         Returns: `True` if we can draw it, `False` if we should not
         """
 
         ans: bool = True
 
-        methodName: str = pyutMethod.name
+        methodName: str = method.name
         if methodName == CONSTRUCTOR_NAME:
-            ans = self._checkConstructor(pyutClass=pyutClass)
+            ans = self._checkConstructor(modelClass=modelClass)
         elif methodName.startswith(DUNDER_METHOD_INDICATOR) and methodName.endswith(DUNDER_METHOD_INDICATOR):
-            ans = self._checkDunderMethod(pyutClass=pyutClass)
+            ans = self._checkDunderMethod(modelClass=modelClass)
 
         return ans
 
-    def _checkConstructor(self, pyutClass: PyutClass) -> bool:
+    def _checkConstructor(self, modelClass: Class) -> bool:
         """
         If class property is UNSPECIFIED, defer to the global value; otherwise check the local value
 
         Args:
-            pyutClass: The specified class to check
+            modelClass: The specified class to check
 
         Returns: Always `True` unless the specific class says `False` or class does not care then returns
         `False` if the global value says so
         """
-        ans: bool = self._allowDraw(classProperty=pyutClass.displayConstructor, globalValue=self._preferences.displayConstructor)
+        ans: bool = self._allowDraw(classProperty=modelClass.displayConstructor, globalValue=self._preferences.displayConstructor)
 
         return ans
 
-    def _checkDunderMethod(self, pyutClass: PyutClass):
+    def _checkDunderMethod(self, modelClass: Class):
         """
         If class property is UNSPECIFIED, defer to the global value; otherwise check the local value
 
         Args:
-            pyutClass: The specified class to check
+            modelClass: The specified class to check
 
         Returns: Always `True` unless the specific class says `False` or class does not care then returns
         `False` if the global value says so
         """
-        ans: bool = self._allowDraw(classProperty=pyutClass.displayDunderMethods, globalValue=self._preferences.displayDunderMethods)
+        ans: bool = self._allowDraw(classProperty=modelClass.displayDunderMethods, globalValue=self._preferences.displayDunderMethods)
 
         return ans
 
-    def _allowDraw(self, classProperty: PyutDisplayMethods, globalValue: bool) -> bool:
+    def _allowDraw(self, classProperty: DisplayMethods, globalValue: bool) -> bool:
         ans: bool = True
 
-        if classProperty == PyutDisplayMethods.UNSPECIFIED:
+        if classProperty == DisplayMethods.UNSPECIFIED:
             # noinspection PySimplifyBooleanCheck
             if globalValue is False:
                 ans = False
         else:
-            if classProperty == PyutDisplayMethods.DO_NOT_DISPLAY:
+            if classProperty == DisplayMethods.DO_NOT_DISPLAY:
                 ans = False
 
         return ans
@@ -487,10 +486,10 @@ class UmlClass(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
     def _isSameName(self, other) -> bool:
 
         ans: bool = False
-        selfPyutClass:  PyutClass = self.pyutClass
-        otherPyutClass: PyutClass = other.pyutClass
+        selfModelClass:   Class = self.modelClass
+        otherModelClass: Class = other.modelClass
 
-        if selfPyutClass.name == otherPyutClass.name:
+        if selfModelClass.name == otherModelClass.name:
             ans = True
         return ans
 
@@ -545,9 +544,9 @@ class UmlClass(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
         Returns:  A proper string rendition of a stereotype
         """
 
-        stereotype: PyutStereotype = self.pyutClass.stereotype
+        stereotype: Stereotype = self.modelClass.stereotype
 
-        if self.pyutClass.displayStereoType is True and stereotype is not None and stereotype != PyutStereotype.NO_STEREOTYPE:
+        if self.modelClass.displayStereoType is True and stereotype is not None and stereotype != Stereotype.NO_STEREOTYPE:
             stereoTypeValue: str = f'<<{stereotype.value}>>'
         else:
             stereoTypeValue = ''
@@ -566,17 +565,17 @@ class UmlClass(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
         Returns: The highest based on the font set in the DC
         """
 
-        pyutClass:        PyutClass = self.pyutClass
-        singleLineHeight: int       = self._textHeight
+        modelClass:       Class = self.modelClass
+        singleLineHeight: int   = self._textHeight
 
         currentHeight: int = singleLineHeight * 5
 
-        if len(pyutClass.fields) > 0 and pyutClass.showFields is True:
+        if len(modelClass.fields) > 0 and modelClass.showFields is True:
             currentHeight += singleLineHeight * 2   # Above and below margins
-            currentHeight += singleLineHeight * len(pyutClass.fields)
+            currentHeight += singleLineHeight * len(modelClass.fields)
 
-        if len(pyutClass.methods) > 0 and pyutClass.showMethods is True:
-            currentHeight += singleLineHeight * len(pyutClass.methods)
+        if len(modelClass.methods) > 0 and modelClass.showMethods is True:
+            currentHeight += singleLineHeight * len(modelClass.methods)
 
         currentHeight += singleLineHeight   # Add space after last method
 
@@ -608,11 +607,11 @@ class UmlClass(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
         Returns: The widest based on the font set in the DC
         """
 
-        pyutClass:       PyutClass = self.pyutClass
-        stereoTypeValue: str       = self._getStereoTypeValue()
+        modelClass:      Class = self.modelClass
+        stereoTypeValue: str   = self._getStereoTypeValue()
 
         maxWidth:        int       = 0
-        classNameWidth: int = self.textWidth(dc, pyutClass.name)
+        classNameWidth: int = self.textWidth(dc, modelClass.name)
         stereoTypeWidth: int = self.textWidth(dc, stereoTypeValue)
 
         maxWidth = max(maxWidth, classNameWidth)
@@ -629,12 +628,12 @@ class UmlClass(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
         Returns: The widest based on the font set in the DC
         """
 
-        pyutClass:  PyutClass  = self.pyutClass
-        pyutFields: PyutFields = pyutClass.fields
+        modelClass: Class  = self.modelClass
+        fields:     Fields = modelClass.fields
 
         maxWidth: int = 0
-        if len(pyutFields) > 0 and pyutClass.showFields is True:
-            for pyutField in pyutFields:
+        if len(fields) > 0 and modelClass.showFields is True:
+            for pyutField in fields:
                 fieldStr: str = str(pyutField)
                 fieldWidth: int = self.textWidth(dc, fieldStr)
                 maxWidth = max(maxWidth, fieldWidth)
@@ -652,16 +651,16 @@ class UmlClass(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
         Returns: The widest based on the font set in the DC
         """
 
-        pyutClass:   PyutClass   = self.pyutClass
-        pyutMethods: PyutMethods = pyutClass.methods
+        modelClass: Class   = self.modelClass
+        methods:    Methods = modelClass.methods
 
         maxWidth: int = 0
         # noinspection PySimplifyBooleanCheck
-        if pyutClass.showMethods is True:
-            for pyutMethod in pyutMethods:
+        if modelClass.showMethods is True:
+            for pyutMethod in methods:
                 # noinspection PySimplifyBooleanCheck
-                if self._eligibleToDraw(pyutClass=pyutClass, pyutMethod=pyutMethod) is True:
-                    methodStr:   str = self._getMethodRepresentation(pyutMethod=pyutMethod, displayParameters=pyutClass.displayParameters)
+                if self._eligibleToDraw(modelClass=modelClass, method=pyutMethod) is True:
+                    methodStr:   str = self._getMethodRepresentation(method=pyutMethod, displayParameters=modelClass.displayParameters)
                     self.logger.debug(f'{methodStr=}')
                     methodWidth: int = self.textWidth(dc=dc, text=methodStr)
                     maxWidth = max(maxWidth, methodWidth)
@@ -669,11 +668,11 @@ class UmlClass(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
         return maxWidth
 
     # noinspection PyTypeChecker
-    def _getMethodRepresentation(self, pyutMethod: PyutMethod, displayParameters: PyutDisplayParameters) -> str:
+    def _getMethodRepresentation(self, method: Method, displayParameters: DisplayParameters) -> str:
         """
 
         Args:
-            pyutMethod:         The one we want to transform
+            method:         The one we want to transform
             displayParameters:  The PyutClass value
 
         Returns:  The appropriate string version of a method
@@ -681,18 +680,18 @@ class UmlClass(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
 
         self.logger.debug(f'{displayParameters=} - {self._preferences.showParameters=}')
 
-        if displayParameters == PyutDisplayParameters.UNSPECIFIED:
+        if displayParameters == DisplayParameters.UNSPECIFIED:
 
             if self._preferences.showParameters is True:
-                methodStr: str = pyutMethod.methodWithParameters()
+                methodStr: str = method.methodWithParameters()
             else:
-                methodStr = pyutMethod.methodWithoutParameters()
+                methodStr = method.methodWithoutParameters()
 
-        elif displayParameters == PyutDisplayParameters.WITH_PARAMETERS:
-            methodStr = pyutMethod.methodWithParameters()
+        elif displayParameters == DisplayParameters.DISPLAY_PARAMETERS:
+            methodStr = method.methodWithParameters()
 
-        elif displayParameters == PyutDisplayParameters.WITHOUT_PARAMETERS:
-            methodStr = pyutMethod.methodWithoutParameters()
+        elif displayParameters == DisplayParameters.DO_NOT_DISPLAY_PARAMETERS:
+            methodStr = method.methodWithoutParameters()
         else:
             assert False, 'Internal error unknown pyutMethod parameter display type'
 
@@ -702,8 +701,8 @@ class UmlClass(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
         return self.__repr__()
 
     def __repr__(self) -> str:
-        selfName: str = self.pyutClass.name
-        modelId:  int = self.pyutClass.id
+        selfName: str = self.modelClass.name
+        modelId:  str = self.modelClass.id
         return f'UmlClass.{selfName} umlId: `{self.id}` modelId: {modelId}'
 
     def __eq__(self, other) -> bool:
@@ -718,6 +717,6 @@ class UmlClass(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
 
     def __hash__(self):
 
-        selfPyutClass: PyutClass = self.pyutClass
+        selfModelClass: Class = self.modelClass
 
-        return hash(selfPyutClass.name) + hash(self.id)
+        return hash(selfModelClass.name) + hash(self.id)

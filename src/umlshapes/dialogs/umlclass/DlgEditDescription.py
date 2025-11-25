@@ -1,6 +1,8 @@
 
 from typing import Union
 
+from umlmodel.Class import Class
+from umlmodel.Interface import Interface
 from wx import EVT_TEXT
 from wx import TE_MULTILINE
 
@@ -9,9 +11,6 @@ from wx import Window
 
 from wx.lib.sized_controls import SizedPanel
 
-from pyutmodelv2.PyutClass import PyutClass
-from pyutmodelv2.PyutInterface import PyutInterface
-
 from umlshapes.dialogs.BaseEditDialog import BaseEditDialog
 
 
@@ -19,7 +18,7 @@ class DlgEditDescription(BaseEditDialog):
     """
     Edit a class description
     """
-    def __init__(self, parent: Window, pyutModel: Union[PyutClass, PyutInterface]):
+    def __init__(self, parent: Window, pyutModel: Union[Class, Interface]):
         """
 
         Args:
@@ -28,7 +27,7 @@ class DlgEditDescription(BaseEditDialog):
         """
         super().__init__(parent, title="Edit Description")
 
-        self._pyutModel: Union[PyutClass, PyutInterface] = pyutModel
+        self._pyutModel: Union[Class, Interface] = pyutModel
 
         sizedPanel: SizedPanel = self.GetContentsPane()
 

@@ -5,8 +5,8 @@ from logging import Logger
 from logging import getLogger
 from typing import cast
 
-from pyutmodelv2.PyutObject import PyutObject
-from pyutmodelv2.PyutUseCase import PyutUseCase
+from umlmodel.UseCase import UseCase
+from umlmodel.BaseAttributes import BaseAttributes
 
 from umlshapes.commands.BasePasteCommand import BasePasteCommand
 
@@ -21,11 +21,11 @@ if TYPE_CHECKING:
 
 
 class UseCasePasteCommand(BasePasteCommand):
-    def __init__(self, pyutObject: PyutObject, umlPosition: UmlPosition, umlFrame: 'UmlFrame', umlPubSubEngine: IUmlPubSubEngine):
+    def __init__(self, baseAttributes: BaseAttributes, umlPosition: UmlPosition, umlFrame: 'UmlFrame', umlPubSubEngine: IUmlPubSubEngine):
         """
 
         Args:
-            pyutObject:         We will build the appropriate UML Shape from this
+            baseAttributes:         We will build the appropriate UML Shape from this
             umlPosition:        The location to paste it to
             umlFrame:           The UML Frame we are pasting to
             umlPubSubEngine:    The event handler that is injected
@@ -34,14 +34,14 @@ class UseCasePasteCommand(BasePasteCommand):
 
         self.logger: Logger = getLogger(__name__)
 
-        super().__init__(partialName='UseCasePasteCommand', pyutObject=pyutObject, umlPosition=umlPosition, umlFrame=umlFrame, umlPubSubEngine=umlPubSubEngine)
+        super().__init__(partialName='UseCasePasteCommand', baseAttributes=baseAttributes, umlPosition=umlPosition, umlFrame=umlFrame, umlPubSubEngine=umlPubSubEngine)
 
         self._umlUseCase: UmlUseCase = cast(UmlUseCase, None)
 
     def Do(self) -> bool:
         from umlshapes.ShapeTypes import UmlShapeGenre
 
-        umlShape: UmlShapeGenre = self._createPastedShape(pyutObject=self._pyutObject)
+        umlShape: UmlShapeGenre = self._createPastedShape(baseAttributes=self._baseAttributes)
 
         self._setupUmlShape(umlShape=umlShape)
         self._umlUseCase = umlShape  # type: ignore
@@ -52,11 +52,11 @@ class UseCasePasteCommand(BasePasteCommand):
         self._undo(umlShape=self._umlUseCase)
         return True
 
-    def _createPastedShape(self, pyutObject: PyutObject) -> 'UmlShapeGenre':
+    def _createPastedShape(self, baseAttributes: BaseAttributes) -> 'UmlShapeGenre':
         from umlshapes.shapes.UmlUseCase import UmlUseCase
         from umlshapes.shapes.eventhandlers.UmlUseCaseEventHandler import UmlUseCaseEventHandler
 
-        umlShape:     UmlUseCase             = UmlUseCase(cast(PyutUseCase, pyutObject))
+        umlShape:     UmlUseCase             = UmlUseCase(cast(UseCase, baseAttributes))
         eventHandler: UmlUseCaseEventHandler = UmlUseCaseEventHandler()
 
         self._setupEventHandler(umlShape=umlShape, eventHandler=eventHandler)
