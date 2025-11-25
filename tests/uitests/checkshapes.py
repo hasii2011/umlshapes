@@ -1,14 +1,10 @@
 #!/usr/bin/env python
 
-from pathlib import Path
-
 from PIL import ImageGrab
 
 import pyautogui
 from pyautogui import click
-from pyautogui import moveTo
 from pyautogui import dragTo
-
 
 # Hmm why is this coming from here
 from pymsgbox import alert
@@ -17,11 +13,14 @@ from codeallybasic.Basic import Basic
 from codeallybasic.Basic import RunResult
 from codeallybasic.UnitTestBase import UnitTestBase
 
+from tests.uitests.common import LEFT
+from tests.uitests.common import isAppRunning
+from tests.uitests.common import makeAppActive
+from tests.uitests.common import pullDownViewMenu
 
 pyautogui.PAUSE = 0.5
 
 DRAG_DURATION: float = 0.5
-LEFT:          str   = 'left'
 
 FIND_ME_IMAGE:           str = f'FindMe.png'
 SHAPES_IMAGE_FILENAME:   str = f'testShapes.png'
@@ -30,27 +29,8 @@ VERIFICATION_IMAGE_PATH: str = f'/tmp/{SHAPES_IMAGE_FILENAME}'
 # noinspection SpellCheckingInspection
 GOLDEN_IMAGE_PACKAGE:   str = 'tests.uitests.goldenImages'
 
-DEMO_RUNNING_INDICATOR: Path = Path('/tmp/DemoRunning.txt')
-
 BEYOND_COMPARE_SUCCESS:     int = 0
 BEYOND_COMPARE_BINARY_SAME: int = 1
-
-def isAppRunning() -> bool:
-    answer: bool = False
-
-    if DEMO_RUNNING_INDICATOR.exists() is True:
-        answer = True
-
-    return answer
-
-def makeAppActive():
-    # Make UML Diagrammer Active
-    moveTo(130, 110)
-    click()
-
-def pullDownViewMenu():
-    # Pull down view menu
-    click(220, 20, button=LEFT)
 
 def testActor():
     pullDownViewMenu()
