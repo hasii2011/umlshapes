@@ -24,13 +24,14 @@ from umlshapes.shapes.UmlUseCase import UmlUseCase
 
 LinkableUmlShape = UmlClass | UmlNote | UmlActor | UmlUseCase
 
-LinkableUmlShapes = NewType('LinkableUmlShapes', Dict[int, LinkableUmlShape])
+LinkableUmlShapes = NewType('LinkableUmlShapes', Dict[str, LinkableUmlShape])
 
 LinkableModelClass = Union[Class, Actor, UseCase, Note]
 
 
 def linkableUmlShapesFactory() -> LinkableUmlShapes:
     return LinkableUmlShapes({})
+
 
 UmlShape = UmlActor | UmlClass | UmlNote | UmlText | UmlUseCase
 

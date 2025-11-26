@@ -5,8 +5,8 @@ from typing import TYPE_CHECKING
 from logging import Logger
 from logging import getLogger
 
-from umlmodel.BaseAttributes import BaseAttributes
 from umlmodel.Class import Class
+from umlmodel.UmlModelBase import UmlModelBase
 
 from umlshapes.commands.BasePasteCommand import BasePasteCommand
 
@@ -21,11 +21,11 @@ if TYPE_CHECKING:
 
 class ClassPasteCommand(BasePasteCommand):
 
-    def __init__(self, baseAttributes: BaseAttributes, umlPosition: UmlPosition, umlFrame: 'UmlFrame', umlPubSubEngine: IUmlPubSubEngine):
+    def __init__(self, umlModelBase: UmlModelBase, umlPosition: UmlPosition, umlFrame: 'UmlFrame', umlPubSubEngine: IUmlPubSubEngine):
         """
 
         Args:
-            baseAttributes:         We will build the appropriate UML Shape from this
+            umlModelBase:         We will build the appropriate UML Shape from this
             umlPosition:        The location to paste it to
             umlFrame:           The UML Frame we are pasting to
             umlPubSubEngine:    The event handler that is injected
@@ -34,7 +34,7 @@ class ClassPasteCommand(BasePasteCommand):
 
         self.logger: Logger = getLogger(__name__)
 
-        super().__init__(partialName='ClassPasteCommand', baseAttributes=baseAttributes, umlPosition=umlPosition, umlFrame=umlFrame, umlPubSubEngine=umlPubSubEngine)
+        super().__init__(partialName='ClassPasteCommand', umlModelBase=umlModelBase, umlPosition=umlPosition, umlFrame=umlFrame, umlPubSubEngine=umlPubSubEngine)
 
         self._umlClass: UmlClass = cast(UmlClass, None)
 
@@ -44,7 +44,7 @@ class ClassPasteCommand(BasePasteCommand):
     def Do(self) -> bool:
         from umlshapes.ShapeTypes import UmlShapeGenre
 
-        umlShape: UmlShapeGenre = self._createPastedShape(umlBase=self._baseAttributes)
+        umlShape: UmlShapeGenre = self._createPastedShape(umlModelBase=self._baseAttributes)
 
         self._setupUmlShape(umlShape=umlShape)
         self._umlClass = umlShape   # type: ignore
@@ -55,12 +55,12 @@ class ClassPasteCommand(BasePasteCommand):
         self._undo(umlShape=self._umlClass)
         return True
 
-    def _createPastedShape(self, umlBase: BaseAttributes) -> 'UmlShapeGenre':
+    def _createPastedShape(self, umlModelBase: UmlModelBase) -> 'UmlShapeGenre':
 
         from umlshapes.shapes.UmlClass import UmlClass
         from umlshapes.shapes.eventhandlers.UmlClassEventHandler import UmlClassEventHandler
 
-        umlShape:     UmlClass             = UmlClass(cast(Class, umlBase))
+        umlShape:     UmlClass             = UmlClass(cast(Class, umlModelBase))
         eventHandler: UmlClassEventHandler = UmlClassEventHandler()
 
         self._setupEventHandler(umlShape=umlShape, eventHandler=eventHandler)

@@ -7,7 +7,7 @@ from logging import getLogger
 from abc import ABC
 from abc import abstractmethod
 
-from umlmodel.BaseAttributes import BaseAttributes
+from umlmodel.UmlModelBase import UmlModelBase
 
 from umlshapes.commands.BaseCommand import BaseCommand
 from umlshapes.commands.AbstractBaseCommandMeta import AbstractBaseCommandMeta
@@ -22,22 +22,23 @@ if TYPE_CHECKING:
 
 class BasePasteCommand(BaseCommand, metaclass=AbstractBaseCommandMeta):
 
-    def __init__(self, partialName: str, baseAttributes: BaseAttributes, umlPosition: UmlPosition, umlFrame: 'UmlFrame', umlPubSubEngine: IUmlPubSubEngine):
+    def __init__(self, partialName: str, umlModelBase: UmlModelBase, umlPosition: UmlPosition, umlFrame: 'UmlFrame', umlPubSubEngine: IUmlPubSubEngine):
 
         self.basePasteLogger: Logger = getLogger(__name__)
 
-        super().__init__(partialName=partialName, baseAttributes=baseAttributes, umlPosition=umlPosition, umlFrame=umlFrame, umlPubSubEngine=umlPubSubEngine)
+        super().__init__(partialName=partialName, umlModelBase=umlModelBase, umlPosition=umlPosition, umlFrame=umlFrame, umlPubSubEngine=umlPubSubEngine)
+
     class Meta(ABC):
         abstract = True
 
         @abstractmethod
-        def _createPastedShape(self, baseAttributes: BaseAttributes) -> 'UmlShapeGenre':
+        def _createPastedShape(self, umlModelBase: UmlModelBase) -> 'UmlShapeGenre':
             """
             Specific paste types create their version of the shape;  Also the shape
             should have its specific event handler set up
 
             Args:
-                baseAttributes:     The model object for the UML Shape
+                umlModelBase:     The model object for the UML Shape
 
             Returns:  The correct UML Shape
 

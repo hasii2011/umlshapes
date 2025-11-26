@@ -23,7 +23,7 @@ dependencies = [
     'wxPython~=4.2.3',
     'codeallybasic>=1.30.0',
     'codeallyadvanced>=2.2.0',
-    'umlmodel>=3.3.0',
+    'umlmodel>=3.4.0',
     'human_id==0.2.0',
     'Pypubsub==4.0.3',
 ]

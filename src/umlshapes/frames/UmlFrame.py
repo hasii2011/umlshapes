@@ -11,14 +11,6 @@ from collections.abc import Iterable
 
 from copy import deepcopy
 
-from umlmodel.Actor import Actor
-from umlmodel.BaseAttributes import BaseAttributes
-from umlmodel.Class import Class
-from umlmodel.Link import Links
-from umlmodel.LinkedObject import LinkedObject
-from umlmodel.Note import Note
-from umlmodel.Text import Text
-from umlmodel.UseCase import UseCase
 from wx import EVT_MOTION
 from wx import ICON_ERROR
 from wx import OK
@@ -28,6 +20,15 @@ from wx import CommandProcessor
 from wx import MessageDialog
 from wx import MouseEvent
 from wx import Window
+
+from umlmodel.Actor import Actor
+from umlmodel.Class import Class
+from umlmodel.Link import Links
+from umlmodel.Note import Note
+from umlmodel.Text import Text
+from umlmodel.UseCase import UseCase
+from umlmodel.LinkedObject import LinkedObject
+from umlmodel.UmlModelBase import UmlModelBase
 
 from umlshapes.lib.ogl import Shape
 from umlshapes.lib.ogl import ShapeCanvas
@@ -71,7 +72,7 @@ A4_FACTOR:     float = 1.41
 PIXELS_PER_UNIT_X: int = 20
 PIXELS_PER_UNIT_Y: int = 20
 
-PyutObjects = NewType('PyutObjects', List[BaseAttributes])
+PyutObjects = NewType('PyutObjects', List[UmlModelBase])
 
 BIG_NUM: int = 10000    # Hopefully, there are less than this number of shapes on frame
 
@@ -197,7 +198,7 @@ class UmlFrame(DiagramFrame):
         if self._selector is None:
             self._beginSelect(x=x, y=y)
 
-    def OnEndDragLeft(self, x, y, keys = 0):
+    def OnEndDragLeft(self, x, y, keys=0):
 
         from umlshapes.links.UmlLink import UmlLink
 
@@ -208,8 +209,8 @@ class UmlFrame(DiagramFrame):
             if self._ignoreShape(shapeToCheck=s) is False:
                 if isinstance(s, UmlLink):
                     umlLink: UmlLink = s
-                    x1,y1,x2,y2 = umlLink.GetEnds()
-                    umlLine: UmlLine = UmlLine(start=UmlPoint(x=x1,y=y1), end=UmlPoint(x=x2, y=y2))
+                    x1, y1, x2, y2 = umlLink.GetEnds()
+                    umlLine: UmlLine = UmlLine(start=UmlPoint(x=x1, y=y1), end=UmlPoint(x=x2, y=y2))
                     if UmlUtils.isLineWhollyContainedByRectangle(boundingRectangle=self._selector.rectangle, umlLine=umlLine) is True:
                         umlLink.selected = True
                 else:
@@ -340,10 +341,11 @@ class UmlFrame(DiagramFrame):
         y: int = pasteStart.y
         numbObjectsPasted: int = 0
         for clipboardObject in self._clipboard:
-            pyutObject:   BaseAttributes = clipboardObject
 
-            if isinstance(pyutObject, Class) is True:
-                classPasteCommand: ClassPasteCommand = ClassPasteCommand(baseAttributes=pyutObject,
+            umlModelBase: UmlModelBase = clipboardObject
+
+            if isinstance(umlModelBase, Class) is True:
+                classPasteCommand: ClassPasteCommand = ClassPasteCommand(umlModelBase=umlModelBase,
                                                                          umlPosition=UmlPosition(x=x, y=y),
                                                                          umlFrame=self,
                                                                          umlPubSubEngine=self._umlPubSubEngine
@@ -351,33 +353,33 @@ class UmlFrame(DiagramFrame):
                 self._commandProcessor.Submit(classPasteCommand)
 
                 self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.FRAME_MODIFIED, frameId=self.id, modifiedFrameId=self.id)
-            elif isinstance(pyutObject, Actor):
-                actorPasteCommand: ActorPasteCommand = ActorPasteCommand(baseAttributes=pyutObject,
+            elif isinstance(umlModelBase, Actor):
+                actorPasteCommand: ActorPasteCommand = ActorPasteCommand(umlModelBase=umlModelBase,
                                                                          umlPosition=UmlPosition(x=x, y=y),
                                                                          umlFrame=self,
                                                                          umlPubSubEngine=self._umlPubSubEngine
                                                                          )
                 self._commandProcessor.Submit(actorPasteCommand)
-            elif isinstance(pyutObject, Note):
-                notePasteCommand: NotePasteCommand = NotePasteCommand(baseAttributes=pyutObject,
+            elif isinstance(umlModelBase, Note):
+                notePasteCommand: NotePasteCommand = NotePasteCommand(umlModelBase=umlModelBase,
                                                                       umlPosition=UmlPosition(x=x, y=y),
                                                                       umlFrame=self,
                                                                       umlPubSubEngine=self._umlPubSubEngine
                                                                       )
                 self._commandProcessor.Submit(notePasteCommand)
-            elif isinstance(pyutObject, Text):
-                textPasteCommand: TextPasteCommand = TextPasteCommand(baseAttributes=pyutObject,
+            elif isinstance(umlModelBase, Text):
+                textPasteCommand: TextPasteCommand = TextPasteCommand(umlModelBase=umlModelBase,
                                                                       umlPosition=UmlPosition(x=x, y=y),
                                                                       umlFrame=self,
                                                                       umlPubSubEngine=self._umlPubSubEngine
                                                                       )
                 self._commandProcessor.Submit(textPasteCommand)
-            elif isinstance(pyutObject, UseCase):
-                useCasePasteCommand: UseCasePasteCommand = UseCasePasteCommand(baseAttributes=pyutObject,
-                                                                            umlPosition=UmlPosition(x=x, y=y),
-                                                                            umlFrame=self,
-                                                                            umlPubSubEngine=self._umlPubSubEngine
-                                                                            )
+            elif isinstance(umlModelBase, UseCase):
+                useCasePasteCommand: UseCasePasteCommand = UseCasePasteCommand(umlModelBase=umlModelBase,
+                                                                               umlPosition=UmlPosition(x=x, y=y),
+                                                                               umlFrame=self,
+                                                                               umlPubSubEngine=self._umlPubSubEngine
+                                                                               )
                 self._commandProcessor.Submit(useCasePasteCommand)
 
             else:
@@ -401,7 +403,7 @@ class UmlFrame(DiagramFrame):
         from umlshapes.ShapeTypes import UmlShapeGenre
 
         for s in self.umlDiagram.shapes:
-            if isinstance(s, UmlActor | UmlClass| UmlNote | UmlText | UmlUseCase):
+            if isinstance(s, UmlActor | UmlClass | UmlNote | UmlText | UmlUseCase):
                 umlShape: UmlShapeGenre = s
                 umlShape.selected = True
         self.refresh()
@@ -423,8 +425,8 @@ class UmlFrame(DiagramFrame):
             if not isinstance(umlShape, UmlLink) and not isinstance(umlShape, UmlAssociationLabel):
                 if umlShape.moveMaster is False:
                     umlShape.position = UmlPosition(
-                        x = umlShape.position.x + deltaXY.deltaX,
-                        y = umlShape.position.y + deltaXY.deltaY
+                        x=umlShape.position.x + deltaXY.deltaX,
+                        y=umlShape.position.y + deltaXY.deltaY
                     )
                     dc: ClientDC = ClientDC(umlShape.umlFrame)
                     umlShape.umlFrame.PrepareDC(dc)
@@ -553,9 +555,10 @@ class UmlFrame(DiagramFrame):
 
         ignore: bool = False
 
-        if (isinstance(shapeToCheck, UmlControlPoint) or isinstance(shapeToCheck, UmlAssociationLabel) or
-                isinstance(shapeToCheck, UmlLollipopInterface) or isinstance(shapeToCheck, UmlLineControlPoint)
-        ):
+        if (isinstance(shapeToCheck, UmlControlPoint) or
+                isinstance(shapeToCheck, UmlAssociationLabel) or
+                isinstance(shapeToCheck, UmlLollipopInterface) or
+                isinstance(shapeToCheck, UmlLineControlPoint)):
             ignore = True
 
         return ignore

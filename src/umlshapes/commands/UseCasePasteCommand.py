@@ -6,7 +6,7 @@ from logging import getLogger
 from typing import cast
 
 from umlmodel.UseCase import UseCase
-from umlmodel.BaseAttributes import BaseAttributes
+from umlmodel.UmlModelBase import UmlModelBase
 
 from umlshapes.commands.BasePasteCommand import BasePasteCommand
 
@@ -21,11 +21,11 @@ if TYPE_CHECKING:
 
 
 class UseCasePasteCommand(BasePasteCommand):
-    def __init__(self, baseAttributes: BaseAttributes, umlPosition: UmlPosition, umlFrame: 'UmlFrame', umlPubSubEngine: IUmlPubSubEngine):
+    def __init__(self, umlModelBase: UmlModelBase, umlPosition: UmlPosition, umlFrame: 'UmlFrame', umlPubSubEngine: IUmlPubSubEngine):
         """
 
         Args:
-            baseAttributes:         We will build the appropriate UML Shape from this
+            umlModelBase:         We will build the appropriate UML Shape from this
             umlPosition:        The location to paste it to
             umlFrame:           The UML Frame we are pasting to
             umlPubSubEngine:    The event handler that is injected
@@ -34,7 +34,7 @@ class UseCasePasteCommand(BasePasteCommand):
 
         self.logger: Logger = getLogger(__name__)
 
-        super().__init__(partialName='UseCasePasteCommand', baseAttributes=baseAttributes, umlPosition=umlPosition, umlFrame=umlFrame, umlPubSubEngine=umlPubSubEngine)
+        super().__init__(partialName='UseCasePasteCommand', umlModelBase=umlModelBase, umlPosition=umlPosition, umlFrame=umlFrame, umlPubSubEngine=umlPubSubEngine)
 
         self._umlUseCase: UmlUseCase = cast(UmlUseCase, None)
 
@@ -52,7 +52,8 @@ class UseCasePasteCommand(BasePasteCommand):
         self._undo(umlShape=self._umlUseCase)
         return True
 
-    def _createPastedShape(self, baseAttributes: BaseAttributes) -> 'UmlShapeGenre':
+    def _createPastedShape(self, baseAttributes: UmlModelBase) -> 'UmlShapeGenre':
+
         from umlshapes.shapes.UmlUseCase import UmlUseCase
         from umlshapes.shapes.eventhandlers.UmlUseCaseEventHandler import UmlUseCaseEventHandler
 

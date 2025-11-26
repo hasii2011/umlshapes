@@ -39,7 +39,7 @@ install:
   - pip install build==1.2.2.post1
   - pip install html-testRunner~=1.2.1
   - pip install codeallybasic==1.30.0
-  - pip install umlmodel==3.3.0
+  - pip install umlmodel==3.4.0
   - pip install untangle==1.2.1
   - pip install six==1.16.0
   - pip install attrdict3

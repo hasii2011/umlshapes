@@ -6,7 +6,7 @@ from logging import Logger
 from logging import getLogger
 
 from umlmodel.Text import Text
-from umlmodel.BaseAttributes import BaseAttributes
+from umlmodel.UmlModelBase import UmlModelBase
 
 from umlshapes.commands.BaseCutCommand import BaseCutCommand
 from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
@@ -31,7 +31,7 @@ class TextCutCommand(BaseCutCommand):
         """
         from umlshapes.shapes.UmlText import UmlText
 
-        super().__init__(partialName='TextCutCommand', baseAttributes=umlText.modelText, umlPosition=umlPosition, umlFrame=umlFrame, umlPubSubEngine=umlPubSubEngine)
+        super().__init__(partialName='TextCutCommand', umlModelBase=umlText.modelText, umlPosition=umlPosition, umlFrame=umlFrame, umlPubSubEngine=umlPubSubEngine)
 
         self.logger: Logger = getLogger(__name__)
 
@@ -46,19 +46,19 @@ class TextCutCommand(BaseCutCommand):
     def Undo(self) -> bool:
         from umlshapes.ShapeTypes import UmlShapeGenre
 
-        umlShape: UmlShapeGenre = self._createCutShape(baseAttributes=self._baseAttributes)
+        umlShape: UmlShapeGenre = self._createCutShape(umlModelBase=self._baseAttributes)
 
         self._setupUmlShape(umlShape=umlShape)
         self._umlText = umlShape   # type: ignore
 
         return True
 
-    def _createCutShape(self, baseAttributes: BaseAttributes) -> 'UmlShapeGenre':
+    def _createCutShape(self, umlModelBase: UmlModelBase) -> 'UmlShapeGenre':
 
         from umlshapes.shapes.UmlText import UmlText
         from umlshapes.shapes.eventhandlers.UmlTextEventHandler import UmlTextEventHandler
 
-        umlShape:     UmlText             = UmlText(cast(Text, baseAttributes))
+        umlShape:     UmlText             = UmlText(cast(Text, umlModelBase))
         eventHandler: UmlTextEventHandler = UmlTextEventHandler()
 
         self._setupEventHandler(umlShape=umlShape, eventHandler=eventHandler)

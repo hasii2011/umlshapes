@@ -1,3 +1,4 @@
+
 from typing import TYPE_CHECKING
 
 from logging import Logger
@@ -5,8 +6,9 @@ from logging import getLogger
 
 from datetime import datetime
 
-from umlmodel.BaseAttributes import BaseAttributes
 from wx import Command
+
+from umlmodel.UmlModelBase import UmlModelBase
 
 from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 
@@ -20,10 +22,10 @@ if TYPE_CHECKING:
 
 class BaseCommand(Command):
 
-    def __init__(self, partialName: str, baseAttributes: BaseAttributes, umlPosition: UmlPosition, umlFrame: 'UmlFrame', umlPubSubEngine: IUmlPubSubEngine):
+    def __init__(self, partialName: str, umlModelBase: UmlModelBase, umlPosition: UmlPosition, umlFrame: 'UmlFrame', umlPubSubEngine: IUmlPubSubEngine):
         from umlshapes.frames.UmlFrame import UmlFrame
 
-        self._baseAttributes:  BaseAttributes     = baseAttributes
+        self._baseAttributes:  UmlModelBase     = umlModelBase
         self._umlPosition:     UmlPosition    = umlPosition
         self._umlFrame:        UmlFrame       = umlFrame
         self._umlPubSubEngine: IUmlPubSubEngine = umlPubSubEngine

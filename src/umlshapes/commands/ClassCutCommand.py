@@ -6,7 +6,7 @@ from logging import Logger
 from logging import getLogger
 
 from umlmodel.Class import Class
-from umlmodel.BaseAttributes import BaseAttributes
+from umlmodel.UmlModelBase import UmlModelBase
 
 from umlshapes.commands.BaseCutCommand import BaseCutCommand
 
@@ -35,7 +35,7 @@ class ClassCutCommand(BaseCutCommand):
 
         self.logger: Logger = getLogger(__name__)
 
-        super().__init__(partialName='ClassCutCommand', baseAttributes=umlClass.modelClass, umlPosition=umlPosition, umlFrame=umlFrame, umlPubSubEngine=umlPubSubEngine)
+        super().__init__(partialName='ClassCutCommand', umlModelBase=umlClass.modelClass, umlPosition=umlPosition, umlFrame=umlFrame, umlPubSubEngine=umlPubSubEngine)
 
         self._umlClass: UmlClass = umlClass
 
@@ -47,19 +47,19 @@ class ClassCutCommand(BaseCutCommand):
 
     def Undo(self) -> bool:
 
-        umlShape: UmlShapeGenre = self._createCutShape(umlBase=self._baseAttributes)
+        umlShape: UmlShapeGenre = self._createCutShape(umlModelBase=self._baseAttributes)
 
         self._setupUmlShape(umlShape=umlShape)
         self._umlClass = umlShape   # type: ignore
 
         return True
 
-    def _createCutShape(self, umlBase: BaseAttributes) -> 'UmlShapeGenre':
+    def _createCutShape(self, umlModelBase: UmlModelBase) -> 'UmlShapeGenre':
 
         from umlshapes.shapes.UmlClass import UmlClass
         from umlshapes.shapes.eventhandlers.UmlClassEventHandler import UmlClassEventHandler
 
-        umlShape: UmlClass = UmlClass(cast(Class, umlBase))
+        umlShape: UmlClass = UmlClass(cast(Class, umlModelBase))
         eventHandler = UmlClassEventHandler()
 
         self._setupEventHandler(umlShape=umlShape, eventHandler=eventHandler)
