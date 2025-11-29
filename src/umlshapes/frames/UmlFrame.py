@@ -395,17 +395,13 @@ class UmlFrame(DiagramFrame):
                                           message=f'Pasted {len(self._clipboard)} shape')
 
     def _selectAllShapesListener(self):
-        from umlshapes.shapes.UmlClass import UmlClass
-        from umlshapes.shapes.UmlText import UmlText
-        from umlshapes.shapes.UmlActor import UmlActor
-        from umlshapes.shapes.UmlNote import UmlNote
-        from umlshapes.shapes.UmlUseCase import UmlUseCase
         from umlshapes.ShapeTypes import UmlShapeGenre
+        from umlshapes.ShapeTypes import UmlLinkGenre
 
-        for s in self.umlDiagram.shapes:
-            if isinstance(s, UmlActor | UmlClass | UmlNote | UmlText | UmlUseCase):
-                umlShape: UmlShapeGenre = s
-                umlShape.selected = True
+        for shape in self.umlDiagram.shapes:
+            if isinstance(shape, UmlShapeGenre) is True or isinstance(shape, UmlLinkGenre) is True:
+                shape.selected = True
+
         self.refresh()
 
     def _shapeMovingListener(self, deltaXY: DeltaXY):
@@ -489,11 +485,7 @@ class UmlFrame(DiagramFrame):
             y:
 
         Returns:
-
         """
-        # if not event.ControlDown():
-        #     self.DeselectAllShapes()
-        # x, y = event.GetX(), event.GetY()   # event position has been modified
         selector: ShapeSelector = ShapeSelector(width=0, height=0)     # RectangleShape(x, y, 0, 0)
         selector.position = UmlPosition(x, y)
         selector.originalPosition = selector.position
