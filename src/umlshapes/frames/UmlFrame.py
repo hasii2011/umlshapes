@@ -455,7 +455,7 @@ class UmlFrame(DiagramFrame):
             elif isinstance(umlShape, UmlNote):
                 linkedObject = deepcopy(umlShape.modelNote)
             # elif isinstance(umlShape, UmlText):
-            #     pyutObject = deepcopy(umlShape.modelText)
+            #     linkedObject = deepcopy(umlShape.modelText)
             elif isinstance(umlShape, UmlActor):
                 linkedObject = deepcopy(umlShape.modelActor)
             elif isinstance(umlShape, UmlUseCase):

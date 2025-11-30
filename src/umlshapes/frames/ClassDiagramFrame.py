@@ -58,7 +58,7 @@ class ClassDiagramFrame(UmlFrame):
     def getDefinedInterfaces(self) -> Interfaces:
         """
         This will not only look for lollipop interfaces but will find UmlInterfaces.
-        It will convert those PyutLink's to PyutInterfaces
+        It will convert those Link's to Interfaces
 
         Exposed for the event handler
 
@@ -67,9 +67,6 @@ class ClassDiagramFrame(UmlFrame):
         from umlshapes.ShapeTypes import UmlShapes
         from umlshapes.links.UmlInterface import UmlInterface
         from umlshapes.links.UmlLollipopInterface import UmlLollipopInterface
-
-        # umlLollipopInterface: UmlLollipopInterface = self.GetShape()
-        # umlFrame:             ClassDiagramFrame = umlLollipopInterface.GetCanvas()
 
         umlShapes:  UmlShapes      = self.umlShapes
         interfaces: Interfaces = Interfaces([])
@@ -88,7 +85,7 @@ class ClassDiagramFrame(UmlFrame):
                 interfaceClass: UmlClass = umlInterface.interfaceClass
                 implementor:    UmlClass = umlInterface.implementingClass
                 #
-                # Convert to PyutInterface
+                # Convert to mode interface
                 #
                 interface = Interface(name=interfaceClass.modelClass.name)
                 interface.addImplementor(ClassName(implementor.modelClass.name))
