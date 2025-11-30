@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from PIL import ImageGrab
+from pathlib import Path
 
 import pyautogui
 from pyautogui import click
@@ -9,28 +9,23 @@ from pyautogui import dragTo
 # Hmm why is this coming from here
 from pymsgbox import alert
 
-from codeallybasic.Basic import Basic
-from codeallybasic.Basic import RunResult
 from codeallybasic.UnitTestBase import UnitTestBase
+
+from tests.uitests.ExtendedBasic import EXIFTOOL
+from tests.uitests.ExtendedBasic import ExtendedBasic
+from tests.uitests.ExtendedBasic import VerifyStatus
+from tests.uitests.common import GOLDEN_IMAGE_PACKAGE
 
 from tests.uitests.common import LEFT
 from tests.uitests.common import isAppRunning
 from tests.uitests.common import makeAppActive
 from tests.uitests.common import pullDownViewMenu
-
-pyautogui.PAUSE = 0.5
-
-DRAG_DURATION: float = 0.5
+from tests.uitests.common import takeCompletionScreenShot
 
 FIND_ME_IMAGE:           str = f'FindMe.png'
 SHAPES_IMAGE_FILENAME:   str = f'testShapes.png'
-VERIFICATION_IMAGE_PATH: str = f'/tmp/{SHAPES_IMAGE_FILENAME}'
 
-# noinspection SpellCheckingInspection
-GOLDEN_IMAGE_PACKAGE:   str = 'tests.uitests.goldenImages'
-
-BEYOND_COMPARE_SUCCESS:     int = 0
-BEYOND_COMPARE_BINARY_SAME: int = 1
+VERIFICATION_IMAGE_PATH: Path = Path(f'/tmp/{SHAPES_IMAGE_FILENAME}')
 
 def testActor():
     pullDownViewMenu()
@@ -82,44 +77,19 @@ def testClass():
     click(200, 230, button=LEFT)
     dragTo(645, 550, duration=DRAG_DURATION, button=LEFT)
 
-def takeCompletionScreenShot():
-    left:   int = 18
-    top:    int = 39
-    right:  int = 1030
-    bottom: int = 730
 
-    bbox = (left, top, right, bottom)
+def wasTestSuccessful() -> VerifyStatus:
 
-    # Capture the specified region
-    screenshot = ImageGrab.grab(bbox)
-    screenshot.save(VERIFICATION_IMAGE_PATH, 'png')
-    #
-    # cleanupImage: Path = Path(VERIFICATION_IMAGE_PATH)
-    # cleanupImage.unlink(missing_ok=True)
-    # doneImage: Image = pyautogui.screenshot(region=(18, 39, 1030, 730))
-    #
-    # doneImage.save(VERIFICATION_IMAGE_PATH)
-
-def wasTestSuccessful() -> bool:
-    answer: bool = False
-
-    path: str = UnitTestBase.getFullyQualifiedResourceFileName(package=GOLDEN_IMAGE_PACKAGE, fileName=SHAPES_IMAGE_FILENAME)
-
-    # noinspection SpellCheckingInspection
-    diffCmd: str = (
-        '/usr/local/bin/bcomp '
-        f'{VERIFICATION_IMAGE_PATH} '
-        f'{path}'
-    )
-    result: RunResult = Basic.runCommand(programToRun=diffCmd)
-    print(f'{result.returnCode=}')
-    if result.returnCode == BEYOND_COMPARE_SUCCESS or result.returnCode == BEYOND_COMPARE_BINARY_SAME:
-        answer = True
+    goldenImage: str          = UnitTestBase.getFullyQualifiedResourceFileName(package=GOLDEN_IMAGE_PACKAGE, fileName=SHAPES_IMAGE_FILENAME)
+    answer:      VerifyStatus = ExtendedBasic.verifySameImage(goldenImage=Path(goldenImage), generatedImage=VERIFICATION_IMAGE_PATH)
 
     return answer
 
 
 if __name__ == '__main__':
+
+    pyautogui.PAUSE = 0.5
+    DRAG_DURATION: float = 0.5
 
     if isAppRunning() is False:
         alert(text='The demo app is not running', title='Hey, bonehead', button='OK')
@@ -130,15 +100,20 @@ if __name__ == '__main__':
         testNote()
         testText()
         testClass()
-        takeCompletionScreenShot()
+        takeCompletionScreenShot(imagePath=VERIFICATION_IMAGE_PATH)
 
-        success: bool = wasTestSuccessful()
+        success: VerifyStatus = wasTestSuccessful()
 
-        if success is True:
+        if success == VerifyStatus.SUCCESS:
             title:   str = 'Success'
             message: str = 'You are a great programmer'
-        else:
+        elif success == VerifyStatus.FAIL:
             title   = 'Failure'
             message = 'You have failed as a programmer'
+        elif success == VerifyStatus.CANNOT_VERIFY:
+            title   = 'Cannot verify tooling is messing'
+            message = f'{EXIFTOOL} must be missing'
+        else:
+            assert False, 'Developer error'
 
         alert(text=message, title=title, button='OK')
