@@ -352,24 +352,24 @@ class UmlClass(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
         yOffset: int = startYOffset
 
         textHeight: int   = self._textHeight
-        pyutClass:  Class = self.modelClass
+        modelClass: Class = self.modelClass
 
         # Add space above
-        if len(pyutClass.fields) > 0:
+        if len(modelClass.fields) > 0:
             yOffset += textHeight
 
-        # This code depends on excellent string representations of fields
+        # This code depends on the excellent string representations of fields
         # Provided by the fields __str__() methods
         #
         # noinspection PySimplifyBooleanCheck
-        if pyutClass.showFields is True:
-            for field in pyutClass.fields:
+        if modelClass.showFields is True:
+            for field in modelClass.fields:
                 fieldStr: str = str(field)      # Must be good __str__()
                 dc.DrawText(fieldStr, x + self._margin, y + yOffset)
                 yOffset += textHeight
 
         # Add space below
-        if len(pyutClass.fields) > 0:
+        if len(modelClass.fields) > 0:
             yOffset += textHeight
 
         return yOffset
@@ -388,27 +388,27 @@ class UmlClass(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
         textHeight: int = self._textHeight
 
         # Add space above
-        pyutClass: Class = self.modelClass
-        if len(pyutClass.methods) > 0:
+        modelClass: Class = self.modelClass
+        if len(modelClass.methods) > 0:
             yOffset += textHeight
 
-        for method in pyutClass.methods:
+        for method in modelClass.methods:
             # noinspection PySimplifyBooleanCheck
-            if self._eligibleToDraw(modelClass=pyutClass, method=method) is True:
+            if self._eligibleToDraw(modelClass=modelClass, method=method) is True:
 
-                displayParameters: DisplayParameters = pyutClass.displayParameters
+                displayParameters: DisplayParameters = modelClass.displayParameters
                 self._drawMethod(dc, method, displayParameters, leftX=leftX, leftY=leftY, startYOffset=yOffset)
 
                 yOffset += textHeight
 
-    def _drawMethod(self, dc: MemoryDC, pyutMethod: Method, displayParameters: DisplayParameters, leftX: int, leftY: int, startYOffset: int):
+    def _drawMethod(self, dc: MemoryDC, method: Method, displayParameters: DisplayParameters, leftX: int, leftY: int, startYOffset: int):
         """
         If the preference is not set at the individual class level, then defer to global preference; Otherwise,
         respect the class level preference
 
         Args:
             dc:
-            pyutMethod:
+            method:
             displayParameters:
             leftX
             leftY
@@ -417,7 +417,7 @@ class UmlClass(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
         x: int = leftX
         y: int = leftY
 
-        methodStr: str = self._getMethodRepresentation(pyutMethod, displayParameters)
+        methodStr: str = self._getMethodRepresentation(method, displayParameters)
 
         dc.DrawText(methodStr, x + self._margin, y + startYOffset)
 
@@ -633,8 +633,9 @@ class UmlClass(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
 
         maxWidth: int = 0
         if len(fields) > 0 and modelClass.showFields is True:
-            for pyutField in fields:
-                fieldStr: str = str(pyutField)
+            for field in fields:
+
+                fieldStr:   str = str(field)
                 fieldWidth: int = self.textWidth(dc, fieldStr)
                 maxWidth = max(maxWidth, fieldWidth)
 
@@ -657,10 +658,10 @@ class UmlClass(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
         maxWidth: int = 0
         # noinspection PySimplifyBooleanCheck
         if modelClass.showMethods is True:
-            for pyutMethod in methods:
+            for method in methods:
                 # noinspection PySimplifyBooleanCheck
-                if self._eligibleToDraw(modelClass=modelClass, method=pyutMethod) is True:
-                    methodStr:   str = self._getMethodRepresentation(method=pyutMethod, displayParameters=modelClass.displayParameters)
+                if self._eligibleToDraw(modelClass=modelClass, method=method) is True:
+                    methodStr:   str = self._getMethodRepresentation(method=method, displayParameters=modelClass.displayParameters)
                     self.logger.debug(f'{methodStr=}')
                     methodWidth: int = self.textWidth(dc=dc, text=methodStr)
                     maxWidth = max(maxWidth, methodWidth)
@@ -672,8 +673,8 @@ class UmlClass(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
         """
 
         Args:
-            method:         The one we want to transform
-            displayParameters:  The PyutClass value
+            method:            The one we want to transform
+            displayParameters:,The Class value
 
         Returns:  The appropriate string version of a method
         """
@@ -693,7 +694,7 @@ class UmlClass(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
         elif displayParameters == DisplayParameters.DO_NOT_DISPLAY_PARAMETERS:
             methodStr = method.methodWithoutParameters()
         else:
-            assert False, 'Internal error unknown pyutMethod parameter display type'
+            assert False, 'Internal error unknown method parameter display type'
 
         return methodStr
 
