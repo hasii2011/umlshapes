@@ -52,18 +52,26 @@ class DlgEditClassCommon(BaseEditDialog):
 
     Subclasses need to override the `onOk` and `onCancel` handlers
 
-    `onOk` the subclasses should retrieve the common attributes from _pyutModelCopy
-    `onCancel` the subclasses should restore the common attributes from _pyutModel
+    `onOk` the subclasses should retrieve the common attributes from _modelCopy
+    `onCancel` the subclasses should restore the common attributes from _Model
 
     A big ask here is that the parent class that is provided for the UI is the actual
     frame on which we are editing.
     """
-    def __init__(self, parent: ClassDiagramFrame, umlPubSubEngine: IUmlPubSubEngine, dlgTitle: str, pyutModel: CommonClassType, editInterface: bool = False, ):
+    def __init__(self, parent: ClassDiagramFrame, umlPubSubEngine: IUmlPubSubEngine, dlgTitle: str, commonClassType: CommonClassType, editInterface: bool = False):
+        """
+
+        Args:
+            parent:
+            umlPubSubEngine:
+            dlgTitle:
+            commonClassType:
+            editInterface:
+        """
 
         super().__init__(parent, dlgTitle)
 
         self._parent = parent   #
-
 
         self._umlFrame: ClassDiagramFrame = parent  # another moniker
 
@@ -73,11 +81,13 @@ class DlgEditClassCommon(BaseEditDialog):
         self._editInterface:   bool             = editInterface
         self._umlPubSubEngine: IUmlPubSubEngine = umlPubSubEngine
 
-        self._pyutModel:     CommonClassType = pyutModel
-        self._modeInterfaceCopy: CommonClassType = deepcopy(pyutModel)
+        self._model:             CommonClassType = commonClassType
+        self._modeInterfaceCopy: CommonClassType = deepcopy(commonClassType)
 
         sizedPanel: SizedPanel = self.GetContentsPane()
         sizedPanel.SetSizerType('vertical')
+
+        self._methods: EnhancedListBox = cast(EnhancedListBox, None)
 
         self._customDialogButtons: CustomDialogButtons = CustomDialogButtons([])
 
@@ -118,16 +128,16 @@ class DlgEditClassCommon(BaseEditDialog):
         callbacks.upCallback     = self._methodUpCallback
         callbacks.downCallback   = self._methodDownCallback
 
-        self._pyutMethods = EnhancedListBox(parent=parent, title='Methods:', callbacks=callbacks)
+        self._methods = EnhancedListBox(parent=parent, title='Methods:', callbacks=callbacks)
 
     def _fillMethodList(self):
 
         methodItems: EnhancedListBoxItems = EnhancedListBoxItems([])
 
-        for pyutMethod in self._modeInterfaceCopy.methods:
-            methodItems.append(str(pyutMethod))
+        for method in self._modeInterfaceCopy.methods:
+            methodItems.append(str(method))
 
-        self._pyutMethods.setItems(methodItems)
+        self._methods.setItems(methodItems)
 
     def _onNameChange(self, event):
         self._modeInterfaceCopy.name = event.GetString()
@@ -139,12 +149,12 @@ class DlgEditClassCommon(BaseEditDialog):
         Args:
             event:
         """
-        with DlgEditDescription(self, pyutModel=self._modeInterfaceCopy) as dlg:
+        with DlgEditDescription(self, model=self._modeInterfaceCopy) as dlg:
             if dlg.ShowModal() == OK:
                 # self._eventEngine.sendEvent(EventType.UMLDiagramModified)
                 self._modeInterfaceCopy.description = dlg.description
             else:
-                self._modeInterfaceCopy.description = self._pyutModel.description
+                self._modeInterfaceCopy.description = self._model.description
 
     def _methodEditCallback(self, selection: int):
         """
@@ -152,31 +162,31 @@ class DlgEditClassCommon(BaseEditDialog):
         """
         method: Method = self._modeInterfaceCopy.methods[selection]
 
-        return self._editMethod(pyutMethod=method)
+        return self._editMethod(method=method)
 
     def _methodAddCallback(self) -> CallbackAnswer:
         """
         """
         method: Method     = Method(name=UmlPreferences().defaultNameMethod)
-        answer: CallbackAnswer = self._editMethod(pyutMethod=method)
+        answer: CallbackAnswer = self._editMethod(method=method)
         if answer.valid is True:
             self._modeInterfaceCopy.methods.append(method)
 
         return answer
 
-    def _editMethod(self, pyutMethod: Method) -> CallbackAnswer:
+    def _editMethod(self, method: Method) -> CallbackAnswer:
         """
         Common method to edit either new or old method
         Args:
-            pyutMethod:
+            method:
         """
-        self.ccLogger.info(f'method to edit: {pyutMethod}')
+        self.ccLogger.info(f'method to edit: {method}')
 
         answer: CallbackAnswer = CallbackAnswer()
 
-        with DlgEditMethod(parent=self, method=pyutMethod, editInterface=self._editInterface) as dlg:
+        with DlgEditMethod(parent=self, method=method, editInterface=self._editInterface) as dlg:
             if dlg.ShowModal() == OK:
-                answer.item = str(pyutMethod)
+                answer.item = str(method)
                 answer.valid = True
             else:
                 answer.valid = False
@@ -185,7 +195,7 @@ class DlgEditClassCommon(BaseEditDialog):
 
     def _methodRemoveCallback(self, selection: int):
 
-        # Remove from _pyutModelCopy
+        # Remove from _modelCopy
         methods: List[Method] = self._modeInterfaceCopy.methods
         methods.pop(selection)
 
@@ -224,15 +234,11 @@ class DlgEditClassCommon(BaseEditDialog):
     # noinspection PyUnusedLocal
     def _onStereotype(self, event: CommandEvent):
         """
-        Do the funky type casting to quiet mypy;  Eventually, the data model will be updated
-        See: https://github.com/hasii2011/pyutmodel/issues/14
-
         Args:
             event:
-
         """
         stereotype: Stereotype = cast(Class, self._modeInterfaceCopy).stereotype
-        # stereotype: PyutStereotype = self._pyutModelCopy.stereotype
+
         with DlgEditStereotype(parent=self._parent, stereotype=stereotype) as dlg:
             if dlg.ShowModal() == OK:
                 cast(Class, self._modeInterfaceCopy).stereotype = dlg.value

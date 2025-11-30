@@ -13,9 +13,9 @@ class DlgEditUseCase(TextEntryDialog):
     editing a use case name
     Usage:
 
-        with DlgEditUseCase(umlFrame, useCaseName=pyutUseCase.name) as dlg:
+        with DlgEditUseCase(umlFrame, useCaseName=useCase.name) as dlg:
             if dlg.ShowModal() == ID_OK:
-                pyutUseCase.name = dlg.useCaseName
+                useCase.name = dlg.useCaseName
     """
     def __init__(self, parent: Window, useCaseName: str):
         super().__init__(parent, message="Use Case Name", caption="Edit Use Case Name", value=useCaseName, style=OK | CANCEL | CENTER)

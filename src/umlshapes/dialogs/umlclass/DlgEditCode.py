@@ -34,7 +34,7 @@ class DlgEditCode(SizedDialog):
 
     def __init__(self, parent, wxID, sourceCode: SourceCode):
         """
-        We'll modify pyutMethod on OK
+        This class modifies the model method on OK
         Args:
             parent:
             wxID:

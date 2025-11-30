@@ -16,12 +16,14 @@ from umlmodel.Note import Note
 from umlmodel.enumerations.LinkType import LinkType
 
 from umlshapes.UmlDiagram import UmlDiagram
-from umlshapes.links.eventhandlers.UmlNoteLinkEventHandler import UmlNoteLinkEventHandler
 
 from umlshapes.pubsubengine.UmlPubSubEngine import UmlPubSubEngine
 
-from umlshapes.links.UmlAssociation import UmlAssociation
 from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
+
+from umlshapes.preferences.UmlPreferences import UmlPreferences
+
+from umlshapes.links.UmlAssociation import UmlAssociation
 from umlshapes.links.UmlAggregation import UmlAggregation
 from umlshapes.links.UmlComposition import UmlComposition
 from umlshapes.links.UmlInheritance import UmlInheritance
@@ -30,13 +32,12 @@ from umlshapes.links.UmlNoteLink import UmlNoteLink
 
 from umlshapes.links.eventhandlers.UmlAssociationEventHandler import UmlAssociationEventHandler
 from umlshapes.links.eventhandlers.UmlLinkEventHandler import UmlLinkEventHandler
+from umlshapes.links.eventhandlers.UmlNoteLinkEventHandler import UmlNoteLinkEventHandler
 
 from umlshapes.shapes.UmlClass import UmlClass
 from umlshapes.shapes.UmlNote import UmlNote
 
 from umlshapes.shapes.eventhandlers.UmlClassEventHandler import UmlClassEventHandler
-
-from umlshapes.preferences.UmlPreferences import UmlPreferences
 from umlshapes.shapes.eventhandlers.UmlNoteEventHandler import UmlNoteEventHandler
 
 from umlshapes.types.UmlDimensions import UmlDimensions
@@ -221,13 +222,13 @@ class LinkCreator:
         sourcePosition:       UmlPosition = UmlPosition(x=100, y=100)       # fix this should be input
         destinationPosition:  UmlPosition = UmlPosition(x=200, y=300)
 
-        sourcePyutClass:      Class   = self._createSimpleModelClass(classCounter=self._classCounter)
+        sourceModelClass:      Class   = self._createSimpleModelClass(classCounter=self._classCounter)
         self._classCounter += 1
-        destinationPyutClass: Class   = self._createSimpleModelClass(classCounter=self._classCounter)
+        destinationModelClass: Class   = self._createSimpleModelClass(classCounter=self._classCounter)
         self._classCounter += 1
 
-        sourceUmlClass:      UmlClass = UmlClass(modelClass=sourcePyutClass)
-        destinationUmlClass: UmlClass = UmlClass(modelClass=destinationPyutClass)
+        sourceUmlClass:      UmlClass = UmlClass(modelClass=sourceModelClass)
+        destinationUmlClass: UmlClass = UmlClass(modelClass=destinationModelClass)
 
         self._displayUmlClass(umlClass=sourceUmlClass, umlPosition=sourcePosition, diagramFrame=diagramFrame)
         self._displayUmlClass(umlClass=destinationUmlClass, umlPosition=destinationPosition, diagramFrame=diagramFrame)
@@ -295,7 +296,7 @@ class LinkCreator:
     def _createUmlNote(self) -> UmlNote:
 
         modelNote: Note    = Note(content='I am a great note')
-        umlNote:  UmlNote = UmlNote(note=modelNote)
+        umlNote:   UmlNote = UmlNote(note=modelNote)
 
         notePosition:  UmlPosition = UmlPosition(x=100, y=100)
 

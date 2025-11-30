@@ -49,31 +49,31 @@ class DlgEditClass(DlgEditClassCommon):
     Dialog for the class edits.
 
     Creating a DlgEditClass object will automatically open a dialog for class
-    editing. The PyutClass given in the constructor parameters is used to fill the
+    editing. The Class given in the constructor parameters is used to fill the
     fields with the dialog, and is updated when the OK button is clicked.
 
     Dialogs for methods and fields editing are implemented in different dialog classes and
     created when invoking the _callDlgEditMethod and _callDlgEditField methods.
 
-    Because the dialog works on a copy of the PyutClass object, if you cancel the
+    Because the dialog works on a copy of the Class object, if you cancel the
     dialog, any modifications are lost.
 
     """
-    def __init__(self, parent: ClassDiagramFrame, umlPubSubEngine: IUmlPubSubEngine, pyutClass: Class):
+    def __init__(self, parent: ClassDiagramFrame, umlPubSubEngine: IUmlPubSubEngine, modelClass: Class):
         """
 
         Args:
             parent:         dialog parent
-            pyutClass:      Class modified by dialog
+            modelClass:      Class modified by dialog
         """
 
         assert isinstance(parent, ClassDiagramFrame), 'Developer error.  Must be a Uml Diagram Frame'
 
         self.logger:      Logger = getLogger(__name__)
-        self._modelClass: Class  = pyutClass
+        self._modelClass: Class  = modelClass
 
-        super().__init__(parent=parent, umlPubSubEngine=umlPubSubEngine, dlgTitle="Edit Class", pyutModel=self._modelClass, editInterface=False)
-        self._oldClassName: str = pyutClass.name
+        super().__init__(parent=parent, umlPubSubEngine=umlPubSubEngine, dlgTitle="Edit Class", commonClassType=self._modelClass, editInterface=False)
+        self._oldClassName: str = modelClass.name
 
         sizedPanel: SizedPanel = self.GetContentsPane()
         sizedPanel.SetSizerProps(expand=True, proportion=1)
@@ -140,7 +140,7 @@ class DlgEditClass(DlgEditClassCommon):
 
     def _fillAllControls(self):
         """
-        Fill all controls with _pyutModelCopy data.
+        Fill all controls with _modelCopy data.
 
         """
         # Fill Class name
@@ -248,8 +248,8 @@ class DlgEditClass(DlgEditClassCommon):
         self._indicateFrameModified()
 
         # TODO:
-        # if self._oldClassName != self._pyutClass.name:
-        #     self._eventEngine.sendEvent(EventType.ClassNameChanged, oldClassName=self._oldClassName, newClassName=self._pyutClass.name)
+        # if self._oldClassName != self._class.name:
+        #     self._eventEngine.sendEvent(EventType.ClassNameChanged, oldClassName=self._oldClassName, newClassName=self._class.name)
 
         self.SetReturnCode(OK)
         self.EndModal(OK)
@@ -259,18 +259,18 @@ class DlgEditClass(DlgEditClassCommon):
         self.SetReturnCode(CANCEL)
         self.EndModal(CANCEL)
 
-    def _getAssociatedUmlClass(self, pyutClass: Class) -> 'UmlClass':
+    def _getAssociatedUmlClass(self, modelClass: Class) -> 'UmlClass':
         """
-        Return the OglClass that represents pyutClass
+        Return the UmlClass that represents model Class
 
         Args:
-            pyutClass:  Model class
+            modelClass:  Model class
 
         Returns:    The appropriate graphical class
         """
         from umlshapes.shapes.UmlClass import UmlClass
 
-        umlClasses: List[UmlClass] = [po for po in self._getUmlShapes() if isinstance(po, UmlClass) and po.modelClass is pyutClass]
+        umlClasses: List[UmlClass] = [po for po in self._getUmlShapes() if isinstance(po, UmlClass) and po.modelClass is modelClass]
 
         # This will pop in the TestADialog application since it has no frame
         assert len(umlClasses) == 1, 'Cannot have more then one UML Class per model class'

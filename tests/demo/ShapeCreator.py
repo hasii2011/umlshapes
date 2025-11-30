@@ -63,8 +63,8 @@ from umlshapes.types.Common import ModelObject
 from umlshapes.types.UmlPosition import UmlPosition
 
 from tests.demo.DemoCommon import ID_REFERENCE
-from tests.demo.DemoCommon import INCREMENT_X
-from tests.demo.DemoCommon import INCREMENT_Y
+# from tests.demo.DemoCommon import INCREMENT_X
+# from tests.demo.DemoCommon import INCREMENT_Y
 from tests.demo.DemoCommon import INITIAL_X
 from tests.demo.DemoCommon import INITIAL_Y
 from tests.demo.DemoCommon import Identifiers
@@ -134,7 +134,7 @@ class ShapeCreator:
         )
         shapeUmlClass:   ShapeDescription = ShapeDescription(
             umlShape=UmlClass,
-            createModel=lambda: self._createDemoPyutClass,
+            createModel=lambda: self._createDemoModelClass,
             eventHandler=UmlClassEventHandler,
             defaultValue=self._preferences.defaultClassName
         )
@@ -193,98 +193,97 @@ class ShapeCreator:
 
         currentPosition: UmlPosition = UmlPosition(x=self._currentPosition.x, y=self._currentPosition.y)
 
-
         # self._currentPosition.x += INCREMENT_X
         # self._currentPosition.y += INCREMENT_Y
 
         return currentPosition
 
     @property
-    def _createDemoPyutClass(self) -> Class:
+    def _createDemoModelClass(self) -> Class:
 
         className: str = f'{self._preferences.defaultClassName} {self._classCounter}'
         self._classCounter += 1
-        pyutClass: Class      = Class(name=className)
-        pyutClass.stereotype  = Stereotype.METACLASS
-        pyutClass.showFields  = True
-        pyutClass.showMethods = True
-        pyutClass.displayParameters = DisplayParameters.UNSPECIFIED
+        modelClass: Class      = Class(name=className)
+        modelClass.stereotype  = Stereotype.METACLASS
+        modelClass.showFields  = True
+        modelClass.showMethods = True
+        modelClass.displayParameters = DisplayParameters.UNSPECIFIED
 
-        pyutField1: Field = Field(
+        modelField1: Field = Field(
             name='DemoField1',
             visibility=Visibility.PUBLIC,
             type=FieldType('float'),
             defaultValue='42.0'
         )
 
-        pyutField2: Field = Field(
+        modelField2: Field = Field(
             name='DemoField2',
             visibility=Visibility.PUBLIC,
             type=FieldType('int'),
             defaultValue='666'
         )
 
-        pyutClass.fields  = Fields([pyutField1, pyutField2])
+        modelClass.fields  = Fields([modelField1, modelField2])
 
-        pyutMethod:    Method    = Method(name='DemoMethod', visibility=Visibility.PUBLIC)
-        pyutParameter: Parameter = Parameter(name='DemoParameter', type=ParameterType("str"), defaultValue='Ozzee')
+        modelMethod:    Method    = Method(name='DemoMethod', visibility=Visibility.PUBLIC)
+        modelParameter: Parameter = Parameter(name='DemoParameter', type=ParameterType("str"), defaultValue='Ozzee')
 
-        pyutMethod.parameters = Parameters([pyutParameter])
+        modelMethod.parameters = Parameters([modelParameter])
 
         constructorMethod: Method = Method(name='__init__')
         constructorMethod.parameters = self._manyParameters()
         dunderStrMethod:   Method = Method(name='__str__', visibility=Visibility.PUBLIC, returnType=ReturnType(value='str'))
 
-        pyutClass.methods = Methods([constructorMethod, pyutMethod, dunderStrMethod])
+        modelClass.methods = Methods([constructorMethod, modelMethod, dunderStrMethod])
 
-        return pyutClass
+        return modelClass
 
     def _manyParameters(self) -> Parameters:
 
-        pyutParameters: Parameters = Parameters([])
+        modelParameters: Parameters = Parameters([])
 
-        pyutParameter1: Parameter = Parameter(name='parameter1', type=ParameterType("str"),   defaultValue='Ozzee')
-        pyutParameter2: Parameter = Parameter(name='parameter2', type=ParameterType("int"),   defaultValue='0')
-        pyutParameter3: Parameter = Parameter(name='parameter3', type=ParameterType("float"), defaultValue='42.00')
+        modelParameter1: Parameter = Parameter(name='parameter1', type=ParameterType("str"),   defaultValue='Ozzee')
+        modelParameter2: Parameter = Parameter(name='parameter2', type=ParameterType("int"),   defaultValue='0')
+        modelParameter3: Parameter = Parameter(name='parameter3', type=ParameterType("float"), defaultValue='42.00')
 
-        pyutParameters.append(pyutParameter1)
-        pyutParameters.append(pyutParameter2)
-        pyutParameters.append(pyutParameter3)
+        modelParameters.append(modelParameter1)
+        modelParameters.append(modelParameter2)
+        modelParameters.append(modelParameter3)
 
-        return pyutParameters
+        return modelParameters
 
-    def _invokeEditNoteDialog(self, pyutNote: Note, diagramFrame: ClassDiagramFrame):
+    def _invokeEditNoteDialog(self, note: Note, diagramFrame: ClassDiagramFrame):
 
-        self.logger.info(f'{pyutNote=}')
+        self.logger.info(f'{note=}')
 
-        with DlgEditNote(diagramFrame, note=pyutNote) as dlg:
+        with DlgEditNote(diagramFrame, note=note) as dlg:
             if dlg.ShowModal() == OK:
-                self.logger.info(f'UpdatedNote: {pyutNote}')
+                self.logger.info(f'UpdatedNote: {note}')
 
-    def _invokeEditTextDialog(self, pyutText: Text, diagramFrame: ClassDiagramFrame,):
+    def _invokeEditTextDialog(self, text: Text, diagramFrame: ClassDiagramFrame, ):
 
-        self.logger.info(f'{pyutText=}')
+        self.logger.info(f'{text=}')
 
-        with DlgEditText(diagramFrame, text=pyutText) as dlg:
+        with DlgEditText(diagramFrame, text=text) as dlg:
             if dlg.ShowModal() == OK:
-                self.logger.info(f'Updated text: {pyutText}')
+                self.logger.info(f'Updated text: {text}')
 
-    def _invokeEditUseCaseDialog(self, pyutUseCase: UseCase, diagramFrame: ClassDiagramFrame,):
+    def _invokeEditUseCaseDialog(self, useCase: UseCase, diagramFrame: ClassDiagramFrame, ):
 
-        self.logger.info(f'{pyutUseCase=}')
+        self.logger.info(f'{useCase=}')
 
-        with DlgEditUseCase(diagramFrame, useCaseName=pyutUseCase.name) as dlg:
+        with DlgEditUseCase(diagramFrame, useCaseName=useCase.name) as dlg:
             if dlg.ShowModal() == ID_OK:
-                pyutUseCase.name = dlg.useCaseName
-                self.logger.info(f'Updated use case: {pyutUseCase}')
+                useCase.name = dlg.useCaseName
+                self.logger.info(f'Updated use case: {useCase}')
             else:
                 self.logger.warning('Not Ok')
 
-    def _invokeEditActorDialog(self, pyutActor: Actor, diagramFrame: ClassDiagramFrame,) -> None:
+    def _invokeEditActorDialog(self, actor: Actor, diagramFrame: ClassDiagramFrame, ) -> None:
 
-        with DlgEditActor(diagramFrame, actorName=pyutActor.name) as dlg:
+        with DlgEditActor(diagramFrame, actorName=actor.name) as dlg:
             if dlg.ShowModal() == ID_OK:
-                pyutActor.name = dlg.actorName
-                self.logger.info(f'Updated note: {pyutActor}')
+                actor.name = dlg.actorName
+                self.logger.info(f'Updated note: {actor}')
             else:
                 self.logger.warning('Not Ok')

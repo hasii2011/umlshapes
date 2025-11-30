@@ -64,7 +64,7 @@ class UmlLink(IdentifierMixin, LineShape, PubSubMixin):
         self.linkLogger:   Logger         = getLogger(__name__)
         self._preferences: UmlPreferences = UmlPreferences()
 
-        self._pyutLink: Link                = link
+        self._link:     Link                = link
         self._linkName: UmlAssociationLabel = cast(UmlAssociationLabel, None)
 
         self.SetFormatMode(mode=FORMAT_SIZE_TO_CONTENTS)
@@ -100,11 +100,11 @@ class UmlLink(IdentifierMixin, LineShape, PubSubMixin):
 
     @property
     def modelLink(self) -> Link:
-        return self._pyutLink
+        return self._link
 
     @modelLink.setter
-    def modelLink(self, pyutLink: Link):
-        self._pyutLink = pyutLink
+    def modelLink(self, link: Link):
+        self._link = link
 
     @property
     def linkName(self) -> UmlAssociationLabel:

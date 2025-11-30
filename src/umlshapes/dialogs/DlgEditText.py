@@ -19,10 +19,10 @@ class DlgEditText(BaseEditDialog):
 
 
     Sample use:
-        with DlgEditText(parent=self._frame, eventEngine=self._eventEngine, pyutText=pyutText) as dlg:
+        with DlgEditText(parent=self._frame, eventEngine=self._eventEngine, text=text) as dlg:
 
             if dlg.ShowModal() == OK:
-                return f'Retrieved data: {pyutText.content=}'
+                return f'Retrieved data: {text.content=}'
             else:
                 return f'Cancelled'
 
@@ -31,8 +31,8 @@ class DlgEditText(BaseEditDialog):
         """
 
         Args:
-            parent:             parent window to center on
-            text:           Model object we are editing
+            parent: parent window to center on
+            text:   Model object we are editing
         """
         super().__init__(parent, title='Diagram Text')
 

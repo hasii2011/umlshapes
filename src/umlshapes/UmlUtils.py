@@ -465,7 +465,7 @@ class UmlUtils:
         """
         Split the `text` into lines that fit into `textWidth` pixels.
 
-        Note:  This is a copy of the one in Pyut.  Duplicated here to remove the LineSplitter dependency.
+        Note:  This is a copy of the one in codeallyadvancec
 
         Args:
             text:       The text to split

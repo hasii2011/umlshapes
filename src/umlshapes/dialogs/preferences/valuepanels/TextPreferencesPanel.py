@@ -152,7 +152,7 @@ class TextPreferencesPanel(BasePreferencesPanel):
         self._preferences.textFontSize = int(newFontSize)
 
     def _onTextBackGroundColorChanged(self, event: CommandEvent):
-        colorValue:    str      = event.GetString()
-        pyutColorEnum: UmlColor = UmlColor(colorValue)
+        colorValue: str      = event.GetString()
+        colorEnum:  UmlColor = UmlColor(colorValue)
 
-        self._preferences.textBackGroundColor = pyutColorEnum
+        self._preferences.textBackGroundColor = colorEnum

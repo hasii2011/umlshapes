@@ -115,7 +115,7 @@ class DemoAppFrame(SizedFrame):
         self._linkCreator:  LinkCreator    = LinkCreator(umlPubSubEngine=self._umlPubSubEngine)
         self._preferences:  UmlPreferences = UmlPreferences()
 
-        self._pyutInterfaceCount: int = 0
+        self._interfaceCount: int = 0
 
         self._subscribeFrameToRelevantFrameTopics(frameId=self._diagramFrame1.id)
         self._subscribeFrameToRelevantFrameTopics(frameId=self._diagramFrame2.id)
@@ -279,13 +279,13 @@ class DemoAppFrame(SizedFrame):
             perimeterPoint:
         """
 
-        interfaceName: str = f'{self._preferences.defaultNameInterface}{self._pyutInterfaceCount}'
-        self._pyutInterfaceCount += 1
+        interfaceName: str = f'{self._preferences.defaultNameInterface}{self._interfaceCount}'
+        self._interfaceCount += 1
 
-        pyutInterface: Interface = Interface(interfaceName)
-        pyutInterface.addImplementor(ClassName(requestingUmlClass.modelClass.name))
+        interface: Interface = Interface(interfaceName)
+        interface.addImplementor(ClassName(requestingUmlClass.modelClass.name))
 
-        umlLollipopInterface: UmlLollipopInterface = UmlLollipopInterface(interface=pyutInterface)
+        umlLollipopInterface: UmlLollipopInterface = UmlLollipopInterface(interface=interface)
         umlLollipopInterface.attachedTo            = requestingUmlClass
 
         attachmentSide: AttachmentSide      = UmlUtils.attachmentSide(x=perimeterPoint.x, y=perimeterPoint.y, rectangle=requestingUmlClass.rectangle)
@@ -308,7 +308,7 @@ class DemoAppFrame(SizedFrame):
         pubsubEngine: IUmlPubSubEngine  = requestingFrame.umlPubSubEngine
 
         # Update with our generated one
-        interfaces.append(pyutInterface)
+        interfaces.append(interface)
         with DlgEditInterface(parent=requestingFrame, lollipopInterface=umlLollipopInterface, umlPubSubEngine=pubsubEngine, interfaces=interfaces) as dlg:
             if dlg.ShowModal() == OK:
                 requestingFrame.refresh()

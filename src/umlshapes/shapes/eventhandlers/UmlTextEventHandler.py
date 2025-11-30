@@ -101,11 +101,11 @@ class UmlTextEventHandler(UmlBaseEventHandler):
         super().OnLeftDoubleClick(x=x, y=y, keys=keys, attachment=attachment)
 
         umlText:  UmlText  = self.GetShape()
-        pyutText: Text     = umlText.modelText
+        text:     Text     = umlText.modelText
 
         umlFrame:  ClassDiagramFrame  = umlText.GetCanvas()
 
-        with DlgEditText(parent=umlFrame, text=pyutText, ) as dlg:
+        with DlgEditText(parent=umlFrame, text=text, ) as dlg:
             if dlg.ShowModal() == OK:
                 umlFrame.refresh()
 

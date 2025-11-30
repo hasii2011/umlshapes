@@ -48,7 +48,7 @@ class DlgEditInterface(DlgEditClassCommon):
             parent:             parent window
             umlPubSubEngine:    the pub/sub engine
             lollipopInterface:  The created UmlLollipop interface
-            interfaces:     The list of Pyut Interfaces on the board
+            interfaces:         The list of interfaces on the board
             editMode:           Set to true when we are editing, Not on initial creation
         """
 
@@ -62,7 +62,7 @@ class DlgEditInterface(DlgEditClassCommon):
         self.editMode:     bool      = editMode
         self._implementor: ClassName = self._modelInterface.implementors[0]
 
-        super().__init__(parent, umlPubSubEngine=umlPubSubEngine, dlgTitle='Edit Interface', pyutModel=self._modelInterfaceCopy, editInterface=True)
+        super().__init__(parent, umlPubSubEngine=umlPubSubEngine, dlgTitle='Edit Interface', commonClassType=self._modelInterfaceCopy, editInterface=True)
 
         self.logger: Logger = DlgEditInterface.clsLogger
 
@@ -80,7 +80,7 @@ class DlgEditInterface(DlgEditClassCommon):
         self._modeInterfaceCopy: Interface = cast(Interface, None)
 
     @property
-    def pyutInterface(self) -> Interface:
+    def interface(self) -> Interface:
         return self._modelInterface
 
     def _layoutInterfaceNameSelectionControl(self, parent: SizedPanel):
@@ -157,10 +157,10 @@ class DlgEditInterface(DlgEditClassCommon):
             event:
         """
         selectedInterfaceName: str            = self._modeInterfaceCopy.name
-        pyutInterfacesDict:    InterfacesDict = self._interfacesDict
-        if selectedInterfaceName in pyutInterfacesDict.keys():
+        interfacesDict:        InterfacesDict = self._interfacesDict
+        if selectedInterfaceName in interfacesDict.keys():
 
-            existingInterface: Interface = pyutInterfacesDict[selectedInterfaceName]
+            existingInterface: Interface = interfacesDict[selectedInterfaceName]
             self._modelInterface = existingInterface
             self._modelInterface.addImplementor(self._implementor)
             self.logger.debug(f'Using existing interface. {self._modelInterface.name=} {self._modelInterface.id=} {self._modelInterface.implementors}')
@@ -190,9 +190,9 @@ class DlgEditInterface(DlgEditClassCommon):
 
     def _toDictionary(self, interfaces: Interfaces) -> InterfacesDict:
 
-        pyutInterfacesDict: InterfacesDict = InterfacesDict({})
+        interfacesDict: InterfacesDict = InterfacesDict({})
 
-        for pyutInterface in interfaces:
-            pyutInterfacesDict[pyutInterface.name] = pyutInterface
+        for interface in interfaces:
+            interfacesDict[interface.name] = interface
 
-        return pyutInterfacesDict
+        return interfacesDict

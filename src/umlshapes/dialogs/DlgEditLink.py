@@ -33,11 +33,11 @@ class DlgEditLink (SizedDialog):
     Dialog to edit links between classes
 
     Usage:
-        with DlgEditLink(parent, pyutLink) as dlg:
+        with DlgEditLink(parent, link) as dlg:
             if dlg.ShowModal() == OK:
-                pyutLink = dlg.value
+                link = dlg.value
 
-    The input PyutLink is only updated on Ok;  Else if the dialog is
+    The input model ink is only updated on Ok;  Else if the dialog is
     "canceled" any updated values are discarded
     """
     def __init__(self, parent, link: Link):

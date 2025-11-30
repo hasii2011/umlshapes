@@ -59,7 +59,8 @@ if __name__ == '__main__':
     print(f'WxPython: {version.wxPythonVersion}')
     print(f'')
     print(f'UML Diagrammer Packages')
-    print(f'    Uml Shapes:      {version.umlShapesVersion}')
+    print(f'    UML Data Model: {version.modelVersion}')
+    print(f'    Uml Shapes:     {version.umlShapesVersion}')
 
     print(f'')
     print(f'Python:   {version.pythonVersion}')

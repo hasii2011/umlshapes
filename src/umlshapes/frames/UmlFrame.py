@@ -72,7 +72,7 @@ A4_FACTOR:     float = 1.41
 PIXELS_PER_UNIT_X: int = 20
 PIXELS_PER_UNIT_Y: int = 20
 
-PyutObjects = NewType('PyutObjects', List[UmlModelBase])
+ModelObjects = NewType('ModelObjects', List[UmlModelBase])
 
 BIG_NUM: int = 10000    # Hopefully, there are less than this number of shapes on frame
 
@@ -101,7 +101,7 @@ class UmlFrame(DiagramFrame):
         self._currentReportInterval: int = self._preferences.trackMouseInterval
         self._frameModified: bool = False
 
-        self._clipboard: PyutObjects = PyutObjects([])            # will be re-created at every copy
+        self._clipboard: ModelObjects = ModelObjects([])            # will be re-created at every copy
 
         self._setupListeners()
 
@@ -444,9 +444,9 @@ class UmlFrame(DiagramFrame):
         from umlshapes.shapes.UmlUseCase import UmlUseCase
         # from umlshapes.shapes.UmlText import UmlText
 
-        self._clipboard = PyutObjects([])
+        self._clipboard = ModelObjects([])
 
-        # put a copy of the PyutObjects in the clipboard
+        # put a copy of the model instances in the clipboard
         for umlShape in selectedShapes:
             linkedObject: LinkedObject = cast(LinkedObject, None)
 
@@ -455,7 +455,7 @@ class UmlFrame(DiagramFrame):
             elif isinstance(umlShape, UmlNote):
                 linkedObject = deepcopy(umlShape.modelNote)
             # elif isinstance(umlShape, UmlText):
-            #     pyutObject = deepcopy(umlShape.modelText)
+            #     linkedObject = deepcopy(umlShape.modelText)
             elif isinstance(umlShape, UmlActor):
                 linkedObject = deepcopy(umlShape.modelActor)
             elif isinstance(umlShape, UmlUseCase):
