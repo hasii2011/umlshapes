@@ -56,8 +56,8 @@ class DlgEditMethod(BaseEditDialog):
         self.logger:         Logger = getLogger(__name__)
         self._editInterface: bool   = editInterface
 
-        self._pyutMethod:     Method = method
-        self._pyutMethodCopy: Method = deepcopy(method)
+        self._method:     Method = method
+        self._methodCopy: Method = deepcopy(method)
 
         self._rdbVisibility:    RadioBox = cast(RadioBox, None)
         self._methodName:       TextCtrl = cast(TextCtrl, None)
@@ -67,7 +67,7 @@ class DlgEditMethod(BaseEditDialog):
         sizedPanel: SizedPanel = self.GetContentsPane()
         sizedPanel.SetSizerType('vertical')
 
-        self._pyutParameters: EnhancedListBox = cast(EnhancedListBox, None)
+        self._parameters: EnhancedListBox = cast(EnhancedListBox, None)
 
         self._layoutMethodInformation(parent=sizedPanel)
         self._layoutParameterControls(parent=sizedPanel)
@@ -91,20 +91,20 @@ class DlgEditMethod(BaseEditDialog):
 
     def _initializeDataInControls(self):
         """
-            Fill the text controls with PyutMethod data
+        Fill the text controls with method data
         """
-        self._methodName.SetValue(self._pyutMethodCopy.name)
+        self._methodName.SetValue(self._methodCopy.name)
 
-        self._MethodReturnType.SetValue(str(self._pyutMethodCopy.returnType))
+        self._MethodReturnType.SetValue(str(self._methodCopy.returnType))
 
         if self._editInterface is False:
-            self._rdbVisibility.SetStringSelection(str(self._pyutMethodCopy.visibility))
+            self._rdbVisibility.SetStringSelection(str(self._methodCopy.visibility))
 
         parameterItems: EnhancedListBoxItems = EnhancedListBoxItems([])
-        for pyutParameter in self._pyutMethodCopy.parameters:
-            parameterItems.append(str(pyutParameter))     # Depends on a reasonable __str__ implementation
+        for parameter in self._methodCopy.parameters:
+            parameterItems.append(str(parameter))     # Depends on a reasonable __str__ implementation
 
-        self._pyutParameters.setItems(parameterItems)
+        self._parameters.setItems(parameterItems)
 
     def _layoutMethodInformation(self, parent: SizedPanel):
 
@@ -142,58 +142,58 @@ class DlgEditMethod(BaseEditDialog):
         callbacks.upCallback     = self._parameterUpCallback
         callbacks.downCallback   = self._parameterDownCallback
 
-        self._pyutParameters = EnhancedListBox(parent=parent, title='Parameters:', callbacks=callbacks)
+        self._parameters = EnhancedListBox(parent=parent, title='Parameters:', callbacks=callbacks)
 
     def _parameterAddCallback (self) -> CallbackAnswer:
         # TODO Use default parameter name when available
-        parameter: Parameter  = Parameter(name='parameter1')
-        answer:        CallbackAnswer = self._editParameter(pyutParameter=parameter)
+        parameter: Parameter      = Parameter(name='parameter1')
+        answer:    CallbackAnswer = self._editParameter(parameter=parameter)
         if answer.valid is True:
-            self._pyutMethodCopy.parameters.append(parameter)
+            self._methodCopy.parameters.append(parameter)
 
         return answer
 
     def _parameterEditCallback (self, selection: int) -> CallbackAnswer:
 
-        pyutParameter: Parameter = self._pyutMethodCopy.parameters[selection]
-        return self._editParameter(pyutParameter=pyutParameter)
+        parameter: Parameter = self._methodCopy.parameters[selection]
+        return self._editParameter(parameter=parameter)
 
-    def _editParameter(self, pyutParameter: Parameter) -> CallbackAnswer:
+    def _editParameter(self, parameter: Parameter) -> CallbackAnswer:
 
         answer:        CallbackAnswer = CallbackAnswer()
-        with DlgEditParameter(parent=self, parameterToEdit=pyutParameter) as dlg:
+        with DlgEditParameter(parent=self, parameterToEdit=parameter) as dlg:
             if dlg.ShowModal() == OK:
                 answer.valid = True
-                answer.item  = str(pyutParameter)
+                answer.item  = str(parameter)
             else:
                 answer.valid = False
 
         return answer
 
     def _parameterRemoveCallback (self, selection: int):
-        pyutParameters: Parameters = self._pyutMethodCopy.parameters
-        pyutParameters.pop(selection)
+        parameters: Parameters = self._methodCopy.parameters
+        parameters.pop(selection)
 
     def _parameterUpCallback (self, selection: int) -> UpCallbackData:
 
-        pyutParameters: Parameters = self._pyutMethodCopy.parameters
-        pyutParameter:  Parameter  = pyutParameters[selection]
-        pyutParameters.pop(selection)
-        pyutParameters.insert(selection-1, pyutParameter)
+        parameters: Parameters = self._methodCopy.parameters
+        parameter:  Parameter  = parameters[selection]
+        parameters.pop(selection)
+        parameters.insert(selection-1, parameter)
 
         upCallbackData: UpCallbackData = UpCallbackData()
-        upCallbackData.currentItem  = str(pyutParameters[selection])
-        upCallbackData.previousItem = str(pyutParameters[selection-1])
+        upCallbackData.currentItem  = str(parameters[selection])
+        upCallbackData.previousItem = str(parameters[selection-1])
 
         return upCallbackData
 
     # noinspection PyUnusedLocal
     def _parameterDownCallback (self, selection: int) -> DownCallbackData:
 
-        parameters:    Parameters = self._pyutMethodCopy.parameters
-        pyutParameter: Parameter  = parameters[selection]
+        parameters:    Parameters = self._methodCopy.parameters
+        parameter: Parameter  = parameters[selection]
         parameters.pop(selection)
-        parameters.insert(selection + 1, pyutParameter)
+        parameters.insert(selection + 1, parameter)
 
         downCallbackData: DownCallbackData = DownCallbackData()
         downCallbackData.currentItem = str(parameters[selection])
@@ -204,17 +204,17 @@ class DlgEditMethod(BaseEditDialog):
     # noinspection PyUnusedLocal
     def _onModifiers(self, event: CommandEvent):
 
-        with DlgEditMethodModifiers(parent=self, pyutModifiers=self._pyutMethodCopy.modifiers) as dlg:
+        with DlgEditMethodModifiers(parent=self, modifiers=self._methodCopy.modifiers) as dlg:
             if dlg.ShowModal() == OK:
-                self._pyutMethodCopy.modifiers = dlg.pyutModifiers
+                self._methodCopy.modifiers = dlg.modifiers
 
     # noinspection PyUnusedLocal
     def _onMethodCode(self, event: CommandEvent):
-        sourceCode: SourceCode = self._pyutMethodCopy.sourceCode
+        sourceCode: SourceCode = self._methodCopy.sourceCode
         with DlgEditCode(parent=self, wxID=ID_ANY, sourceCode=sourceCode) as dlg:
             if dlg.ShowModal() == OK:
                 self.logger.debug(f'Answered Ok')
-                self._pyutMethodCopy.sourceCode = dlg.sourceCode
+                self._methodCopy.sourceCode = dlg.sourceCode
             else:
                 self.logger.debug(f'Do nothing code dialog cancelled')
 
@@ -237,20 +237,20 @@ class DlgEditMethod(BaseEditDialog):
         Args:
             event:
         """
-        self._pyutMethod.name = self._methodName.GetValue()
+        self._method.name = self._methodName.GetValue()
 
-        self._pyutMethod.modifiers = self._pyutMethodCopy.modifiers
+        self._method.modifiers = self._methodCopy.modifiers
 
         returnType: ReturnType = ReturnType(self._MethodReturnType.GetValue())
-        self._pyutMethod.returnType = returnType
-        self._pyutMethod.parameters = self._pyutMethodCopy.parameters
+        self._method.returnType = returnType
+        self._method.parameters = self._methodCopy.parameters
 
         if self._editInterface is False:
             visStr:      str               = self._rdbVisibility.GetStringSelection()
             visibility: Visibility = Visibility.toEnum(visStr)
-            self._pyutMethod.visibility = visibility
+            self._method.visibility = visibility
 
-        self._pyutMethod.sourceCode = self._pyutMethodCopy.sourceCode
+        self._method.sourceCode = self._methodCopy.sourceCode
 
         super()._onOk(event)
 

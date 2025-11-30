@@ -21,7 +21,7 @@ class DlgEditNote(BaseEditDialog):
     displayed in a UML note.
 
     Sample use:
-        with DlgEditNote(umlFrame, pyutNote) as dlg:
+        with DlgEditNote(umlFrame, note) as dlg:
             if dlg.ShowModal() == ID_OK:
                 self._eventEngine.sendEvent(EventType.UMLDiagramModified)
 
@@ -35,11 +35,11 @@ class DlgEditNote(BaseEditDialog):
         """
         super().__init__(parent, title="Edit Note")
 
-        self._pyutNote: Note = note
+        self._note: Note = note
 
         sizedPanel: SizedPanel = self.GetContentsPane()
 
-        self._txtCtrl: TextCtrl = TextCtrl(sizedPanel, value=self._pyutNote.content, size=Size(400, 180), style=TE_MULTILINE)
+        self._txtCtrl: TextCtrl = TextCtrl(sizedPanel, value=self._note.content, size=Size(400, 180), style=TE_MULTILINE)
         self._txtCtrl.SetFocus()
 
         self._layoutStandardOkCancelButtonSizer()
@@ -55,4 +55,4 @@ class DlgEditNote(BaseEditDialog):
         Args:
             event:
         """
-        self._pyutNote.content = event.GetString()
+        self._note.content = event.GetString()

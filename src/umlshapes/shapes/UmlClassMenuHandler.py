@@ -1,3 +1,4 @@
+
 from typing import cast
 from typing import TYPE_CHECKING
 
@@ -79,9 +80,9 @@ class UmlClassMenuHandler:
 
     def popupMenu(self, x: int, y: int):
 
-        pyutClass: Class = self._umlClass.modelClass
+        modelClass: Class = self._umlClass.modelClass
 
-        self._setMenuItemValues(pyutClass)
+        self._setMenuItemValues(modelClass)
 
         self.logger.debug(f'UmlClassMenuHandler - x,y: {x},{y}')
 

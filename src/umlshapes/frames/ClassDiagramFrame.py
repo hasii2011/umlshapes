@@ -44,7 +44,7 @@ class ClassDiagramFrame(UmlFrame):
         self._umlPubSubEngine.subscribe(messageType=UmlMessageType.REQUEST_LOLLIPOP_LOCATION,
                                         frameId=self.id,
                                         listener=self._onRequestLollipopLocation)
-        self._pyutInterfaceCount: int = 0
+        self._interfaceCount: int = 0
 
     @property
     def requestingLollipopLocation(self) -> bool:
@@ -54,6 +54,7 @@ class ClassDiagramFrame(UmlFrame):
         Returns: the mode we are in
         """
         return self._requestingLollipopLocation
+
     def getDefinedInterfaces(self) -> Interfaces:
         """
         This will not only look for lollipop interfaces but will find UmlInterfaces.
@@ -95,7 +96,6 @@ class ClassDiagramFrame(UmlFrame):
                 interfaces.append(interface)
 
         return interfaces
-
 
     def OnLeftClick(self, x, y, keys=0):
 
@@ -145,7 +145,7 @@ class ClassDiagramFrame(UmlFrame):
                                           frameId=self.id,
                                           requestingFrame=self,
                                           requestingUmlClass=requestingUmlClass,
-                                          pyutInterfaces=self.getDefinedInterfaces(),
+                                          interfaces=self.getDefinedInterfaces(),
                                           perimeterPoint=perimeterPoint,
                                           )
         #

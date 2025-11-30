@@ -115,7 +115,7 @@ class DemoAppFrame(SizedFrame):
         self._linkCreator:  LinkCreator    = LinkCreator(umlPubSubEngine=self._umlPubSubEngine)
         self._preferences:  UmlPreferences = UmlPreferences()
 
-        self._pyutInterfaceCount: int = 0
+        self._interfaceCount: int = 0
 
         self._subscribeFrameToRelevantFrameTopics(frameId=self._diagramFrame1.id)
         self._subscribeFrameToRelevantFrameTopics(frameId=self._diagramFrame2.id)
@@ -279,8 +279,8 @@ class DemoAppFrame(SizedFrame):
             perimeterPoint:
         """
 
-        interfaceName: str = f'{self._preferences.defaultNameInterface}{self._pyutInterfaceCount}'
-        self._pyutInterfaceCount += 1
+        interfaceName: str = f'{self._preferences.defaultNameInterface}{self._interfaceCount}'
+        self._interfaceCount += 1
 
         pyutInterface: Interface = Interface(interfaceName)
         pyutInterface.addImplementor(ClassName(requestingUmlClass.modelClass.name))

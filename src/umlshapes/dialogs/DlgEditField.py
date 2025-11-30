@@ -15,7 +15,7 @@ class DlgEditField(BaseEditParamFieldDialog):
     def __init__(self, parent: Window, fieldToEdit: Field):
         super().__init__(parent, title='Edit Field', layoutField=True)
         """
-        The Dialog to edit PyutFields
+        The Dialog to edit model fields
         Args:
             parent:
             fieldToEdit:  The parameter that is being edited

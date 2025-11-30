@@ -46,8 +46,8 @@ class UmlNote(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin):
         """
 
         Args:
-            note:   A PyutNote Object
-            size:       An initial size that overrides the default
+            note:   Note Object
+            size:   An initial size that overrides the default
         """
         self._preferences: UmlPreferences = UmlPreferences()
 

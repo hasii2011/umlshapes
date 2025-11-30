@@ -82,6 +82,6 @@ class UmlClassEventHandler(UmlBaseEventHandler):
         umlFrame:  ClassDiagramFrame  = umlClass.GetCanvas()
 
         eventEngine: IUmlPubSubEngine = umlFrame.umlPubSubEngine
-        with DlgEditClass(parent=umlFrame, pyutClass=modelClass, umlPubSubEngine=eventEngine) as dlg:
+        with DlgEditClass(parent=umlFrame, modelClass=modelClass, umlPubSubEngine=eventEngine) as dlg:
             if dlg.ShowModal() == OK:
                 umlFrame.refresh()

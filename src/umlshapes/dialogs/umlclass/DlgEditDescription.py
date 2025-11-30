@@ -18,20 +18,20 @@ class DlgEditDescription(BaseEditDialog):
     """
     Edit a class description
     """
-    def __init__(self, parent: Window, pyutModel: Union[Class, Interface]):
+    def __init__(self, parent: Window, model: Union[Class, Interface]):
         """
 
         Args:
             parent:
-            pyutModel:
+            model:
         """
         super().__init__(parent, title="Edit Description")
 
-        self._pyutModel: Union[Class, Interface] = pyutModel
+        self._model: Union[Class, Interface] = model
 
         sizedPanel: SizedPanel = self.GetContentsPane()
 
-        self._txtCtrl: TextCtrl = TextCtrl(sizedPanel, value=self._pyutModel.description, style=TE_MULTILINE)
+        self._txtCtrl: TextCtrl = TextCtrl(sizedPanel, value=self._model.description, style=TE_MULTILINE)
         self._txtCtrl.SetSizerProps(expand=True, proportion=1)
         self._txtCtrl.SetFocus()
 
@@ -44,7 +44,7 @@ class DlgEditDescription(BaseEditDialog):
 
     @property
     def description(self) -> str:
-        return self._pyutModel.description
+        return self._model.description
 
     def _onTxtDescriptionChange(self, event):
-        self._pyutModel.description = event.GetString()
+        self._model.description = event.GetString()

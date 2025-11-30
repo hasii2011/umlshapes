@@ -282,10 +282,10 @@ class DiagramPreferencesPanel(BasePreferencesPanel):
 
     def _onGridLineColorSelectionChanged(self, event: CommandEvent):
 
-        colorValue:    str              = event.GetString()
-        pyutColorEnum: UmlColor = UmlColor(colorValue)
+        colorValue: str      = event.GetString()
+        colorEnum:  UmlColor = UmlColor(colorValue)
 
-        self._preferences.gridLineColor = pyutColorEnum
+        self._preferences.gridLineColor = colorEnum
 
     def _onGridIntervalChanged(self, event: SpinEvent):
 
@@ -297,9 +297,9 @@ class DiagramPreferencesPanel(BasePreferencesPanel):
         styleText: str = event.GetString()
         self.logger.warning(f'{styleText=}')
 
-        pyutPenStyle: UmlPenStyle = UmlPenStyle(styleText)
+        penStyle: UmlPenStyle = UmlPenStyle(styleText)
 
-        self._preferences.gridLineStyle = pyutPenStyle
+        self._preferences.gridLineStyle = penStyle
 
     def _resetSnapToGridControl(self):
         """
@@ -314,19 +314,19 @@ class DiagramPreferencesPanel(BasePreferencesPanel):
             self._preferences.snapToGrid = False
 
     def _onNormalBackGroundColorChanged(self, event: CommandEvent):
-        colorValue:    str      = event.GetString()
-        pyutColorEnum: UmlColor = UmlColor(colorValue)
+        colorValue: str      = event.GetString()
+        colorEnum:  UmlColor = UmlColor(colorValue)
 
-        self._preferences.backGroundColor = pyutColorEnum
+        self._preferences.backGroundColor = colorEnum
 
     def _onDarkModeBackgroundColorChanged(self, event: CommandEvent):
-        colorValue:    str      = event.GetString()
-        pyutColorEnum: UmlColor = UmlColor(colorValue)
+        colorValue: str      = event.GetString()
+        colorEnum:  UmlColor = UmlColor(colorValue)
 
-        self._preferences.darkModeBackGroundColor = pyutColorEnum
+        self._preferences.darkModeBackGroundColor = colorEnum
 
     def _onDarkModeGridLineColorChanged(self, event: CommandEvent):
-        colorValue:    str      = event.GetString()
-        pyutColorEnum: UmlColor = UmlColor(colorValue)
+        colorValue: str      = event.GetString()
+        colorEnum:  UmlColor = UmlColor(colorValue)
 
-        self._preferences.darkModeGridLineColor = pyutColorEnum
+        self._preferences.darkModeGridLineColor = colorEnum

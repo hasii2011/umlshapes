@@ -85,15 +85,15 @@ class UmlLinkEventHandler(UmlBaseEventHandler):
         super().OnLeftDoubleClick(x=x, y=y, keys=keys, attachment=attachment)
 
         umlLink:  UmlAssociation = self.GetShape()
-        pyutLink: Link           = umlLink.modelLink
+        link:     Link           = umlLink.modelLink
         umlFrame: UmlFrame       = umlLink.GetCanvas()
 
-        if self._isLinkEditable(linkType=pyutLink.linkType):
+        if self._isLinkEditable(linkType=link.linkType):
 
-            with DlgEditLink(parent=umlFrame, link=pyutLink) as dlg:
+            with DlgEditLink(parent=umlFrame, link=link) as dlg:
                 if dlg.ShowModal() == OK:
                     umlFrame.refresh()
-                    self.logger.info(f'{pyutLink=}')
+                    self.logger.info(f'{link=}')
                     self._updateAssociationLabels(umlLink=umlLink, modelLink=dlg.value)
 
     def OnRightClick(self, x: int, y: int, keys: int = 0, attachment: int = 0):

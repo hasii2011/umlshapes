@@ -29,13 +29,13 @@ from umlshapes.dialogs.BaseEditDialog import BaseEditDialog
 
 class DlgEditMethodModifiers(BaseEditDialog):
 
-    def __init__(self, parent, pyutModifiers: Modifiers):
+    def __init__(self, parent, modifiers: Modifiers):
 
         super().__init__(parent, title='Edit Method Modifiers')
 
         self.logger:             Logger     = getLogger(__name__)
-        self._modelModifiers:     Modifiers = pyutModifiers
-        self._modelModifiersCopy: Modifiers = deepcopy(pyutModifiers)
+        self._modelModifiers:     Modifiers = modifiers
+        self._modelModifiersCopy: Modifiers = deepcopy(modifiers)
 
         self._elb: EditableListBox = cast(EditableListBox, None)
         sizedPanel: SizedPanel = self.GetContentsPane()
@@ -45,13 +45,13 @@ class DlgEditMethodModifiers(BaseEditDialog):
 
     @property
     def modifiers(self) -> Modifiers:
-        return self._stringToPyutModifiers()
+        return self._stringToModifiers()
 
     def _layoutEditableListBox(self, parent: SizedPanel):
         style: int = EL_DEFAULT_STYLE | EL_ALLOW_NEW | EL_ALLOW_EDIT | EL_ALLOW_DELETE
         self._elb = EditableListBox(parent, ID_ANY, "Modifiers", Point(-1, -1), Size(-1, -1), style=style)
 
-        self._elb.SetStrings(self._pyutModifiersToStrings())
+        self._elb.SetStrings(self._modifiersToStrings())
 
     def _onOk(self, event: CommandEvent):
         """
@@ -59,24 +59,24 @@ class DlgEditMethodModifiers(BaseEditDialog):
 
         super()._onOk(event)
 
-    def _pyutModifiersToStrings(self) -> List[str]:
+    def _modifiersToStrings(self) -> List[str]:
         """
         Converts the copy of the modifiers to a list of string
         Returns:
         """
 
         stringList: List[str] = []
-        for pyutModifier in self._modelModifiersCopy:
-            stringList.append(pyutModifier.name)
+        for modifier in self._modelModifiersCopy:
+            stringList.append(modifier.name)
 
         return stringList
 
-    def _stringToPyutModifiers(self) -> Modifiers:
+    def _stringToModifiers(self) -> Modifiers:
 
-        pyutModifiers: Modifiers = Modifiers([])
+        modifiers: Modifiers = Modifiers([])
         strList:       List[str]     = self._elb.GetStrings()
         for modifierString in strList:
-            pyutModifier: Modifier = Modifier(name=modifierString)
-            pyutModifiers.append(pyutModifier)
+            modifier: Modifier = Modifier(name=modifierString)
+            modifiers.append(modifier)
 
-        return pyutModifiers
+        return modifiers

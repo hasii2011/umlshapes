@@ -26,9 +26,9 @@ from umlshapes.dialogs.BaseEditDialog import BaseEditDialog
 class DlgEditStereotype(BaseEditDialog):
     """
     Usage:
-            with DlgEditStereotype(parent=parent, eventEngine=eventEngine, pyutStereotype=pyutModel.stereotype) as dlg:
+            with DlgEditStereotype(parent=parent, eventEngine=eventEngine, stereotype=model.stereotype) as dlg:
                 if dlg.ShowModal() == OK:
-                    self._pyutModel.stereotype = dlg.value
+                    self._model.stereotype = dlg.value
     """
 
     def __init__(self, parent: Window, stereotype: Stereotype):
@@ -47,7 +47,7 @@ class DlgEditStereotype(BaseEditDialog):
 
         self.SetButtonSizer(self.CreateStdDialogButtonSizer(OK | CANCEL))
 
-        self._setSelected(pyutStereotype=stereotype)
+        self._setSelected(stereotype=stereotype)
         self.Fit()
         self.SetMinSize(self.GetSize())
 
@@ -66,11 +66,11 @@ class DlgEditStereotype(BaseEditDialog):
         """
         selection: str = self._stereoTypeSelector.GetString(self._stereoTypeSelector.GetSelection())
 
-        pyutStereotype: Stereotype = Stereotype.toEnum(selection)
-        return pyutStereotype
+        stereotype: Stereotype = Stereotype.toEnum(selection)
+        return stereotype
 
-    def _setSelected(self, pyutStereotype: Stereotype):
-        x: int = self._stereoTypeSelector.FindString(pyutStereotype.value)
+    def _setSelected(self, stereotype: Stereotype):
+        x: int = self._stereoTypeSelector.FindString(stereotype.value)
         self._stereoTypeSelector.SetSelection(x)
 
     def _onOk(self, event: CommandEvent):
