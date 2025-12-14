@@ -15,14 +15,17 @@ from copy import deepcopy
 
 from dataclasses import dataclass
 
+from wx import OK
+from wx import EVT_CHAR
 from wx import EVT_MOTION
 from wx import ICON_ERROR
-from wx import OK
+from wx import WXK_DELETE
 
 from wx import ClientDC
 from wx import CommandProcessor
 from wx import MessageDialog
 from wx import MouseEvent
+from wx import KeyEvent
 from wx import Window
 
 from umlmodel.Actor import Actor
@@ -95,6 +98,8 @@ class Ltrb:
 
 class UmlFrame(DiagramFrame):
 
+    KEY_CODE_DELETE: int = WXK_DELETE
+
     def __init__(self, parent: Window, umlPubSubEngine: IUmlPubSubEngine):
 
         self.ufLogger:         Logger           = getLogger(__name__)
@@ -120,6 +125,7 @@ class UmlFrame(DiagramFrame):
         self._clipboard: ModelObjects = ModelObjects([])            # will be re-created at every copy
 
         self._setupListeners()
+        self.Bind(EVT_CHAR, self._onProcessKeystrokes)
 
     def markFrameSaved(self):
         """
@@ -283,6 +289,22 @@ class UmlFrame(DiagramFrame):
 
         return True
 
+    def _onProcessKeystrokes(self, event: KeyEvent):
+        """
+
+        Args:
+            event:  The wxPython key event
+
+        """
+        c: int = event.GetKeyCode()
+        # print(f'{WXK_DELETE=} {WXK_BACK=} {WXK_INSERT=}')
+        match c:
+            case UmlFrame.KEY_CODE_DELETE:
+                self._cutShapes(selectedShapes=self.selectedShapes)
+            case _:
+                self.ufLogger.warning(f'Key code not supported: {c}')
+                event.Skip()
+
     def _setupListeners(self):
         self._umlPubSubEngine.subscribe(messageType=UmlMessageType.UNDO, frameId=self.id, listener=self._undoListener)
         self._umlPubSubEngine.subscribe(messageType=UmlMessageType.REDO, frameId=self.id, listener=self._redoListener)
@@ -308,65 +330,69 @@ class UmlFrame(DiagramFrame):
         know how to recreate them.  Notice we pass the full UML Shape to the command
         for direct removal
         """
+        selectedShapes: UmlShapes = self.selectedShapes
+        if len(selectedShapes) == 0:
+            with MessageDialog(parent=None, message='No shapes selected', caption='', style=OK | ICON_ERROR) as dlg:
+                dlg.ShowModal()
+        else:
+            self._cutShapes(selectedShapes)
+
+    def _cutShapes(self, selectedShapes: 'UmlShapes'):
         from umlshapes.shapes.UmlClass import UmlClass
         from umlshapes.shapes.UmlNote import UmlNote
         from umlshapes.shapes.UmlActor import UmlActor
         from umlshapes.shapes.UmlText import UmlText
         from umlshapes.shapes.UmlUseCase import UmlUseCase
 
-        selectedShapes: UmlShapes = self.selectedShapes
-        if len(selectedShapes) == 0:
-            with MessageDialog(parent=None, message='No shapes selected', caption='', style=OK | ICON_ERROR) as dlg:
-                dlg.ShowModal()
-        else:
-            self._copyToInternalClipboard(selectedShapes=selectedShapes)    # In case we want to paste them back
-            for shape in selectedShapes:
-                if isinstance(shape, UmlClass) is True:
-                    umlClass:        UmlClass        = cast(UmlClass, shape)
-                    classCutCommand: ClassCutCommand = ClassCutCommand(umlClass=umlClass,
-                                                                       umlPosition=umlClass.position,
-                                                                       umlFrame=self,
-                                                                       umlPubSubEngine=self._umlPubSubEngine
-                                                                       )
-                    self._commandProcessor.Submit(classCutCommand)
-                elif isinstance(shape, UmlNote):
-                    umlNote:        UmlNote        = shape
-                    noteCutCommand: NoteCutCommand = NoteCutCommand(umlNote=umlNote,
-                                                                    umlPosition=umlNote.position,
-                                                                    umlFrame=self,
-                                                                    umlPubSubEngine=self._umlPubSubEngine
-                                                                    )
-                    self._commandProcessor.Submit(noteCutCommand)
-                elif isinstance(shape, UmlActor):
-                    umlActor: UmlActor = shape
-                    actorCutCommand: ActorCutCommand = ActorCutCommand(umlActor=umlActor,
-                                                                       umlPosition=umlActor.position,
-                                                                       umlFrame=self,
-                                                                       umlPubSubEngine=self._umlPubSubEngine
-                                                                       )
-                    self._commandProcessor.Submit(actorCutCommand)
-                elif isinstance(shape, UmlText):
-                    umlText: UmlText = shape
-                    textCutCommand: TextCutCommand = TextCutCommand(umlText=umlText,
-                                                                    umlPosition=umlText.position,
-                                                                    umlFrame=self,
-                                                                    umlPubSubEngine=self._umlPubSubEngine
-                                                                    )
-                    self._commandProcessor.Submit(textCutCommand)
-                elif isinstance(shape, UmlUseCase):
-                    umlUseCase: UmlUseCase = shape
-                    useCaseCutCommand: UseCaseCutCommand = UseCaseCutCommand(umlUseCase=umlUseCase,
-                                                                             umlPosition=umlUseCase.position,
-                                                                             umlFrame=self,
-                                                                             umlPubSubEngine=self._umlPubSubEngine
-                                                                             )
-                    self._commandProcessor.Submit(useCaseCutCommand)
+        self._copyToInternalClipboard(selectedShapes=selectedShapes)  # In case we want to paste them back
 
-            self.frameModified = True
+        for shape in selectedShapes:
+            if isinstance(shape, UmlClass) is True:
+                umlClass: UmlClass = cast(UmlClass, shape)
+                classCutCommand: ClassCutCommand = ClassCutCommand(umlClass=umlClass,
+                                                                   umlPosition=umlClass.position,
+                                                                   umlFrame=self,
+                                                                   umlPubSubEngine=self._umlPubSubEngine
+                                                                   )
+                self._commandProcessor.Submit(classCutCommand)
+            elif isinstance(shape, UmlNote):
+                umlNote: UmlNote = shape
+                noteCutCommand: NoteCutCommand = NoteCutCommand(umlNote=umlNote,
+                                                                umlPosition=umlNote.position,
+                                                                umlFrame=self,
+                                                                umlPubSubEngine=self._umlPubSubEngine
+                                                                )
+                self._commandProcessor.Submit(noteCutCommand)
+            elif isinstance(shape, UmlActor):
+                umlActor: UmlActor = shape
+                actorCutCommand: ActorCutCommand = ActorCutCommand(umlActor=umlActor,
+                                                                   umlPosition=umlActor.position,
+                                                                   umlFrame=self,
+                                                                   umlPubSubEngine=self._umlPubSubEngine
+                                                                   )
+                self._commandProcessor.Submit(actorCutCommand)
+            elif isinstance(shape, UmlText):
+                umlText: UmlText = shape
+                textCutCommand: TextCutCommand = TextCutCommand(umlText=umlText,
+                                                                umlPosition=umlText.position,
+                                                                umlFrame=self,
+                                                                umlPubSubEngine=self._umlPubSubEngine
+                                                                )
+                self._commandProcessor.Submit(textCutCommand)
+            elif isinstance(shape, UmlUseCase):
+                umlUseCase: UmlUseCase = shape
+                useCaseCutCommand: UseCaseCutCommand = UseCaseCutCommand(umlUseCase=umlUseCase,
+                                                                         umlPosition=umlUseCase.position,
+                                                                         umlFrame=self,
+                                                                         umlPubSubEngine=self._umlPubSubEngine
+                                                                         )
+                self._commandProcessor.Submit(useCaseCutCommand)
 
-            self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.UPDATE_APPLICATION_STATUS,
-                                              frameId=self.id,
-                                              message=f'Cut {len(self._clipboard)} shapes')
+        self.frameModified = True
+
+        self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.UPDATE_APPLICATION_STATUS,
+                                          frameId=self.id,
+                                          message=f'Cut {len(self._clipboard)} shapes')
 
     def _copyShapesListener(self):
         """

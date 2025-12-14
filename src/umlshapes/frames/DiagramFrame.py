@@ -1,22 +1,19 @@
 
 from typing import NewType
-from typing import TYPE_CHECKING
 from typing import cast
+from typing import TYPE_CHECKING
 
 from logging import Logger
 from logging import getLogger
 
 from enum import Enum
 
-from wx import Point
 from wx import VERTICAL
 from wx import HORIZONTAL
 from wx import SUNKEN_BORDER
+from wx import PenStyle
 
-# I know it is there
-# noinspection PyUnresolvedReferences
-from wx.core import PenStyle
-
+from wx import Point
 from wx import MouseEvent
 from wx import Bitmap
 from wx import Brush
@@ -83,6 +80,8 @@ class DiagramFrame(ShapeCanvas):
         self._umlPreferences: UmlPreferences = UmlPreferences()
 
         umlDiagram: UmlDiagram = UmlDiagram(self)
+        # TODO: See  https://github.com/hasii2011/umlshapes/issues/71
+        # umlDiagram.SetGridSpacing(spacing=self._umlPreferences.backgroundGridInterval)
         umlDiagram.SetSnapToGrid(True)
 
         self.SetDiagram(diag=umlDiagram)    # incestuous behavior here
