@@ -144,9 +144,12 @@ class UmlClassMenuHandler:
                                               frameId=frameId,
                                               requestingUmlClass=self._umlClass)
         elif eventId == ID_CUT_SHAPE:
-            self._umlPubSubEngine.sendMessage(UmlMessageType.CUT_UML_CLASS,
-                                              frameId=frameId,
-                                              frameshapeToCut=self._umlClass)
+            # Cheater way to cut but eliminates a message
+            self._umlClass.selected = True
+            # self._umlClass.umlFrame.refresh()     # No clue to the end-user
+            self._umlPubSubEngine.sendMessage(UmlMessageType.CUT_SHAPES,
+                                              frameId=frameId
+                                              )
         else:
             event.Skip()
 
@@ -235,8 +238,7 @@ class UmlClassMenuHandler:
                 self.logger.warning(f'Unknown Parameter Display type: {displayParameters}')
                 assert False, 'Developer error'
 
-        # noinspection PyTypeChecker
-        itemToggleParameters.SetBitmap(triStateData.bitMap)
+        itemToggleParameters.SetBitmap(triStateData.bitMap)     # noqa
         itemToggleParameters.SetItemLabel(triStateData.menuText)
 
     def _setTheTriStateDisplayConstructorMenuItem(self, modelClass: Class):
