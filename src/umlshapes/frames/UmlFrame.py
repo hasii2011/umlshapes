@@ -7,9 +7,13 @@ from typing import TYPE_CHECKING
 from logging import Logger
 from logging import getLogger
 
+from sys import maxsize
+
 from collections.abc import Iterable
 
 from copy import deepcopy
+
+from dataclasses import dataclass
 
 from wx import EVT_MOTION
 from wx import ICON_ERROR
@@ -75,6 +79,18 @@ PIXELS_PER_UNIT_Y: int = 20
 ModelObjects = NewType('ModelObjects', List[UmlModelBase])
 
 BIG_NUM: int = 10000    # Hopefully, there are less than this number of shapes on frame
+
+BOUNDARY_RIGHT_MARGIN:  int = 5
+BOUNDARY_LEFT_MARGIN:   int = 5
+BOUNDARY_TOP_MARGIN:    int = 5
+BOUNDARY_BOTTOM_MARGIN: int = 5
+
+@dataclass
+class Ltrb:
+    left:   int = 0
+    top:    int = 0
+    right:  int = 0
+    bottom: int = 0
 
 
 class UmlFrame(DiagramFrame):
@@ -146,6 +162,49 @@ class UmlFrame(DiagramFrame):
                 selectedShapes.append(shape)
 
         return selectedShapes
+
+    @property
+    def shapeBoundaries(self) -> Ltrb:
+        """
+
+        Return shape boundaries as and LTRB instance
+
+        """
+        minX: int = maxsize
+        maxX: int = -maxsize
+        minY: int = maxsize
+        maxY: int = -maxsize
+
+        # Compute the boundaries
+        for shapeInstance in self.umlDiagram.shapes:
+
+            from umlshapes.ShapeTypes import UmlShapeGenre
+
+            if isinstance(shapeInstance, UmlShapeGenre):
+                umlShape: UmlShapeGenre = shapeInstance
+                # Get shape limits
+                topLeft: UmlPosition   = umlShape.position
+                size:    UmlDimensions = umlShape.size
+
+                ox1: int = topLeft.x
+                oy1: int = topLeft.y
+                ox2: int = size.width
+                oy2: int = size.height
+                ox2 += ox1
+                oy2 += oy1
+
+                # Update min-max
+                minX = min(minX, ox1)
+                maxX = max(maxX, ox2)
+                minY = min(minY, oy1)
+                maxY = max(maxY, oy2)
+
+        # Return values
+        return Ltrb(left=minX - BOUNDARY_LEFT_MARGIN,
+                    top=minY - BOUNDARY_TOP_MARGIN,
+                    right=maxX + BOUNDARY_RIGHT_MARGIN,
+                    bottom=maxY + BOUNDARY_BOTTOM_MARGIN
+                    )
 
     def OnLeftClick(self, x, y, keys=0):
         """
