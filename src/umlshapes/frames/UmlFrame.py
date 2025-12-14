@@ -1,4 +1,4 @@
-
+from typing import Callable
 from typing import List
 from typing import NewType
 from typing import cast
@@ -16,10 +16,12 @@ from copy import deepcopy
 from dataclasses import dataclass
 
 from wx import OK
+from wx import WXK_UP
 from wx import EVT_CHAR
 from wx import EVT_MOTION
-from wx import ICON_ERROR
 from wx import WXK_DELETE
+from wx import WXK_DOWN
+from wx import ICON_ERROR
 
 from wx import ClientDC
 from wx import CommandProcessor
@@ -99,6 +101,11 @@ class Ltrb:
 class UmlFrame(DiagramFrame):
 
     KEY_CODE_DELETE: int = WXK_DELETE
+    KEY_CODE_UP:     int = WXK_UP
+    KEY_CODE_DOWN:   int = WXK_DOWN
+
+    KEY_CODE_CAPITAL_S:    int = ord('S')
+    KEY_CODE_LOWER_CASE_S: int = ord('s')
 
     def __init__(self, parent: Window, umlPubSubEngine: IUmlPubSubEngine):
 
@@ -107,6 +114,9 @@ class UmlFrame(DiagramFrame):
         self._umlPubSubEngine: IUmlPubSubEngine = umlPubSubEngine
 
         super().__init__(parent=parent)
+
+        # Doing this so key up/down Z Order code works
+        self.DisableKeyboardScrolling()
 
         self._commandProcessor: CommandProcessor = CommandProcessor()
         self._maxWidth:  int  = self._preferences.virtualWindowWidth
@@ -297,13 +307,22 @@ class UmlFrame(DiagramFrame):
 
         """
         c: int = event.GetKeyCode()
-        # print(f'{WXK_DELETE=} {WXK_BACK=} {WXK_INSERT=}')
         match c:
             case UmlFrame.KEY_CODE_DELETE:
                 self._cutShapes(selectedShapes=self.selectedShapes)
+            case UmlFrame.KEY_CODE_UP:
+                self._changeTheSelectedShapesZOrder(callback=self._moveShapeToFront)
+                event.Skip(skip=True)
+            case UmlFrame.KEY_CODE_DOWN:
+                self._changeTheSelectedShapesZOrder(callback=self._moveShapeToBack)
+                event.Skip(skip=True)
+            case UmlFrame.KEY_CODE_LOWER_CASE_S:
+                self._toggleSpline()
+            case UmlFrame.KEY_CODE_CAPITAL_S:
+                self._toggleSpline()
             case _:
                 self.ufLogger.warning(f'Key code not supported: {c}')
-                event.Skip()
+                event.Skip(skip=True)
 
     def _setupListeners(self):
         self._umlPubSubEngine.subscribe(messageType=UmlMessageType.UNDO, frameId=self.id, listener=self._undoListener)
@@ -639,3 +658,59 @@ class UmlFrame(DiagramFrame):
             ignore = True
 
         return ignore
+
+    def _toggleSpline(self):
+        from umlshapes.ShapeTypes import UmlLinkGenre
+
+        selectedShapes = self.selectedShapes
+
+        for shape in selectedShapes:
+            if isinstance(shape, UmlLinkGenre):
+                shape.spline = (not shape.spline)
+        self.refresh()
+
+    def _changeTheSelectedShapesZOrder(self, callback: Callable):
+        """
+        Move the selected shape one level in the z-order
+
+        Args:
+            callback:  The input method determines which way
+        """
+        from umlshapes.ShapeTypes import UmlShapeGenre
+
+        selectedShapes = self.selectedShapes
+
+        if len(selectedShapes) > 0:
+            for shape in selectedShapes:
+                if isinstance(shape, UmlShapeGenre):
+                    callback(shape)
+        self.refresh()
+
+    def _moveShapeToFront(self, shape: Shape):
+        """
+        Move the given shape to the top of the Z order
+
+        Args:
+            shape: The shape to move
+        """
+        shapesToMove = [shape] + shape.GetChildren()
+        currentShapes = list(self.umlDiagram.shapes)
+
+        for s in shapesToMove:
+            currentShapes.remove(s)
+
+        self.umlDiagram.shapes = currentShapes + shapesToMove
+
+    def _moveShapeToBack(self, shape: Shape):
+        """
+        Move the given shape to the bottom of the Z order
+
+        Args:
+            shape: The shape to move
+        """
+        shapesToMove = [shape] + shape.GetChildren()
+        currentShapes = list(self.umlDiagram.shapes)
+        for s in shapesToMove:
+            currentShapes.remove(s)
+
+        self.umlDiagram.shapes = shapesToMove + currentShapes
