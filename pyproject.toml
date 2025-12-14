@@ -20,7 +20,7 @@ classifiers = [
 ]
 
 dependencies = [
-    'wxPython~=4.2.3',
+    'wxPython==4.2.4',
     'codeallybasic>=1.30.0',
     'codeallyadvanced>=2.2.0',
     'umlmodel>=3.4.0',
@@ -30,7 +30,7 @@ dependencies = [
 
 [project.optional-dependencies]
 test = [
-    'mypy==1.17.1',
+    'mypy==1.19.0',
     'mypy-extensions==1.1.0',
     'types-Deprecated==1.2.9.20240311',
     'html-testRunner~=1.2.1',

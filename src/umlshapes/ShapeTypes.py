@@ -9,6 +9,7 @@ from umlmodel.Class import Class
 from umlmodel.Note import Note
 from umlmodel.UseCase import UseCase
 
+from umlshapes.links.UmlNoteLink import UmlNoteLink
 from umlshapes.links.UmlInterface import UmlInterface
 from umlshapes.links.UmlAggregation import UmlAggregation
 from umlshapes.links.UmlAssociation import UmlAssociation
@@ -36,7 +37,8 @@ def linkableUmlShapesFactory() -> LinkableUmlShapes:
 UmlShape = UmlActor | UmlClass | UmlNote | UmlText | UmlUseCase
 
 UmlShapeGenre = UmlActor | UmlClass | UmlNote | UmlText | UmlUseCase
-UmlLinkGenre  = UmlInheritance | UmlInterface | UmlAssociation | UmlComposition | UmlAggregation
+UmlLinkGenre  = UmlInheritance | UmlInterface | UmlAssociation | UmlComposition | UmlAggregation | UmlNoteLink
+
 
 UmlAssociationGenre = UmlAssociation | UmlComposition | UmlAggregation
 

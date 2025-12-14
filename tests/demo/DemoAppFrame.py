@@ -7,8 +7,8 @@ from logging import getLogger
 
 from pathlib import Path
 
-
 from wx import EVT_CLOSE
+from wx import ICON_ERROR
 from wx import OK
 from wx import EVT_MENU
 from wx import ID_CUT
@@ -29,6 +29,8 @@ from wx import Notebook
 from wx import CommandEvent
 from wx import BookCtrlEvent
 from wx import Point
+from wx import MenuItem
+from wx import MessageDialog
 
 from wx.lib.sized_controls import SizedFrame
 from wx.lib.sized_controls import SizedPanel
@@ -36,6 +38,7 @@ from wx.lib.sized_controls import SizedPanel
 from umlmodel.Interface import Interface
 from umlmodel.Interface import Interfaces
 from umlmodel.ModelTypes import ClassName
+
 from umlshapes.ShapeTypes import UmlShapeGenre
 from umlshapes.UmlDiagram import UmlDiagram
 from umlshapes.UmlUtils import UmlUtils
@@ -62,6 +65,7 @@ from umlshapes.types.UmlPosition import UmlPosition
 from tests.demo.DemoCommon import Identifiers
 from tests.demo.LinkCreator import LinkCreator
 from tests.demo.ShapeCreator import ShapeCreator
+from tests.demo.DemoClassDiagramFrame import DemoClassDiagramFrame
 
 from tests.demo.DlgUmlShapesPreferences import DlgUmlShapesPreferences
 
@@ -82,15 +86,16 @@ class DemoAppFrame(SizedFrame):
 
         self._umlPubSubEngine: UmlPubSubEngine = UmlPubSubEngine()
         self._editMenu:        Menu            = cast(Menu, None)
+        self._shapeItem:       MenuItem        = cast(MenuItem, None)
 
         self._noteBook: Notebook = Notebook(parent=sizedPanel)
         self._noteBook.SetSizerProps(expand=True, proportion=1)
 
-        self._diagramFrame1 = ClassDiagramFrame(
+        self._diagramFrame1 = DemoClassDiagramFrame(
             parent=self._noteBook,
             umlPubSubEngine=self._umlPubSubEngine,
         )
-        self._diagramFrame2 = ClassDiagramFrame(
+        self._diagramFrame2 = DemoClassDiagramFrame(
             parent=self._noteBook,
             umlPubSubEngine=self._umlPubSubEngine,
         )
@@ -98,7 +103,7 @@ class DemoAppFrame(SizedFrame):
         self._noteBook.AddPage(page=self._diagramFrame1, text='Frame 1', select=True)
         self._noteBook.AddPage(page=self._diagramFrame2, text='Frame 2')
 
-        self._currentFrame: ClassDiagramFrame = self._diagramFrame1
+        self._currentFrame: DemoClassDiagramFrame = self._diagramFrame1
 
         self._createApplicationMenuBar()
         self._diagramFrame1.commandProcessor.SetEditMenu(menu=self._editMenu)
@@ -141,6 +146,7 @@ class DemoAppFrame(SizedFrame):
         editMenu: Menu    = Menu()
         viewMenu: Menu    = Menu()
 
+        self._shapeItem = fileMenu.AppendCheckItem(Identifiers.ID_DEMO_SHAPE_BOUNDARIES, item='Shape Boundaries', help='Demo Shape Boundaries')
         fileMenu.AppendSeparator()
         fileMenu.Append(ID_EXIT, '&Quit', "Quit Application")
         fileMenu.AppendSeparator()
@@ -183,6 +189,8 @@ class DemoAppFrame(SizedFrame):
 
         self._editMenu = editMenu
 
+        self.Bind(EVT_MENU, self._onDemoShapeBoundaries, id=Identifiers.ID_DEMO_SHAPE_BOUNDARIES)
+
         self.Bind(EVT_MENU, self._onDisplayElement, id=Identifiers.ID_DISPLAY_UML_TEXT)
         self.Bind(EVT_MENU, self._onDisplayElement, id=Identifiers.ID_DISPLAY_UML_NOTE)
         self.Bind(EVT_MENU, self._onDisplayElement, id=Identifiers.ID_DISPLAY_UML_USE_CASE)
@@ -203,6 +211,25 @@ class DemoAppFrame(SizedFrame):
         self.Bind(EVT_MENU, self._onEditMenu, id=ID_COPY)
         self.Bind(EVT_MENU, self._onEditMenu, id=ID_PASTE)
         self.Bind(EVT_MENU, self._onEditMenu, id=ID_SELECTALL)
+
+    # noinspection PyUnusedLocal
+    def _onDemoShapeBoundaries(self, event: CommandEvent):
+
+        from umlshapes.ShapeTypes import UmlShapes
+
+        if event.IsChecked() is True:
+            frame: ClassDiagramFrame = self._currentFrame
+
+            umlShapes:  UmlShapes = frame.umlShapes
+            if len(umlShapes) == 0:
+                with MessageDialog(parent=None, message='There are no shapes on the current frame', caption='You messed up!', style=OK | ICON_ERROR) as dlg:
+                    dlg.ShowModal()
+            else:
+                self._currentFrame.drawShapeBoundary = True
+        else:
+            self._currentFrame.drawShapeBoundary = False
+
+        self.logger.info(f'Drawing Shapes Boundary=`{self._currentFrame.drawShapeBoundary}` frame=`{self._currentFrame.id}`')
 
     def _onDisplayElement(self, event: CommandEvent):
 
@@ -336,11 +363,15 @@ class DemoAppFrame(SizedFrame):
     # noinspection PyUnusedLocal
     def _onFrameDisplayedChanged(self, event: BookCtrlEvent):
 
-        self._currentFrame = cast(ClassDiagramFrame, self._noteBook.GetCurrentPage())
+        self._currentFrame = cast(DemoClassDiagramFrame, self._noteBook.GetCurrentPage())
 
         self._currentFrame.commandProcessor.SetMenuStrings()
 
         self.logger.info(f'{self._currentFrame.id=}')
+        #
+        # Toggle the menu item based on the current frame value
+        #
+        self._shapeItem.Check(check=self._currentFrame.drawShapeBoundary)
 
     def _subscribeFrameToRelevantFrameTopics(self, frameId: FrameId):
 
