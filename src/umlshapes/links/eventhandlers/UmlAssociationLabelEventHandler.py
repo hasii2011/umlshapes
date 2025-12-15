@@ -4,17 +4,22 @@ from typing import cast
 from logging import Logger
 from logging import getLogger
 
-from umlshapes.types.DeltaXY import DeltaXY
-from umlshapes.links.LabelType import LabelType
+from umlshapes.lib.ogl import ShapeEvtHandler
 
+from umlshapes.types.DeltaXY import DeltaXY
+
+from umlshapes.links.LabelType import LabelType
 from umlshapes.links.UmlAssociationLabel import UmlAssociationLabel
+
 from umlshapes.shapes.PositionReporter import PositionReporter
+
 from umlshapes.UmlBaseEventHandler import UmlBaseEventHandler
 
 from umlshapes.types.Common import DESTINATION_CARDINALITY_IDX
 from umlshapes.types.Common import LeftCoordinate
 from umlshapes.types.Common import NAME_IDX
 from umlshapes.types.Common import SOURCE_CARDINALITY_IDX
+
 from umlshapes.types.UmlPosition import UmlPosition
 
 REPORT_INTERVAL: int = 10
@@ -25,11 +30,11 @@ class UmlAssociationLabelEventHandler(UmlBaseEventHandler):
     BTW, I hate local imports
     """
 
-    def __init__(self):
+    def __init__(self, previousEventHandler: ShapeEvtHandler):
 
         self.logger: Logger = getLogger(__name__)
 
-        super().__init__()
+        super().__init__(previousEventHandler=previousEventHandler)
 
         self._currentDebugCount: int = REPORT_INTERVAL
 

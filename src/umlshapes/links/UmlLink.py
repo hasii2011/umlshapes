@@ -268,6 +268,10 @@ class UmlLink(IdentifierMixin, LineShape, PubSubMixin):
         umlAssociationLabel: UmlAssociationLabel = UmlAssociationLabel(label=text, labelType=labelType)
 
         umlAssociationLabel.position = UmlPosition(x=x, y=y)
+        #
+        # Maybe not necessary, but let's be consistent
+        #
+        self._children.append(umlAssociationLabel)
         self._setupAssociationLabel(umlAssociationLabel)
 
         return umlAssociationLabel
@@ -293,11 +297,9 @@ class UmlLink(IdentifierMixin, LineShape, PubSubMixin):
         Args:
             umlAssociationLabel:
         """
-        eventHandler: UmlAssociationLabelEventHandler = UmlAssociationLabelEventHandler()
+        eventHandler: UmlAssociationLabelEventHandler = UmlAssociationLabelEventHandler(previousEventHandler=umlAssociationLabel.GetEventHandler())
 
         eventHandler.SetShape(umlAssociationLabel)
-        eventHandler.SetPreviousHandler(umlAssociationLabel.GetEventHandler())
-
         eventHandler.umlPubSubEngine = self._umlPubSubEngine
 
         umlAssociationLabel.SetEventHandler(eventHandler)

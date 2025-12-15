@@ -56,7 +56,7 @@ class NotePasteCommand(BasePasteCommand):
         from umlshapes.shapes.eventhandlers.UmlNoteEventHandler import UmlNoteEventHandler
 
         umlShape:     UmlNote             = UmlNote(cast(Note, umlModelBase))
-        eventHandler: UmlNoteEventHandler = UmlNoteEventHandler()
+        eventHandler: UmlNoteEventHandler = UmlNoteEventHandler(previousEventHandler=umlShape.GetEventHandler())
 
         self._setupEventHandler(umlShape=umlShape, eventHandler=eventHandler)
 

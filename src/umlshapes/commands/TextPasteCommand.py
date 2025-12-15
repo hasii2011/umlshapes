@@ -56,7 +56,7 @@ class TextPasteCommand(BasePasteCommand):
         from umlshapes.shapes.eventhandlers.UmlTextEventHandler import UmlTextEventHandler
 
         umlShape:     UmlText             = UmlText(cast(Text, umlModelBase))
-        eventHandler: UmlTextEventHandler = UmlTextEventHandler()
+        eventHandler: UmlTextEventHandler = UmlTextEventHandler(previousEventHandler=umlShape.GetEventHandler())
 
         self._setupEventHandler(umlShape=umlShape, eventHandler=eventHandler)
 

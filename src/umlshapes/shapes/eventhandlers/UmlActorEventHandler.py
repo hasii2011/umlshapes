@@ -2,8 +2,11 @@
 from logging import Logger
 from logging import getLogger
 
-from umlmodel.Actor import Actor
 from wx import ID_OK
+
+from umlmodel.Actor import Actor
+
+from umlshapes.lib.ogl import ShapeEvtHandler
 
 from umlshapes.dialogs.DlgEditActor import DlgEditActor
 from umlshapes.frames.UmlFrame import UmlFrame
@@ -18,10 +21,10 @@ class UmlActorEventHandler(UmlBaseEventHandler):
     Nothing special here;  Just some syntactic sugar
     """
 
-    def __init__(self):
+    def __init__(self, previousEventHandler: ShapeEvtHandler):
         self.logger:       Logger         = getLogger(__name__)
         self._preferences: UmlPreferences = UmlPreferences()
-        super().__init__()
+        super().__init__(previousEventHandler=previousEventHandler)
 
     def OnLeftDoubleClick(self, x: int, y: int, keys: int = 0, attachment: int = 0):
 

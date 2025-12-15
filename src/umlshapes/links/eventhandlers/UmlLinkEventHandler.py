@@ -6,8 +6,6 @@ from typing import TYPE_CHECKING
 from logging import Logger
 from logging import getLogger
 
-from umlmodel.Link import Link
-from umlmodel.enumerations.LinkType import LinkType
 from wx import DC
 from wx import EVT_MENU
 from wx import Menu
@@ -20,6 +18,11 @@ from wx import Point
 from wx import NewIdRef as wxNewIdRef
 
 from umlshapes.lib.ogl import LineShape
+
+from umlmodel.Link import Link
+from umlmodel.enumerations.LinkType import LinkType
+
+from umlshapes.lib.ogl import ShapeEvtHandler
 
 from umlshapes.UmlUtils import UmlUtils
 from umlshapes.dialogs.DlgEditLink import DlgEditLink
@@ -59,16 +62,17 @@ class UmlLinkEventHandler(UmlBaseEventHandler):
     BTW, I hate local imports
     """
 
-    def __init__(self, umlLink: 'UmlLink'):
+    def __init__(self, umlLink: 'UmlLink', previousEventHandler: ShapeEvtHandler):
         """
 
         Args:
             umlLink:   The link handled by this event handler
+            previousEventHandler:
         """
 
         self.logger: Logger = getLogger(__name__)
 
-        super().__init__(shape=umlLink)
+        super().__init__(shape=umlLink, previousEventHandler=previousEventHandler)
 
         self._contextMenu:    Menu           = self._createContextMenu()
 

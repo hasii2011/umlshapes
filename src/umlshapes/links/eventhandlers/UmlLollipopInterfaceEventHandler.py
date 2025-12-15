@@ -25,7 +25,9 @@ class UmlLollipopInterfaceEventHandler(UmlBaseEventHandler):
     def __init__(self, lollipopInterface: UmlLollipopInterface):
 
         self.logger: Logger = getLogger(__name__)
-        super().__init__(shape=lollipopInterface)
+        super().__init__(shape=lollipopInterface, previousEventHandler=lollipopInterface.GetEventHandler())
+
+        lollipopInterface.SetEventHandler(self)
 
     def OnLeftDoubleClick(self, x: int, y: int, keys: int = 0, attachment: int = 0):
 

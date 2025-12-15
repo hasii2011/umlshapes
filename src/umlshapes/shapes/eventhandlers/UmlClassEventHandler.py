@@ -4,8 +4,11 @@ from typing import cast
 from logging import Logger
 from logging import getLogger
 
-from umlmodel.Class import Class
 from wx import OK
+
+from umlshapes.lib.ogl import ShapeEvtHandler
+
+from umlmodel.Class import Class
 
 from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
 from umlshapes.preferences.UmlPreferences import UmlPreferences
@@ -21,10 +24,10 @@ class UmlClassEventHandler(UmlBaseEventHandler):
     Nothing special here;  Just some syntactic sugar
     """
 
-    def __init__(self):
+    def __init__(self, previousEventHandler: ShapeEvtHandler):
         self.baseLogger:   Logger         = getLogger(__name__)
         self._preferences: UmlPreferences = UmlPreferences()
-        super().__init__()
+        super().__init__(previousEventHandler=previousEventHandler)
 
         self._menuHandler: UmlClassMenuHandler = cast(UmlClassMenuHandler, None)
 

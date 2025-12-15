@@ -61,7 +61,7 @@ class ClassPasteCommand(BasePasteCommand):
         from umlshapes.shapes.eventhandlers.UmlClassEventHandler import UmlClassEventHandler
 
         umlShape:     UmlClass             = UmlClass(cast(Class, umlModelBase))
-        eventHandler: UmlClassEventHandler = UmlClassEventHandler()
+        eventHandler: UmlClassEventHandler = UmlClassEventHandler(previousEventHandler=umlShape.GetEventHandler())
 
         self._setupEventHandler(umlShape=umlShape, eventHandler=eventHandler)
 

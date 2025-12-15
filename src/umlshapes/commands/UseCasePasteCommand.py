@@ -58,7 +58,7 @@ class UseCasePasteCommand(BasePasteCommand):
         from umlshapes.shapes.eventhandlers.UmlUseCaseEventHandler import UmlUseCaseEventHandler
 
         umlShape:     UmlUseCase             = UmlUseCase(cast(UseCase, baseAttributes))
-        eventHandler: UmlUseCaseEventHandler = UmlUseCaseEventHandler()
+        eventHandler: UmlUseCaseEventHandler = UmlUseCaseEventHandler(previousEventHandler=umlShape.GetEventHandler())
 
         self._setupEventHandler(umlShape=umlShape, eventHandler=eventHandler)
 

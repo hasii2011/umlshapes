@@ -112,6 +112,9 @@ class UmlActor(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
 
     def addLink(self, umlAssociation: UmlAssociation, umlUseCase: UmlUseCase):
 
+        umlAssociation.sourceShape      = self
+        umlAssociation.destinationShape = umlUseCase
+
         self.AddLine(line=umlAssociation, other=umlUseCase)
 
     # This is dangerous, accessing internal stuff
