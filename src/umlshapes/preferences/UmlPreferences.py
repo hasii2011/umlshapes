@@ -49,8 +49,8 @@ DEFAULT_ASSOCIATION_LABEL_FORMAT: str = (
 
 PASTE_PREFERENCES: ValueDescriptions = ValueDescriptions(
     {
-    KeyName('pasteStart'):   ValueDescription(defaultValue=str(UmlPosition(150, 150)), deserializer=UmlPosition.deSerialize),
-    KeyName('pasteDeltaXY'): ValueDescription(defaultValue=str(DeltaXY(100, 100)),     deserializer=DeltaXY.deSerialize),
+        KeyName('pasteStart'):   ValueDescription(defaultValue=str(UmlPosition(150, 150)), deserializer=UmlPosition.deSerialize),
+        KeyName('pasteDeltaXY'): ValueDescription(defaultValue=str(DeltaXY(100, 100)),     deserializer=DeltaXY.deSerialize),
     }
 )
 UML_SHAPE_PREFERENCES: ValueDescriptions = ValueDescriptions(
