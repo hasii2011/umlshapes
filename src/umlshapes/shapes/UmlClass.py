@@ -25,10 +25,8 @@ from umlshapes.lib.ogl import RectangleShape
 
 from umlshapes.UmlUtils import UmlUtils
 
-from umlshapes.frames.UmlFrame import UmlFrame
-
-from umlshapes.links.UmlAssociation import UmlAssociation
 from umlshapes.links.UmlLink import UmlLink
+
 from umlshapes.mixins.IdentifierMixin import IdentifierMixin
 
 from umlshapes.types.Common import LeftCoordinate
@@ -122,6 +120,8 @@ class UmlClass(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
         self.Select(select=select)
 
     def addLink(self, umlLink: UmlLink, destinationClass: 'UmlClass'):
+
+        from umlshapes.links.UmlAssociation import UmlAssociation
 
         self.AddLine(line=umlLink, other=destinationClass)
 
@@ -225,6 +225,8 @@ class UmlClass(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
         Adjust the shape to a width and height accommodates the widest displayable method
         and the height to accommodate all the displayable fields and methods
         """
+        from umlshapes.frames.UmlFrame import UmlFrame
+
         savePosition: UmlPosition = self.position
 
         umlFrame:    UmlFrame = self.GetCanvas()
