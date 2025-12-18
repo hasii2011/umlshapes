@@ -125,6 +125,9 @@ class UmlClass(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
 
         self.AddLine(line=umlLink, other=destinationClass)
 
+        umlLink.sourceShape      = self
+        umlLink.destinationShape = destinationClass
+
         if isinstance(umlLink, UmlAssociation):
             umlLink.createAssociationLabels()
 

@@ -268,6 +268,10 @@ class UmlLink(IdentifierMixin, LineShape, PubSubMixin):
         umlAssociationLabel: UmlAssociationLabel = UmlAssociationLabel(label=text, labelType=labelType)
 
         umlAssociationLabel.position = UmlPosition(x=x, y=y)
+        #
+        # Maybe not necessary, but let's be consistent
+        #
+        self._children.append(umlAssociationLabel)
         self._setupAssociationLabel(umlAssociationLabel)
 
         return umlAssociationLabel

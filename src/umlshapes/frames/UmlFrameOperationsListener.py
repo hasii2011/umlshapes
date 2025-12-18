@@ -33,6 +33,7 @@ from umlshapes.commands.ActorPasteCommand import ActorPasteCommand
 from umlshapes.commands.BaseCutCommand import BaseCutCommand
 from umlshapes.commands.ClassCutCommand import ClassCutCommand
 from umlshapes.commands.ClassPasteCommand import ClassPasteCommand
+from umlshapes.commands.DeleteLinkCommand import DeleteLinkCommand
 from umlshapes.commands.NoteCutCommand import NoteCutCommand
 from umlshapes.commands.NotePasteCommand import NotePasteCommand
 from umlshapes.commands.TextCutCommand import TextCutCommand
@@ -233,6 +234,7 @@ class UmlFrameOperationsListener:
     def _cutShapes(self, selectedShapes: 'UmlShapes'):
 
         from umlshapes.ShapeTypes import UmlShapeGenre
+        from umlshapes.ShapeTypes import UmlLinkGenre
 
         from umlshapes.shapes.UmlClass import UmlClass
         from umlshapes.shapes.UmlNote import UmlNote
@@ -292,7 +294,11 @@ class UmlFrameOperationsListener:
         for shape in selectedShapes:
             if isinstance(shape, UmlShapeGenre):
                 self._umlFrame.commandProcessor.Submit(createCutCommand(shape))
-
+            elif isinstance(shape, UmlLinkGenre):
+                deleteLinkCommand: DeleteLinkCommand = DeleteLinkCommand(partialName='Delete-', umlLink=shape, umlPubSubEngine=self._umlPubSubEngine)
+                self._umlFrame.commandProcessor.Submit(deleteLinkCommand)
+            else:
+                assert False, f'Now do I delete this: {shape=}'
         self._umlFrame.frameModified = True
 
         self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.UPDATE_APPLICATION_STATUS,

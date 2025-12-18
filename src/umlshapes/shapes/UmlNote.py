@@ -103,6 +103,9 @@ class UmlNote(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin):
 
     def addLink(self, umlNoteLink: UmlNoteLink, umlClass: UmlClass):
 
+        umlNoteLink.sourceShape      = self
+        umlNoteLink.destinationShape = umlClass
+
         self.AddLine(line=umlNoteLink, other=umlClass)
 
     def OnDraw(self, dc: MemoryDC):
