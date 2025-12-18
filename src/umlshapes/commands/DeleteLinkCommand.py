@@ -1,4 +1,5 @@
 
+from typing import List
 from typing import cast
 from typing import TYPE_CHECKING
 
@@ -10,13 +11,21 @@ from datetime import datetime
 from wx import Command
 
 from umlmodel.Link import Link
+from umlmodel.enumerations.LinkType import LinkType
 
+from umlshapes.UmlDiagram import UmlDiagram
 from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 
 if TYPE_CHECKING:
     from umlshapes.ShapeTypes import UmlLinkGenre
     from umlshapes.ShapeTypes import UmlShapeGenre
+    from umlshapes.shapes.UmlClass import UmlClass
+    from umlshapes.links.UmlInterface import UmlInterface
+    from umlshapes.links.UmlAssociation import UmlAssociation
+    from umlshapes.links.UmlInheritance import UmlInheritance
 
+
+MODEL_ASSOCIATION_LINK_TYPE: List[LinkType] = [LinkType.ASSOCIATION, LinkType.AGGREGATION, LinkType.COMPOSITION]
 
 class DeleteLinkCommand(Command):
 
@@ -73,18 +82,65 @@ class DeleteLinkCommand(Command):
     def Undo(self) -> bool:
         from umlshapes.shapes.UmlClass import UmlClass
         from umlshapes.links.UmlAssociation import UmlAssociation
-        from umlshapes.links.eventhandlers.UmlAssociationEventHandler import UmlAssociationEventHandler
+        from umlshapes.links.UmlInheritance import UmlInheritance
+        from umlshapes.links.UmlInterface import UmlInterface
 
-        sourceUmlShape:      UmlClass = cast(UmlClass, self._sourceUmlShape)
-        destinationUmlShape: UmlClass = cast(UmlClass, self._destinationUmlShape)
-
+        sourceUmlShape:      UmlClass   = cast(UmlClass, self._sourceUmlShape)
+        destinationUmlShape: UmlClass   = cast(UmlClass, self._destinationUmlShape)
+        umlDiagram:          UmlDiagram = self._umlFrame.umlDiagram
         #
         # HAVE TO HANDLE ALL THE OTHER LINKS,  INTERFACE, INHERITANCE, NOTE LINK
         #
-        umlAssociation: UmlAssociation = UmlAssociation(link=self._modelLink)
-        umlAssociation.umlFrame        = self._umlFrame
+        if self._modelLink.linkType in MODEL_ASSOCIATION_LINK_TYPE:
+            umlAssociation: UmlAssociation = self._createUmlAssociation(destinationUmlShape, sourceUmlShape)
+
+            umlDiagram.AddShape(umlAssociation)
+            umlAssociation.Show(True)
+            # RECREATED !!!
+            self._umlLink = umlAssociation
+        elif self._modelLink.linkType == LinkType.INHERITANCE:
+            umlInheritance: UmlInheritance = self._createInheritanceLink(baseClass=destinationUmlShape, subClass=sourceUmlShape)
+
+            umlDiagram.AddShape(umlInheritance)
+            umlInheritance.Show(True)
+            # RECREATED !!!
+            self._umlLink = umlInheritance
+        elif self._modelLink.linkType == LinkType.INTERFACE:
+            umlInterface: UmlInterface = self._createInterfaceLink(interfaceClass=destinationUmlShape, implementingClass=sourceUmlShape)
+
+            umlDiagram.AddShape(umlInterface)
+            umlInterface.Show(True)
+            # RECREATED !!!
+            self._umlLink = umlInterface
+
+        return True
+
+    def _createUmlAssociation(self, sourceUmlShape: 'UmlClass', destinationUmlShape: 'UmlClass') -> 'UmlAssociation':
+        """
+
+        Args:
+            sourceUmlShape:         The source of the association
+            destinationUmlShape:    The destination for the association
+
+        Returns:  The appropriate UML Association based on the model Link Type
+        """
+
+        from umlshapes.links.UmlAssociation import UmlAssociation
+        from umlshapes.links.UmlComposition import UmlComposition
+        from umlshapes.links.UmlAggregation import UmlAggregation
+
+        from umlshapes.links.eventhandlers.UmlAssociationEventHandler import UmlAssociationEventHandler
+
+        if self._modelLink.linkType == LinkType.COMPOSITION:
+            umlAssociation: UmlAssociation = UmlComposition(link=self._modelLink)
+        elif self._modelLink.linkType == LinkType.AGGREGATION:
+            umlAssociation = UmlAggregation(link=self._modelLink)
+        else:
+            umlAssociation = UmlAssociation(link=self._modelLink)
+
+        umlAssociation.umlFrame = self._umlFrame
         umlAssociation.umlPubSubEngine = self._umlPubSubEngine
-        umlAssociation.MakeLineControlPoints(n=2)       # Make this configurable
+        umlAssociation.MakeLineControlPoints(n=2)  # Make this configurable
 
         associationEventHandler: UmlAssociationEventHandler = UmlAssociationEventHandler(umlAssociation=umlAssociation)
 
@@ -94,35 +150,52 @@ class DeleteLinkCommand(Command):
 
         sourceUmlShape.addLink(umlLink=umlAssociation, destinationClass=destinationUmlShape)
 
-        self._umlFrame.umlDiagram.AddShape(umlAssociation)
-        umlAssociation.Show(True)
+        return umlAssociation
 
-        # RECREATED !!!
-        self._umlLink = umlAssociation
+    def _createInheritanceLink(self, baseClass: 'UmlClass', subClass: 'UmlClass') -> 'UmlInheritance':
+        """
 
-        return True
+        Args:
+            baseClass:  The base class that represents the inheritance
+            subClass:   the bas class that UML subclasses from the base class
+
+        Returns:  The appropriate UML Inheritance Link
+        """
+        from umlshapes.links.UmlInheritance import UmlInheritance
+        from umlshapes.links.eventhandlers.UmlLinkEventHandler import UmlLinkEventHandler
+
+        umlInheritance: UmlInheritance = UmlInheritance(link=self._modelLink, baseClass=baseClass, subClass=subClass)
+        umlInheritance.umlFrame = self._umlFrame
+        umlInheritance.MakeLineControlPoints(n=2)       # Make this configurable
+
+        eventHandler: UmlLinkEventHandler = UmlLinkEventHandler(umlLink=umlInheritance)
+        eventHandler.umlPubSubEngine = self._umlPubSubEngine
+        eventHandler.SetPreviousHandler(umlInheritance.GetEventHandler())
+        umlInheritance.SetEventHandler(eventHandler)
+
+        # REMEMBER:   from subclass to base class
+        subClass.addLink(umlLink=umlInheritance, destinationClass=baseClass)
+
+        return umlInheritance
+
+    def _createInterfaceLink(self, interfaceClass: 'UmlClass', implementingClass: 'UmlClass') -> 'UmlInterface':
+        from umlshapes.links.eventhandlers.UmlLinkEventHandler import UmlLinkEventHandler
+
+        umlInterface: UmlInterface = UmlInterface(link=self._modelLink, interfaceClass=interfaceClass, implementingClass=implementingClass)
+        umlInterface.umlFrame = self._umlFrame
+        umlInterface.MakeLineControlPoints(n=2)     # Make this configurable
+
+        eventHandler: UmlLinkEventHandler = UmlLinkEventHandler(umlLink=umlInterface)
+        eventHandler.umlPubSubEngine = self._umlPubSubEngine
+        eventHandler.SetPreviousHandler(umlInterface.GetEventHandler())
+        umlInterface.SetEventHandler(eventHandler)
+
+        implementingClass.addLink(umlLink=umlInterface, destinationClass=interfaceClass)
+
+        return umlInterface
 
     def GetName(self) -> str:
         return self._name
 
     def CanUndo(self):
         return True
-
-
-"""
-        umlAssociation.umlFrame = diagramFrame
-        umlAssociation.umlPubSubEngine = self._umlPubSubEngine
-        umlAssociation.MakeLineControlPoints(n=2)       # Make this configurable
-
-        sourceUmlClass.addLink(umlLink=umlAssociation, destinationClass=destinationUmlClass)
-
-        diagramFrame.umlDiagram.AddShape(umlAssociation)
-        umlAssociation.Show(True)
-
-        eventHandler: UmlAssociationEventHandler = UmlAssociationEventHandler(umlAssociation=umlAssociation)
-
-        eventHandler.umlPubSubEngine = self._umlPubSubEngine
-        eventHandler.SetPreviousHandler(umlAssociation.GetEventHandler())
-        umlAssociation.SetEventHandler(eventHandler)
-
-"""

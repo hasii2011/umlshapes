@@ -107,7 +107,7 @@ class LinkCreator:
         sourceUmlClass, destinationUmlClass = self._createClassPair(diagramFrame=diagramFrame)
         self.logger.info(f'{sourceUmlClass.id=} {destinationUmlClass.id=}')
 
-        modelLink = self._createAssociationModelLink()
+        modelLink = self._createAssociationModelLink(linkType=associationDescription.linkType)
 
         modelLink.name = f'{associationDescription.linkType}-{self._associationCounter}'
         self._associationCounter += 1
@@ -246,10 +246,10 @@ class LinkCreator:
 
         return modelClass
 
-    def _createAssociationModelLink(self) -> Link:
+    def _createAssociationModelLink(self, linkType: LinkType) -> Link:
 
         name: str = f'{self._preferences.defaultAssociationName}-{self._associationCounter}'
-        modelLink: Link = Link(name=name, linkType=LinkType.ASSOCIATION)
+        modelLink: Link = Link(name=name, linkType=linkType)
 
         modelLink.sourceCardinality      = 'src Card'
         modelLink.destinationCardinality = 'dst Card'
