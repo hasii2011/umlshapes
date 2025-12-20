@@ -201,7 +201,6 @@ class LinkCreator:
         umlNote.umlFrame  = diagramFrame
 
         umlClass.umlFrame = diagramFrame
-        umlNote.addLink(umlNoteLink=umlNoteLink, umlClass=umlClass)
 
         diagramFrame.umlDiagram.AddShape(umlNote)
         diagramFrame.umlDiagram.AddShape(umlClass)

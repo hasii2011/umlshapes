@@ -20,10 +20,11 @@ if TYPE_CHECKING:
     from umlshapes.ShapeTypes import UmlLinkGenre
     from umlshapes.ShapeTypes import UmlShapeGenre
     from umlshapes.shapes.UmlClass import UmlClass
+    from umlshapes.shapes.UmlNote import UmlNote
     from umlshapes.links.UmlInterface import UmlInterface
     from umlshapes.links.UmlAssociation import UmlAssociation
     from umlshapes.links.UmlInheritance import UmlInheritance
-
+    from umlshapes.links.UmlNoteLink import UmlNoteLink
 
 MODEL_ASSOCIATION_LINK_TYPE: List[LinkType] = [LinkType.ASSOCIATION, LinkType.AGGREGATION, LinkType.COMPOSITION]
 
@@ -81,9 +82,11 @@ class DeleteLinkCommand(Command):
 
     def Undo(self) -> bool:
         from umlshapes.shapes.UmlClass import UmlClass
+        from umlshapes.shapes.UmlNote import UmlNote
         from umlshapes.links.UmlAssociation import UmlAssociation
         from umlshapes.links.UmlInheritance import UmlInheritance
         from umlshapes.links.UmlInterface import UmlInterface
+        from umlshapes.links.UmlNoteLink import UmlNoteLink
 
         sourceUmlShape:      UmlClass   = cast(UmlClass, self._sourceUmlShape)
         destinationUmlShape: UmlClass   = cast(UmlClass, self._destinationUmlShape)
@@ -112,6 +115,16 @@ class DeleteLinkCommand(Command):
             umlInterface.Show(True)
             # RECREATED !!!
             self._umlLink = umlInterface
+        elif self._modelLink.linkType == LinkType.NOTELINK:
+
+            umlNote: UmlNote = cast(UmlNote, sourceUmlShape)
+
+            umlNoteLink: UmlNoteLink = self._createNoteLink(umlClass=destinationUmlShape, umlNote=umlNote)
+
+            umlDiagram.AddShape(umlNoteLink)
+            umlNoteLink.Show(True)
+            # RECREATED !!!
+            self._umlLink = umlNoteLink
 
         return True
 
@@ -193,6 +206,28 @@ class DeleteLinkCommand(Command):
         implementingClass.addLink(umlLink=umlInterface, destinationClass=interfaceClass)
 
         return umlInterface
+
+    def _createNoteLink(self, umlClass: 'UmlClass', umlNote: 'UmlNote') -> 'UmlNoteLink':
+        from umlshapes.links.UmlNoteLink import UmlNoteLink
+
+        from umlshapes.links.eventhandlers.UmlNoteLinkEventHandler import UmlNoteLinkEventHandler
+
+        umlNoteLink: UmlNoteLink = UmlNoteLink(link=self._modelLink)
+        umlNoteLink.umlFrame  = self._umlFrame
+        umlNoteLink.MakeLineControlPoints(2)        # Make this configurable
+
+        umlNoteLink.sourceNote       = umlNote
+        umlNoteLink.destinationClass = umlClass
+        umlNoteLink.umlPubSubEngine  = self._umlPubSubEngine
+
+        eventHandler: UmlNoteLinkEventHandler = UmlNoteLinkEventHandler(umlNoteLink=umlNoteLink)
+        eventHandler.umlPubSubEngine = self._umlPubSubEngine
+        eventHandler.SetPreviousHandler(umlNoteLink.GetEventHandler())
+        umlNoteLink.SetEventHandler(eventHandler)
+
+        umlNote.addLink(umlNoteLink=umlNoteLink, umlClass=umlClass)
+
+        return umlNoteLink
 
     def GetName(self) -> str:
         return self._name
