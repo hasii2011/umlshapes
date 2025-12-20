@@ -137,7 +137,6 @@ class DeleteLinkCommand(Command):
 
         Returns:  The appropriate UML Association based on the model Link Type
         """
-
         from umlshapes.links.UmlAssociation import UmlAssociation
         from umlshapes.links.UmlComposition import UmlComposition
         from umlshapes.links.UmlAggregation import UmlAggregation
@@ -155,11 +154,8 @@ class DeleteLinkCommand(Command):
         umlAssociation.umlPubSubEngine = self._umlPubSubEngine
         umlAssociation.MakeLineControlPoints(n=2)  # Make this configurable
 
-        associationEventHandler: UmlAssociationEventHandler = UmlAssociationEventHandler(umlAssociation=umlAssociation)
-
-        associationEventHandler.umlPubSubEngine = self._umlPubSubEngine
-        associationEventHandler.SetPreviousHandler(umlAssociation.GetEventHandler())
-        umlAssociation.SetEventHandler(associationEventHandler)
+        # Looks weird but we do not need the result
+        UmlAssociationEventHandler(umlAssociation=umlAssociation, umlPubSubEngine=self._umlPubSubEngine)
 
         sourceUmlShape.addLink(umlLink=umlAssociation, destinationClass=destinationUmlShape)
 
@@ -181,9 +177,8 @@ class DeleteLinkCommand(Command):
         umlInheritance.umlFrame = self._umlFrame
         umlInheritance.MakeLineControlPoints(n=2)       # Make this configurable
 
-        eventHandler: UmlLinkEventHandler = UmlLinkEventHandler(umlLink=umlInheritance)
+        eventHandler: UmlLinkEventHandler = UmlLinkEventHandler(umlLink=umlInheritance, previousEventHandler=umlInheritance.GetEventHandler())
         eventHandler.umlPubSubEngine = self._umlPubSubEngine
-        eventHandler.SetPreviousHandler(umlInheritance.GetEventHandler())
         umlInheritance.SetEventHandler(eventHandler)
 
         # REMEMBER:   from subclass to base class
@@ -193,14 +188,14 @@ class DeleteLinkCommand(Command):
 
     def _createInterfaceLink(self, interfaceClass: 'UmlClass', implementingClass: 'UmlClass') -> 'UmlInterface':
         from umlshapes.links.eventhandlers.UmlLinkEventHandler import UmlLinkEventHandler
+        from umlshapes.links.UmlInterface import UmlInterface
 
         umlInterface: UmlInterface = UmlInterface(link=self._modelLink, interfaceClass=interfaceClass, implementingClass=implementingClass)
         umlInterface.umlFrame = self._umlFrame
         umlInterface.MakeLineControlPoints(n=2)     # Make this configurable
 
-        eventHandler: UmlLinkEventHandler = UmlLinkEventHandler(umlLink=umlInterface)
+        eventHandler: UmlLinkEventHandler = UmlLinkEventHandler(umlLink=umlInterface, previousEventHandler=umlInterface.GetEventHandler())
         eventHandler.umlPubSubEngine = self._umlPubSubEngine
-        eventHandler.SetPreviousHandler(umlInterface.GetEventHandler())
         umlInterface.SetEventHandler(eventHandler)
 
         implementingClass.addLink(umlLink=umlInterface, destinationClass=interfaceClass)
@@ -220,9 +215,8 @@ class DeleteLinkCommand(Command):
         umlNoteLink.destinationClass = umlClass
         umlNoteLink.umlPubSubEngine  = self._umlPubSubEngine
 
-        eventHandler: UmlNoteLinkEventHandler = UmlNoteLinkEventHandler(umlNoteLink=umlNoteLink)
+        eventHandler: UmlNoteLinkEventHandler = UmlNoteLinkEventHandler(umlNoteLink=umlNoteLink, previousEventHandler=umlNoteLink.GetEventHandler())
         eventHandler.umlPubSubEngine = self._umlPubSubEngine
-        eventHandler.SetPreviousHandler(umlNoteLink.GetEventHandler())
         umlNoteLink.SetEventHandler(eventHandler)
 
         umlNote.addLink(umlNoteLink=umlNoteLink, umlClass=umlClass)

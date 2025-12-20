@@ -1,7 +1,5 @@
 
 from typing import cast
-from typing import NewType
-from typing import List
 
 from logging import Logger
 from logging import getLogger
@@ -27,19 +25,20 @@ from wx import NewIdRef as wxNewIdRef
 
 from umlmodel.Text import Text
 
-from umlshapes.lib.ogl import Shape
 from umlshapes.lib.ogl import ShapeCanvas
+from umlshapes.lib.ogl import ShapeEvtHandler
 
 from umlshapes.dialogs.DlgEditText import DlgEditText
+
 from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
 from umlshapes.frames.UmlFrame import UmlFrame
+
 from umlshapes.UmlBaseEventHandler import UmlBaseEventHandler
+
 from umlshapes.shapes.UmlText import UmlText
 
 from umlshapes.resources.images.textdetails.DecreaseTextSize import embeddedImage as DecreaseTextSize
 from umlshapes.resources.images.textdetails.IncreaseTextSize import embeddedImage as IncreaseTextSize
-
-ShapeList = NewType('ShapeList', List[Shape])
 
 ID_MENU_INCREASE_SIZE:  int = wxNewIdRef()
 ID_MENU_DECREASE_SIZE:  int = wxNewIdRef()
@@ -52,10 +51,10 @@ TEXT_SIZE_DECREMENT: int = 2
 
 class UmlTextEventHandler(UmlBaseEventHandler):
 
-    def __init__(self):
+    def __init__(self, previousEventHandler: ShapeEvtHandler):
 
         self.logger: Logger = getLogger(__name__)
-        super().__init__()
+        super().__init__(previousEventHandler=previousEventHandler)
 
         self._moveColor: Colour = RED
         self._outlinePen: Pen   = Pen(colour=self._moveColor, width=2, style=PENSTYLE_SOLID)

@@ -221,14 +221,14 @@ class DemoAppFrame(SizedFrame):
             frame: ClassDiagramFrame = self._currentFrame
 
             umlShapes:  UmlShapes = frame.umlShapes
-            if len(umlShapes) == 0:
+            if len(umlShapes) == 0:     # noqa
                 with MessageDialog(parent=None, message='There are no shapes on the current frame', caption='You messed up!', style=OK | ICON_ERROR) as dlg:
                     dlg.ShowModal()
             else:
                 self._currentFrame.drawShapeBoundary = True
         else:
             self._currentFrame.drawShapeBoundary = False
-
+        self._currentFrame.refresh()
         self.logger.info(f'Drawing Shapes Boundary=`{self._currentFrame.drawShapeBoundary}` frame=`{self._currentFrame.id}`')
 
     def _onDisplayElement(self, event: CommandEvent):
@@ -328,9 +328,11 @@ class DemoAppFrame(SizedFrame):
         umlLollipopInterface.Show(show=True)
         self.logger.info(f'UmlInterface added: {umlLollipopInterface}')
 
-        eventHandler: UmlLollipopInterfaceEventHandler = UmlLollipopInterfaceEventHandler(lollipopInterface=umlLollipopInterface)
-        eventHandler.SetPreviousHandler(umlLollipopInterface.GetEventHandler())
-        umlLollipopInterface.SetEventHandler(eventHandler)
+        # eventHandler: UmlLollipopInterfaceEventHandler = UmlLollipopInterfaceEventHandler(lollipopInterface=umlLollipopInterface)
+        # eventHandler.SetPreviousHandler(umlLollipopInterface.GetEventHandler())
+        # umlLollipopInterface.SetEventHandler(eventHandler)
+        # Looks weired but don't need the result
+        UmlLollipopInterfaceEventHandler(lollipopInterface=umlLollipopInterface)
 
         pubsubEngine: IUmlPubSubEngine  = requestingFrame.umlPubSubEngine
 

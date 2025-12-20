@@ -105,7 +105,7 @@ class UmlFrameOperationsListener:
         for direct removal
         """
         selectedShapes: UmlShapes = self._umlFrame.selectedShapes
-        if len(selectedShapes) == 0:
+        if len(selectedShapes) == 0:        # noqa
             with MessageDialog(parent=None, message='No shapes selected', caption='', style=OK | ICON_ERROR) as dlg:
                 dlg.ShowModal()
         else:
@@ -117,7 +117,7 @@ class UmlFrameOperationsListener:
         """
 
         selectedShapes: UmlShapes = self._umlFrame.selectedShapes
-        if len(selectedShapes) == 0:
+        if len(selectedShapes) == 0:        # noqa
             with MessageDialog(parent=None, message='No shapes selected', caption='', style=OK | ICON_ERROR) as dlg:
                 dlg.ShowModal()
         else:
@@ -125,7 +125,7 @@ class UmlFrameOperationsListener:
 
             self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.UPDATE_APPLICATION_STATUS,
                                               frameId=self._umlFrame.id,
-                                              message=f'Copied {len(self._clipboard)} shapes')
+                                              message=f'Copied {len(self._clipboard)} shapes')  # noqa
 
     def _pasteShapesListener(self):
         """
@@ -134,7 +134,7 @@ class UmlFrameOperationsListener:
         Assumes that the model objects are deep copies and that the ID has been made unique
 
         """
-        self.logger.info(f'Pasting {len(self._clipboard)} shapes')
+        self.logger.info(f'Pasting {len(self._clipboard)} shapes')  # noqa
 
         # Get the objects out of the internal clipboard and let the appropriate command process them
         pasteStart:   UmlPosition = self._preferences.pasteStart
@@ -194,7 +194,7 @@ class UmlFrameOperationsListener:
         self.frameModified = True
         self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.UPDATE_APPLICATION_STATUS,
                                           frameId=self._umlFrame.id,
-                                          message=f'Pasted {len(self._clipboard)} shape')
+                                          message=f'Pasted {len(self._clipboard)} shape')       # noqa
 
     def _selectAllShapesListener(self):
 
@@ -303,7 +303,7 @@ class UmlFrameOperationsListener:
 
         self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.UPDATE_APPLICATION_STATUS,
                                           frameId=self._umlFrame.id,
-                                          message=f'Cut {len(self._clipboard)} shapes')
+                                          message=f'Cut {len(self._clipboard)} shapes')     # noqa
 
     def _copyToInternalClipboard(self, selectedShapes: 'UmlShapes'):
         """
@@ -320,7 +320,7 @@ class UmlFrameOperationsListener:
         from umlshapes.shapes.UmlNote import UmlNote
         from umlshapes.shapes.UmlActor import UmlActor
         from umlshapes.shapes.UmlUseCase import UmlUseCase
-        # from umlshapes.shapes.UmlText import UmlText
+        from umlshapes.shapes.UmlText import UmlText
 
         self._clipboard = ModelObjects([])
 
@@ -332,14 +332,17 @@ class UmlFrameOperationsListener:
                 linkedObject = deepcopy(umlShape.modelClass)
             elif isinstance(umlShape, UmlNote):
                 linkedObject = deepcopy(umlShape.modelNote)
-            # elif isinstance(umlShape, UmlText):
-            #     linkedObject = deepcopy(umlShape.modelText)
             elif isinstance(umlShape, UmlActor):
                 linkedObject = deepcopy(umlShape.modelActor)
             elif isinstance(umlShape, UmlUseCase):
                 linkedObject = deepcopy(umlShape.modelUseCase)
+            elif isinstance(umlShape, UmlText):
+                umlText: UmlText = umlShape
+                text:    Text    = deepcopy(umlText.modelText)
+                self._clipboard.append(text)
             else:
-                pass
+                self.logger.warning(f'Unhandled copy of shape {type(umlShape)}')
+
             if linkedObject is not None:
                 linkedObject.id = UmlUtils.getID()
                 linkedObject.links = Links([])  # we don't want to copy the links

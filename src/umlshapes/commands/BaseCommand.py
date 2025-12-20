@@ -53,7 +53,6 @@ class BaseCommand(Command):
 
         eventHandler.SetShape(umlShape)
         eventHandler.umlPubSubEngine = self._umlPubSubEngine
-        eventHandler.SetPreviousHandler(umlShape.GetEventHandler())
         umlShape.SetEventHandler(eventHandler)
 
     def _setupUmlShape(self, umlShape: 'UmlShapeGenre'):

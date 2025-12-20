@@ -14,7 +14,7 @@ from umlshapes.lib.ogl import ShapeCanvas
 from umlshapes.lib.ogl import ShapeEvtHandler
 
 from umlshapes.pubsubengine.UmlMessageType import UmlMessageType
-from umlshapes.pubsubengine.UmlPubSubEngine import UmlPubSubEngine
+from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 
 from umlshapes.types.DeltaXY import DeltaXY
 from umlshapes.types.UmlPosition import UmlPosition
@@ -27,22 +27,22 @@ NO_POSITION = cast(UmlPosition, None)
 
 class UmlBaseEventHandler(ShapeEvtHandler):
 
-    def __init__(self, shape: Shape = None):
+    def __init__(self, previousEventHandler: ShapeEvtHandler, shape: Shape = None):
 
         self._baseLogger: Logger = getLogger(__name__)
 
-        super().__init__(shape=shape)
+        super().__init__(shape=shape, prev=previousEventHandler)
 
-        self._umlPubSubEngine:  UmlPubSubEngine = cast(UmlPubSubEngine, None)
-        self._previousPosition: UmlPosition     = NO_POSITION
+        self._umlPubSubEngine:  IUmlPubSubEngine = cast(IUmlPubSubEngine, None)
+        self._previousPosition: UmlPosition      = NO_POSITION
 
-    def _setUmlPubSubEngine(self, umlPubSubEngine: UmlPubSubEngine):
+    def _setUmlPubSubEngine(self, umlPubSubEngine: IUmlPubSubEngine):
         self._umlPubSubEngine = umlPubSubEngine
 
     # noinspection PyTypeChecker
     umlPubSubEngine = property(fget=None, fset=_setUmlPubSubEngine)
 
-    def OnDragLeft(self, draw, x, y, keys = 0, attachment = 0):
+    def OnDragLeft(self, draw, x, y, keys=0, attachment=0):
         """
         Move this shape, then subsequently send messages to move the other
         selected shapes (if any)
@@ -122,7 +122,7 @@ class UmlBaseEventHandler(ShapeEvtHandler):
             self._baseLogger.warning(f'We do not have a pub sub engine for {shape}.  Seems like a developer error')
         else:
             self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.UML_SHAPE_SELECTED,
-                                              frameId=cast(UmlFrame,canvas).id,
+                                              frameId=cast(UmlFrame, canvas).id,
                                               umlShape=shape)
 
     def OnDrawOutline(self, dc: ClientDC, x: int, y: int, w: int, h: int):
@@ -161,7 +161,7 @@ class UmlBaseEventHandler(ShapeEvtHandler):
                     # shapes too!) and bad things will happen...
                     toUnselect.append(s)
 
-            if len(toUnselect) > 0:
+            if len(toUnselect) > 0:     # noqa
                 for s in toUnselect:
                     s.Select(False, dc)
 

@@ -58,7 +58,7 @@ class ActorPasteCommand(BasePasteCommand):
         from umlshapes.shapes.eventhandlers.UmlActorEventHandler import UmlActorEventHandler
 
         umlShape:     UmlActor             = UmlActor(cast(Actor, umlModelBase))
-        eventHandler: UmlActorEventHandler = UmlActorEventHandler()
+        eventHandler: UmlActorEventHandler = UmlActorEventHandler(previousEventHandler=umlShape.GetEventHandler())
 
         self._setupEventHandler(umlShape=umlShape, eventHandler=eventHandler)
 

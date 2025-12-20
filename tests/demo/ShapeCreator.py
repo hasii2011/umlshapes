@@ -1,8 +1,8 @@
 
-from typing import Callable
+from typing import cast
 from typing import Dict
 from typing import NewType
-from typing import cast
+from typing import Callable
 
 from logging import Logger
 from logging import getLogger
@@ -32,7 +32,6 @@ from wx import ID_OK
 from wx import OK
 
 from umlshapes.ShapeTypes import UmlShapeGenre
-from umlshapes.lib.ogl import ShapeEvtHandler
 
 from umlshapes.UmlDiagram import UmlDiagram
 
@@ -75,11 +74,11 @@ InvokeEditDialog = Callable[[ModelObject, ClassDiagramFrame], None]
 
 @dataclass
 class ShapeDescription:
-    umlShape:         type[UmlShapeGenre]   = cast(type[UmlShapeGenre], None)
-    modelClass:       type[ModelObject]     = cast(type[ModelObject], None)
-    createModel:      CreateModel           = cast(CreateModel, None)
-    invokeEditDialog: InvokeEditDialog      = cast(InvokeEditDialog, None)
-    eventHandler:     type[ShapeEvtHandler] = cast(type[ShapeEvtHandler], None)
+    umlShape:         type[UmlShapeGenre]       = cast(type[UmlShapeGenre], None)
+    modelClass:       type[ModelObject]         = cast(type[ModelObject], None)
+    createModel:      CreateModel               = cast(CreateModel, None)
+    invokeEditDialog: InvokeEditDialog          = cast(InvokeEditDialog, None)
+    eventHandler:     type[UmlBaseEventHandler] = cast(type[UmlBaseEventHandler], None)
     defaultValue:     str = ''
     instanceCounter:  int = 1000
 
@@ -171,10 +170,12 @@ class ShapeCreator:
         diagram.AddShape(umlShape)
         umlShape.Show(True)
 
-        eventHandler = shapeDescription.eventHandler()
+        #
+        # All the shape event handlers subclass from the UmlBaseEventHandler1
+        #
+        eventHandler = shapeDescription.eventHandler(previousEventHandler=umlShape.GetEventHandler())
         eventHandler.SetShape(umlShape)
-        cast(UmlBaseEventHandler, eventHandler).umlPubSubEngine = self._umlPubSubEngine
-        eventHandler.SetPreviousHandler(umlShape.GetEventHandler())
+        eventHandler.umlPubSubEngine = self._umlPubSubEngine
         umlShape.SetEventHandler(eventHandler)
 
         diagramFrame.refresh()

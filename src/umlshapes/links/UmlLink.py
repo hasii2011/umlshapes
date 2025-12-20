@@ -297,11 +297,9 @@ class UmlLink(IdentifierMixin, LineShape, PubSubMixin):
         Args:
             umlAssociationLabel:
         """
-        eventHandler: UmlAssociationLabelEventHandler = UmlAssociationLabelEventHandler()
+        eventHandler: UmlAssociationLabelEventHandler = UmlAssociationLabelEventHandler(previousEventHandler=umlAssociationLabel.GetEventHandler())
 
         eventHandler.SetShape(umlAssociationLabel)
-        eventHandler.SetPreviousHandler(umlAssociationLabel.GetEventHandler())
-
         eventHandler.umlPubSubEngine = self._umlPubSubEngine
 
         umlAssociationLabel.SetEventHandler(eventHandler)

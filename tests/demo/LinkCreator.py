@@ -122,12 +122,9 @@ class LinkCreator:
 
         diagramFrame.umlDiagram.AddShape(umlAssociation)
         umlAssociation.Show(True)
-
-        eventHandler: UmlAssociationEventHandler = UmlAssociationEventHandler(umlAssociation=umlAssociation)
-
-        eventHandler.umlPubSubEngine = self._umlPubSubEngine
-        eventHandler.SetPreviousHandler(umlAssociation.GetEventHandler())
-        umlAssociation.SetEventHandler(eventHandler)
+        #
+        # I know this looks weird but we do not need the variable
+        UmlAssociationEventHandler(umlAssociation=umlAssociation, umlPubSubEngine=self._umlPubSubEngine)
 
     def displayUmlInheritance(self, diagramFrame: ClassDiagramFrame):
         """
@@ -148,9 +145,8 @@ class LinkCreator:
         diagramFrame.umlDiagram.AddShape(umlInheritance)
         umlInheritance.Show(True)
 
-        eventHandler: UmlLinkEventHandler = UmlLinkEventHandler(umlLink=umlInheritance)
+        eventHandler: UmlLinkEventHandler = UmlLinkEventHandler(umlLink=umlInheritance, previousEventHandler=umlInheritance.GetEventHandler())
         eventHandler.umlPubSubEngine = self._umlPubSubEngine
-        eventHandler.SetPreviousHandler(umlInheritance.GetEventHandler())
         umlInheritance.SetEventHandler(eventHandler)
 
     def displayUmlInterface(self, diagramFrame: ClassDiagramFrame):
@@ -176,9 +172,8 @@ class LinkCreator:
         diagramFrame.umlDiagram.AddShape(umlInterface)
         umlInterface.Show(True)
 
-        eventHandler: UmlLinkEventHandler = UmlLinkEventHandler(umlLink=umlInterface)
+        eventHandler: UmlLinkEventHandler = UmlLinkEventHandler(umlLink=umlInterface, previousEventHandler=umlInterface.GetEventHandler())
         eventHandler.umlPubSubEngine = self._umlPubSubEngine
-        eventHandler.SetPreviousHandler(umlInterface.GetEventHandler())
         umlInterface.SetEventHandler(eventHandler)
 
     def displayNoteLink(self, diagramFrame: ClassDiagramFrame):
@@ -276,20 +271,17 @@ class LinkCreator:
 
     def _associateClassEventHandler(self, umlClass: UmlClass):
 
-        eventHandler: UmlClassEventHandler = UmlClassEventHandler()
+        eventHandler: UmlClassEventHandler = UmlClassEventHandler(previousEventHandler=umlClass.GetEventHandler())
 
         eventHandler.umlPubSubEngine = self._umlPubSubEngine
         eventHandler.SetShape(umlClass)
-        eventHandler.SetPreviousHandler(umlClass.GetEventHandler())
 
         umlClass.SetEventHandler(eventHandler)
 
     def _associateNoteLinkEventHandler(self, umlNoteLink: UmlNoteLink):
 
-        eventHandler: UmlNoteLinkEventHandler = UmlNoteLinkEventHandler(umlNoteLink=umlNoteLink)
+        eventHandler: UmlNoteLinkEventHandler = UmlNoteLinkEventHandler(umlNoteLink=umlNoteLink, previousEventHandler=umlNoteLink.GetEventHandler())
         eventHandler.umlPubSubEngine = self._umlPubSubEngine
-
-        eventHandler.SetPreviousHandler(umlNoteLink.GetEventHandler())
         umlNoteLink.SetEventHandler(eventHandler)
 
     def _createUmlNote(self) -> UmlNote:
@@ -303,11 +295,10 @@ class LinkCreator:
         umlNote.modelNote = modelNote
         umlNote.position = notePosition
 
-        eventHandler: UmlNoteEventHandler = UmlNoteEventHandler()
+        eventHandler: UmlNoteEventHandler = UmlNoteEventHandler(previousEventHandler=umlNote.GetEventHandler())
 
         eventHandler.umlPubSubEngine = self._umlPubSubEngine
         eventHandler.SetShape(umlNote)
-        eventHandler.SetPreviousHandler(umlNote.GetEventHandler())
         umlNote.SetEventHandler(eventHandler)
 
         return umlNote
