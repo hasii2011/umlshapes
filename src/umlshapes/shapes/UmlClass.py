@@ -394,7 +394,8 @@ class UmlClass(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
 
         # Add space above
         modelClass: Class = self.modelClass
-        if len(modelClass.methods) > 0:
+        # if len(modelClass.methods) > 0:
+        if modelClass.methods:
             yOffset += textHeight
 
         for method in modelClass.methods:

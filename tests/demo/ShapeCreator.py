@@ -62,8 +62,7 @@ from umlshapes.types.Common import ModelObject
 from umlshapes.types.UmlPosition import UmlPosition
 
 from tests.demo.DemoCommon import ID_REFERENCE
-# from tests.demo.DemoCommon import INCREMENT_X
-# from tests.demo.DemoCommon import INCREMENT_Y
+
 from tests.demo.DemoCommon import INITIAL_X
 from tests.demo.DemoCommon import INITIAL_Y
 from tests.demo.DemoCommon import Identifiers

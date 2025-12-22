@@ -248,8 +248,8 @@ class UmlLinkEventHandler(UmlBaseEventHandler):
 
         self.logger.debug(f'Add a bend.  {clickPoint=}')
 
-        line: UmlLink = self.GetShape()
-        line.InsertLineControlPoint(point=Point(x=clickPoint.x, y=clickPoint.y))
+        umlLink: UmlLink = self.GetShape()
+        umlLink.addLineControlPoint(umlPosition=UmlPosition(x=clickPoint.x, y=clickPoint.y))
 
         frame: UmlFrame = self.GetShape().GetCanvas()
         frame.Refresh()

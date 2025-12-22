@@ -161,6 +161,30 @@ class UmlLink(IdentifierMixin, LineShape, PubSubMixin):
         frame.Refresh()
         # self._indicateDiagramModified()
 
+    def setLinkEnds(self, fromPosition: UmlPosition, toPosition: UmlPosition):
+        """
+        Adjust the link ends
+        Args:
+            fromPosition:   The from position
+            toPosition:     The to position
+        """
+        self.SetEnds(
+            x1=fromPosition.x,
+            y1=fromPosition.y,
+            x2=toPosition.x,
+            y2=toPosition.y
+        )
+
+    def addLineControlPoint(self, umlPosition: UmlPosition):
+        """
+        Add a line control point. For example to 'add a bend' or
+        create an orthogonal line
+
+        Args:
+            umlPosition:  The UML x,y coordinates
+        """
+        self.InsertLineControlPoint(point=Point(x=umlPosition.x, y=umlPosition.y))
+
     def OnDraw(self, dc: MemoryDC):
         if self._linkName is None:
             self._linkName = self._createLinkName()

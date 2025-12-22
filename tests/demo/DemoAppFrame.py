@@ -176,6 +176,7 @@ class DemoAppFrame(SizedFrame):
         viewMenu.Append(id=Identifiers.ID_DISPLAY_UML_NOTE,        item='Uml Note',           helpString='Display Uml Note')
         viewMenu.Append(id=Identifiers.ID_DISPLAY_UML_USE_CASE,    item='Uml Use Case',       helpString='Display Uml Use Case')
         viewMenu.Append(id=Identifiers.ID_DISPLAY_UML_ACTOR,       item='Uml Actor',          helpString='Display Uml Actor')
+        viewMenu.Append(id=Identifiers.ID_DISPLAY_ORTHOGONAL_LINK, item='Orthogonal Link',    helpString='Display Orthogonal Link')
         # viewMenu.Append(id=self._ID_DISPLAY_SEQUENCE_DIAGRAM,    item='Sequence Diagram', helpString='Display Sequence Diagram')
         viewMenu.AppendSeparator()
 
@@ -202,6 +203,7 @@ class DemoAppFrame(SizedFrame):
         self.Bind(EVT_MENU, self._onDisplayElement, id=Identifiers.ID_DISPLAY_UML_AGGREGATION)
         self.Bind(EVT_MENU, self._onDisplayElement, id=Identifiers.ID_DISPLAY_UML_INTERFACE)
         self.Bind(EVT_MENU, self._onDisplayElement, id=Identifiers.ID_DISPLAY_UML_NOTE_LINK)
+        self.Bind(EVT_MENU, self._onDisplayElement, id=Identifiers.ID_DISPLAY_ORTHOGONAL_LINK)
 
         self.Bind(EVT_MENU, self._onUmlShapePreferences, id=ID_PREFERENCES)
 
@@ -265,6 +267,9 @@ class DemoAppFrame(SizedFrame):
                 linkCreator.displayUmlInheritance(diagramFrame=self._currentFrame)
             case Identifiers.ID_DISPLAY_UML_INTERFACE:
                 linkCreator.displayUmlInterface(diagramFrame=self._currentFrame)
+            case Identifiers.ID_DISPLAY_ORTHOGONAL_LINK:
+                linkCreator.displayOrthogonalLink(diagramFrame=self._currentFrame)
+
             # case self._ID_DISPLAY_SEQUENCE_DIAGRAM:
             #     self._displaySequenceDiagram()
             case _:

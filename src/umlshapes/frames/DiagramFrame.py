@@ -82,7 +82,10 @@ class DiagramFrame(ShapeCanvas):
         umlDiagram: UmlDiagram = UmlDiagram(self)
         # TODO: See  https://github.com/hasii2011/umlshapes/issues/71
         # umlDiagram.SetGridSpacing(spacing=self._umlPreferences.backgroundGridInterval)
-        umlDiagram.SetSnapToGrid(True)
+        if self._umlPreferences.snapToGrid is True:
+            umlDiagram.SetSnapToGrid(True)
+        else:
+            umlDiagram.SetSnapToGrid(False)
 
         self.SetDiagram(diag=umlDiagram)    # incestuous behavior here
         systemAppearance: SystemAppearance = SystemSettings.GetAppearance()

@@ -211,6 +211,53 @@ class LinkCreator:
 
         diagramFrame.refresh()
 
+    def displayOrthogonalLink(self, diagramFrame: ClassDiagramFrame):
+        baseClassPosition: UmlPosition = UmlPosition(x=180, y=205)
+        subClassPosition:  UmlPosition = UmlPosition(x=550, y=480)
+
+        baseModelClass:    Class  = Class(name='BaseClass')
+        subClassModelClass: Class = Class(name='SubClass')
+
+        baseUmlClass:     UmlClass = UmlClass(modelClass=baseModelClass)
+        subClassUmlClass: UmlClass = UmlClass(modelClass=subClassModelClass)
+
+        self._displayUmlClass(umlClass=baseUmlClass,     umlPosition=baseClassPosition, diagramFrame=diagramFrame)
+        self._displayUmlClass(umlClass=subClassUmlClass, umlPosition=subClassPosition,  diagramFrame=diagramFrame)
+
+        self._associateClassEventHandler(umlClass=baseUmlClass)
+        self._associateClassEventHandler(umlClass=subClassUmlClass)
+
+        self._createOrthogonalLink(baseUmlClass=baseUmlClass, subClassUmlClass=subClassUmlClass, diagramFrame=diagramFrame)
+
+    def _createOrthogonalLink(self, baseUmlClass: UmlClass, subClassUmlClass: UmlClass, diagramFrame: ClassDiagramFrame):
+
+        # name: str = f'Inherits From'
+        name: str = f''
+
+        modelInheritance: Link = Link(name=name, linkType=LinkType.INHERITANCE)
+
+        modelInheritance.destination  = baseUmlClass.modelClass
+        modelInheritance.source       = subClassUmlClass.modelClass
+
+        umlInheritance: UmlInheritance = UmlInheritance(link=modelInheritance, baseClass=baseUmlClass, subClass=subClassUmlClass)
+        umlInheritance.umlFrame = diagramFrame
+        umlInheritance.MakeLineControlPoints(n=2)       # Make this configurable
+
+        # REMEMBER:   from subclass to base class
+        subClassUmlClass.addLink(umlLink=umlInheritance, destinationClass=baseUmlClass)
+
+        umlInheritance.setLinkEnds(
+            fromPosition=UmlPosition(x=625, y=480),
+            toPosition=UmlPosition(x=327, y=250)
+        )
+        umlInheritance.addLineControlPoint(umlPosition=UmlPosition(x=625, y=250))
+        diagramFrame.umlDiagram.AddShape(umlInheritance)
+        umlInheritance.Show(True)
+
+        eventHandler: UmlLinkEventHandler = UmlLinkEventHandler(umlLink=umlInheritance, previousEventHandler=umlInheritance.GetEventHandler())
+        eventHandler.umlPubSubEngine = self._umlPubSubEngine
+        umlInheritance.SetEventHandler(eventHandler)
+
     def _createClassPair(self, diagramFrame: ClassDiagramFrame) -> Tuple[UmlClass, UmlClass]:
 
         sourcePosition:       UmlPosition = UmlPosition(x=100, y=100)       # fix this should be input
