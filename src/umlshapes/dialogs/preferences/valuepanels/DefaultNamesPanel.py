@@ -86,4 +86,3 @@ class DefaultNamesPanel(SizedPanel):
     def _onAssociationNameChanged(self, event: CommandEvent):
         newValue: str = event.GetString()
         self._preferences.defaultAssociationName = newValue
-

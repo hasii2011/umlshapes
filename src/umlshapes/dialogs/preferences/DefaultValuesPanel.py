@@ -57,13 +57,17 @@ class DefaultValuesPanel(BasePreferencesPanel):
         toolBook: Toolbook = Toolbook(parent, ID_ANY, style=BK_DEFAULT)
         toolBook.SetSizerProps(expand=True, proportion=1)
         #
-        # Brittle code; these MUST be in the specific order
-        # and the toolBook.AddPage must be in exactly that ordr
-        embeddedImages: List[PyEmbeddedImage] = [ImgToolboxNote, ImgToolboxText, ImgToolboxClass, DefaultPreferences,
-                                                 ImgToolboxSequenceDiagramInstance,
-                                                 ImgToolboxRelationshipComposition,
-                                                 UmlLollipop,
-                                                 ]
+        # Brittle code; these MUST be in this specific order
+        # and the toolBook.AddPage must add them in exactly this order
+        embeddedImages: List[PyEmbeddedImage] = [
+            ImgToolboxClass,
+            DefaultPreferences,
+            ImgToolboxNote,
+            ImgToolboxText,
+            ImgToolboxSequenceDiagramInstance,
+            ImgToolboxRelationshipComposition,
+            UmlLollipop,
+        ]
         imageList:      ImageList             = ImageList(width=16, height=16)
 
         for embeddedImage in embeddedImages:
@@ -74,22 +78,23 @@ class DefaultValuesPanel(BasePreferencesPanel):
 
         imageIdGenerator = getNextImageID(imageList.GetImageCount())
 
+        classPreferencesPanel: ClassPreferencesPanel = ClassPreferencesPanel(parent=toolBook)
+        defaultNamesPanel:     DefaultNamesPanel     = DefaultNamesPanel(parent=toolBook)
         notePreferencesPanel:  NotePreferencesPanel  = NotePreferencesPanel(parent=toolBook)
         textPreferencesPanel:  TextPreferencesPanel  = TextPreferencesPanel(parent=toolBook)
-        classPreferencesPanel: ClassPreferencesPanel = ClassPreferencesPanel(parent=toolBook)
-        defaultNamesPanel:     DefaultNamesPanel         = DefaultNamesPanel(parent=toolBook)
-        sdPanel:               SDPreferencesPanel = SDPreferencesPanel(parent=toolBook)
-        associationPreferencesPanel:  AssociationPreferencesPanel = AssociationPreferencesPanel(parent=toolBook)
-        lollipopPreferencesPanel:    LollipopPreferencesPanel = LollipopPreferencesPanel(parent=toolBook)
+        sdPanel:               SDPreferencesPanel    = SDPreferencesPanel(parent=toolBook)
 
+        associationPreferencesPanel:  AssociationPreferencesPanel = AssociationPreferencesPanel(parent=toolBook)
+        lollipopPreferencesPanel:     LollipopPreferencesPanel = LollipopPreferencesPanel(parent=toolBook)
+
+        toolBook.AddPage(classPreferencesPanel, text='Class', select=True, imageId=next(imageIdGenerator))
+        toolBook.AddPage(defaultNamesPanel,     text='Names', select=False, imageId=next(imageIdGenerator))
         toolBook.AddPage(notePreferencesPanel,  text='Notes', select=False, imageId=next(imageIdGenerator))
         toolBook.AddPage(textPreferencesPanel,  text='Text',  select=False, imageId=next(imageIdGenerator))
-        toolBook.AddPage(classPreferencesPanel, text='Class', select=False, imageId=next(imageIdGenerator))
-        toolBook.AddPage(defaultNamesPanel,     text='Names', select=False, imageId=next(imageIdGenerator))
         toolBook.AddPage(sdPanel,               text='SD',    select=False, imageId=next(imageIdGenerator))
 
         toolBook.AddPage(associationPreferencesPanel,  text='Association', select=False, imageId=next(imageIdGenerator))
-        toolBook.AddPage(lollipopPreferencesPanel,     text='Lollipop',    select=True,  imageId=next(imageIdGenerator))
+        toolBook.AddPage(lollipopPreferencesPanel,     text='Lollipop',    select=False,  imageId=next(imageIdGenerator))
 
     def _setControlValues(self):
         pass

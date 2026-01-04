@@ -1,16 +1,17 @@
+
 from typing import cast
 
 from logging import Logger
 from logging import getLogger
 
-from wx import EVT_SPINCTRLDOUBLE
 from wx import ID_ANY
 from wx import SP_ARROW_KEYS
+from wx import EVT_SPINCTRLDOUBLE
 
 from wx import Size
+from wx import Window
 from wx import SpinCtrlDouble
 from wx import SpinDoubleEvent
-from wx import Window
 
 from wx.lib.sized_controls import SizedPanel
 from wx.lib.sized_controls import SizedStaticBox
@@ -73,7 +74,7 @@ LollipopCircleRadius: NamedSpinControlDescription = NamedSpinControlDescription(
     minValue=MIN_LOLLIPOP_CIRCLE_RADIUS,
     maxValue=MAX_LOLLIPOP_CIRCLE_RADIUS,
     valueType=NSCValueType.INT,
-    valueChangedCallback = onLollipopCircleRadiusChanged
+    valueChangedCallback=onLollipopCircleRadiusChanged
 )
 
 InterfaceNameIndent: NamedSpinControlDescription = NamedSpinControlDescription(
@@ -91,7 +92,7 @@ HitAreaInflationRate:  NamedSpinControlDescription = NamedSpinControlDescription
     minValue=MIN_HIT_AREA_INFLATION_RATE,
     maxValue=MAX_HIT_AREA_INFLATION_RATE,
     valueType=NSCValueType.INT,
-    valueChangedCallback = onHitAreaInflationRationChanged
+    valueChangedCallback=onHitAreaInflationRationChanged
 )
 
 

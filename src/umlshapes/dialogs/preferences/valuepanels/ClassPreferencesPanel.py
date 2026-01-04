@@ -1,15 +1,16 @@
 
 from typing import List
 from typing import cast
+from typing import Callable
 
 from logging import Logger
 from logging import getLogger
 
-from wx import EVT_SPINCTRL
-from wx import EVT_TEXT
 from wx import ID_ANY
-from wx import SP_ARROW_KEYS
+from wx import EVT_TEXT
 from wx import EVT_CHOICE
+from wx import EVT_SPINCTRL
+from wx import SP_ARROW_KEYS
 from wx import EVT_CHECKBOX
 
 from wx import Size
@@ -23,14 +24,45 @@ from wx import TextCtrl
 from wx import CommandEvent
 
 from wx.lib.sized_controls import SizedPanel
-from wx.lib.sized_controls import SizedStaticBox
 
-from codeallyadvanced.ui.widgets.DimensionsControl import DimensionsControl
+from codeallybasic.Dimensions import Dimensions
 
 from umlshapes.dialogs.preferences.BasePreferencesPanel import BasePreferencesPanel
 
+from umlshapes.dialogs.preferences.valuepanels.DualSpinners import DualSpinners
+from umlshapes.dialogs.preferences.valuepanels.DualSpinners import SpinnerValues
+
 from umlshapes.types.UmlColor import UmlColor
 from umlshapes.types.UmlDimensions import UmlDimensions
+
+class ClassDimensions(DualSpinners):
+    """
+    Syntactic sugar around dual spinners
+    """
+    def __init__(self, sizedPanel: SizedPanel,
+                 valueChangedCallback: Callable,
+                 minValue: int = DualSpinners.DEFAULT_MIN_VALUE, maxValue: int = DualSpinners.DEFAULT_MAX_VALUE,
+                 setControlsSize: bool = True):
+
+        self._dimensionsChangedCallback: Callable   = valueChangedCallback
+        self._dimensions:                Dimensions = Dimensions()
+
+        super().__init__(sizedPanel, valueChangedCallback=self._onSpinValueChangedCallback, minValue=minValue, maxValue=maxValue, setControlsSize=setControlsSize)
+
+    def _setDimensions(self, newValue: Dimensions):
+        self._dimensions = newValue
+        self.spinnerValues = SpinnerValues(value0=newValue.width, value1=newValue.height)
+
+    # noinspection PyTypeChecker
+    dimensions = property(fset=_setDimensions, doc='Write only property to set dimensions on control')
+
+    def _onSpinValueChangedCallback(self, spinnerValues: SpinnerValues):
+        self.logger.info(f'{spinnerValues}')
+
+        self._dimensions.width = spinnerValues.value0
+        self._dimensions.height = spinnerValues.value1
+
+        self._dimensionsChangedCallback(self._dimensions)
 
 
 class ClassPreferencesPanel(BasePreferencesPanel):
@@ -44,11 +76,11 @@ class ClassPreferencesPanel(BasePreferencesPanel):
 
         super().__init__(parent)
 
-        self._className:            TextCtrl          = cast(TextCtrl, None)
-        self._classDimensions:      DimensionsControl = cast(DimensionsControl, None)
-        self._classTextMargin:      SpinCtrl          = cast(SpinCtrl, None)
-        self._classBackgroundColor: Choice            = cast(Choice, None)
-        self._classTextColor:       Choice            = cast(Choice, None)
+        self._className:            TextCtrl        = cast(TextCtrl, None)
+        self._classDimensions:      ClassDimensions = cast(ClassDimensions, None)
+        self._classTextMargin:      SpinCtrl        = cast(SpinCtrl, None)
+        self._classBackgroundColor: Choice          = cast(Choice, None)
+        self._classTextColor:       Choice          = cast(Choice, None)
 
         self._displayDunderMethods: CheckBox      = cast(CheckBox, None)
         self._displayConstructor:   CheckBox      = cast(CheckBox, None)
@@ -63,12 +95,12 @@ class ClassPreferencesPanel(BasePreferencesPanel):
         self._fixPanelSize(self)
 
     def _bindControls(self, parent):
-        parent.Bind(EVT_TEXT, self._classNameChanged, self._className)
-        parent.Bind(EVT_CHOICE, self._onClassBackgroundColorChanged, self._classBackgroundColor)
-        parent.Bind(EVT_CHOICE, self._onClassTextColorChanged, self._classTextColor)
+        parent.Bind(EVT_TEXT,     self._onClassNameChanged,            self._className)
+        parent.Bind(EVT_CHOICE,   self._onClassBackgroundColorChanged, self._classBackgroundColor)
+        parent.Bind(EVT_CHOICE,   self._onClassTextColorChanged,       self._classTextColor)
         parent.Bind(EVT_CHECKBOX, self._onDisplayDunderMethodsChanged, self._displayDunderMethods)
-        parent.Bind(EVT_CHECKBOX, self._onDisplayConstructorChanged, self._displayConstructor)
-        parent.Bind(EVT_SPINCTRL, self._onClassTextMarginChanged, self._classTextMargin)
+        parent.Bind(EVT_CHECKBOX, self._onDisplayConstructorChanged,   self._displayConstructor)
+        parent.Bind(EVT_SPINCTRL, self._onClassTextMarginChanged,      self._classTextMargin)
 
     def _setControlValues(self):
         """
@@ -88,86 +120,54 @@ class ClassPreferencesPanel(BasePreferencesPanel):
 
     def _layoutControls(self, parentPanel: SizedPanel):
 
-        self._layoutNameControl(parentPanel)
-
-        self._layoutColorControls(parentPanel)
-
-        # sizedPanel: SizedPanel = SizedPanel(parentPanel)
-        # sizedPanel.SetSizerType('horizontal')
-        # sizedPanel.SetSizerProps(proportion=1, expand=True)
-
-        self._layoutClassSizeTweaks(parentPanel)
-
-        # noinspection PyUnresolvedReferences
-        self._classDimensions.SetSizerProps(proportion=1, expand=True)
+        self._layoutClassAttributesForm(parentPanel)
 
         self._layoutMethodDisplayControls(parentPanel)
 
-    def _layoutColorControls(self, parentPanel: SizedPanel):
+    def _layoutClassAttributesForm(self, parentPanel):
+        """
 
-        colorPanel: SizedPanel = SizedPanel(parentPanel)
-        colorPanel.SetSizerType('horizontal')
-        colorPanel.SetSizerProps(proportion=1, expand=False)
+        Args:
+            parentPanel:
 
-        self._layoutClassBackgroundControl(parentPanel=colorPanel)
-        self._layoutClassTextColorControl(parentPanel=colorPanel)
+        Returns:
+        """
 
-    def _layoutClassSizeTweaks(self, parentPanel: SizedPanel):
+        nameFormPanel: SizedPanel = SizedPanel(parentPanel)
+        nameFormPanel.SetSizerType('form')
+        nameFormPanel.SetSizerProps(expand=True, halign='center')
 
-        self._classDimensions = DimensionsControl(sizedPanel=parentPanel,
-                                                  displayText='Class Width/Height',
-                                                  valueChangedCallback=self._onClassDimensionsChanged,
-                                                  setControlsSize=False
-                                                  )
-
-        panel: SizedStaticBox = SizedStaticBox(parent=parentPanel, label='Class Text Margin')
-        panel.SetSizerProps(expand=True, proportion=1)
-
-        spinCtrl: SpinCtrl = SpinCtrl(panel, id=ID_ANY, size=Size(width=100, height=50), style=SP_ARROW_KEYS)
-        spinCtrl.SetRange(1, 100)
-
-        self._classTextMargin = spinCtrl
-
-    def _layoutNameControl(self, parentPanel):
-
-        nameSizedPanel: SizedPanel = SizedPanel(parentPanel)
-        nameSizedPanel.SetSizerType('form')
-        nameSizedPanel.SetSizerProps(proportion=1, expand=False)
-
-        StaticText(nameSizedPanel, ID_ANY, 'Default Class Name:')
-        self._className = TextCtrl(nameSizedPanel, value=self._preferences.defaultClassName, size=Size(160, -1))
-        self._className.SetSizerProps(proportion=1, expand=False)
-
-    def _layoutClassBackgroundControl(self, parentPanel: SizedPanel):
+        StaticText(nameFormPanel, ID_ANY, 'Default Class Name')
+        self._className = TextCtrl(nameFormPanel, value=self._preferences.defaultClassName)
+        self._className.SetSizerProps(expand=True)
 
         classBackgroundColors = [s.value for s in UmlColor]
 
-        classBackgroundSSB: SizedStaticBox = SizedStaticBox(parentPanel, label='Class Background')
-        classBackgroundSSB.SetSizerProps(expand=True, proportion=1)
-
-        self._classBackgroundColor = Choice(classBackgroundSSB, choices=classBackgroundColors)
-
-    def _layoutClassTextColorControl(self, parentPanel: SizedPanel):
+        StaticText(nameFormPanel, ID_ANY, 'Class Background')
+        self._classBackgroundColor = Choice(nameFormPanel, choices=classBackgroundColors)
 
         classTextColors = [s.value for s in UmlColor]
+        StaticText(nameFormPanel, ID_ANY, 'Class Text Color')
+        self._classTextColor = Choice(nameFormPanel, choices=classTextColors)
 
-        classTextColorSSB: SizedStaticBox = SizedStaticBox(parentPanel, label='Class Text Color')
-        classTextColorSSB.SetSizerProps(expand=True, proportion=1)
+        StaticText(nameFormPanel, ID_ANY, 'Class Text Margin')
+        self._classTextMargin = SpinCtrl(nameFormPanel, id=ID_ANY, size=Size(width=100, height=-1), style=SP_ARROW_KEYS)
+        self._classTextMargin .SetRange(1, 100)
 
-        self._classTextColor = Choice(classTextColorSSB, choices=classTextColors)
+        StaticText(nameFormPanel, ID_ANY, 'Class Width/Height')
+        self._classDimensions = ClassDimensions(sizedPanel=nameFormPanel,
+                                                valueChangedCallback=self._onClassDimensionsChanged,
+                                                setControlsSize=False
+                                                )
 
     def _layoutMethodDisplayControls(self, parentPanel: SizedPanel):
 
-        methodDisplayPanel: SizedPanel = SizedPanel(parentPanel)
-        methodDisplayPanel.SetSizerType('horizontal')
-        methodDisplayPanel.SetSizerProps(proportion=1, expand=True)
+        self._displayDunderMethods = CheckBox(parent=parentPanel, label='Display Dunder Methods')
+        self._displayConstructor   = CheckBox(parent=parentPanel, label='Display Constructor')
 
-        self._displayDunderMethods = CheckBox(parent=methodDisplayPanel, label='Display Dunder Methods')
-        self._displayConstructor   = CheckBox(parent=methodDisplayPanel, label='Display Constructor')
-
-    def _classNameChanged(self, event: CommandEvent):
+    def _onClassNameChanged(self, event: CommandEvent):
         newValue: str = event.GetString()
-        self._preferences.className = newValue
+        self._preferences.defaultClassName = newValue
 
     def _onClassDimensionsChanged(self, newValue: UmlDimensions):
         self._preferences.classDimensions = newValue
@@ -177,7 +177,7 @@ class ClassPreferencesPanel(BasePreferencesPanel):
         colorValue:    str     = event.GetString()
         oglColorEnum: UmlColor = UmlColor(colorValue)
 
-        self._preferences.classBackgroundColor = oglColorEnum
+        self._preferences.classBackGroundColor = oglColorEnum
 
     def _onClassTextColorChanged(self, event: CommandEvent):
 

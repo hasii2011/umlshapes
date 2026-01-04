@@ -1,4 +1,3 @@
-
 from typing import List
 from typing import cast
 
@@ -29,7 +28,7 @@ from umlshapes.types.UmlDimensions import UmlDimensions
 
 ASSOCIATION_LABEL_MIN_SIZE: int = 20
 
-FONT_SIZES:    List[str] = ['8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20']
+FONT_SIZES: List[str] = ['8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20']
 DIAMOND_SIZES: List[str] = ['6', '7', '8', '10', '11', '12', '13', '14', '15']
 
 
@@ -40,34 +39,35 @@ class AssociationPreferencesPanel(BasePreferencesPanel):
 
     def __init__(self, parent: Window):
 
-        self.logger:       Logger         = getLogger(__name__)
+        self.logger: Logger = getLogger(__name__)
         super().__init__(parent)
         self.SetSizerType('vertical')
 
-        self._textFontSize:         ComboBox          = cast(ComboBox, None)
-        self._diamondSize:          ComboBox          = cast(ComboBox, None)
+        self._textFontSize: ComboBox = cast(ComboBox, None)
+        self._diamondSize: ComboBox = cast(ComboBox, None)
         self._associationLabelSize: DimensionsControl = cast(DimensionsControl, None)
 
-        self._formatNone:             CheckBox = cast(CheckBox, None)
+        self._formatNone: CheckBox = cast(CheckBox, None)
         self._formatCenterHorizontal: CheckBox = cast(CheckBox, None)
-        self._formatCenterVertical:   CheckBox = cast(CheckBox, None)
-        self._formatSizeToContents:   CheckBox = cast(CheckBox, None)
+        self._formatCenterVertical: CheckBox = cast(CheckBox, None)
+        self._formatSizeToContents: CheckBox = cast(CheckBox, None)
 
         self._layoutControls(parentPanel=self)
         self._setControlValues()
 
         self.Bind(EVT_COMBOBOX, self._onTextFontSizedChanged, self._textFontSize)
-        self.Bind(EVT_COMBOBOX, self._onDiamondSizeChanged,   self._diamondSize)
+        self.Bind(EVT_COMBOBOX, self._onDiamondSizeChanged, self._diamondSize)
 
-        self.Bind(EVT_CHECKBOX, self._onFormatNoneChange,             self._formatNone)
+        self.Bind(EVT_CHECKBOX, self._onFormatNoneChange, self._formatNone)
         self.Bind(EVT_CHECKBOX, self._onFormatCenterHorizontalChange, self._formatCenterHorizontal)
-        self.Bind(EVT_CHECKBOX, self._onFormatCenterVerticalChange,   self._formatCenterVertical)
-        self.Bind(EVT_CHECKBOX, self._onFormatSizeToContentsChange,   self._formatSizeToContents)
+        self.Bind(EVT_CHECKBOX, self._onFormatCenterVerticalChange, self._formatCenterVertical)
+        self.Bind(EVT_CHECKBOX, self._onFormatSizeToContentsChange, self._formatSizeToContents)
 
     def _layoutControls(self, parentPanel: SizedPanel):
 
         formPanel: SizedPanel = SizedPanel(parentPanel)
         formPanel.SetSizerType('form')
+        formPanel.SetSizerProps(valign='center')
 
         # First Line
         StaticText(formPanel, ID_ANY, 'Font Size')
@@ -89,7 +89,7 @@ class AssociationPreferencesPanel(BasePreferencesPanel):
     def _layoutFormatMode(self, parentPanel: SizedPanel):
 
         formatContainer: SizedStaticBox = SizedStaticBox(parent=parentPanel, label='Association Label Format')
-        formatContainer.SetSizerProps(expand=True, proportion=2)
+        formatContainer.SetSizerProps(expand=True, proportion=3)
 
         self._formatNone             = CheckBox(formatContainer, ID_ANY, UmlAssociationLabelFormat.FORMAT_NONE.value)
         self._formatCenterHorizontal = CheckBox(formatContainer, ID_ANY, UmlAssociationLabelFormat.FORMAT_CENTER_HORIZONTAL.value)

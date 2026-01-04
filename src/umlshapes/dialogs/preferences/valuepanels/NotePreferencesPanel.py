@@ -1,5 +1,4 @@
 
-
 from logging import Logger
 from logging import getLogger
 
@@ -30,18 +29,21 @@ class NotePreferencesPanel(BasePreferencesPanel):
         self.logger:       Logger         = getLogger(__name__)
         super().__init__(parent)
 
+        self.SetSizerType('vertical')
         nameSizer: SizedPanel = SizedPanel(self)
-        nameSizer.SetSizerProps(proportion=0, expand=False)
+        nameSizer.SetSizerProps(proportion=3, expand=False)
 
         StaticText(nameSizer, ID_ANY, 'Default Note Text:')
         noteText: TextCtrl = TextCtrl(nameSizer, value=self._preferences.noteText, size=Size(400, 100), style=TE_MULTILINE)
         noteText.SetSizerProps(expand=True, proportion=1)
+
         parent.Bind(EVT_TEXT, self._onNoteTextChanged, noteText)
 
         self._noteDimensions: DimensionsControl = DimensionsControl(sizedPanel=self, displayText='Note Width/Height',
                                                                     valueChangedCallback=self._noteDimensionsChanged,
                                                                     setControlsSize=False)
 
+        self._noteDimensions.SetSizerProps(expand=True, proportion=1)
         self._noteDimensions.dimensions = self._preferences.noteDimensions
 
     def _onNoteTextChanged(self, event: CommandEvent):

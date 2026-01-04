@@ -46,8 +46,8 @@ class DlgUmlShapesPreferences(SizedDialog):
         diagramPreferencesPanel:      DiagramPreferencesPanel = DiagramPreferencesPanel(parent=book)
         defaultValuesPreferencesPage: DefaultValuesPanel      = DefaultValuesPanel(parent=book)
 
-        book.AddPage(diagramPreferencesPanel,      text=diagramPreferencesPanel.name,       select=True)
-        book.AddPage(defaultValuesPreferencesPage, text=defaultValuesPreferencesPage.name, select=False)
+        book.AddPage(diagramPreferencesPanel,      text=diagramPreferencesPanel.name,      select=False)
+        book.AddPage(defaultValuesPreferencesPage, text=defaultValuesPreferencesPage.name, select=True)
 
         self._layoutStandardOkCancelButtonSizer()
         # self.Fit()
