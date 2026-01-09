@@ -28,6 +28,7 @@
     "loggers": {
         "umlshapes": {
             "level": "INFO",
+            "handlers": ["consoleHandler"],
             "propagate": false
         },
         "tests": {

@@ -10,6 +10,7 @@ from umlshapes.lib.ogl import Shape
 
 from umlshapes.mixins.TopLeftMixin import Rectangle
 from umlshapes.mixins.TopLeftMixin import TopLeftMixin
+from umlshapes.types.UmlDimensions import UmlDimensions
 
 from umlshapes.types.UmlPosition import UmlPosition
 
@@ -59,6 +60,18 @@ class TestTopLeftMixin(UnitTestBaseW):
 
     def tearDown(self):
         super().tearDown()
+
+    def testSDInstanceShape(self):
+
+        expectedPosition: UmlPosition = UmlPosition(x=100, y=50)
+
+        shape: MixinShape = MixinShape()
+        shape.size     = UmlDimensions(width=100, height=400)
+        shape.position = expectedPosition
+
+        actualPosition: UmlPosition = shape.position
+
+        self.assertEqual(expectedPosition, actualPosition, 'These should match')
 
     def testBasicRectangleLeft(self):
         shape: MixinShape = MixinShape()

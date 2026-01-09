@@ -111,12 +111,14 @@ NAME_PREFERENCES: ValueDescriptions = ValueDescriptions(
         KeyName('defaultNameField'):       ValueDescription(defaultValue='FieldName'),
         KeyName('defaultNameParameter'):   ValueDescription(defaultValue='ParameterName'),
         KeyName('defaultAssociationName'): ValueDescription(defaultValue='Association'),
+        KeyName('defaultInstanceName'):    ValueDescription(defaultValue='Unnamed instance'),
     }
 )
 SEQUENCE_DIAGRAM_PREFERENCES: ValueDescriptions = ValueDescriptions(
     {
-        KeyName('instanceYPosition'):  ValueDescription(defaultValue='50',                         deserializer=SecureConversions.secureInteger),
-        KeyName('instanceDimensions'): ValueDescription(defaultValue=str(UmlDimensions(100, 400)), deserializer=UmlDimensions.deSerialize)
+        KeyName('instanceYPosition'):          ValueDescription(defaultValue='50',                         deserializer=SecureConversions.secureInteger),
+        KeyName('instanceDimensions'):         ValueDescription(defaultValue=str(UmlDimensions(100, 400)), deserializer=UmlDimensions.deSerialize),
+        KeyName('instanceNameRelativeHeight'): ValueDescription(defaultValue='0.15',                       deserializer=SecureConversions.secureFloat),
     }
 )
 ASSOCIATION_PREFERENCES: ValueDescriptions = ValueDescriptions(
@@ -145,6 +147,7 @@ DEBUG_PREFERENCES: ValueDescriptions = ValueDescriptions(
         KeyName('trackMouse'):              ValueDescription(defaultValue='True',  deserializer=SecureConversions.secureBoolean),
         KeyName('trackMouseInterval'):      ValueDescription(defaultValue='10',    deserializer=SecureConversions.secureInteger),
         KeyName('drawLabelMarker'):         ValueDescription(defaultValue='False', deserializer=SecureConversions.secureBoolean),
+        KeyName('debugSDInstance'):         ValueDescription(defaultValue='True',  deserializer=SecureConversions.secureBoolean),
     }
 )
 

@@ -7,18 +7,19 @@ from logging import getLogger
 
 from pathlib import Path
 
-from wx import EVT_CLOSE
-from wx import ICON_ERROR
+from umlmodel.SDInstance import SDInstance
 from wx import OK
-from wx import EVT_MENU
 from wx import ID_CUT
-from wx import ID_UNDO
 from wx import ID_COPY
 from wx import ID_EXIT
-from wx import ID_PASTE
-from wx import ID_PREFERENCES
 from wx import ID_REDO
+from wx import ID_UNDO
+from wx import EVT_MENU
+from wx import ID_PASTE
+from wx import EVT_CLOSE
+from wx import ICON_ERROR
 from wx import ID_SELECTALL
+from wx import ID_PREFERENCES
 from wx import DEFAULT_FRAME_STYLE
 from wx import FRAME_FLOAT_ON_PARENT
 from wx import EVT_NOTEBOOK_PAGE_CHANGED
@@ -39,15 +40,16 @@ from umlmodel.Interface import Interface
 from umlmodel.Interface import Interfaces
 from umlmodel.ModelTypes import ClassName
 
+from umlshapes.UmlUtils import UmlUtils
 from umlshapes.ShapeTypes import UmlShapeGenre
 from umlshapes.UmlDiagram import UmlDiagram
-from umlshapes.UmlUtils import UmlUtils
 
 from umlshapes.dialogs.DlgEditInterface import DlgEditInterface
+from umlshapes.frames.SequenceDiagramFrame import SequenceDiagramFrame
 
-from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
-from umlshapes.pubsubengine.UmlPubSubEngine import UmlPubSubEngine
 from umlshapes.pubsubengine.UmlMessageType import UmlMessageType
+from umlshapes.pubsubengine.UmlPubSubEngine import UmlPubSubEngine
+from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 
 from umlshapes.frames.UmlFrame import UmlFrame
 from umlshapes.frames.DiagramFrame import FrameId
@@ -57,7 +59,10 @@ from umlshapes.links.UmlLollipopInterface import UmlLollipopInterface
 from umlshapes.links.eventhandlers.UmlLollipopInterfaceEventHandler import UmlLollipopInterfaceEventHandler
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
+
 from umlshapes.shapes.UmlClass import UmlClass
+from umlshapes.shapes.UmlSdInstance import UmlSdInstance
+# from umlshapes.shapes.eventhandlers.UmlSdInstanceEventHandler import UmlSdInstanceEventHandler
 
 from umlshapes.types.Common import AttachmentSide
 from umlshapes.types.UmlPosition import UmlPosition
@@ -74,6 +79,7 @@ DEMO_RUNNING_INDICATOR: str = '/tmp/DemoRunning.txt'
 FRAME_WIDTH:  int = 1024
 FRAME_HEIGHT: int = 720
 
+DemoFrame = DemoClassDiagramFrame | SequenceDiagramFrame
 
 class DemoAppFrame(SizedFrame):
     def __init__(self):
@@ -95,15 +101,15 @@ class DemoAppFrame(SizedFrame):
             parent=self._noteBook,
             umlPubSubEngine=self._umlPubSubEngine,
         )
-        self._diagramFrame2 = DemoClassDiagramFrame(
+        self._diagramFrame2 = SequenceDiagramFrame(
             parent=self._noteBook,
             umlPubSubEngine=self._umlPubSubEngine,
         )
 
-        self._noteBook.AddPage(page=self._diagramFrame1, text='Frame 1', select=True)
-        self._noteBook.AddPage(page=self._diagramFrame2, text='Frame 2')
+        self._noteBook.AddPage(page=self._diagramFrame1, text='Class Diagram',    select=False)
+        self._noteBook.AddPage(page=self._diagramFrame2, text='Sequence Diagram', select=True)
 
-        self._currentFrame: DemoClassDiagramFrame = self._diagramFrame1
+        self._currentFrame: DemoClassDiagramFrame | SequenceDiagramFrame = cast(DemoFrame, self._noteBook.GetCurrentPage())
 
         self._createApplicationMenuBar()
         self._diagramFrame1.commandProcessor.SetEditMenu(menu=self._editMenu)
@@ -177,7 +183,8 @@ class DemoAppFrame(SizedFrame):
         viewMenu.Append(id=Identifiers.ID_DISPLAY_UML_USE_CASE,    item='Uml Use Case',       helpString='Display Uml Use Case')
         viewMenu.Append(id=Identifiers.ID_DISPLAY_UML_ACTOR,       item='Uml Actor',          helpString='Display Uml Actor')
         viewMenu.Append(id=Identifiers.ID_DISPLAY_ORTHOGONAL_LINK, item='Orthogonal Link',    helpString='Display Orthogonal Link')
-        # viewMenu.Append(id=self._ID_DISPLAY_SEQUENCE_DIAGRAM,    item='Sequence Diagram', helpString='Display Sequence Diagram')
+
+        viewMenu.Append(id=Identifiers.ID_DISPLAY_SEQUENCE_DIAGRAM,    item='Sequence Diagram', helpString='Display Sequence Diagram')
         viewMenu.AppendSeparator()
 
         menuBar.Append(fileMenu, 'File')
@@ -204,6 +211,7 @@ class DemoAppFrame(SizedFrame):
         self.Bind(EVT_MENU, self._onDisplayElement, id=Identifiers.ID_DISPLAY_UML_INTERFACE)
         self.Bind(EVT_MENU, self._onDisplayElement, id=Identifiers.ID_DISPLAY_UML_NOTE_LINK)
         self.Bind(EVT_MENU, self._onDisplayElement, id=Identifiers.ID_DISPLAY_ORTHOGONAL_LINK)
+        self.Bind(EVT_MENU, self._onDisplayElement, id=Identifiers.ID_DISPLAY_SEQUENCE_DIAGRAM)
 
         self.Bind(EVT_MENU, self._onUmlShapePreferences, id=ID_PREFERENCES)
 
@@ -269,11 +277,47 @@ class DemoAppFrame(SizedFrame):
                 linkCreator.displayUmlInterface(diagramFrame=self._currentFrame)
             case Identifiers.ID_DISPLAY_ORTHOGONAL_LINK:
                 linkCreator.displayOrthogonalLink(diagramFrame=self._currentFrame)
-
-            # case self._ID_DISPLAY_SEQUENCE_DIAGRAM:
-            #     self._displaySequenceDiagram()
+            case Identifiers.ID_DISPLAY_SEQUENCE_DIAGRAM:
+                self._displaySequenceDiagram(diagramFrame=self._currentFrame)
             case _:
                 self.logger.error(f'WTH!  I am not handling that menu item')
+
+    def _displaySequenceDiagram(self, diagramFrame: SequenceDiagramFrame):
+        """
+        For now ignore that we are using a ClassDiagramFrame
+        Args:
+            diagramFrame:
+
+        """
+        if isinstance(diagramFrame, SequenceDiagramFrame) is True:
+
+            sdInstance: SDInstance = SDInstance()
+            umlSdInstance: UmlSdInstance = UmlSdInstance(sdInstance=sdInstance, xPosition=100)
+
+            umlSdInstance.umlFrame = diagramFrame
+
+            diagram: UmlDiagram = diagramFrame.umlDiagram
+
+            diagram.AddShape(umlSdInstance)
+            umlSdInstance.Show(True)
+
+            # eventHandler: UmlSdInstanceEventHandler = UmlSdInstanceEventHandler(
+            #     previousEventHandler=sdInstance.GetEventHandler(),
+            #     umlPubSubEngine=self._umlPubSubEngine
+            # )
+            # eventHandler.SetShape(sdInstance)
+            # eventHandler.umlPubSubEngine = self._umlPubSubEngine
+            # sdInstance.SetEventHandler(eventHandler)
+
+            diagramFrame.refresh()
+        else:
+            msgDlg: MessageDialog = MessageDialog(
+                parent=None,
+                message='Sequence Diagrams must be placed on a Sequence Diagram frame',
+                caption='Bad News',
+                style=OK | ICON_ERROR
+            )
+            msgDlg.ShowModal()
 
     def _onEditMenu(self, event: CommandEvent):
 
@@ -370,7 +414,7 @@ class DemoAppFrame(SizedFrame):
     # noinspection PyUnusedLocal
     def _onFrameDisplayedChanged(self, event: BookCtrlEvent):
 
-        self._currentFrame = cast(DemoClassDiagramFrame, self._noteBook.GetCurrentPage())
+        self._currentFrame = cast(DemoFrame, self._noteBook.GetCurrentPage())
 
         self._currentFrame.commandProcessor.SetMenuStrings()
 
@@ -378,7 +422,8 @@ class DemoAppFrame(SizedFrame):
         #
         # Toggle the menu item based on the current frame value
         #
-        self._shapeItem.Check(check=self._currentFrame.drawShapeBoundary)
+        if isinstance(self._currentFrame, DemoClassDiagramFrame) is True:
+            self._shapeItem.Check(check=self._currentFrame.drawShapeBoundary)
 
     def _subscribeFrameToRelevantFrameTopics(self, frameId: FrameId):
 
