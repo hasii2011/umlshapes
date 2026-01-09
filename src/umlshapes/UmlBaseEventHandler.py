@@ -17,12 +17,11 @@ from umlshapes.pubsubengine.UmlMessageType import UmlMessageType
 from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 
 from umlshapes.types.DeltaXY import DeltaXY
+from umlshapes.types.UmlPosition import NO_POSITION
 from umlshapes.types.UmlPosition import UmlPosition
 from umlshapes.types.UmlDimensions import UmlDimensions
 
 ShapeList = NewType('ShapeList', List[Shape])
-
-NO_POSITION = cast(UmlPosition, None)
 
 
 class UmlBaseEventHandler(ShapeEvtHandler):

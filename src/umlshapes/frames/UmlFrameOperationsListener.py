@@ -88,7 +88,10 @@ class UmlFrameOperationsListener:
         self._umlPubSubEngine.subscribe(messageType=UmlMessageType.PASTE_SHAPES, frameId=self._umlFrame.id, listener=self._pasteShapesListener)
 
         self._umlPubSubEngine.subscribe(messageType=UmlMessageType.SELECT_ALL_SHAPES, frameId=self._umlFrame.id, listener=self._selectAllShapesListener)
-        self._umlPubSubEngine.subscribe(messageType=UmlMessageType.SHAPE_MOVING,      frameId=self._umlFrame.id, listener=self._shapeMovingListener)
+        #
+        #  TODO: This shapeMovingListener is only for Class and Use Case diagrams
+        #
+        # self._umlPubSubEngine.subscribe(messageType=UmlMessageType.SHAPE_MOVING,      frameId=self._umlFrame.id, listener=self._shapeMovingListener)
 
     def _undoListener(self):
         self._umlFrame.commandProcessor.Undo()

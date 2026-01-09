@@ -27,6 +27,7 @@ from umlmodel.SDInstance import SDInstance
 from umlshapes.lib.ogl import RectangleShape
 
 from umlshapes.UmlUtils import UmlUtils
+from umlshapes.mixins.ControlPointMixin import ControlPointMixin
 
 from umlshapes.mixins.IDMixin import IDMixin
 from umlshapes.mixins.TopLeftMixin import TopLeftMixin
@@ -35,13 +36,12 @@ from umlshapes.preferences.UmlPreferences import UmlPreferences
 
 from umlshapes.types.Common import LeftCoordinate
 from umlshapes.types.UmlPosition import UmlPosition
-from umlshapes.types.UmlDimensions import UmlDimensions
 
 if TYPE_CHECKING:
     from umlshapes.frames.SequenceDiagramFrame import SequenceDiagramFrame
 
 
-class UmlSdInstance(RectangleShape, IDMixin, TopLeftMixin):
+class UmlSdInstance(ControlPointMixin, RectangleShape, IDMixin, TopLeftMixin):
 
     def __init__(self, sdInstance: SDInstance, xPosition):
 
@@ -54,12 +54,10 @@ class UmlSdInstance(RectangleShape, IDMixin, TopLeftMixin):
         instanceWidth:  int = self._preferences.instanceDimensions.width
         instanceHeight: int = self._preferences.instanceDimensions.height
 
-        super().__init__(w=instanceWidth, h=instanceHeight)
-
-        instanceSize: UmlDimensions = UmlDimensions(width=instanceWidth, height=instanceHeight)
-
+        ControlPointMixin.__init__(self, shape=self)
         IDMixin.__init__(self, shape=self)
-        TopLeftMixin.__init__(self, umlShape=self, width=instanceSize.width, height=instanceSize.height)
+        RectangleShape.__init__(self, w=instanceWidth, h=instanceHeight)
+        TopLeftMixin.__init__(self, umlShape=self, width=instanceWidth, height=instanceHeight)
 
         instancePosition: UmlPosition = UmlPosition(
             x=xPosition,
@@ -103,6 +101,7 @@ class UmlSdInstance(RectangleShape, IDMixin, TopLeftMixin):
         Start coordinates are on the UML Class perimeter
         End coordinates are where the line ends and the circle is drawn
 
+        We use the DC provided pens & brushes;  However, we still have to manipulate the shape's
         Args:
             dc:
         """
@@ -118,6 +117,8 @@ class UmlSdInstance(RectangleShape, IDMixin, TopLeftMixin):
         else:
             pen.SetStyle(PENSTYLE_TRANSPARENT)
 
+        super().OnDraw(dc=dc)
+
         dc.SetFont(self._defaultFont)
         if self.selected:
             dc.SetPen(RED_PEN)
@@ -126,26 +127,24 @@ class UmlSdInstance(RectangleShape, IDMixin, TopLeftMixin):
             dc.SetPen(BLACK_PEN)
             dc.SetTextForeground(BLACK)
 
-        super().OnDraw(dc=dc)
-
-        self._drawInstanceBox(dc, pen)
+        self._drawInstanceBox(dc)
         self._drawInstanceLifeLine(dc)
 
-    def _drawInstanceBox(self, dc: MemoryDC, pen: Pen):
+    def _drawInstanceBox(self, dc: MemoryDC):
         """
 
         Args:
             dc:
-            pen:
         """
         x: int = self.position.x
         y: int = self._preferences.instanceYPosition
         width:  int = self.size.width
         height: int = round(self.size.height * self._instanceNameRelativeSize)
 
+        pen: Pen = dc.GetPen()
+
         pen.SetWidth(1)
         pen.SetStyle(PENSTYLE_SOLID)
-        pen.SetColour(BLACK)
         dc.SetPen(pen)
 
         dc.DrawRectangle(x, y, width, height)
@@ -155,7 +154,7 @@ class UmlSdInstance(RectangleShape, IDMixin, TopLeftMixin):
 
         leftCoordinate: LeftCoordinate = self._computeTopLeft()
         x: int = leftCoordinate.x
-        y: int = leftCoordinate.y
+        y: int = self._preferences.instanceYPosition
         w: int = self.size.width
 
         instanceName: str = self.sdInstance.instanceName

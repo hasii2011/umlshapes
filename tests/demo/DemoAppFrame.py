@@ -62,6 +62,7 @@ from umlshapes.preferences.UmlPreferences import UmlPreferences
 
 from umlshapes.shapes.UmlClass import UmlClass
 from umlshapes.shapes.UmlSdInstance import UmlSdInstance
+from umlshapes.shapes.eventhandlers.UmlSdInstanceEventHandler import UmlSdInstanceEventHandler
 # from umlshapes.shapes.eventhandlers.UmlSdInstanceEventHandler import UmlSdInstanceEventHandler
 
 from umlshapes.types.Common import AttachmentSide
@@ -301,13 +302,10 @@ class DemoAppFrame(SizedFrame):
             diagram.AddShape(umlSdInstance)
             umlSdInstance.Show(True)
 
-            # eventHandler: UmlSdInstanceEventHandler = UmlSdInstanceEventHandler(
-            #     previousEventHandler=sdInstance.GetEventHandler(),
-            #     umlPubSubEngine=self._umlPubSubEngine
-            # )
-            # eventHandler.SetShape(sdInstance)
-            # eventHandler.umlPubSubEngine = self._umlPubSubEngine
-            # sdInstance.SetEventHandler(eventHandler)
+            eventHandler: UmlSdInstanceEventHandler = UmlSdInstanceEventHandler(previousEventHandler=umlSdInstance.GetEventHandler())
+            eventHandler.SetShape(umlSdInstance)
+            eventHandler.umlPubSubEngine = self._umlPubSubEngine
+            umlSdInstance.SetEventHandler(eventHandler)
 
             diagramFrame.refresh()
         else:
