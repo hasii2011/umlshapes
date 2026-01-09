@@ -106,6 +106,7 @@ class UmlFrame(DiagramFrame):
 
         # self._clipboard: ModelObjects = ModelObjects([])            # will be re-created at every copy
 
+        # TODO this needs to move to each type of frame
         self._umlFrameOperationsListener: UmlFrameOperationsListener = UmlFrameOperationsListener(
             umlFrame=self,
             umlPubSubEngine=self._umlPubSubEngine

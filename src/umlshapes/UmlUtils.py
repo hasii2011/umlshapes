@@ -89,10 +89,11 @@ class UmlUtils:
         leftBottomVertex:  UmlPoint = UmlPoint(x=shapeRectangle.left,  y=shapeRectangle.bottom)
         rightBottomVertex: UmlPoint = UmlPoint(x=shapeRectangle.right, y=shapeRectangle.bottom)
 
-        if (UmlUtils.isPointInsideRectangle(point=leftTopVertex,     rectangle=boundingRectangle) is True and
-            UmlUtils.isPointInsideRectangle(point=rightTopVertex,    rectangle=boundingRectangle) is True and
-            UmlUtils.isPointInsideRectangle(point=leftBottomVertex,  rectangle=boundingRectangle) is True and
-            UmlUtils.isPointInsideRectangle(point=rightBottomVertex, rectangle=boundingRectangle) is True
+        if (
+                UmlUtils.isPointInsideRectangle(point=leftTopVertex,     rectangle=boundingRectangle) is True and
+                UmlUtils.isPointInsideRectangle(point=rightTopVertex,    rectangle=boundingRectangle) is True and
+                UmlUtils.isPointInsideRectangle(point=leftBottomVertex,  rectangle=boundingRectangle) is True and
+                UmlUtils.isPointInsideRectangle(point=rightBottomVertex, rectangle=boundingRectangle) is True
         ):
 
             ans = True
@@ -465,7 +466,7 @@ class UmlUtils:
         """
         Split the `text` into lines that fit into `textWidth` pixels.
 
-        Note:  This is a copy of the one in codeallyadvancec
+        Note:  This is a copy of the one in codeallyadvanced
 
         Args:
             text:       The text to split

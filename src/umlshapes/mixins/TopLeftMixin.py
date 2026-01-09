@@ -1,4 +1,6 @@
 
+from typing import Tuple
+
 from logging import Logger
 from logging import getLogger
 
@@ -89,14 +91,18 @@ class TopLeftMixin:
         Args:
             position:
         """
-        width:  int = self.size.width
+        centerX, centerY = self.computeCenterXY(position)
+
+        self._shape.SetX(centerX)
+        self._shape.SetY(centerY)
+
+    def computeCenterXY(self, position: UmlPosition) -> Tuple[int, int]:
+        width: int = self.size.width
         height: int = self.size.height
 
         centerX: int = position.x + (width // 2)
         centerY: int = position.y + (height // 2)
-
-        self._shape.SetX(centerX)
-        self._shape.SetY(centerY)
+        return centerX, centerY
 
     def _computeTopLeft(self) -> LeftCoordinate:
         """

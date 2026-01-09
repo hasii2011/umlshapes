@@ -1,9 +1,11 @@
 
+from typing import cast
 from typing import List
-from typing import NewType
 from typing import Tuple
+from typing import NewType
 
 from dataclasses import dataclass
+
 
 @dataclass
 class UmlPoint:
@@ -52,4 +54,7 @@ class UmlPosition(UmlPoint):
     def __repr__(self):
         return self.__str__()
 
+
 UmlPositions = NewType('UmlPositions', List[UmlPosition])
+
+NO_POSITION = cast(UmlPosition, None)

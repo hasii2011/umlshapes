@@ -21,13 +21,14 @@
     "handlers": {
         "consoleHandler": {
             "class": "logging.StreamHandler",
-            "formatter": "bestFormat",
+            "formatter": "functionNames",
             "stream": "ext://sys.stdout"
         }
     },
     "loggers": {
         "umlshapes": {
             "level": "INFO",
+            "handlers": ["consoleHandler"],
             "propagate": false
         },
         "tests": {
