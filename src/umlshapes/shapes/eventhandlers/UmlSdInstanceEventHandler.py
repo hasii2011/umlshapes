@@ -12,6 +12,8 @@ from umlshapes.lib.ogl import Shape
 from umlshapes.lib.ogl import ShapeEvtHandler
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
+from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
+from umlshapes.shapes.UmlSdInstance import UmlSdInstance
 
 from umlshapes.types.DeltaXY import DeltaXY
 from umlshapes.types.UmlPosition import NO_POSITION
@@ -21,11 +23,13 @@ from umlshapes.types.UmlDimensions import UmlDimensions
 
 class UmlSdInstanceEventHandler(UmlBaseEventHandler):
 
-    def __init__(self, previousEventHandler: ShapeEvtHandler):
+    def __init__(self, umlSdInstance: UmlSdInstance, previousEventHandler: ShapeEvtHandler, umlPubSubEngine: IUmlPubSubEngine):
 
         self.logger: Logger = getLogger(__name__)
 
-        super().__init__(previousEventHandler=previousEventHandler)
+        super().__init__(previousEventHandler=previousEventHandler, shape=umlSdInstance)
+
+        self._umlPubSubEngine = umlPubSubEngine
 
         self._preferences: UmlPreferences = UmlPreferences()
 
@@ -40,7 +44,7 @@ class UmlSdInstanceEventHandler(UmlBaseEventHandler):
             keys:
             attachment:
         """
-        # self.logger.warning(f'xy: ({x},{y})')
+
         if self._previousPosition is NO_POSITION:
             self._previousPosition = UmlPosition(x=x, y=self._preferences.instanceYPosition)
         else:
@@ -65,11 +69,12 @@ class UmlSdInstanceEventHandler(UmlBaseEventHandler):
         We completely override the Base Handler version
 
         Args:
-            dc  This is a client DC; It won't draw on OS X
-            x:  x-coordinate center of shape
-            y:  y-coordinate center of shape
-            w:
-            h:
+            dc: This is a client DC; It won't draw on OS X
+            x: x-coordinate center of shape
+            y: y-coordinate center of shape
+            w: shape width
+            h: shape height
+
         """
         from umlshapes.ShapeTypes import UmlShapeGenre
 

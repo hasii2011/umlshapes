@@ -285,29 +285,16 @@ class DemoAppFrame(SizedFrame):
 
     def _displaySequenceDiagram(self, diagramFrame: SequenceDiagramFrame):
         """
-        For now ignore that we are using a ClassDiagramFrame
+
         Args:
             diagramFrame:
 
         """
         if isinstance(diagramFrame, SequenceDiagramFrame) is True:
 
-            sdInstance: SDInstance = SDInstance()
-            umlSdInstance: UmlSdInstance = UmlSdInstance(sdInstance=sdInstance, xPosition=100)
+            self._createSDInstance(diagramFrame=diagramFrame, instanceName='instance1', xCoordinate=100)
+            self._createSDInstance(diagramFrame=diagramFrame, instanceName='instance2', xCoordinate=300)
 
-            umlSdInstance.umlFrame = diagramFrame
-
-            diagram: UmlDiagram = diagramFrame.umlDiagram
-
-            diagram.AddShape(umlSdInstance)
-            umlSdInstance.Show(True)
-
-            eventHandler: UmlSdInstanceEventHandler = UmlSdInstanceEventHandler(previousEventHandler=umlSdInstance.GetEventHandler())
-            eventHandler.SetShape(umlSdInstance)
-            eventHandler.umlPubSubEngine = self._umlPubSubEngine
-            umlSdInstance.SetEventHandler(eventHandler)
-
-            diagramFrame.refresh()
         else:
             msgDlg: MessageDialog = MessageDialog(
                 parent=None,
@@ -443,3 +430,26 @@ class DemoAppFrame(SizedFrame):
         self._umlPubSubEngine.subscribe(UmlMessageType.CREATE_LOLLIPOP,
                                         frameId=frameId,
                                         listener=self._createLollipopInterfaceListener)
+
+    def _createSDInstance(self, diagramFrame: SequenceDiagramFrame, instanceName: str, xCoordinate: int) -> UmlSdInstance:
+
+        sdInstance: SDInstance = SDInstance()
+        sdInstance.instanceName = instanceName
+
+        umlSdInstance: UmlSdInstance = UmlSdInstance(sdInstance=sdInstance, xPosition=xCoordinate)
+
+        umlSdInstance.umlFrame = diagramFrame
+
+        diagramFrame.umlDiagram.AddShape(umlSdInstance)
+        umlSdInstance.Show(True)
+
+        eventHandler: UmlSdInstanceEventHandler = UmlSdInstanceEventHandler(
+            previousEventHandler=umlSdInstance.GetEventHandler(),
+            umlSdInstance=umlSdInstance,
+            umlPubSubEngine=self._umlPubSubEngine,
+        )
+        umlSdInstance.SetEventHandler(eventHandler)
+
+        diagramFrame.refresh()
+
+        return umlSdInstance
