@@ -27,10 +27,12 @@ from umlmodel.SDInstance import SDInstance
 from umlshapes.lib.ogl import RectangleShape
 
 from umlshapes.UmlUtils import UmlUtils
-from umlshapes.mixins.ControlPointMixin import ControlPointMixin
+from umlshapes.links.UmlSDMessage import UmlSDMessage
+from umlshapes.links.UmlSDMessage import UmlSDMessages
 
 from umlshapes.mixins.IDMixin import IDMixin
 from umlshapes.mixins.TopLeftMixin import TopLeftMixin
+from umlshapes.mixins.ControlPointMixin import ControlPointMixin
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
@@ -41,7 +43,7 @@ if TYPE_CHECKING:
     from umlshapes.frames.SequenceDiagramFrame import SequenceDiagramFrame
 
 
-class UmlSdInstance(ControlPointMixin, RectangleShape, IDMixin, TopLeftMixin):
+class UmlSDInstance(ControlPointMixin, RectangleShape, IDMixin, TopLeftMixin):
 
     def __init__(self, sdInstance: SDInstance, xPosition):
 
@@ -64,13 +66,23 @@ class UmlSdInstance(ControlPointMixin, RectangleShape, IDMixin, TopLeftMixin):
             y=self._preferences.instanceYPosition
         )
         self.position = instancePosition
+
         self._defaultFont:              Font  = UmlUtils.defaultFont()
         self._instanceNameRelativeSize: float = self._preferences.instanceNameRelativeHeight
         self._textHeight:               int   = cast(int, None)
 
-        self._inDebugMode: bool = self._preferences.debugSDInstance
+        self._messages:    UmlSDMessages = UmlSDMessages([])
+        self._inDebugMode: bool          = self._preferences.debugSDInstance
         if self._inDebugMode is True:
             self.SetPen(RED_PEN)
+
+    @property
+    def messages(self) -> UmlSDMessages:
+        return self._messages
+
+    @messages.setter
+    def messages(self, messages: UmlSDMessages):
+        self._messages = messages
 
     @property
     def sdInstance(self) -> SDInstance:
@@ -96,14 +108,19 @@ class UmlSdInstance(ControlPointMixin, RectangleShape, IDMixin, TopLeftMixin):
     def selected(self, select: bool):
         self.Select(select=select)
 
+    def addMessage(self, message: UmlSDMessage):
+        self._messages.append(message)
+
     def OnDraw(self, dc: MemoryDC):
         """
         Start coordinates are on the UML Class perimeter
         End coordinates are where the line ends and the circle is drawn
 
         We use the DC provided pens & brushes;  However, we still have to manipulate the shape's
+
         Args:
             dc:
+
         """
         if self._textHeight is None:
             self._textHeight = self._determineTextHeight(dc)  + self._preferences.lineHeightAdjustment

@@ -61,7 +61,7 @@ from umlshapes.links.eventhandlers.UmlLollipopInterfaceEventHandler import UmlLo
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
 from umlshapes.shapes.UmlClass import UmlClass
-from umlshapes.shapes.UmlSdInstance import UmlSdInstance
+from umlshapes.shapes.UmlSDInstance import UmlSDInstance
 from umlshapes.shapes.eventhandlers.UmlSdInstanceEventHandler import UmlSdInstanceEventHandler
 # from umlshapes.shapes.eventhandlers.UmlSdInstanceEventHandler import UmlSdInstanceEventHandler
 
@@ -431,12 +431,12 @@ class DemoAppFrame(SizedFrame):
                                         frameId=frameId,
                                         listener=self._createLollipopInterfaceListener)
 
-    def _createSDInstance(self, diagramFrame: SequenceDiagramFrame, instanceName: str, xCoordinate: int) -> UmlSdInstance:
+    def _createSDInstance(self, diagramFrame: SequenceDiagramFrame, instanceName: str, xCoordinate: int) -> UmlSDInstance:
 
         sdInstance: SDInstance = SDInstance()
         sdInstance.instanceName = instanceName
 
-        umlSdInstance: UmlSdInstance = UmlSdInstance(sdInstance=sdInstance, xPosition=xCoordinate)
+        umlSdInstance: UmlSDInstance = UmlSDInstance(sdInstance=sdInstance, xPosition=xCoordinate)
 
         umlSdInstance.umlFrame = diagramFrame
 

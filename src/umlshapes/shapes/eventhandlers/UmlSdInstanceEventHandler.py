@@ -13,7 +13,7 @@ from umlshapes.lib.ogl import ShapeEvtHandler
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
-from umlshapes.shapes.UmlSdInstance import UmlSdInstance
+from umlshapes.shapes.UmlSDInstance import UmlSDInstance
 
 from umlshapes.types.DeltaXY import DeltaXY
 from umlshapes.types.UmlPosition import NO_POSITION
@@ -23,7 +23,7 @@ from umlshapes.types.UmlDimensions import UmlDimensions
 
 class UmlSdInstanceEventHandler(UmlBaseEventHandler):
 
-    def __init__(self, umlSdInstance: UmlSdInstance, previousEventHandler: ShapeEvtHandler, umlPubSubEngine: IUmlPubSubEngine):
+    def __init__(self, umlSdInstance: UmlSDInstance, previousEventHandler: ShapeEvtHandler, umlPubSubEngine: IUmlPubSubEngine):
 
         self.logger: Logger = getLogger(__name__)
 
