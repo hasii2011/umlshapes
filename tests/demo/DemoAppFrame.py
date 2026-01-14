@@ -63,7 +63,6 @@ from umlshapes.preferences.UmlPreferences import UmlPreferences
 
 from umlshapes.shapes.UmlClass import UmlClass
 from umlshapes.shapes.UmlSDInstance import UmlSDInstance
-from umlshapes.shapes.UmlSDInstance2 import UmlSDInstance2
 from umlshapes.shapes.eventhandlers.UmlSdInstanceEventHandler import UmlSdInstanceEventHandler
 
 from umlshapes.types.Common import AttachmentSide
@@ -280,8 +279,8 @@ class DemoAppFrame(SizedFrame):
             case Identifiers.ID_DISPLAY_ORTHOGONAL_LINK:
                 linkCreator.displayOrthogonalLink(diagramFrame=self._currentFrame)
             case Identifiers.ID_DISPLAY_SEQUENCE_DIAGRAM:
-                # self._displaySequenceDiagram(diagramFrame=self._currentFrame)
-                self._displaySequenceDiagram2(diagramFrame=self._currentFrame)
+                self._displaySequenceDiagram(diagramFrame=self._currentFrame)
+                # self._displaySequenceDiagram2(diagramFrame=self._currentFrame)
             case _:
                 self.logger.error(f'WTH!  I am not handling that menu item')
 
@@ -296,21 +295,6 @@ class DemoAppFrame(SizedFrame):
 
             self._createSDInstance(diagramFrame=diagramFrame, instanceName='instance1', xCoordinate=100)
             self._createSDInstance(diagramFrame=diagramFrame, instanceName='instance2', xCoordinate=300)
-
-        else:
-            msgDlg: MessageDialog = MessageDialog(
-                parent=None,
-                message='Sequence Diagrams must be placed on a Sequence Diagram frame',
-                caption='Bad News',
-                style=OK | ICON_ERROR
-            )
-            msgDlg.ShowModal()
-
-    def _displaySequenceDiagram2(self, diagramFrame: SequenceDiagramFrame):
-
-        if isinstance(diagramFrame, SequenceDiagramFrame) is True:
-
-            self._createSDInstance2(diagramFrame=diagramFrame, instanceName='instance1', xCoordinate=100)
 
         else:
             msgDlg: MessageDialog = MessageDialog(
@@ -453,47 +437,24 @@ class DemoAppFrame(SizedFrame):
         sdInstance: SDInstance = SDInstance()
         sdInstance.instanceName = instanceName
 
-        umlSdInstance: UmlSDInstance = UmlSDInstance(sdInstance=sdInstance, xPosition=xCoordinate)
-
-        umlSdInstance.umlFrame = diagramFrame
-
-        diagramFrame.umlDiagram.AddShape(umlSdInstance)
-        umlSdInstance.Show(True)
-
-        # eventHandler: UmlSdInstanceEventHandler = UmlSdInstanceEventHandler(
-        #     previousEventHandler=umlSdInstance.GetEventHandler(),
-        #     umlSdInstance=umlSdInstance,
-        #     umlPubSubEngine=self._umlPubSubEngine,
-        # )
-        # umlSdInstance.SetEventHandler(eventHandler)
-
-        diagramFrame.refresh()
-
-        return umlSdInstance
-
-    def _createSDInstance2(self, diagramFrame: SequenceDiagramFrame, instanceName: str, xCoordinate: int) -> UmlSDInstance2:
-
-        sdInstance: SDInstance = SDInstance()
-        sdInstance.instanceName = instanceName
-
-        umlSDInstance2: UmlSDInstance2 = UmlSDInstance2(sdInstance=sdInstance, diagramFrame=diagramFrame)
+        umlSDInstance: UmlSDInstance = UmlSDInstance(sdInstance=sdInstance, diagramFrame=diagramFrame)
 
         dc: ClientDC = ClientDC(diagramFrame)
         diagramFrame.PrepareDC(dc)
-        umlSDInstance2.Move(dc, 450, 300)
+        umlSDInstance.Move(dc, xCoordinate, 300)
 
-        umlSDInstance2.SetCanvas(self)
-        umlSDInstance2.SetX(450)
-        umlSDInstance2.SetY(300)
+        umlSDInstance.SetCanvas(self)
+        umlSDInstance.SetX(xCoordinate)
+        umlSDInstance.SetY(300)
 
-        diagramFrame.umlDiagram.AddShape(umlSDInstance2)
-        umlSDInstance2.Show(True)
+        diagramFrame.umlDiagram.AddShape(umlSDInstance)
+        umlSDInstance.Show(True)
 
         eventHandler: UmlSdInstanceEventHandler = UmlSdInstanceEventHandler(umlPubSubEngine=self._umlPubSubEngine)
-        eventHandler.SetShape(umlSDInstance2)
-        eventHandler.SetPreviousHandler(umlSDInstance2.GetEventHandler())
-        umlSDInstance2.SetEventHandler(eventHandler)
+        eventHandler.SetShape(umlSDInstance)
+        eventHandler.SetPreviousHandler(umlSDInstance.GetEventHandler())
+        umlSDInstance.SetEventHandler(eventHandler)
 
         diagramFrame.refresh()
 
-        return umlSDInstance2
+        return umlSDInstance
