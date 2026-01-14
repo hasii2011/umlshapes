@@ -1,91 +1,71 @@
 
-from typing import cast
-
 from logging import Logger
 from logging import getLogger
 
 from wx import ClientDC
 
-from umlshapes.UmlBaseEventHandler import UmlBaseEventHandler
-
-from umlshapes.lib.ogl import Shape
 from umlshapes.lib.ogl import ShapeEvtHandler
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
-from umlshapes.shapes.UmlSDInstance import UmlSDInstance
-
-from umlshapes.types.DeltaXY import DeltaXY
-from umlshapes.types.UmlPosition import NO_POSITION
-from umlshapes.types.UmlPosition import UmlPosition
-from umlshapes.types.UmlDimensions import UmlDimensions
 
 
-class UmlSdInstanceEventHandler(UmlBaseEventHandler):
+class UmlSdInstanceEventHandler(ShapeEvtHandler):
 
-    def __init__(self, umlSdInstance: UmlSDInstance, previousEventHandler: ShapeEvtHandler, umlPubSubEngine: IUmlPubSubEngine):
+    def __init__(self, umlPubSubEngine: IUmlPubSubEngine):
 
         self.logger: Logger = getLogger(__name__)
 
-        super().__init__(previousEventHandler=previousEventHandler, shape=umlSdInstance)
-
+        # super().__init__(previousEventHandler=previousEventHandler, shape=umlSdInstance)
+        super().__init__()
         self._umlPubSubEngine = umlPubSubEngine
 
         self._preferences: UmlPreferences = UmlPreferences()
 
-    def OnDragLeft(self, draw, x, y, keys=0, attachment=0):
-        """
-        We completely override the Base Handler version
+    def OnLeftClick(self, x, y, keys=0, attachment=0):
+        shape = self.GetShape()
+        canvas = shape.GetCanvas()
+        dc = ClientDC(canvas)
+        canvas.PrepareDC(dc)
 
-        Args:
-            draw:
-            x:          new x position
-            y:          new y position
-            keys:
-            attachment:
-        """
-
-        if self._previousPosition is NO_POSITION:
-            self._previousPosition = UmlPosition(x=x, y=self._preferences.instanceYPosition)
+        if shape.Selected():
+            shape.Select(False, dc)
+            # canvas.Redraw(dc)
+            canvas.Refresh(False)
         else:
-            deltaXY: DeltaXY = DeltaXY(
-                deltaX=x - self._previousPosition.x,
-                deltaY=y - self._previousPosition.y
-            )
-            # self.logger.warning(f'{deltaXY=}')
-            umlShape = self.GetShape()
-            umlShape.position = UmlPosition(
-                x=umlShape.position.x + deltaXY.deltaX,
-                y=umlShape.position.y + deltaXY.deltaY
-            )
+            # redraw = False
+            shapeList = canvas.GetDiagram().GetShapeList()
+            toUnselect = []
 
-            self._previousPosition = UmlPosition(x=x, y=y)
+            for s in shapeList:
+                if s.Selected():
+                    # If we unselect it now then some of the objects in
+                    # shapeList will become invalid (the control points are
+                    # shapes too!) and bad things will happen...
+                    toUnselect.append(s)
 
-        super().OnDragLeft(draw, x, y, keys, attachment)
+            shape.Select(True, dc)
 
-    def OnDrawOutline(self, dc: ClientDC, x: int, y: int, w: int, h: int):
-        """
-        Called when SDInstance is moving or is resized
-        We completely override the Base Handler version
+            if toUnselect:
+                for s in toUnselect:
+                    s.Select(False, dc)
 
-        Args:
-            dc: This is a client DC; It won't draw on OS X
-            x: x-coordinate center of shape
-            y: y-coordinate center of shape
-            w: shape width
-            h: shape height
+                # #canvas.Redraw(dc)
+                canvas.Refresh(False)
 
-        """
-        from umlshapes.ShapeTypes import UmlShapeGenre
+    def OnEndDragLeft(self, x, y, keys=0, attachment=0):
+        shape = self.GetShape()
+        ShapeEvtHandler.OnEndDragLeft(self, x, y, keys, attachment)
 
-        instanceY: int = self._preferences.instanceYPosition
-        self.logger.warning(f'{instanceY=} - xy: ({x},{y}) - {w=},{h=}')
+        if not shape.Selected():
+            self.OnLeftClick(x, y, keys, attachment)
 
-        shape: Shape  = self.GetShape()
-        shape.Move(dc=dc, x=x, y=instanceY, display=True)
+    def OnSizingEndDragLeft(self, pt, x, y, keys=0, attachment=0):
+        super().OnSizingEndDragLeft(pt=pt, x=x, y=y, keys=keys, attachment=attachment)
 
-        umlShape: UmlShapeGenre = cast(UmlShapeGenre, shape)
-        umlShape.size           = UmlDimensions(width=w, height=h)
-        umlShape.position       = UmlPosition(x=x, y=instanceY)
+    def OnMovePost(self, dc, x, y, oldX, oldY, display=0):
 
-        umlShape.umlFrame.refresh()
+        shape = self.GetShape()
+        super().OnMovePost(dc, x, y, oldX, oldY, display=True)
+
+        shape.GetCanvas().Refresh(False)

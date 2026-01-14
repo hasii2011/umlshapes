@@ -91,12 +91,12 @@ class TopLeftMixin:
         Args:
             position:
         """
-        centerX, centerY = self._computeCenterXY(position)
+        centerX, centerY = self.computeCenterXY(position)
 
         self._shape.SetX(centerX)
         self._shape.SetY(centerY)
 
-    def _computeCenterXY(self, position: UmlPosition) -> Tuple[int, int]:
+    def computeCenterXY(self, position: UmlPosition) -> Tuple[int, int]:
         width: int = self.size.width
         height: int = self.size.height
 
