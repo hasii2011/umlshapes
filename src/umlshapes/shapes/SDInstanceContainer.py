@@ -13,12 +13,15 @@ from umlshapes.lib.ogl import RectangleShape
 
 from umlshapes.frames.SequenceDiagramFrame import SequenceDiagramFrame
 
-from umlshapes.mixins.TopLeftMixin import TopLeftMixin
 from umlshapes.types.UmlDimensions import UmlDimensions
+
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
 
-class SDInstanceContainer(RectangleShape, TopLeftMixin):
+class SDInstanceContainer(RectangleShape):
+    """
+    The constraining shape for the UML SD Instance
+    """
 
     def __init__(self, diagramFrame: SequenceDiagramFrame):
 
@@ -28,8 +31,6 @@ class SDInstanceContainer(RectangleShape, TopLeftMixin):
         super().__init__(w=instanceDimensions.width, h=instanceDimensions.height)
 
         self.SetCanvas(diagramFrame)
-
-        TopLeftMixin.__init__(self, umlShape=self, width=instanceDimensions.width, height=instanceDimensions.height)
 
         self.logger: Logger = getLogger(__name__)
 
