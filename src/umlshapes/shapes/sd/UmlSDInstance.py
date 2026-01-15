@@ -17,8 +17,8 @@ from umlshapes.preferences.UmlPreferences import UmlPreferences
 
 from umlshapes.types.UmlDimensions import UmlDimensions
 
-from umlshapes.shapes.SDInstanceContainer import SDInstanceContainer
-from umlshapes.shapes.UmlInstanceName import UmlInstanceName
+from umlshapes.shapes.sd.SDInstanceConstrainer import SDInstanceConstrainer
+from umlshapes.shapes.sd.UmlInstanceName import UmlInstanceName
 
 
 if TYPE_CHECKING:
@@ -40,7 +40,7 @@ class UmlSDInstance(CompositeShape, TopLeftMixin):
 
         self.logger:        Logger         = getLogger(__name__)
 
-        constrainingShape: SDInstanceContainer = SDInstanceContainer(diagramFrame)
+        constrainingShape: SDInstanceConstrainer = SDInstanceConstrainer(diagramFrame)
         instanceName:      UmlInstanceName     = UmlInstanceName(sdInstance=sdInstance)
 
         instanceName.SetPen(UmlUtils.blackSolidPen())

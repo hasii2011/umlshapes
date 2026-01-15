@@ -14,7 +14,7 @@ from umlmodel.SDMessage import SDMessage
 from umlshapes.types.UmlPosition import UmlPosition
 
 if TYPE_CHECKING:
-    from umlshapes.shapes.UmlSDInstance import UmlSDInstance
+    from umlshapes.shapes.sd.UmlSDInstance import UmlSDInstance
 
 @dataclass
 class InstanceDetails:

@@ -62,7 +62,7 @@ from umlshapes.links.eventhandlers.UmlLollipopInterfaceEventHandler import UmlLo
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
 from umlshapes.shapes.UmlClass import UmlClass
-from umlshapes.shapes.UmlSDInstance import UmlSDInstance
+from umlshapes.shapes.sd.UmlSDInstance import UmlSDInstance
 from umlshapes.shapes.eventhandlers.UmlSdInstanceEventHandler import UmlSdInstanceEventHandler
 
 from umlshapes.types.Common import AttachmentSide

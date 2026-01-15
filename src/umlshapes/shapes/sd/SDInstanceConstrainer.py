@@ -18,9 +18,10 @@ from umlshapes.types.UmlDimensions import UmlDimensions
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
 
-class SDInstanceContainer(RectangleShape):
+class SDInstanceConstrainer(RectangleShape):
     """
-    The constraining shape for the UML SD Instance
+    The constraining shape for the UML SD Instance.  Internal shape
+    required by wx ogl composite shapes
     """
 
     def __init__(self, diagramFrame: SequenceDiagramFrame):
