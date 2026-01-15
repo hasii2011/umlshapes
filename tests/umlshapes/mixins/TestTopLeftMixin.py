@@ -73,6 +73,9 @@ class TestTopLeftMixin(UnitTestBaseW):
 
         self.assertEqual(expectedPosition, actualPosition, 'These should match')
 
+        centerX, centerY = shape.computeCenterXY(expectedPosition)
+        print(f'{centerX=}, {centerY=}')
+
     def testBasicRectangleLeft(self):
         shape: MixinShape = MixinShape()
 

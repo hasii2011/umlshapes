@@ -5,32 +5,40 @@ from typing import TYPE_CHECKING
 
 from umlmodel.SDInstance import SDInstance
 
-from umlshapes.UmlUtils import UmlUtils
 from umlshapes.lib.ogl import CONSTRAINT_ALIGNED_TOP
-
 from umlshapes.lib.ogl import CompositeShape
 from umlshapes.lib.ogl import Constraint
 
+from umlshapes.UmlUtils import UmlUtils
+
+from umlshapes.mixins.TopLeftMixin import TopLeftMixin
+
 from umlshapes.preferences.UmlPreferences import UmlPreferences
+
+from umlshapes.types.UmlDimensions import UmlDimensions
+
 from umlshapes.shapes.SDInstanceContainer import SDInstanceContainer
 from umlshapes.shapes.UmlInstanceName import UmlInstanceName
+
 
 if TYPE_CHECKING:
     from umlshapes.frames.SequenceDiagramFrame import SequenceDiagramFrame
 
 
-# class UmlSDInstance2(CompositeShape, TopLeftMixin):
-class UmlSDInstance(CompositeShape):
+class UmlSDInstance(CompositeShape, TopLeftMixin):
 
     def __init__(self, sdInstance: SDInstance, diagramFrame: 'SequenceDiagramFrame'):
-        
+
+        self._sdInstance:   SDInstance     = sdInstance
+        self._preferences:  UmlPreferences = UmlPreferences()
+        instanceDimensions: UmlDimensions  = self._preferences.instanceDimensions
+
         super().__init__()
+        TopLeftMixin.__init__(self, umlShape=self, width=instanceDimensions.width, height=instanceDimensions.height)
 
         self.SetCanvas(diagramFrame)
 
-        self._sdInstance:   SDInstance     = sdInstance
         self.logger:        Logger         = getLogger(__name__)
-        self._preferences:  UmlPreferences = UmlPreferences()
 
         constrainingShape: SDInstanceContainer = SDInstanceContainer(diagramFrame)
         instanceName:      UmlInstanceName     = UmlInstanceName(sdInstance=sdInstance)

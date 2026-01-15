@@ -439,13 +439,19 @@ class DemoAppFrame(SizedFrame):
 
         umlSDInstance: UmlSDInstance = UmlSDInstance(sdInstance=sdInstance, diagramFrame=diagramFrame)
 
-        dc: ClientDC = ClientDC(diagramFrame)
-        diagramFrame.PrepareDC(dc)
-        umlSDInstance.Move(dc, xCoordinate, 300)
+        instanceY:   int         = self._preferences.instanceYPosition
+        umlPosition: UmlPosition = UmlPosition(x=xCoordinate, y=instanceY)
 
-        umlSDInstance.SetCanvas(self)
-        umlSDInstance.SetX(xCoordinate)
-        umlSDInstance.SetY(300)
+        dc:        ClientDC = ClientDC(diagramFrame)
+        diagramFrame.PrepareDC(dc)
+
+        x, y = umlSDInstance.computeCenterXY(umlPosition)
+        umlSDInstance.Move(dc, x, y)
+        self.logger.info(f'{xCoordinate=} {instanceY=}')
+
+        umlSDInstance.SetCanvas(diagramFrame)
+
+        umlSDInstance.position = umlPosition
 
         diagramFrame.umlDiagram.AddShape(umlSDInstance)
         umlSDInstance.Show(True)
