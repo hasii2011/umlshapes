@@ -14,6 +14,7 @@ from umlshapes.UmlUtils import UmlUtils
 from umlshapes.mixins.TopLeftMixin import TopLeftMixin
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
+from umlshapes.shapes.sd.UmlSDLifeLine import UmlSDLifeLine
 
 from umlshapes.types.UmlDimensions import UmlDimensions
 
@@ -41,25 +42,37 @@ class UmlSDInstance(CompositeShape, TopLeftMixin):
         self.logger:        Logger         = getLogger(__name__)
 
         constrainingShape: SDInstanceConstrainer = SDInstanceConstrainer(diagramFrame)
-        instanceName:      UmlInstanceName     = UmlInstanceName(sdInstance=sdInstance)
+        instanceName:      UmlInstanceName       = UmlInstanceName(sdInstance=sdInstance, sequenceDiagramFrame=diagramFrame)
+        lifeLine:          UmlSDLifeLine         = UmlSDLifeLine(sequenceDiagramFrame=diagramFrame, instanceName=instanceName, instanceConstrainer=constrainingShape)
+
+        lifeLine.MakeLineControlPoints(n=2)
+        lifeLine.SetPen(UmlUtils.blackDashedPen())
 
         instanceName.SetPen(UmlUtils.blackSolidPen())
         instanceName.SetTextColour('Black')
+        instanceName.attachLifeline(umlSDLifeLine=lifeLine, constrainer=constrainingShape)
 
         self.AddChild(constrainingShape)
         self.AddChild(instanceName)
+        self.AddChild(lifeLine)
 
-        constraint: Constraint = Constraint(CONSTRAINT_ALIGNED_TOP, constrainingShape, [instanceName])
+        constraint: Constraint = Constraint(CONSTRAINT_ALIGNED_TOP, constrainingShape, [instanceName, lifeLine])
         self.AddConstraint(constraint)
         self.Recompute()
+        lifeLine.Show(True)
 
         # If we don't do this, the shapes will be able to move on their
         # own, instead of moving the composite
         constrainingShape.SetDraggable(False)
         instanceName.SetDraggable(False)
+        lifeLine.SetDraggable(False)
 
         # If we don't do this the shape will take all left-clicks for itself
         constrainingShape.SetSensitivityFilter(0)
+
+        self._constrainingShape: SDInstanceConstrainer = constrainingShape
+        self._instanceName:      UmlInstanceName       = instanceName
+        self._lifeLine:          UmlSDLifeLine         = lifeLine
 
     @property
     def umlFrame(self) -> 'SequenceDiagramFrame':
@@ -68,3 +81,26 @@ class UmlSDInstance(CompositeShape, TopLeftMixin):
     @umlFrame.setter
     def umlFrame(self, frame: 'SequenceDiagramFrame'):
         self.SetCanvas(frame)
+
+    def connectInstanceNameToBottomOfContainer(self):
+
+        instanceNameHeight: int = self._instanceName.GetHeight()
+        self.logger.debug(f'{instanceNameHeight=}')
+
+        startX: int = round(self._instanceName.GetX())
+        startY: int = round(self._instanceName.GetY() + (instanceNameHeight // 2))
+        self.logger.debug(f'x2y2: ({startX},{startY})')
+
+        constrainerHeight: int = self._constrainingShape.GetHeight()
+        endX: int = round(self._constrainingShape.GetX())
+        endY: int = round(self._constrainingShape.GetY() + (constrainerHeight // 2))
+        self.logger.debug(f'x1y1: ({endX},{endY})')
+
+        self._lifeLine.SetEnds(
+            x1=startX,
+            y1=startY,
+            x2=endX,
+            y2=endY
+        )
+
+        self.logger.debug(f'------------------')

@@ -1074,8 +1074,8 @@ class LineShape(Shape):
 
         if self._lineControlPoints and not (x_offset == 0 and y_offset == 0):
             for point in self._lineControlPoints:
-                point[0] += x_offset
-                point[1] += y_offset
+                point[0] += round(x_offset)
+                point[1] += round(y_offset)
 
         # Move temporary label rectangles if necessary
         for i in range(3):

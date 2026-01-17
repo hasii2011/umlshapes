@@ -385,7 +385,7 @@ class DemoAppFrame(SizedFrame):
         self.logger.info(f'Frame Modified - {modifiedFrameId=}')
 
     def _frameLeftClickListener(self, frame: UmlFrame, umlPosition: UmlPosition):
-        self.logger.info(f'Frame {frame.id}, clicked at {umlPosition=}')
+        self.logger.debug(f'Frame {frame.id}, clicked at {umlPosition=}')
 
     def _umlShapeListener(self, umlShape: UmlShapeGenre):
         self.logger.info(f'Shape was selected: {umlShape}')
@@ -447,7 +447,7 @@ class DemoAppFrame(SizedFrame):
 
         x, y = umlSDInstance.computeCenterXY(umlPosition)
         umlSDInstance.Move(dc, x, y)
-        self.logger.info(f'{xCoordinate=} {instanceY=}')
+        self.logger.debug(f'{xCoordinate=} {instanceY=}')
 
         umlSDInstance.SetCanvas(diagramFrame)
 
@@ -455,6 +455,8 @@ class DemoAppFrame(SizedFrame):
 
         diagramFrame.umlDiagram.AddShape(umlSDInstance)
         umlSDInstance.Show(True)
+
+        umlSDInstance.connectInstanceNameToBottomOfContainer()
 
         eventHandler: UmlSdInstanceEventHandler = UmlSdInstanceEventHandler(umlPubSubEngine=self._umlPubSubEngine)
         eventHandler.SetShape(umlSDInstance)

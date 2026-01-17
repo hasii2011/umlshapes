@@ -4,6 +4,7 @@ from logging import getLogger
 
 from wx import PENSTYLE_DOT
 from wx import BRUSHSTYLE_TRANSPARENT
+from wx import PENSTYLE_TRANSPARENT
 
 from wx import Pen
 from wx import Brush
@@ -47,7 +48,11 @@ class SDInstanceConstrainer(RectangleShape):
         self.SetBrush(brush)
 
         pen: Pen = self.GetPen()
-        pen.SetStyle(PENSTYLE_DOT)
+        if self._preferences.debugSDInstance is True:
+            pen.SetStyle(PENSTYLE_DOT)
+        else:
+            pen.SetStyle(PENSTYLE_TRANSPARENT)
+
         self.SetPen(pen)
 
         super().OnDraw(dc)
