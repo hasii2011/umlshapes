@@ -48,15 +48,15 @@ class UmlInstanceName(RectangleShape):
         self.AddText(sdInstance.instanceName)
 
     @property
-    def instanceName(self) -> str:
-        return self._sdInstance.instanceName
+    def sdInstance(self) -> SDInstance:
+        return self._sdInstance
 
-    @instanceName.setter
-    def instanceName(self, instanceName: str):
+    @sdInstance.setter
+    def sdInstance(self, sdInstance: SDInstance):
 
-        self._sdInstance.instanceName = instanceName
+        self._sdInstance = sdInstance
         self.ClearText()
-        self.AddText(instanceName)
+        self.AddText(sdInstance.instanceName)
 
     def attachLifeline(self, umlSDLifeLine: UmlSDLifeLine, constrainer: 'SDInstanceConstrainer'):
 

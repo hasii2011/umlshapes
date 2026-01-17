@@ -14,6 +14,7 @@ from umlshapes.UmlUtils import UmlUtils
 from umlshapes.mixins.TopLeftMixin import TopLeftMixin
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
+from umlshapes.shapes.sd.UmlInstanceNameEventHandler import UmlInstanceNameEventHandler
 from umlshapes.shapes.sd.UmlSDLifeLine import UmlSDLifeLine
 
 from umlshapes.types.UmlDimensions import UmlDimensions
@@ -70,6 +71,8 @@ class UmlSDInstance(CompositeShape, TopLeftMixin):
         # If we don't do this the shape will take all left-clicks for itself
         constrainingShape.SetSensitivityFilter(0)
 
+        self._setInstanceNameEventHandler(instanceName=instanceName)
+
         self._constrainingShape: SDInstanceConstrainer = constrainingShape
         self._instanceName:      UmlInstanceName       = instanceName
         self._lifeLine:          UmlSDLifeLine         = lifeLine
@@ -104,3 +107,13 @@ class UmlSDInstance(CompositeShape, TopLeftMixin):
         )
 
         self.logger.debug(f'------------------')
+
+    def _setInstanceNameEventHandler(self, instanceName: UmlInstanceName):
+
+        eventHandler: UmlInstanceNameEventHandler = UmlInstanceNameEventHandler(
+            umlInstanceName=instanceName,
+            sdInstance=self._sdInstance,
+            previousEventHandler=instanceName.GetEventHandler()
+        )
+
+        instanceName.SetEventHandler(eventHandler)
