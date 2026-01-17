@@ -4,8 +4,12 @@ from typing import TYPE_CHECKING
 from logging import Logger
 from logging import getLogger
 
+from wx import FONTWEIGHT_NORMAL
+from wx import Font
+
 from umlmodel.SDInstance import SDInstance
 
+from umlshapes.UmlUtils import UmlUtils
 from umlshapes.lib.ogl import RectangleShape
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
@@ -13,6 +17,7 @@ from umlshapes.shapes.sd.SDInstanceConstrainer import SDInstanceConstrainer
 from umlshapes.shapes.sd.UmlSDLifeLine import UmlSDLifeLine
 
 from umlshapes.types.UmlDimensions import UmlDimensions
+from umlshapes.types.UmlFontFamily import UmlFontFamily
 
 if TYPE_CHECKING:
     from umlshapes.shapes.sd.SDInstanceConstrainer import SDInstanceConstrainer
@@ -39,6 +44,7 @@ class UmlInstanceName(RectangleShape):
         super().__init__(w=width, h=height)
         self.SetCanvas(sequenceDiagramFrame)
 
+        self._initializeTextFont()
         self.AddText(sdInstance.instanceName)
 
     @property
@@ -58,3 +64,20 @@ class UmlInstanceName(RectangleShape):
 
         umlSDLifeLine.instanceName        = self
         umlSDLifeLine.instanceConstrainer = constrainer
+
+    def _initializeTextFont(self):
+        """
+        Use a partial version of the defaults
+        """
+        textSize:    int  = self._preferences.textFontSize
+        defaultFont: Font = UmlUtils.defaultFont()
+        textFont:    Font = defaultFont.GetBaseFont()
+
+        textFont.SetPointSize(textSize)
+        textFont.SetPointSize(textSize)
+        textFont.SetWeight(FONTWEIGHT_NORMAL)
+
+        textFontFamily: UmlFontFamily = self._preferences.textFontFamily
+        textFont.SetFamily(UmlUtils.umlFontFamilyToWxFontFamily(textFontFamily))
+
+        self.SetFont(textFont)
