@@ -7,7 +7,6 @@ from logging import getLogger
 
 from pathlib import Path
 
-from umlmodel.SDInstance import SDInstance
 from wx import ClientDC
 from wx import OK
 from wx import ID_CUT
@@ -40,6 +39,7 @@ from wx.lib.sized_controls import SizedPanel
 from umlmodel.Interface import Interface
 from umlmodel.Interface import Interfaces
 from umlmodel.ModelTypes import ClassName
+from umlmodel.SDInstance import SDInstance
 
 from umlshapes.UmlUtils import UmlUtils
 from umlshapes.ShapeTypes import UmlShapeGenre
@@ -64,6 +64,7 @@ from umlshapes.preferences.UmlPreferences import UmlPreferences
 from umlshapes.shapes.UmlClass import UmlClass
 from umlshapes.shapes.sd.UmlSDInstance import UmlSDInstance
 from umlshapes.shapes.eventhandlers.UmlSdInstanceEventHandler import UmlSdInstanceEventHandler
+from umlshapes.shapes.sd.UmlSDLifeLineEventHandler import LifeLineClickDetails
 
 from umlshapes.types.Common import AttachmentSide
 from umlshapes.types.UmlPosition import UmlPosition
@@ -411,6 +412,9 @@ class DemoAppFrame(SizedFrame):
         if isinstance(self._currentFrame, DemoClassDiagramFrame) is True:
             self._shapeItem.Check(check=self._currentFrame.drawShapeBoundary)
 
+    def _lifeLineClicked(self, clickDetails: LifeLineClickDetails):
+        self.logger.info(f'{clickDetails}=')
+
     def _subscribeFrameToRelevantFrameTopics(self, frameId: FrameId):
 
         self._umlPubSubEngine.subscribe(UmlMessageType.UPDATE_APPLICATION_STATUS,
@@ -432,12 +436,16 @@ class DemoAppFrame(SizedFrame):
                                         frameId=frameId,
                                         listener=self._createLollipopInterfaceListener)
 
+        self._umlPubSubEngine.subscribe(UmlMessageType.SD_LIFE_LINE_CLICKED,
+                                        frameId=frameId,
+                                        listener=self._lifeLineClicked)
+
     def _createSDInstance(self, diagramFrame: SequenceDiagramFrame, instanceName: str, xCoordinate: int) -> UmlSDInstance:
 
         sdInstance: SDInstance = SDInstance()
         sdInstance.instanceName = instanceName
 
-        umlSDInstance: UmlSDInstance = UmlSDInstance(sdInstance=sdInstance, diagramFrame=diagramFrame)
+        umlSDInstance: UmlSDInstance = UmlSDInstance(sdInstance=sdInstance, diagramFrame=diagramFrame, umlPubSubEngine=self._umlPubSubEngine)
 
         instanceY:   int         = self._preferences.instanceYPosition
         umlPosition: UmlPosition = UmlPosition(x=xCoordinate, y=instanceY)

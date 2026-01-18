@@ -1,7 +1,7 @@
 from logging import Logger
 from logging import getLogger
 
-from umlmodel.SDInstance import SDInstance
+from wx import Colour
 from wx import EVT_TEXT
 from wx import TE_MULTILINE
 
@@ -11,6 +11,8 @@ from wx import TextCtrl
 from wx import CommandEvent
 
 from wx.lib.sized_controls import SizedPanel
+
+from umlmodel.SDInstance import SDInstance
 
 from umlshapes.dialogs.BaseEditDialog import BaseEditDialog
 
@@ -44,6 +46,8 @@ class DlgEditInstanceName(BaseEditDialog):
         self._txtCtrl: TextCtrl = TextCtrl(sizedPanel, value=self._sdInstance.instanceName, size=Size(400, 180), style=TE_MULTILINE)
         self._txtCtrl.SetFocus()
 
+        self._normalNameBackgroundColour: Colour = self._txtCtrl.GetBackgroundColour()
+
         self._layoutStandardOkCancelButtonSizer()
 
         self.Bind(EVT_TEXT, self._onInstanceNameChanged, self._txtCtrl)
@@ -59,6 +63,10 @@ class DlgEditInstanceName(BaseEditDialog):
         """
         self._sdInstance.instanceName = event.GetString()
         self.logger.debug(f'{self._sdInstance=}')
+        if len(self._sdInstance.instanceName) == 0:
+            self._indicateEmptyTextCtrl(self._txtCtrl)
+        else:
+            self._indicateNonEmptyTextCtrl(self._txtCtrl, normalBackgroundColor=self._normalNameBackgroundColour)
 
     @property
     def sdInstance(self) -> SDInstance:

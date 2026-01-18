@@ -1,7 +1,8 @@
 
+from typing import TYPE_CHECKING
+
 from logging import Logger
 from logging import getLogger
-from typing import TYPE_CHECKING
 
 from umlmodel.SDInstance import SDInstance
 
@@ -14,13 +15,16 @@ from umlshapes.UmlUtils import UmlUtils
 from umlshapes.mixins.TopLeftMixin import TopLeftMixin
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
-from umlshapes.shapes.sd.UmlInstanceNameEventHandler import UmlInstanceNameEventHandler
-from umlshapes.shapes.sd.UmlSDLifeLine import UmlSDLifeLine
+from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 
 from umlshapes.types.UmlDimensions import UmlDimensions
 
+from umlshapes.shapes.sd.UmlInstanceNameEventHandler import UmlInstanceNameEventHandler
+from umlshapes.shapes.sd.UmlSDLifeLineEventHandler import UmlSDLifeLineEventHandler
+
 from umlshapes.shapes.sd.SDInstanceConstrainer import SDInstanceConstrainer
 from umlshapes.shapes.sd.UmlInstanceName import UmlInstanceName
+from umlshapes.shapes.sd.UmlSDLifeLine import UmlSDLifeLine
 
 
 if TYPE_CHECKING:
@@ -29,10 +33,12 @@ if TYPE_CHECKING:
 
 class UmlSDInstance(CompositeShape, TopLeftMixin):
 
-    def __init__(self, sdInstance: SDInstance, diagramFrame: 'SequenceDiagramFrame'):
+    def __init__(self, sdInstance: SDInstance, diagramFrame: 'SequenceDiagramFrame', umlPubSubEngine: IUmlPubSubEngine):
 
-        self._sdInstance:   SDInstance     = sdInstance
-        self._preferences:  UmlPreferences = UmlPreferences()
+        self._sdInstance:      SDInstance       = sdInstance
+        self._umlPubSubEngine: IUmlPubSubEngine = umlPubSubEngine
+        self._preferences:     UmlPreferences   = UmlPreferences()
+
         instanceDimensions: UmlDimensions  = self._preferences.instanceDimensions
 
         super().__init__()
@@ -46,12 +52,7 @@ class UmlSDInstance(CompositeShape, TopLeftMixin):
         instanceName:      UmlInstanceName       = UmlInstanceName(sdInstance=sdInstance, sequenceDiagramFrame=diagramFrame)
         lifeLine:          UmlSDLifeLine         = UmlSDLifeLine(sequenceDiagramFrame=diagramFrame, instanceName=instanceName, instanceConstrainer=constrainingShape)
 
-        lifeLine.MakeLineControlPoints(n=2)
-        lifeLine.SetPen(UmlUtils.blackDashedPen())
-
-        instanceName.SetPen(UmlUtils.blackSolidPen())
-        instanceName.SetTextColour('Black')
-        instanceName.attachLifeline(umlSDLifeLine=lifeLine, constrainer=constrainingShape)
+        self._customizeConstrainedShapes(constrainingShape, instanceName, lifeLine)
 
         self.AddChild(constrainingShape)
         self.AddChild(instanceName)
@@ -60,6 +61,7 @@ class UmlSDInstance(CompositeShape, TopLeftMixin):
         constraint: Constraint = Constraint(CONSTRAINT_ALIGNED_TOP, constrainingShape, [instanceName, lifeLine])
         self.AddConstraint(constraint)
         self.Recompute()
+
         lifeLine.Show(True)
 
         # If we don't do this, the shapes will be able to move on their
@@ -72,6 +74,7 @@ class UmlSDInstance(CompositeShape, TopLeftMixin):
         constrainingShape.SetSensitivityFilter(0)
 
         self._setInstanceNameEventHandler(instanceName=instanceName)
+        self._setLifeLineEventHandler(lifeLine=lifeLine)
 
         self._constrainingShape: SDInstanceConstrainer = constrainingShape
         self._instanceName:      UmlInstanceName       = instanceName
@@ -108,7 +111,29 @@ class UmlSDInstance(CompositeShape, TopLeftMixin):
 
         self.logger.debug(f'------------------')
 
+    def _customizeConstrainedShapes(self, constrainingShape: SDInstanceConstrainer, instanceName: UmlInstanceName, lifeLine: UmlSDLifeLine):
+        """
+        Sets appropriate colors and ensure the lifeline is displays
+        Args:
+            constrainingShape:
+            instanceName:
+            lifeLine:
+
+        """
+        lifeLine.MakeLineControlPoints(n=2)
+        lifeLine.SetPen(UmlUtils.blackDashedPen())
+
+        instanceName.SetPen(UmlUtils.blackSolidPen())
+        instanceName.SetTextColour('Black')
+        instanceName.attachLifeline(umlSDLifeLine=lifeLine, constrainer=constrainingShape)
+
     def _setInstanceNameEventHandler(self, instanceName: UmlInstanceName):
+        """
+        Custom event handler for the name shape
+        Args:
+            instanceName:
+
+        """
 
         eventHandler: UmlInstanceNameEventHandler = UmlInstanceNameEventHandler(
             umlInstanceName=instanceName,
@@ -117,3 +142,19 @@ class UmlSDInstance(CompositeShape, TopLeftMixin):
         )
 
         instanceName.SetEventHandler(eventHandler)
+
+    def _setLifeLineEventHandler(self, lifeLine: UmlSDLifeLine):
+        """
+        Custom event handle for the life line
+
+        Args:
+            lifeLine:
+
+        """
+
+        eventHandler: UmlSDLifeLineEventHandler = UmlSDLifeLineEventHandler(
+            umlSDLifeLine=lifeLine,
+            previousEventHandler=lifeLine.GetEventHandler()
+        )
+        eventHandler.umlPubSubEngine = self._umlPubSubEngine
+        lifeLine.SetEventHandler(handler=eventHandler)

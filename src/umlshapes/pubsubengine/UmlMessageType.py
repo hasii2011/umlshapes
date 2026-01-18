@@ -22,3 +22,5 @@ class UmlMessageType(Enum):
     COPY_SHAPES       = 'CopyShapes'
     PASTE_SHAPES      = 'PasteShapes'
     SELECT_ALL_SHAPES = 'SelectAllShapes'
+
+    SD_LIFE_LINE_CLICKED = 'SDLifeLine Clickd'
