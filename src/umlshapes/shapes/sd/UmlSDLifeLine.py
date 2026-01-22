@@ -5,6 +5,7 @@ from logging import Logger
 from logging import getLogger
 
 from umlshapes.lib.ogl import LineShape
+from umlshapes.shapes.sd.UmlSDMessage import UmlSDMessage
 
 if TYPE_CHECKING:
     from umlshapes.frames.SequenceDiagramFrame import SequenceDiagramFrame
@@ -22,24 +23,24 @@ class UmlSDLifeLine(LineShape):
         super().__init__()
 
         self.SetCanvas(sequenceDiagramFrame)
-        self._instanceName:        UmlInstanceName       = instanceName
+        self._umlInstanceName:     UmlInstanceName       = instanceName
         self._instanceConstrainer: SDInstanceConstrainer = instanceConstrainer
 
     @property
-    def umlFrame(self) -> 'SequenceDiagramFrame':
+    def sequenceDiagramFrame(self) -> 'SequenceDiagramFrame':
         return self.GetCanvas()
 
-    @umlFrame.setter
-    def umlFrame(self, frame: 'SequenceDiagramFrame'):
+    @sequenceDiagramFrame.setter
+    def sequenceDiagramFrame(self, frame: 'SequenceDiagramFrame'):
         self.SetCanvas(frame)
 
     @property
-    def instanceName(self) -> 'UmlInstanceName':
-        return self._instanceName
+    def umlInstanceName(self) -> 'UmlInstanceName':
+        return self._umlInstanceName
 
-    @instanceName.setter
-    def instanceName(self, instanceName: 'UmlInstanceName'):
-        self._instanceName = instanceName
+    @umlInstanceName.setter
+    def umlInstanceName(self, instanceName: 'UmlInstanceName'):
+        self._umlInstanceName = instanceName
 
     @property
     def instanceConstrainer(self) -> 'SDInstanceConstrainer':
@@ -48,3 +49,25 @@ class UmlSDLifeLine(LineShape):
     @instanceConstrainer.setter
     def instanceConstrainer(self, instanceConstrainer: 'SDInstanceConstrainer'):
         self._instanceConstrainer = instanceConstrainer
+
+    def addMessage(self, umlSDMessage: UmlSDMessage, destinationLifeLine: 'UmlSDLifeLine'):
+        """
+
+        Args:
+            umlSDMessage:           The message between us and the 'other' life line
+            destinationLifeLine:    The 'other'
+
+        Returns:
+
+        """
+
+        self.AddLine(line=umlSDMessage, other=destinationLifeLine)
+
+        # umlLink.sourceShape      = self
+        # umlLink.destinationShape = destinationClass
+
+    def __str__(self) -> str:
+        return self._umlInstanceName.sdInstance.instanceName
+
+    def __repr__(self) -> str:
+        return self.__str__()

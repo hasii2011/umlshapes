@@ -62,7 +62,7 @@ class UmlInstanceName(RectangleShape):
 
         self.AddLine(line=umlSDLifeLine, other=constrainer)
 
-        umlSDLifeLine.instanceName        = self
+        umlSDLifeLine.umlInstanceName        = self
         umlSDLifeLine.instanceConstrainer = constrainer
 
     def _initializeTextFont(self):

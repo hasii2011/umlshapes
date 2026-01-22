@@ -556,7 +556,10 @@ class LineShape(Shape):
             # Now draw the text
             if region.GetFont():
                 dc.SetFont(region.GetFont())
-                dc.DrawRectangle(xp - w / 2.0, yp - h / 2.0, w, h)
+                # dc.DrawRectangle(xp - w / 2.0, yp - h / 2.0, w, h)
+                rectX: int = xp - w // 2
+                rectY: int = yp - h // 2
+                dc.DrawRectangle(rectX, rectY, w, h)
 
                 if self._pen:
                     dc.SetPen(self._pen)

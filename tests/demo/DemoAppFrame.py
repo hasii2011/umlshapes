@@ -41,6 +41,7 @@ from umlmodel.Interface import Interfaces
 from umlmodel.ModelTypes import ClassName
 from umlmodel.SDInstance import SDInstance
 
+from tests.demo.SDMessageHandler import SDMessageHandler
 from umlshapes.UmlUtils import UmlUtils
 from umlshapes.ShapeTypes import UmlShapeGenre
 from umlshapes.UmlDiagram import UmlDiagram
@@ -64,7 +65,6 @@ from umlshapes.preferences.UmlPreferences import UmlPreferences
 from umlshapes.shapes.UmlClass import UmlClass
 from umlshapes.shapes.sd.UmlSDInstance import UmlSDInstance
 from umlshapes.shapes.eventhandlers.UmlSdInstanceEventHandler import UmlSdInstanceEventHandler
-from umlshapes.shapes.sd.UmlSDLifeLineEventHandler import LifeLineClickDetails
 
 from umlshapes.types.Common import AttachmentSide
 from umlshapes.types.UmlPosition import UmlPosition
@@ -126,6 +126,8 @@ class DemoAppFrame(SizedFrame):
 
         self._shapeCreator: ShapeCreator   = ShapeCreator(umlPubSubEngine=self._umlPubSubEngine)
         self._linkCreator:  LinkCreator    = LinkCreator(umlPubSubEngine=self._umlPubSubEngine)
+        self._sdMessageHandler: SDMessageHandler = SDMessageHandler(umlPubSubEngine=self._umlPubSubEngine, sequenceDiagramFrame=self._currentFrame)
+
         self._preferences:  UmlPreferences = UmlPreferences()
 
         self._interfaceCount: int = 0
@@ -296,6 +298,11 @@ class DemoAppFrame(SizedFrame):
 
             self._createSDInstance(diagramFrame=diagramFrame, instanceName='instance1', xCoordinate=100)
             self._createSDInstance(diagramFrame=diagramFrame, instanceName='instance2', xCoordinate=300)
+            self._umlPubSubEngine.sendMessage(
+                UmlMessageType.UPDATE_APPLICATION_STATUS,
+                frameId=self._currentFrame.id,
+                message='Click on source lifeline'
+            )
 
         else:
             msgDlg: MessageDialog = MessageDialog(
@@ -412,9 +419,6 @@ class DemoAppFrame(SizedFrame):
         if isinstance(self._currentFrame, DemoClassDiagramFrame) is True:
             self._shapeItem.Check(check=self._currentFrame.drawShapeBoundary)
 
-    def _lifeLineClicked(self, clickDetails: LifeLineClickDetails):
-        self.logger.info(f'{clickDetails}=')
-
     def _subscribeFrameToRelevantFrameTopics(self, frameId: FrameId):
 
         self._umlPubSubEngine.subscribe(UmlMessageType.UPDATE_APPLICATION_STATUS,
@@ -435,10 +439,6 @@ class DemoAppFrame(SizedFrame):
         self._umlPubSubEngine.subscribe(UmlMessageType.CREATE_LOLLIPOP,
                                         frameId=frameId,
                                         listener=self._createLollipopInterfaceListener)
-
-        self._umlPubSubEngine.subscribe(UmlMessageType.SD_LIFE_LINE_CLICKED,
-                                        frameId=frameId,
-                                        listener=self._lifeLineClicked)
 
     def _createSDInstance(self, diagramFrame: SequenceDiagramFrame, instanceName: str, xCoordinate: int) -> UmlSDInstance:
 
@@ -466,9 +466,12 @@ class DemoAppFrame(SizedFrame):
 
         umlSDInstance.connectInstanceNameToBottomOfContainer()
 
-        eventHandler: UmlSdInstanceEventHandler = UmlSdInstanceEventHandler(umlPubSubEngine=self._umlPubSubEngine)
+        eventHandler: UmlSdInstanceEventHandler = UmlSdInstanceEventHandler(
+            umlPubSubEngine=self._umlPubSubEngine,
+            previousEventHandler=umlSDInstance.GetEventHandler(),
+            umlSDInstance=umlSDInstance
+        )
         eventHandler.SetShape(umlSDInstance)
-        eventHandler.SetPreviousHandler(umlSDInstance.GetEventHandler())
         umlSDInstance.SetEventHandler(eventHandler)
 
         diagramFrame.refresh()

@@ -4,6 +4,7 @@ from typing import TYPE_CHECKING
 from logging import Logger
 from logging import getLogger
 
+from umlmodel.Class import Class
 from umlmodel.SDInstance import SDInstance
 
 from umlshapes.lib.ogl import CONSTRAINT_ALIGNED_TOP
@@ -25,10 +26,15 @@ from umlshapes.shapes.sd.UmlSDLifeLineEventHandler import UmlSDLifeLineEventHand
 from umlshapes.shapes.sd.SDInstanceConstrainer import SDInstanceConstrainer
 from umlshapes.shapes.sd.UmlInstanceName import UmlInstanceName
 from umlshapes.shapes.sd.UmlSDLifeLine import UmlSDLifeLine
+from umlshapes.types.UmlPosition import UmlPosition
 
+MINIMUM_SD_LIFELINE_X: int = 20
+MINIMUM_SD_LIFELINE_Y: int = 20
 
 if TYPE_CHECKING:
     from umlshapes.frames.SequenceDiagramFrame import SequenceDiagramFrame
+
+ANONYMOUS: Class = Class(name='Anonymous')
 
 
 class UmlSDInstance(CompositeShape, TopLeftMixin):
@@ -38,6 +44,7 @@ class UmlSDInstance(CompositeShape, TopLeftMixin):
         self._sdInstance:      SDInstance       = sdInstance
         self._umlPubSubEngine: IUmlPubSubEngine = umlPubSubEngine
         self._preferences:     UmlPreferences   = UmlPreferences()
+        self._modelClass:      Class            = ANONYMOUS
 
         instanceDimensions: UmlDimensions  = self._preferences.instanceDimensions
 
@@ -46,7 +53,7 @@ class UmlSDInstance(CompositeShape, TopLeftMixin):
 
         self.SetCanvas(diagramFrame)
 
-        self.logger:        Logger         = getLogger(__name__)
+        self.logger: Logger = getLogger(__name__)
 
         constrainingShape: SDInstanceConstrainer = SDInstanceConstrainer(diagramFrame)
         instanceName:      UmlInstanceName       = UmlInstanceName(sdInstance=sdInstance, sequenceDiagramFrame=diagramFrame)
@@ -80,6 +87,8 @@ class UmlSDInstance(CompositeShape, TopLeftMixin):
         self._instanceName:      UmlInstanceName       = instanceName
         self._lifeLine:          UmlSDLifeLine         = lifeLine
 
+        self._initialMoveOccurred: bool = False
+
     @property
     def umlFrame(self) -> 'SequenceDiagramFrame':
         return self.GetCanvas()
@@ -87,6 +96,57 @@ class UmlSDInstance(CompositeShape, TopLeftMixin):
     @umlFrame.setter
     def umlFrame(self, frame: 'SequenceDiagramFrame'):
         self.SetCanvas(frame)
+
+    @property
+    def modelClass(self) -> Class:
+        return self._modelClass
+
+    @modelClass.setter
+    def modelClass(self, modelClass: Class):
+        self._modelClass = modelClass
+
+    def Move(self, dc, x: int, y: int, display: bool = True):
+        """
+        Override Move so we can adjust x & instanceY to be the center of
+        the shape
+
+        Args:
+            dc:
+            x:
+            y:
+            display:
+
+        """
+        instanceY: int = self._preferences.instanceYPosition
+        self.logger.debug(f'xy: ({x},{y})  {instanceY=}')
+
+        currentX: int = x
+        if self._initialMoveOccurred is True:
+            oldX:    int = self.position.x
+            deltaX:  int = abs(oldX - x)
+
+            if deltaX > self._preferences.instanceMoveDampener:
+                self.logger.debug(f'{oldX=} {deltaX=}')
+                if currentX > oldX:
+                    self.logger.info(f'current x {currentX} is greater than old x {oldX}')
+                    currentX = oldX + self._preferences.instanceMoveDampener
+                else:
+                    self.logger.info(f'current x {currentX} is less than old x {oldX}')
+                    currentX = oldX - self._preferences.instanceMoveDampener
+
+        else:
+            self._initialMoveOccurred = True
+
+        centerX, centerY = self.computeCenterXY(position=UmlPosition(x=currentX, y=instanceY))
+
+        if centerX <= 0:
+            centerX = MINIMUM_SD_LIFELINE_X
+        if centerY <= 0:
+            centerY = MINIMUM_SD_LIFELINE_Y
+
+        self.logger.info(f'centerXY=({centerX},{centerY})')
+
+        super().Move(dc=dc, x=centerX, y=centerY, display=display)
 
     def connectInstanceNameToBottomOfContainer(self):
 

@@ -496,7 +496,11 @@ class CompositeShape(RectangleShape):
         offsetX = xx - _objectStartX
         offsetY = yy - _objectStartY
 
-        self.GetEventHandler().OnDrawOutline(dc, self.GetX() + offsetX, self.GetY() + offsetY, self.GetWidth(), self.GetHeight())
+        x: int = self.GetX() + offsetX
+        y: int = self.GetY() + offsetY
+        w: int = round(self.GetWidth())
+        h: int = round(self.GetHeight())
+        self.GetEventHandler().OnDrawOutline(dc, x, y, w, h)
 
     def OnEndDragLeft(self, x, y, keys = 0, attachment = 0):
         """The end drag left handler."""
