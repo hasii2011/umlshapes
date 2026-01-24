@@ -20,8 +20,8 @@ from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 
 from umlshapes.types.UmlDimensions import UmlDimensions
 
-from umlshapes.shapes.sd.UmlInstanceNameEventHandler import UmlInstanceNameEventHandler
-from umlshapes.shapes.sd.UmlSDLifeLineEventHandler import UmlSDLifeLineEventHandler
+from umlshapes.shapes.sd.eventhandlers.UmlInstanceNameEventHandler import UmlInstanceNameEventHandler
+from umlshapes.shapes.sd.eventhandlers.UmlSDLifeLineEventHandler import UmlSDLifeLineEventHandler
 
 from umlshapes.shapes.sd.SDInstanceConstrainer import SDInstanceConstrainer
 from umlshapes.shapes.sd.UmlInstanceName import UmlInstanceName

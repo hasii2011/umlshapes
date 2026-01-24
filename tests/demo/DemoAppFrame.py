@@ -41,13 +41,12 @@ from umlmodel.Interface import Interfaces
 from umlmodel.ModelTypes import ClassName
 from umlmodel.SDInstance import SDInstance
 
-from tests.demo.SDMessageHandler import SDMessageHandler
 from umlshapes.UmlUtils import UmlUtils
 from umlshapes.ShapeTypes import UmlShapeGenre
 from umlshapes.UmlDiagram import UmlDiagram
+from umlshapes.preferences.UmlPreferences import UmlPreferences
 
 from umlshapes.dialogs.DlgEditInterface import DlgEditInterface
-from umlshapes.frames.SequenceDiagramFrame import SequenceDiagramFrame
 
 from umlshapes.pubsubengine.UmlMessageType import UmlMessageType
 from umlshapes.pubsubengine.UmlPubSubEngine import UmlPubSubEngine
@@ -56,15 +55,16 @@ from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 from umlshapes.frames.UmlFrame import UmlFrame
 from umlshapes.frames.DiagramFrame import FrameId
 from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
+from umlshapes.frames.SequenceDiagramFrame import SequenceDiagramFrame
 
 from umlshapes.links.UmlLollipopInterface import UmlLollipopInterface
 from umlshapes.links.eventhandlers.UmlLollipopInterfaceEventHandler import UmlLollipopInterfaceEventHandler
 
-from umlshapes.preferences.UmlPreferences import UmlPreferences
-
 from umlshapes.shapes.UmlClass import UmlClass
 from umlshapes.shapes.sd.UmlSDInstance import UmlSDInstance
-from umlshapes.shapes.eventhandlers.UmlSdInstanceEventHandler import UmlSdInstanceEventHandler
+from umlshapes.shapes.sd.eventhandlers.UmlSdInstanceEventHandler import UmlSdInstanceEventHandler
+
+from umlshapes.shapes.sd.SDMessageHandler import SDMessageHandler
 
 from umlshapes.types.Common import AttachmentSide
 from umlshapes.types.UmlPosition import UmlPosition
