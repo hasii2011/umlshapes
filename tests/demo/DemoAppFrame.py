@@ -464,8 +464,6 @@ class DemoAppFrame(SizedFrame):
         diagramFrame.umlDiagram.AddShape(umlSDInstance)
         umlSDInstance.Show(True)
 
-        umlSDInstance.connectInstanceNameToBottomOfContainer()
-
         eventHandler: UmlSdInstanceEventHandler = UmlSdInstanceEventHandler(
             umlPubSubEngine=self._umlPubSubEngine,
             previousEventHandler=umlSDInstance.GetEventHandler(),

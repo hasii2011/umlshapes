@@ -88,6 +88,8 @@ class UmlSDInstance(CompositeShape, TopLeftMixin):
         self._lifeLine:          UmlSDLifeLine         = lifeLine
 
         self._initialMoveOccurred: bool = False
+        from wx import CallAfter as wxCallAfter
+        wxCallAfter(lifeLine.setLifeLineEnds)
 
     @property
     def umlFrame(self) -> 'SequenceDiagramFrame':
@@ -147,29 +149,6 @@ class UmlSDInstance(CompositeShape, TopLeftMixin):
         self.logger.info(f'centerXY=({centerX},{centerY})')
 
         super().Move(dc=dc, x=centerX, y=centerY, display=display)
-
-    def connectInstanceNameToBottomOfContainer(self):
-
-        instanceNameHeight: int = self._instanceName.GetHeight()
-        self.logger.debug(f'{instanceNameHeight=}')
-
-        startX: int = round(self._instanceName.GetX())
-        startY: int = round(self._instanceName.GetY() + (instanceNameHeight // 2))
-        self.logger.debug(f'x2y2: ({startX},{startY})')
-
-        constrainerHeight: int = self._constrainingShape.GetHeight()
-        endX: int = round(self._constrainingShape.GetX())
-        endY: int = round(self._constrainingShape.GetY() + (constrainerHeight // 2))
-        self.logger.debug(f'x1y1: ({endX},{endY})')
-
-        self._lifeLine.SetEnds(
-            x1=startX,
-            y1=startY,
-            x2=endX,
-            y2=endY
-        )
-
-        self.logger.debug(f'------------------')
 
     def _customizeConstrainedShapes(self, constrainingShape: SDInstanceConstrainer, instanceName: UmlInstanceName, lifeLine: UmlSDLifeLine):
         """

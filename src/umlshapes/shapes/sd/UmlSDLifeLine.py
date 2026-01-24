@@ -13,7 +13,16 @@ if TYPE_CHECKING:
     from umlshapes.shapes.sd.SDInstanceConstrainer import SDInstanceConstrainer
 
 class UmlSDLifeLine(LineShape):
+    """
+    """
     def __init__(self, sequenceDiagramFrame: 'SequenceDiagramFrame', instanceName: 'UmlInstanceName', instanceConstrainer: 'SDInstanceConstrainer'):
+        """
+
+        Args:
+            sequenceDiagramFrame:   The sequence diagram frame I appear on
+            instanceName:           The instance name shape that I start from
+            instanceConstrainer:    The constrainer shape that I connect to on the bottom
+        """
 
         from umlshapes.shapes.sd.UmlInstanceName import UmlInstanceName
         from umlshapes.shapes.sd.SDInstanceConstrainer import SDInstanceConstrainer
@@ -49,6 +58,32 @@ class UmlSDLifeLine(LineShape):
     @instanceConstrainer.setter
     def instanceConstrainer(self, instanceConstrainer: 'SDInstanceConstrainer'):
         self._instanceConstrainer = instanceConstrainer
+
+    def setLifeLineEnds(self):
+        """
+
+        """
+
+        instanceNameHeight: int = self._umlInstanceName.GetHeight()
+        self.logger.debug(f'{instanceNameHeight=}')
+
+        startX: int = round(self._umlInstanceName.GetX())
+        startY: int = round(self._umlInstanceName.GetY() + (instanceNameHeight // 2))
+        self.logger.debug(f'x2y2: ({startX},{startY})')
+
+        constrainerHeight: int = self._instanceConstrainer.GetHeight()
+        endX: int = round(self._instanceConstrainer.GetX())
+        endY: int = round(self._instanceConstrainer.GetY() + (constrainerHeight // 2))
+        self.logger.debug(f'x1y1: ({endX},{endY})')
+
+        self.SetEnds(
+            x1=startX,
+            y1=startY,
+            x2=endX,
+            y2=endY
+        )
+
+        self.logger.debug(f'------------------')
 
     def addMessage(self, umlSDMessage: UmlSDMessage, destinationLifeLine: 'UmlSDLifeLine'):
         """

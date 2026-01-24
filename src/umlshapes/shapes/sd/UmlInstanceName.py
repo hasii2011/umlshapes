@@ -81,3 +81,9 @@ class UmlInstanceName(RectangleShape):
         textFont.SetFamily(UmlUtils.umlFontFamilyToWxFontFamily(textFontFamily))
 
         self.SetFont(textFont)
+
+    def __str__(self) -> str:
+        return f'UmlInstanceName: {self.sdInstance.instanceName}'
+
+    def __repr__(self) -> str:
+        return str(self)

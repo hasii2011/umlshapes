@@ -13,13 +13,14 @@ from wx import MemoryDC
 from umlshapes.lib.ogl import RectangleShape
 
 from umlshapes.frames.SequenceDiagramFrame import SequenceDiagramFrame
+from umlshapes.mixins.IdentifierMixin import IdentifierMixin
 
 from umlshapes.types.UmlDimensions import UmlDimensions
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
 
-class SDInstanceConstrainer(RectangleShape):
+class SDInstanceConstrainer(IdentifierMixin, RectangleShape):
     """
     The constraining shape for the UML SD Instance.  Internal shape
     required by wx ogl composite shapes
@@ -30,7 +31,8 @@ class SDInstanceConstrainer(RectangleShape):
         self._preferences: UmlPreferences = UmlPreferences()
 
         instanceDimensions: UmlDimensions  = self._preferences.instanceDimensions
-        super().__init__(w=instanceDimensions.width, h=instanceDimensions.height)
+        IdentifierMixin.__init__(self)
+        RectangleShape.__init__(self, w=instanceDimensions.width, h=instanceDimensions.height)
 
         self.SetCanvas(diagramFrame)
 
@@ -56,3 +58,9 @@ class SDInstanceConstrainer(RectangleShape):
         self.SetPen(pen)
 
         super().OnDraw(dc)
+
+    def __str__(self) -> str:
+        return f'SDInstanceConstrainer: {self.id}'
+
+    def __repr__(self):
+        return str(self)

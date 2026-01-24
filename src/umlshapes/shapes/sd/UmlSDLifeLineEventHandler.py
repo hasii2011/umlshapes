@@ -6,6 +6,8 @@ from logging import getLogger
 
 from dataclasses import dataclass
 
+from wx import ClientDC
+
 from umlshapes.lib.ogl import ShapeEvtHandler
 
 from umlshapes.frames.UmlFrame import UmlFrame
@@ -64,3 +66,11 @@ class UmlSDLifeLineEventHandler(ShapeEvtHandler):
                 lifeLine=sdLifeLine
             )
         )
+
+    def OnDraw(self, dc: ClientDC):
+
+        umlSDLifeLine: UmlSDLifeLine = self.GetShape()
+        self.logger.debug(f'{umlSDLifeLine.umlInstanceName=} {umlSDLifeLine.instanceConstrainer=}')
+
+        umlSDLifeLine.setLifeLineEnds()
+        super().OnDraw(dc=dc)
