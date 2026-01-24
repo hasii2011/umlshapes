@@ -7,7 +7,6 @@ from logging import getLogger
 
 from pathlib import Path
 
-from wx import ClientDC
 from wx import OK
 from wx import ID_CUT
 from wx import ID_COPY
@@ -26,11 +25,12 @@ from wx import EVT_NOTEBOOK_PAGE_CHANGED
 
 from wx import Menu
 from wx import MenuBar
+from wx import Point
+from wx import ClientDC
+from wx import MenuItem
 from wx import Notebook
 from wx import CommandEvent
 from wx import BookCtrlEvent
-from wx import Point
-from wx import MenuItem
 from wx import MessageDialog
 
 from wx.lib.sized_controls import SizedFrame

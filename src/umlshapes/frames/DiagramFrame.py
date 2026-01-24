@@ -10,8 +10,9 @@ from enum import Enum
 
 from wx import VERTICAL
 from wx import HORIZONTAL
-from wx import SUNKEN_BORDER
 from wx import PenStyle
+from wx import SUNKEN_BORDER
+from wx import EVT_MOUSEWHEEL
 
 from wx import Point
 from wx import MouseEvent
@@ -104,6 +105,8 @@ class DiagramFrame(ShapeCanvas):
 
         self._selector: ShapeSelector = cast(ShapeSelector, None)
 
+        self.Bind(EVT_MOUSEWHEEL, self._onMouseWheel)
+
     @property
     def umlDiagram(self) -> 'UmlDiagram':
         return self.GetDiagram()
@@ -194,9 +197,10 @@ class DiagramFrame(ShapeCanvas):
 
         dc.Blit(0, 0, w, h, mem, x, y)
 
-    def OnMouseEvent(self, mouseEvent: MouseEvent):
+    def _onMouseWheel(self, mouseEvent: MouseEvent):
         """
         Add additional behaviour to add wheel mouse scrolling
+        Smoother scrolling when bound to mouse wheel event
 
         Args:
             mouseEvent:
@@ -220,8 +224,6 @@ class DiagramFrame(ShapeCanvas):
             xScrollPosition += rotation
 
         self.Scroll(Point(x=xScrollPosition, y=yScrollPosition))
-
-        super().OnMouseEvent(evt=mouseEvent)
 
     def _drawGrid(self, memDC: DC, width: int, height: int, startX: int, startY: int):
 
