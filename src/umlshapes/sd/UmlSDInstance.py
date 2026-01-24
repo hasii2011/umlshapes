@@ -20,12 +20,12 @@ from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 
 from umlshapes.types.UmlDimensions import UmlDimensions
 
-from umlshapes.shapes.sd.eventhandlers.UmlInstanceNameEventHandler import UmlInstanceNameEventHandler
-from umlshapes.shapes.sd.eventhandlers.UmlSDLifeLineEventHandler import UmlSDLifeLineEventHandler
+from umlshapes.sd.eventhandlers.UmlInstanceNameEventHandler import UmlInstanceNameEventHandler
+from umlshapes.sd.eventhandlers.UmlSDLifeLineEventHandler import UmlSDLifeLineEventHandler
 
-from umlshapes.shapes.sd.SDInstanceConstrainer import SDInstanceConstrainer
-from umlshapes.shapes.sd.UmlInstanceName import UmlInstanceName
-from umlshapes.shapes.sd.UmlSDLifeLine import UmlSDLifeLine
+from umlshapes.sd.SDInstanceConstrainer import SDInstanceConstrainer
+from umlshapes.sd.UmlInstanceName import UmlInstanceName
+from umlshapes.sd.UmlSDLifeLine import UmlSDLifeLine
 from umlshapes.types.UmlPosition import UmlPosition
 
 MINIMUM_SD_LIFELINE_X: int = 20

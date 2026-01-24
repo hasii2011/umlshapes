@@ -6,7 +6,7 @@ from umlshapes.UmlBaseEventHandler import UmlBaseEventHandler
 from umlshapes.lib.ogl import ShapeEvtHandler
 
 from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
-from umlshapes.shapes.sd.UmlSDInstance import UmlSDInstance
+from umlshapes.sd.UmlSDInstance import UmlSDInstance
 
 
 class UmlSdInstanceEventHandler(UmlBaseEventHandler):

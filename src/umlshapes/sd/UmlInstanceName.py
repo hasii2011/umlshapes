@@ -13,14 +13,14 @@ from umlshapes.UmlUtils import UmlUtils
 from umlshapes.lib.ogl import RectangleShape
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
-from umlshapes.shapes.sd.SDInstanceConstrainer import SDInstanceConstrainer
-from umlshapes.shapes.sd.UmlSDLifeLine import UmlSDLifeLine
+from umlshapes.sd.SDInstanceConstrainer import SDInstanceConstrainer
+from umlshapes.sd.UmlSDLifeLine import UmlSDLifeLine
 
 from umlshapes.types.UmlDimensions import UmlDimensions
 from umlshapes.types.UmlFontFamily import UmlFontFamily
 
 if TYPE_CHECKING:
-    from umlshapes.shapes.sd.SDInstanceConstrainer import SDInstanceConstrainer
+    from umlshapes.sd.SDInstanceConstrainer import SDInstanceConstrainer
 from umlshapes.frames.SequenceDiagramFrame import SequenceDiagramFrame
 
 

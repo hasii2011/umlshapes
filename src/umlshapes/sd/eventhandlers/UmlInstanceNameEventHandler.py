@@ -13,7 +13,7 @@ from umlshapes.dialogs.DlgEditInstanceName import DlgEditInstanceName
 
 from umlshapes.frames.UmlFrame import UmlFrame
 
-from umlshapes.shapes.sd.UmlInstanceName import UmlInstanceName
+from umlshapes.sd.UmlInstanceName import UmlInstanceName
 
 
 class UmlInstanceNameEventHandler(ShapeEvtHandler):

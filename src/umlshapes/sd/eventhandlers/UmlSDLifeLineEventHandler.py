@@ -15,7 +15,7 @@ from umlshapes.frames.UmlFrame import UmlFrame
 from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 from umlshapes.pubsubengine.UmlMessageType import UmlMessageType
 
-from umlshapes.shapes.sd.UmlSDLifeLine import UmlSDLifeLine
+from umlshapes.sd.UmlSDLifeLine import UmlSDLifeLine
 from umlshapes.types.UmlPosition import UmlPosition
 
 

@@ -61,10 +61,11 @@ from umlshapes.links.UmlLollipopInterface import UmlLollipopInterface
 from umlshapes.links.eventhandlers.UmlLollipopInterfaceEventHandler import UmlLollipopInterfaceEventHandler
 
 from umlshapes.shapes.UmlClass import UmlClass
-from umlshapes.shapes.sd.UmlSDInstance import UmlSDInstance
-from umlshapes.shapes.sd.eventhandlers.UmlSdInstanceEventHandler import UmlSdInstanceEventHandler
 
-from umlshapes.shapes.sd.SDMessageHandler import SDMessageHandler
+from umlshapes.sd.UmlSDInstance import UmlSDInstance
+from umlshapes.sd.eventhandlers.UmlSdInstanceEventHandler import UmlSdInstanceEventHandler
+
+from umlshapes.sd.SDMessageHandler import SDMessageHandler
 
 from umlshapes.types.Common import AttachmentSide
 from umlshapes.types.UmlPosition import UmlPosition

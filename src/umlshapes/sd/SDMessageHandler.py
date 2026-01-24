@@ -10,8 +10,8 @@ from umlshapes.frames.SequenceDiagramFrame import SequenceDiagramFrame
 from umlshapes.pubsubengine.UmlMessageType import UmlMessageType
 from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 
-from umlshapes.shapes.sd.eventhandlers.UmlSDLifeLineEventHandler import LifeLineClickDetails
-from umlshapes.shapes.sd.UmlSDMessage import UmlSDMessage
+from umlshapes.sd.eventhandlers.UmlSDLifeLineEventHandler import LifeLineClickDetails
+from umlshapes.sd.UmlSDMessage import UmlSDMessage
 
 NO_START_DETAILS = cast(LifeLineClickDetails, None)
 

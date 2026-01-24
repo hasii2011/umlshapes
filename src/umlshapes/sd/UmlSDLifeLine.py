@@ -5,12 +5,12 @@ from logging import Logger
 from logging import getLogger
 
 from umlshapes.lib.ogl import LineShape
-from umlshapes.shapes.sd.UmlSDMessage import UmlSDMessage
+from umlshapes.sd.UmlSDMessage import UmlSDMessage
 
 if TYPE_CHECKING:
     from umlshapes.frames.SequenceDiagramFrame import SequenceDiagramFrame
-    from umlshapes.shapes.sd.UmlInstanceName import UmlInstanceName
-    from umlshapes.shapes.sd.SDInstanceConstrainer import SDInstanceConstrainer
+    from umlshapes.sd.UmlInstanceName import UmlInstanceName
+    from umlshapes.sd.SDInstanceConstrainer import SDInstanceConstrainer
 
 class UmlSDLifeLine(LineShape):
     """
@@ -24,8 +24,8 @@ class UmlSDLifeLine(LineShape):
             instanceConstrainer:    The constrainer shape that I connect to on the bottom
         """
 
-        from umlshapes.shapes.sd.UmlInstanceName import UmlInstanceName
-        from umlshapes.shapes.sd.SDInstanceConstrainer import SDInstanceConstrainer
+        from umlshapes.sd.UmlInstanceName import UmlInstanceName
+        from umlshapes.sd.SDInstanceConstrainer import SDInstanceConstrainer
 
         self.logger: Logger = getLogger(__name__)
 

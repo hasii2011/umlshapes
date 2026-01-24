@@ -18,14 +18,14 @@ from umlshapes.lib.ogl import LineShape
 
 from umlmodel.SDMessage import SDMessage
 
-from umlshapes.shapes.sd.UmlMessageEnd import UmlMessageEnd
+from umlshapes.sd.UmlMessageEnd import UmlMessageEnd
 if TYPE_CHECKING:
-    from umlshapes.shapes.sd.UmlSDLifeLine import UmlSDLifeLine
+    from umlshapes.sd.UmlSDLifeLine import UmlSDLifeLine
 
 
 class UmlSDMessage(LineShape):
     def __init__(self, sdMessage: SDMessage):
-        from umlshapes.shapes.sd.UmlSDLifeLine import UmlSDLifeLine
+        from umlshapes.sd.UmlSDLifeLine import UmlSDLifeLine
 
         self.logger: Logger = getLogger(__name__)
         super().__init__()
