@@ -55,6 +55,11 @@ class SDMessageHandler:
     def reset(self):
         self._startDetails = NO_START_DETAILS
         self._messageCreationInProgress = False
+        self._umlPubSubEngine.sendMessage(
+            UmlMessageType.UPDATE_APPLICATION_STATUS,
+            frameId=self._sequenceDiagramFrame.id,
+            message=''
+        )
 
     def _lifeLineClicked(self, clickDetails: LifeLineClickDetails):
         """
@@ -82,7 +87,7 @@ class SDMessageHandler:
             endDetails:
 
         """
-        self.logger.info(f'\n{endDetails=}')
+        self.logger.debug(f'\n{endDetails=}')
 
         modelMessage: SDMessage    = SDMessage(
             message='demoMessage',
@@ -93,7 +98,7 @@ class SDMessageHandler:
 
         )
         umlSDMessage: UmlSDMessage = UmlSDMessage(sdMessage=modelMessage)
-        umlSDMessage.MakeLineControlPoints(n=2)
+        # umlSDMessage.MakeLineControlPoints(n=2)
 
         self._startDetails.lifeLine.addMessage(umlSDMessage=umlSDMessage, destinationLifeLine=endDetails.lifeLine)
 
@@ -106,3 +111,5 @@ class SDMessageHandler:
         umlSDMessage.Show(True)
         self._sequenceDiagramFrame.umlDiagram.AddShape(umlSDMessage)
         self._sequenceDiagramFrame.refresh()
+
+        self.reset()

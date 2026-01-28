@@ -52,7 +52,7 @@ class UmlSDLifeLineEventHandler(ShapeEvtHandler):
             attachment:
         """
 
-        self.logger.info(f'xy: ({x},{y})')
+        self.logger.debug(f'xy: ({x},{y})')
 
         sdLifeLine: UmlSDLifeLine = self.GetShape()
 

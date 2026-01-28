@@ -130,10 +130,10 @@ class UmlSDInstance(CompositeShape, TopLeftMixin):
             if deltaX > self._preferences.instanceMoveDampener:
                 self.logger.debug(f'{oldX=} {deltaX=}')
                 if currentX > oldX:
-                    self.logger.info(f'current x {currentX} is greater than old x {oldX}')
+                    self.logger.debug(f'current x {currentX} is greater than old x {oldX}')
                     currentX = oldX + self._preferences.instanceMoveDampener
                 else:
-                    self.logger.info(f'current x {currentX} is less than old x {oldX}')
+                    self.logger.debug(f'current x {currentX} is less than old x {oldX}')
                     currentX = oldX - self._preferences.instanceMoveDampener
 
         else:
@@ -146,7 +146,7 @@ class UmlSDInstance(CompositeShape, TopLeftMixin):
         if centerY <= 0:
             centerY = MINIMUM_SD_LIFELINE_Y
 
-        self.logger.info(f'centerXY=({centerX},{centerY})')
+        self.logger.debug(f'centerXY=({centerX},{centerY})')
 
         super().Move(dc=dc, x=centerX, y=centerY, display=display)
 

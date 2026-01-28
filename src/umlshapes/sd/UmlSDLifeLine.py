@@ -3,9 +3,14 @@ from typing import TYPE_CHECKING
 
 from logging import Logger
 from logging import getLogger
+from typing import Tuple
 
+from umlshapes.UmlUtils import NO_INTERSECTION
+from umlshapes.UmlUtils import UmlUtils
 from umlshapes.lib.ogl import LineShape
 from umlshapes.sd.UmlSDMessage import UmlSDMessage
+from umlshapes.types.UmlLine import UmlLine
+from umlshapes.types.UmlPosition import UmlPosition
 
 if TYPE_CHECKING:
     from umlshapes.frames.SequenceDiagramFrame import SequenceDiagramFrame
@@ -100,6 +105,34 @@ class UmlSDLifeLine(LineShape):
 
         # umlLink.sourceShape      = self
         # umlLink.destinationShape = destinationClass
+
+    def GetPerimeterPoint(self, x1, y1, x2, y2) -> Tuple[int, int] | bool:
+        """
+        Get the point at which the line from (x1, y1) to (x2, y2) hits
+        the shape.
+
+        Args:
+            x1: Start of line
+            y1:
+            x2: End of line
+            y2:
+
+        Returns:    `False` if the line doesn't hit the perimeter.
+        """
+        x3, y3, x4, y4 = self.GetEnds()
+        lifeLine: UmlLine = UmlLine(
+            start=UmlPosition(x=x3, y=y3),
+            end=UmlPosition(x=x4, y=y4)
+        )
+        checkLine: UmlLine = UmlLine(
+            start=UmlPosition(x=x1, y=y1),
+            end=UmlPosition(x=x2, y=y2)
+        )
+        umlPosition: UmlPosition = UmlUtils.getIntersectionPoint(line1=lifeLine, line2=checkLine)
+        if umlPosition == NO_INTERSECTION:
+            assert False, 'Why am I getting no intersection'
+        else:
+            return umlPosition.x, umlPosition.y
 
     def __str__(self) -> str:
         return self._umlInstanceName.sdInstance.instanceName

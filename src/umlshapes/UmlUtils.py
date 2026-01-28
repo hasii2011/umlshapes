@@ -1,3 +1,4 @@
+
 from typing import cast
 from typing import List
 from typing import Tuple
@@ -29,6 +30,7 @@ from wx import Size
 
 from umlshapes.lib.ogl import EllipseShape
 from umlshapes.lib.ogl import RectangleShape
+from umlshapes.lib.ogl.oglmisc import CheckLineIntersection
 
 from human_id import generate_id
 
@@ -45,10 +47,12 @@ from umlshapes.types.Common import LollipopCoordinates
 from umlshapes.types.UmlColor import UmlColor
 from umlshapes.types.UmlFontFamily import UmlFontFamily
 from umlshapes.types.UmlLine import UmlLine
+
 from umlshapes.types.UmlPosition import UmlPoint
 from umlshapes.types.UmlPosition import UmlPosition
 from umlshapes.types.UmlPosition import UmlPositions
 
+NO_INTERSECTION: UmlPosition = UmlPosition(x=-1, y=-1)
 
 class UmlUtils:
     """
@@ -69,6 +73,56 @@ class UmlUtils:
     DEFAULT_FONT:     Font = cast(Font, None)
 
     DEFAULT_BACKGROUND_BRUSH: Brush = cast(Brush, None)
+
+    @classmethod
+    def getIntersectionPoint(cls, line1: UmlLine, line2: UmlLine) -> UmlPosition:
+        """
+
+        Args:
+            line1:
+            line2:
+
+        Returns:
+
+        """
+        #
+        #  ratio1: Position of intersection on Line 1.
+        #         * 0.0: Start point (x1, y1)
+        #         * 1.0: End point (x2, y2)
+        #         * 0.5: Middle of the line
+        #  ratio2: Position of intersection on Line 2.
+        #
+        #  Intersection: If both ratios are between 0.0 and 1.0 (inclusive), the line segments intersect.
+        #  Parallel:     If the lines are parallel, it typically returns 1.0 or -1.0.
+        #
+        lineRatio, otherRatio = CheckLineIntersection(
+            x1=line1.start.x,
+            y1=line1.start.y,
+            x2=line1.end.x,
+            y2=line1.end.y,
+            x3=line2.start.x,
+            y3=line2.start.y,
+            x4=line2.end.x,
+            y4=line2.end.y
+        )
+        #                                x1 y1 x2  y2 x3 y3 x4 y4
+        # r1, r2 = CheckLineIntersection(0, 5, 10, 5, 5, 0, 5, 10)
+        #
+        # Calculate exact intersection point using r1
+        #    intersect_x = 0 + (10 - 0) * r1    # x1 + (x2 - x1) * r1
+        #    intersect_y = 5 + (5 - 5) * r1     # y1 + (y2 - y1) * r1
+
+        umlPosition: UmlPosition = NO_INTERSECTION
+        if lineRatio == 1.0 and otherRatio == 1.0:
+            umlPosition = NO_INTERSECTION
+        elif 0.0 <= lineRatio <= 1.0 and 0.0 <= otherRatio <= 1.0:
+
+            intersectX: int = line1.start.x + (line1.end.x - line1.start.x) * lineRatio
+            intersectY: int = line1.start.y + (line1.end.y - line1.start.y) * lineRatio
+
+            umlPosition = UmlPosition(x=round(intersectX), y=round(intersectY))
+
+        return umlPosition
 
     @classmethod
     def isShapeInRectangle(cls, boundingRectangle: Rectangle, shapeRectangle: Rectangle) -> bool:

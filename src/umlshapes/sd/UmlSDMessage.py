@@ -7,37 +7,56 @@ from typing import TYPE_CHECKING
 from logging import Logger
 from logging import getLogger
 
-from wx import MemoryDC
-from wx import PENSTYLE_SOLID
+from enum import Enum
+
+from wx import BLACK_BRUSH
+
 from wx import Pen
+from wx import MemoryDC
+
+from umlshapes.lib.ogl import LineShape
+from umlshapes.lib.ogl import ARROW_ARROW
+from umlshapes.lib.ogl import ARROW_POSITION_END
+from umlshapes.lib.ogl import FORMAT_SIZE_TO_CONTENTS
 
 from umlshapes.UmlUtils import UmlUtils
-from umlshapes.lib.ogl import ARROW_ARROW
-from umlshapes.lib.ogl import FORMAT_SIZE_TO_CONTENTS
-from umlshapes.lib.ogl import LineShape
 
 from umlmodel.SDMessage import SDMessage
 
+from umlshapes.preferences.UmlPreferences import UmlPreferences
 from umlshapes.sd.UmlMessageEnd import UmlMessageEnd
 if TYPE_CHECKING:
     from umlshapes.sd.UmlSDLifeLine import UmlSDLifeLine
 
+class UmlMessageType(Enum):
+    SYNCHRONOUS_MESSAGE = 'Synchronous Message'
+
 
 class UmlSDMessage(LineShape):
-    def __init__(self, sdMessage: SDMessage):
+    def __init__(self, sdMessage: SDMessage, messageType: UmlMessageType = UmlMessageType.SYNCHRONOUS_MESSAGE):
+
         from umlshapes.sd.UmlSDLifeLine import UmlSDLifeLine
 
         self.logger: Logger = getLogger(__name__)
         super().__init__()
 
-        self._sdMessage: SDMessage = sdMessage
-        # self._initializeTextFont()
+        self._sdMessage:   SDMessage      = sdMessage
+        self._messageType: UmlMessageType = messageType
+        self._preferences: UmlPreferences = UmlPreferences()
         self.AddText(sdMessage.message)
-        self.AddArrow(type=ARROW_ARROW)
+        #
+        # TODO:  Support different message type that require different arrow heads
+        #
+        self.AddArrow(
+            type=ARROW_ARROW,
+            end=ARROW_POSITION_END,
+            size=self._preferences.messageArrowHeadSize
+        )
+        self.SetBrush(BLACK_BRUSH)      # Required for solid arrow
 
         self.SetFormatMode(mode=FORMAT_SIZE_TO_CONTENTS)
         self.SetDraggable(True, recursive=True)
-
+        self.MakeLineControlPoints(n=2)
         self._fromLifeline: UmlSDLifeLine = cast(UmlSDLifeLine, None)
         self._toLifeLine:   UmlSDLifeLine = cast(UmlSDLifeLine, None)
 
@@ -81,34 +100,39 @@ class UmlSDMessage(LineShape):
         self.AddText(text)
 
     def OnDraw(self, dc: MemoryDC):
-        savePen: Pen = dc.GetPen()
 
         # TODO:  Support different message types here
         pen: Pen = UmlUtils.blackSolidPen()
-        pen.SetStyle(PENSTYLE_SOLID)
         dc.SetPen(pen)
 
         startX, startY, endX, endY = self.GetEnds()
 
+        fromX: int = self._fromLifeline.GetX()
+        toX:   int = self._toLifeLine.GetX()
         dc.DrawLine(
-            x1=startX,
-            y1=startY,
-            x2=endX,
-            y2=endY
+            x1=round(fromX),
+            y1=round(startY),
+            x2=round(toX),
+            y2=round(endY)
         )
-
+        self.SetEnds(
+            x1=round(fromX),
+            y1=round(startY),
+            x2=round(toX),
+            y2=round(endY)
+        )
         self.SetPen(pen)
-        self.DrawArrows(dc)
-
-        dc.SetPen(savePen)
+        self.DrawArrows(dc=dc)
 
     def OnDrawContents(self, dc: MemoryDC):
         pass
 
     def SetFrom(self, fromLifeline: 'UmlSDLifeLine'):
+        self._from         = fromLifeline
         self._fromLifeline = fromLifeline
 
     def SetTo(self, toLifeLine: 'UmlSDLifeLine'):
+        self._to         = toLifeLine
         self._toLifeLine = toLifeLine
 
     def __str__(self) -> str:

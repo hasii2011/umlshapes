@@ -120,6 +120,7 @@ SEQUENCE_DIAGRAM_PREFERENCES: ValueDescriptions = ValueDescriptions(
         KeyName('instanceDimensions'):         ValueDescription(defaultValue=str(UmlDimensions(100, 400)), deserializer=UmlDimensions.deSerialize),
         KeyName('instanceNameRelativeHeight'): ValueDescription(defaultValue='0.15',                       deserializer=SecureConversions.secureFloat),
         KeyName('instanceMoveDampener'):       ValueDescription(defaultValue='10',                         deserializer=SecureConversions.secureInteger),
+        KeyName('messageArrowHeadSize'):       ValueDescription(defaultValue='10.0',                       deserializer=SecureConversions.secureFloat),
     }
 )
 ASSOCIATION_PREFERENCES: ValueDescriptions = ValueDescriptions(

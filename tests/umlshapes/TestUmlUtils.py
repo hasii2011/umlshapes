@@ -5,6 +5,7 @@ from unittest import main as unitTestMain
 from codeallybasic.UnitTestBase import UnitTestBase
 
 from umlshapes.UmlUtils import UmlUtils
+from umlshapes.UmlUtils import NO_INTERSECTION
 
 from umlshapes.mixins.TopLeftMixin import Rectangle
 
@@ -35,6 +36,26 @@ BOUNDING_RECTANGLE: Rectangle = Rectangle(
     bottom=500
 )
 
+#
+# For UmlSDLifeLine.GetPerimeterPoint() implementation
+#
+x1: int = 100
+y1: int = 100
+x2: int = 150
+y2: int = 200
+UML_LIFE_LINE_1: UmlLine = UmlLine(
+    start=UmlPosition(x=x1, y=y1),
+    end=UmlPosition(x=x2, y=y2)
+)
+
+x3: int = 100
+y3: int = 125
+x4: int = 250
+y4: int = 125
+UML_LIFE_LINE_2: UmlLine = UmlLine(
+    start=UmlPosition(x=x3, y=y3),
+    end=UmlPosition(x=x4, y=y4)
+)
 
 class TestUmlUtils(UnitTestBase):
     """
@@ -58,6 +79,56 @@ class TestUmlUtils(UnitTestBase):
 
     def tearDown(self):
         super().tearDown()
+
+    def testFindIntersectionPoint(self):
+
+        umlPosition: UmlPosition = UmlUtils.getIntersectionPoint(line1=UML_LIFE_LINE_1, line2=UML_LIFE_LINE_2)
+
+        expectedPosition: UmlPosition = UmlPosition(x=112, y=125)
+        self.assertEqual(expectedPosition, umlPosition, 'Incorrect position')
+
+    def testFindIntersectionPointVerticalParallel(self):
+
+        verticalLine1: UmlLine = UmlLine(
+            start=UmlPosition(x=100, y=100),
+            end=UmlPoint(x=110, y=200)
+        )
+        verticalLine2: UmlLine = UmlLine(
+            start=UmlPosition(x=200, y=100),
+            end=UmlPoint(x=200, y=200)
+        )
+        umlPosition: UmlPosition = UmlUtils.getIntersectionPoint(line1=verticalLine1, line2=verticalLine2)
+
+        expectedPosition: UmlPosition = NO_INTERSECTION
+        self.assertEqual(expectedPosition, umlPosition, 'Should be parallel')
+
+    def testFindIntersectionPointHorizontalParallel(self):
+        verticalLine1: UmlLine = UmlLine(
+            start=UmlPosition(x=100, y=100),
+            end=UmlPoint(x=200, y=100)
+        )
+        verticalLine2: UmlLine = UmlLine(
+            start=UmlPosition(x=100, y=300),
+            end=UmlPoint(x=200, y=300)
+        )
+        umlPosition: UmlPosition = UmlUtils.getIntersectionPoint(line1=verticalLine1, line2=verticalLine2)
+
+        expectedPosition: UmlPosition = NO_INTERSECTION
+        self.assertEqual(expectedPosition, umlPosition, 'Incorrect position, should be parallel')
+
+    def testFindIntersectionNonIntersecting(self):
+        verticalLine1: UmlLine = UmlLine(
+            start=UmlPosition(x=100, y=100),
+            end=UmlPoint(x=300, y=300)
+        )
+        verticalLine2: UmlLine = UmlLine(
+            start=UmlPosition(x=200, y=500),
+            end=UmlPoint(x=600, y=200)
+        )
+        umlPosition: UmlPosition = UmlUtils.getIntersectionPoint(line1=verticalLine1, line2=verticalLine2)
+
+        expectedPosition: UmlPosition = NO_INTERSECTION
+        self.assertEqual(expectedPosition, umlPosition, 'Incorrect position, should be non intersecting')
 
     def testIsLineWhollyContainedByRectangleTrue(self):
 
@@ -229,27 +300,27 @@ class TestUmlUtils(UnitTestBase):
         self.assertEqual(0.1, distance, 'Incorrect distance')
 
     def testAttachmentSideTop(self):
-        x1: int = RECTANGLE_LEFT + 5
-        y1: int = RECTANGLE_TOP
-        attachmentSide: AttachmentSide = UmlUtils.attachmentSide(x=x1, y=y1, rectangle=self._rectangle)
+        x: int = RECTANGLE_LEFT + 5
+        y: int = RECTANGLE_TOP
+        attachmentSide: AttachmentSide = UmlUtils.attachmentSide(x=x, y=y, rectangle=self._rectangle)
         self.assertEqual(AttachmentSide.TOP, attachmentSide, 'Incorrect calculation')
 
     def testAttachmentSideBottom(self):
-        x1: int = RECTANGLE_LEFT + 5
-        y1: int = RECTANGLE_BOTTOM
-        attachmentSide: AttachmentSide = UmlUtils.attachmentSide(x=x1, y=y1, rectangle=self._rectangle)
+        x: int = RECTANGLE_LEFT + 5
+        y: int = RECTANGLE_BOTTOM
+        attachmentSide: AttachmentSide = UmlUtils.attachmentSide(x=x, y=y, rectangle=self._rectangle)
         self.assertEqual(AttachmentSide.BOTTOM, attachmentSide, 'Incorrect calculation')
 
     def testAttachmentSideLeft(self):
-        x1: int = RECTANGLE_LEFT
-        y1: int = RECTANGLE_BOTTOM + 6
-        attachmentSide: AttachmentSide = UmlUtils.attachmentSide(x=x1, y=y1, rectangle=self._rectangle)
+        x: int = RECTANGLE_LEFT
+        y: int = RECTANGLE_BOTTOM + 6
+        attachmentSide: AttachmentSide = UmlUtils.attachmentSide(x=x, y=y, rectangle=self._rectangle)
         self.assertEqual(AttachmentSide.LEFT, attachmentSide, 'Incorrect calculation')
 
     def testAttachmentSideRight(self):
-        x1: int = RECTANGLE_RIGHT
-        y1: int = RECTANGLE_BOTTOM + 6
-        attachmentSide: AttachmentSide = UmlUtils.attachmentSide(x=x1, y=y1, rectangle=self._rectangle)
+        x: int = RECTANGLE_RIGHT
+        y: int = RECTANGLE_BOTTOM + 6
+        attachmentSide: AttachmentSide = UmlUtils.attachmentSide(x=x, y=y, rectangle=self._rectangle)
         self.assertEqual(AttachmentSide.RIGHT, attachmentSide, 'Incorrect calculation')
 
     def testAttachmentPointNotOnPerimeter(self):
