@@ -10,6 +10,7 @@ from umlshapes.lib.ogl import CompositeShape
 from umlshapes.lib.ogl import Constraint
 
 from umlshapes.UmlUtils import UmlUtils
+from umlshapes.mixins.ControlPointMixin import ControlPointMixin
 
 from umlshapes.mixins.TopLeftMixin import TopLeftMixin
 
@@ -26,7 +27,7 @@ if TYPE_CHECKING:
 
 OP_NONE: int = 0    # None of OP_CLICK_LEFT, OP_CLICK_RIGHT, OP_DRAG_LEFT, OP_DRAG_RIGHT
 
-class UmlSDInstance(CompositeShape, TopLeftMixin):
+class UmlSDInstance(ControlPointMixin, CompositeShape, TopLeftMixin):
 
     def __init__(self, sdInstance: SDInstance, diagramFrame: 'SequenceDiagramFrame'):
 
@@ -34,7 +35,8 @@ class UmlSDInstance(CompositeShape, TopLeftMixin):
         self._preferences:  UmlPreferences = UmlPreferences()
         instanceDimensions: UmlDimensions  = self._preferences.instanceDimensions
 
-        super().__init__()
+        ControlPointMixin.__init__(self, shape=self)
+        CompositeShape.__init__(self)
         TopLeftMixin.__init__(self, umlShape=self, width=instanceDimensions.width, height=instanceDimensions.height)
 
         self.SetCanvas(diagramFrame)

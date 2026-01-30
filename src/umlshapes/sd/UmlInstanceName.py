@@ -30,6 +30,7 @@ class UmlInstanceName(RectangleShape):
 
         super().__init__(w=width, h=height)
         self.AddText(sdInstance.instanceName)
+        self.SetCentreResize(False)
 
     @property
     def instanceName(self) -> str:
