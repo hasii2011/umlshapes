@@ -7,7 +7,6 @@ from logging import getLogger
 
 from pathlib import Path
 
-from umlmodel.SDInstance import SDInstance
 from wx import ClientDC
 from wx import OK
 from wx import ID_CUT
@@ -40,6 +39,7 @@ from wx.lib.sized_controls import SizedPanel
 from umlmodel.Interface import Interface
 from umlmodel.Interface import Interfaces
 from umlmodel.ModelTypes import ClassName
+from umlmodel.SDInstance import SDInstance
 
 from umlshapes.UmlUtils import UmlUtils
 from umlshapes.ShapeTypes import UmlShapeGenre
@@ -447,7 +447,7 @@ class DemoAppFrame(SizedFrame):
 
         x, y = umlSDInstance.computeCenterXY(umlPosition)
         umlSDInstance.Move(dc, x, y)
-        self.logger.info(f'{xCoordinate=} {instanceY=}')
+        self.logger.info(f'{umlSDInstance.id} - {xCoordinate=} {instanceY=}')
 
         umlSDInstance.SetCanvas(diagramFrame)
 

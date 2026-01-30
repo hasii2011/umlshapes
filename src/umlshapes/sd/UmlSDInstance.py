@@ -3,15 +3,16 @@ from logging import Logger
 from logging import getLogger
 from typing import TYPE_CHECKING
 
-from umlmodel.SDInstance import SDInstance
-
-from umlshapes.lib.ogl import CONSTRAINT_ALIGNED_TOP
 from umlshapes.lib.ogl import CompositeShape
 from umlshapes.lib.ogl import Constraint
+from umlshapes.lib.ogl import CONSTRAINT_ALIGNED_TOP
 
+from umlmodel.SDInstance import SDInstance
 from umlshapes.UmlUtils import UmlUtils
-from umlshapes.mixins.ControlPointMixin import ControlPointMixin
 
+
+from umlshapes.mixins.ControlPointMixin import ControlPointMixin
+from umlshapes.mixins.IdentifierMixin import IdentifierMixin
 from umlshapes.mixins.TopLeftMixin import TopLeftMixin
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
@@ -27,7 +28,7 @@ if TYPE_CHECKING:
 
 OP_NONE: int = 0    # None of OP_CLICK_LEFT, OP_CLICK_RIGHT, OP_DRAG_LEFT, OP_DRAG_RIGHT
 
-class UmlSDInstance(ControlPointMixin, CompositeShape, TopLeftMixin):
+class UmlSDInstance(ControlPointMixin, IdentifierMixin, CompositeShape, TopLeftMixin):
 
     def __init__(self, sdInstance: SDInstance, diagramFrame: 'SequenceDiagramFrame'):
 
@@ -36,6 +37,7 @@ class UmlSDInstance(ControlPointMixin, CompositeShape, TopLeftMixin):
         instanceDimensions: UmlDimensions  = self._preferences.instanceDimensions
 
         ControlPointMixin.__init__(self, shape=self)
+        IdentifierMixin.__init__(self)
         CompositeShape.__init__(self)
         TopLeftMixin.__init__(self, umlShape=self, width=instanceDimensions.width, height=instanceDimensions.height)
 
