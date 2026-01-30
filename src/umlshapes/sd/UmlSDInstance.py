@@ -17,13 +17,14 @@ from umlshapes.preferences.UmlPreferences import UmlPreferences
 
 from umlshapes.types.UmlDimensions import UmlDimensions
 
-from umlshapes.shapes.sd.SDInstanceConstrainer import SDInstanceConstrainer
-from umlshapes.shapes.sd.UmlInstanceName import UmlInstanceName
+from umlshapes.sd.SDInstanceConstrainer import SDInstanceConstrainer
+from umlshapes.sd.UmlInstanceName import UmlInstanceName
 
 
 if TYPE_CHECKING:
     from umlshapes.frames.SequenceDiagramFrame import SequenceDiagramFrame
 
+OP_NONE: int = 0    # None of OP_CLICK_LEFT, OP_CLICK_RIGHT, OP_DRAG_LEFT, OP_DRAG_RIGHT
 
 class UmlSDInstance(CompositeShape, TopLeftMixin):
 
@@ -59,7 +60,8 @@ class UmlSDInstance(CompositeShape, TopLeftMixin):
         instanceName.SetDraggable(False)
 
         # If we don't do this the shape will take all left-clicks for itself
-        constrainingShape.SetSensitivityFilter(0)
+        constrainingShape.SetSensitivityFilter(OP_NONE)
+        self.SetCentreResize(False)
 
     @property
     def umlFrame(self) -> 'SequenceDiagramFrame':

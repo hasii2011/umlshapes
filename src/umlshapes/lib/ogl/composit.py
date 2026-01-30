@@ -21,6 +21,8 @@ from .oglmisc import *
 
 _objectStartX = 0.0
 _objectStartY = 0.0
+_shapeStartX = 0.0
+_shapeStartY = 0.0
 
 CONSTRAINT_CENTRED_VERTICALLY   = 1
 CONSTRAINT_CENTRED_HORIZONTALLY = 2
@@ -409,6 +411,8 @@ class CompositeShape(RectangleShape):
         Default class constructor.
 
         """
+        from umlshapes.preferences.UmlPreferences import UmlPreferences
+
         RectangleShape.__init__(self, 100.0, 100.0)
 
         self._oldX = self._xpos
@@ -416,6 +420,8 @@ class CompositeShape(RectangleShape):
 
         self._constraints = []
         self._divisions = [] # In case it's a container
+
+        self._preferences: UmlPreferences = UmlPreferences()
 
     def OnDraw(self, dc):
         """The draw handler."""
@@ -474,14 +480,21 @@ class CompositeShape(RectangleShape):
         dc.SetPen(dottedPen)
         dc.SetBrush(wx.TRANSPARENT_BRUSH)
 
-        self.GetEventHandler().OnDrawOutline(dc, self.GetX() + offsetX, self.GetY() + offsetY, self.GetWidth(), self.GetHeight())
+        if self._preferences.enableCompositeShapeLiveDragging is True:
+            self.GetEventHandler().OnDrawOutline(dc, _shapeStartX + offsetX, _shapeStartY + offsetY, self.GetWidth(), self.GetHeight())
+        else:
+            self.GetEventHandler().OnDrawOutline(dc, self.GetX() + offsetX, self.GetY() + offsetY, self.GetWidth(), self.GetHeight())
 
     def OnBeginDragLeft(self, x, y, keys = 0, attachment = 0):
         """The begin drag left handler."""
-        global _objectStartX, _objectStartY
+        global _objectStartX, _objectStartY, _shapeStartX, _shapeStartY
 
         _objectStartX = x
         _objectStartY = y
+
+        if self._preferences.enableCompositeShapeLiveDragging is True:
+            _shapeStartX = self.GetX()
+            _shapeStartY = self.GetY()
 
         dc = wx.ClientDC(self.GetCanvas())
         self.GetCanvas().PrepareDC(dc)

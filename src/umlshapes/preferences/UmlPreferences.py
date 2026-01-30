@@ -116,9 +116,10 @@ NAME_PREFERENCES: ValueDescriptions = ValueDescriptions(
 )
 SEQUENCE_DIAGRAM_PREFERENCES: ValueDescriptions = ValueDescriptions(
     {
-        KeyName('instanceYPosition'):          ValueDescription(defaultValue='50',                         deserializer=SecureConversions.secureInteger),
-        KeyName('instanceDimensions'):         ValueDescription(defaultValue=str(UmlDimensions(100, 400)), deserializer=UmlDimensions.deSerialize),
-        KeyName('instanceNameRelativeHeight'): ValueDescription(defaultValue='0.15',                       deserializer=SecureConversions.secureFloat),
+        KeyName('instanceDimensions'):               ValueDescription(defaultValue=str(UmlDimensions(100, 400)), deserializer=UmlDimensions.deSerialize),
+        KeyName('instanceYPosition'):                ValueDescription(defaultValue='50',   deserializer=SecureConversions.secureInteger),
+        KeyName('instanceNameRelativeHeight'):       ValueDescription(defaultValue='0.15', deserializer=SecureConversions.secureFloat),
+        KeyName('enableCompositeShapeLiveDragging'): ValueDescription(defaultValue='True', deserializer=SecureConversions.secureBoolean),
     }
 )
 ASSOCIATION_PREFERENCES: ValueDescriptions = ValueDescriptions(

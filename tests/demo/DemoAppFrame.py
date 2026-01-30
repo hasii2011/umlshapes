@@ -62,8 +62,8 @@ from umlshapes.links.eventhandlers.UmlLollipopInterfaceEventHandler import UmlLo
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
 from umlshapes.shapes.UmlClass import UmlClass
-from umlshapes.shapes.sd.UmlSDInstance import UmlSDInstance
-from umlshapes.shapes.eventhandlers.UmlSdInstanceEventHandler import UmlSdInstanceEventHandler
+from umlshapes.sd.UmlSDInstance import UmlSDInstance
+from umlshapes.sd.eventhandlers.UmlSdInstanceEventHandler import UmlSdInstanceEventHandler
 
 from umlshapes.types.Common import AttachmentSide
 from umlshapes.types.UmlPosition import UmlPosition
@@ -456,9 +456,11 @@ class DemoAppFrame(SizedFrame):
         diagramFrame.umlDiagram.AddShape(umlSDInstance)
         umlSDInstance.Show(True)
 
-        eventHandler: UmlSdInstanceEventHandler = UmlSdInstanceEventHandler(umlPubSubEngine=self._umlPubSubEngine)
-        eventHandler.SetShape(umlSDInstance)
-        eventHandler.SetPreviousHandler(umlSDInstance.GetEventHandler())
+        eventHandler: UmlSdInstanceEventHandler = UmlSdInstanceEventHandler(
+            umlSdInstance=umlSDInstance,
+            umlPubSubEngine=self._umlPubSubEngine,
+            previousEventHandler=umlSDInstance.GetEventHandler()
+        )
         umlSDInstance.SetEventHandler(eventHandler)
 
         diagramFrame.refresh()
