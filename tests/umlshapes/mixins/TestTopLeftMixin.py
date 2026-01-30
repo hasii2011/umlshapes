@@ -72,9 +72,8 @@ class TestTopLeftMixin(UnitTestBaseW):
         actualPosition: UmlPosition = shape.position
 
         self.assertEqual(expectedPosition, actualPosition, 'These should match')
-
+        # noinspection PyUnusedLocal
         centerX, centerY = shape.computeCenterXY(expectedPosition)
-        print(f'{centerX=}, {centerY=}')
 
     def testBasicRectangleLeft(self):
         shape: MixinShape = MixinShape()

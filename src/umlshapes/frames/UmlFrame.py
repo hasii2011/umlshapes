@@ -253,14 +253,15 @@ class UmlFrame(DiagramFrame):
     def OnEndDragLeft(self, x, y, keys=0):
 
         from umlshapes.links.UmlLink import UmlLink
+        from umlshapes.sd.UmlSDMessage import UmlSDMessage
 
         self.Unbind(EVT_MOTION, handler=self._onSelectorMove)
         self.umlDiagram.RemoveShape(self._selector)
 
         for s in self.umlDiagram.shapes:
             if self._ignoreShape(shapeToCheck=s) is False:
-                if isinstance(s, UmlLink):
-                    umlLink: UmlLink = s
+                if isinstance(s, UmlLink) or isinstance(s, UmlSDMessage):
+                    umlLink: UmlLink | UmlSDMessage = s
                     x1, y1, x2, y2 = umlLink.GetEnds()
                     umlLine: UmlLine = UmlLine(start=UmlPoint(x=x1, y=y1), end=UmlPoint(x=x2, y=y2))
                     if UmlUtils.isLineWhollyContainedByRectangle(boundingRectangle=self._selector.rectangle, umlLine=umlLine) is True:
@@ -413,7 +414,7 @@ class UmlFrame(DiagramFrame):
 
         selectedShapes = self.selectedShapes
 
-        if len(selectedShapes) > 0:
+        if len(selectedShapes) > 0:         # noqa
             for shape in selectedShapes:
                 if isinstance(shape, UmlShapeGenre):
                     callback(shape)

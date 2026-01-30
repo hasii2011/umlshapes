@@ -3,8 +3,8 @@ from wx import CANCEL
 from wx import CENTER
 from wx import OK
 
-from wx import TextEntryDialog
 from wx import Window
+from wx import TextEntryDialog
 
 
 class DlgEditUseCase(TextEntryDialog):

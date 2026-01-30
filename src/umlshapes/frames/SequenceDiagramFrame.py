@@ -26,4 +26,4 @@ class SequenceDiagramFrame(UmlFrame):
         self._umlPubSubEngine.subscribe(messageType=UmlMessageType.SHAPE_MOVING,  frameId=self.id, listener=self._shapeMovingListener)
 
     def _shapeMovingListener(self, deltaXY: DeltaXY):
-        self.logger.warning(f'{deltaXY}')
+        self.logger.debug(f'{deltaXY=}')

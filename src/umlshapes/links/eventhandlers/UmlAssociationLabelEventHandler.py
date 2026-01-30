@@ -59,7 +59,7 @@ class UmlAssociationLabelEventHandler(UmlBaseEventHandler):
 
         self._debugPrint(f'label type: {umlAssociationLabel.labelType} xy=({x},{y})')
 
-        if umlAssociationLabel.labelType == LabelType.ASSOCIATION_NAME:
+        if umlAssociationLabel.labelType == LabelType.ASSOCIATION_NAME or umlAssociationLabel.labelType == LabelType.SD_MESSAGE_NAME:
             linkLabelX, linkLabelY = umlLink.GetLabelPosition(NAME_IDX)
         elif umlAssociationLabel.labelType == LabelType.SOURCE_CARDINALITY:
             linkLabelX, linkLabelY = umlLink.GetLabelPosition(SOURCE_CARDINALITY_IDX)

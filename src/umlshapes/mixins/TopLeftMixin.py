@@ -89,7 +89,7 @@ class TopLeftMixin:
         position.
 
         Args:
-            position:
+            position:  The requested top left position
         """
         centerX, centerY = self.computeCenterXY(position)
 
@@ -118,7 +118,7 @@ class TopLeftMixin:
         width:  int = self.size.width
         height: int = self.size.height
 
-        left: int = x - (width // 2)
-        top:  int = y - (height // 2)
+        left: int = round(x - (width // 2))
+        top:  int = round(y - (height // 2))
 
         return LeftCoordinate(x=left, y=top)

@@ -7,7 +7,6 @@ from logging import getLogger
 
 from pathlib import Path
 
-from umlmodel.SDInstance import SDInstance
 from wx import ClientDC
 from wx import OK
 from wx import ID_CUT
@@ -30,7 +29,6 @@ from wx import MenuBar
 from wx import Notebook
 from wx import CommandEvent
 from wx import BookCtrlEvent
-from wx import Point
 from wx import MenuItem
 from wx import MessageDialog
 
@@ -40,6 +38,7 @@ from wx.lib.sized_controls import SizedPanel
 from umlmodel.Interface import Interface
 from umlmodel.Interface import Interfaces
 from umlmodel.ModelTypes import ClassName
+from umlmodel.SDInstance import SDInstance
 
 from umlshapes.UmlUtils import UmlUtils
 from umlshapes.ShapeTypes import UmlShapeGenre
@@ -60,10 +59,11 @@ from umlshapes.links.UmlLollipopInterface import UmlLollipopInterface
 from umlshapes.links.eventhandlers.UmlLollipopInterfaceEventHandler import UmlLollipopInterfaceEventHandler
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
+from umlshapes.sd.SDMessageCreationHandler import SDMessageCreationHandler
 
 from umlshapes.shapes.UmlClass import UmlClass
-from umlshapes.shapes.sd.UmlSDInstance import UmlSDInstance
-from umlshapes.shapes.eventhandlers.UmlSdInstanceEventHandler import UmlSdInstanceEventHandler
+from umlshapes.sd.UmlSDInstance import UmlSDInstance
+from umlshapes.sd.eventhandlers.UmlSdInstanceEventHandler import UmlSdInstanceEventHandler
 
 from umlshapes.types.Common import AttachmentSide
 from umlshapes.types.UmlPosition import UmlPosition
@@ -94,6 +94,7 @@ class DemoAppFrame(SizedFrame):
         self._umlPubSubEngine: UmlPubSubEngine = UmlPubSubEngine()
         self._editMenu:        Menu            = cast(Menu, None)
         self._shapeItem:       MenuItem        = cast(MenuItem, None)
+        self._messageItem:     MenuItem        = cast(MenuItem, None)
 
         self._noteBook: Notebook = Notebook(parent=sizedPanel)
         self._noteBook.SetSizerProps(expand=True, proportion=1)
@@ -119,12 +120,15 @@ class DemoAppFrame(SizedFrame):
         self.CreateStatusBar()  # should always do this when there's a resize border
         self.SetAutoLayout(True)
 
-        self.SetPosition(pt=Point(x=20, y=40))
+        # For running UI tests
+        #  self.SetPosition(pt=Point(x=20, y=40))
 
         self.Show(True)
 
-        self._shapeCreator: ShapeCreator   = ShapeCreator(umlPubSubEngine=self._umlPubSubEngine)
-        self._linkCreator:  LinkCreator    = LinkCreator(umlPubSubEngine=self._umlPubSubEngine)
+        self._shapeCreator:     ShapeCreator     = ShapeCreator(umlPubSubEngine=self._umlPubSubEngine)
+        self._linkCreator:      LinkCreator      = LinkCreator(umlPubSubEngine=self._umlPubSubEngine)
+        self._sdMessageHandler: SDMessageCreationHandler = SDMessageCreationHandler(umlPubSubEngine=self._umlPubSubEngine, sequenceDiagramFrame=self._currentFrame)
+
         self._preferences:  UmlPreferences = UmlPreferences()
 
         self._interfaceCount: int = 0
@@ -149,15 +153,18 @@ class DemoAppFrame(SizedFrame):
     def _createApplicationMenuBar(self):
 
         menuBar:  MenuBar = MenuBar()
-        fileMenu: Menu    = Menu()
-        editMenu: Menu    = Menu()
-        viewMenu: Menu    = Menu()
+        fileMenu:   Menu  = Menu()
+        editMenu:   Menu  = Menu()
+        viewMenu:   Menu  = Menu()
+        actionMenu: Menu  = Menu()
 
-        self._shapeItem = fileMenu.AppendCheckItem(Identifiers.ID_DEMO_SHAPE_BOUNDARIES, item='Shape Boundaries', help='Demo Shape Boundaries')
+        self._shapeItem   = fileMenu.AppendCheckItem(Identifiers.ID_DEMO_SHAPE_BOUNDARIES, item='Shape Boundaries', help='Demo Shape Boundaries')
         fileMenu.AppendSeparator()
         fileMenu.Append(ID_EXIT, '&Quit', "Quit Application")
         fileMenu.AppendSeparator()
         fileMenu.Append(ID_PREFERENCES, "P&references", "Uml preferences")
+
+        self._messageItem = actionMenu.AppendCheckItem(Identifiers.ID_CREATE_SD_MESSAGE, item='Create SD Message', help='Demo SD Message')
 
         #
         # Use all the stock properties
@@ -188,13 +195,12 @@ class DemoAppFrame(SizedFrame):
         viewMenu.Append(id=Identifiers.ID_DISPLAY_SEQUENCE_DIAGRAM,    item='Sequence Diagram', helpString='Display Sequence Diagram')
         viewMenu.AppendSeparator()
 
-        menuBar.Append(fileMenu, 'File')
-        menuBar.Append(editMenu, 'Edit')
-        menuBar.Append(viewMenu, 'View')
+        menuBar.Append(fileMenu,   'File')
+        menuBar.Append(editMenu,   'Edit')
+        menuBar.Append(viewMenu,   'View')
+        menuBar.Append(actionMenu, 'Action')
 
         self.SetMenuBar(menuBar)
-
-        # self.Bind(EVT_MENU, self._onOglPreferences, id=ID_PREFERENCES)
 
         self._editMenu = editMenu
 
@@ -223,6 +229,8 @@ class DemoAppFrame(SizedFrame):
         self.Bind(EVT_MENU, self._onEditMenu, id=ID_PASTE)
         self.Bind(EVT_MENU, self._onEditMenu, id=ID_SELECTALL)
 
+        self.Bind(EVT_MENU, self._onDemoSDMessageCreation, id=Identifiers.ID_CREATE_SD_MESSAGE)
+
     # noinspection PyUnusedLocal
     def _onDemoShapeBoundaries(self, event: CommandEvent):
 
@@ -241,6 +249,24 @@ class DemoAppFrame(SizedFrame):
             self._currentFrame.drawShapeBoundary = False
         self._currentFrame.refresh()
         self.logger.info(f'Drawing Shapes Boundary=`{self._currentFrame.drawShapeBoundary}` frame=`{self._currentFrame.id}`')
+
+    def _onDemoSDMessageCreation(self, event: CommandEvent):
+
+        if event.IsChecked() is True:
+            diagramFrame: SequenceDiagramFrame = self._currentFrame
+            if isinstance(diagramFrame, SequenceDiagramFrame) is True:
+                self._sdMessageHandler.enableMessageCreation = True
+            else:
+                msgDlg: MessageDialog = MessageDialog(
+                    parent=None,
+                    message='Sequence Diagram Messages must be placed on a Sequence Diagram frame',
+                    caption='Bad News',
+                    style=OK | ICON_ERROR
+                )
+                msgDlg.ShowModal()
+
+        else:
+            self._sdMessageHandler.enableMessageCreation = False
 
     def _onDisplayElement(self, event: CommandEvent):
 
@@ -295,7 +321,6 @@ class DemoAppFrame(SizedFrame):
 
             self._createSDInstance(diagramFrame=diagramFrame, instanceName='instance1', xCoordinate=100)
             self._createSDInstance(diagramFrame=diagramFrame, instanceName='instance2', xCoordinate=300)
-
         else:
             msgDlg: MessageDialog = MessageDialog(
                 parent=None,
@@ -437,7 +462,11 @@ class DemoAppFrame(SizedFrame):
         sdInstance: SDInstance = SDInstance()
         sdInstance.instanceName = instanceName
 
-        umlSDInstance: UmlSDInstance = UmlSDInstance(sdInstance=sdInstance, diagramFrame=diagramFrame)
+        umlSDInstance: UmlSDInstance = UmlSDInstance(
+            sdInstance=sdInstance,
+            diagramFrame=diagramFrame,
+            umlPubSubEngine=self._umlPubSubEngine
+        )
 
         instanceY:   int         = self._preferences.instanceYPosition
         umlPosition: UmlPosition = UmlPosition(x=xCoordinate, y=instanceY)
@@ -447,7 +476,7 @@ class DemoAppFrame(SizedFrame):
 
         x, y = umlSDInstance.computeCenterXY(umlPosition)
         umlSDInstance.Move(dc, x, y)
-        self.logger.info(f'{xCoordinate=} {instanceY=}')
+        self.logger.info(f'{umlSDInstance.id} - {xCoordinate=} {instanceY=}')
 
         umlSDInstance.SetCanvas(diagramFrame)
 
@@ -456,9 +485,11 @@ class DemoAppFrame(SizedFrame):
         diagramFrame.umlDiagram.AddShape(umlSDInstance)
         umlSDInstance.Show(True)
 
-        eventHandler: UmlSdInstanceEventHandler = UmlSdInstanceEventHandler(umlPubSubEngine=self._umlPubSubEngine)
-        eventHandler.SetShape(umlSDInstance)
-        eventHandler.SetPreviousHandler(umlSDInstance.GetEventHandler())
+        eventHandler: UmlSdInstanceEventHandler = UmlSdInstanceEventHandler(
+            umlSdInstance=umlSDInstance,
+            umlPubSubEngine=self._umlPubSubEngine,
+            previousEventHandler=umlSDInstance.GetEventHandler()
+        )
         umlSDInstance.SetEventHandler(eventHandler)
 
         diagramFrame.refresh()
