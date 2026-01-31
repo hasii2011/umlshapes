@@ -24,12 +24,22 @@ class UmlSdInstanceEventHandler(UmlBaseEventHandler):
         super().__init__(previousEventHandler=previousEventHandler, shape=umlSdInstance)
         self._umlPubSubEngine = umlPubSubEngine
 
-        self._lockedY: int = umlSdInstance.GetX()
+    def OnEndSize(self, x, y):
+        """
+        We want to tell the lifeline to stretch to shrink to new size
 
-    # def OnEndDragLeft(self, x, y, keys=0, attachment=0):
-    #     self.logger.info(f'{self._lockedY=}')
-    #
-    #     super().OnEndDragLeft(x=x, y=y, keys=keys, attachment=attachment)
+        Args:
+            x:
+            y:
+        """
+        from umlshapes.sd.UmlSDLifeLine import UmlSDLifeLine
+
+        umlSDInstance: UmlSDInstance = self.GetShape()
+        umlSDLifeLIne: UmlSDLifeLine = umlSDInstance.umlSDLifeLine
+
+        umlSDLifeLIne.adjustLifeLineTopPosition()
+
+        super().OnEndSize(x, y)
 
     def OnDrawOutline(self, dc: ClientDC, x: int, y: int, w: int, h: int):
         """
@@ -47,9 +57,7 @@ class UmlSdInstanceEventHandler(UmlBaseEventHandler):
         """
         from umlshapes.ShapeTypes import UmlShapeGenre
 
-        # self.logger.info(f'xy: ({x},{y}) width/height: ({w}/{h}) {self._lockedY=}')
-
-        umlShape:        UmlShapeGenre = self.GetShape()
+        umlShape: UmlShapeGenre = self.GetShape()
         umlShape.Move(dc=dc, x=x, y=y, display=True)
 
         umlShape.size = UmlDimensions(width=round(w), height=round(h))
