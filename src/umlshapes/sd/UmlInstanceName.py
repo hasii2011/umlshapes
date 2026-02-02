@@ -4,6 +4,7 @@ from logging import getLogger
 
 from umlmodel.SDInstance import SDInstance
 
+from umlshapes.UmlUtils import UmlUtils
 from umlshapes.lib.ogl import RectangleShape
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
@@ -29,16 +30,17 @@ class UmlInstanceName(RectangleShape):
         height: int = round(instanceDimensions.height * self._preferences.instanceNameRelativeHeight)
 
         super().__init__(w=width, h=height)
+        self.SetFont(UmlUtils.defaultFont())
         self.AddText(sdInstance.instanceName)
         self.SetCentreResize(False)
 
     @property
-    def instanceName(self) -> str:
-        return self._sdInstance.instanceName
+    def sdInstance(self) -> SDInstance:
+        return self._sdInstance
 
-    @instanceName.setter
-    def instanceName(self, instanceName: str):
+    @sdInstance.setter
+    def sdInstance(self, sdInstance: SDInstance):
 
-        self._sdInstance.instanceName = instanceName
+        self._sdInstance = sdInstance
         self.ClearText()
-        self.AddText(instanceName)
+        self.AddText(sdInstance.instanceName)

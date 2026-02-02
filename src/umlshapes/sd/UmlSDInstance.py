@@ -19,6 +19,8 @@ from umlshapes.mixins.IdentifierMixin import IdentifierMixin
 from umlshapes.mixins.TopLeftMixin import TopLeftMixin
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
+from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
+from umlshapes.sd.eventhandlers.UmlSDLifeLineEventHandler import UmlSDLifeLineEventHandler
 
 from umlshapes.types.UmlDimensions import UmlDimensions
 
@@ -34,11 +36,14 @@ OP_NONE: int = 0    # None of OP_CLICK_LEFT, OP_CLICK_RIGHT, OP_DRAG_LEFT, OP_DR
 
 class UmlSDInstance(ControlPointMixin, IdentifierMixin, CompositeShape, TopLeftMixin):
 
-    def __init__(self, sdInstance: SDInstance, diagramFrame: 'SequenceDiagramFrame'):
+    def __init__(self, sdInstance: SDInstance, diagramFrame: 'SequenceDiagramFrame', umlPubSubEngine: IUmlPubSubEngine):
 
-        self._sdInstance:   SDInstance     = sdInstance
         self._preferences:  UmlPreferences = UmlPreferences()
-        instanceDimensions: UmlDimensions  = self._preferences.instanceDimensions
+
+        self._sdInstance:      SDInstance       = sdInstance
+        self._umlPubSubEngine: IUmlPubSubEngine = umlPubSubEngine
+
+        instanceDimensions: UmlDimensions = self._preferences.instanceDimensions
 
         ControlPointMixin.__init__(self, shape=self)
         IdentifierMixin.__init__(self)
@@ -80,6 +85,7 @@ class UmlSDInstance(ControlPointMixin, IdentifierMixin, CompositeShape, TopLeftM
 
         wxCallAfter(sdLifeLine.adjustLifeLineTopPosition)
 
+        self._setEventHandlers(umlSDLifeLine=sdLifeLine)
         self._umlSDLifeLine: UmlSDLifeLine = sdLifeLine
 
     @property
@@ -93,3 +99,19 @@ class UmlSDInstance(ControlPointMixin, IdentifierMixin, CompositeShape, TopLeftM
     @property
     def umlSDLifeLine(self) -> UmlSDLifeLine:
         return self._umlSDLifeLine
+
+    def _setEventHandlers(self, umlSDLifeLine: UmlSDLifeLine):
+        """
+        Set the event handlers for the constrained shapes
+
+        Args:
+            umlSDLifeLine:
+
+        """
+
+        eventHandler: UmlSDLifeLineEventHandler = UmlSDLifeLineEventHandler(
+            umlSDLifeLine=umlSDLifeLine,
+            umlPubSubEngine=self._umlPubSubEngine,
+            previousEventHandler=umlSDLifeLine.GetEventHandler()
+        )
+        umlSDLifeLine.SetEventHandler(eventHandler)

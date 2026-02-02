@@ -11,6 +11,7 @@ from umlshapes.preferences.UmlPreferences import UmlPreferences
 
 from umlshapes.sd.SDInstanceConstrainer import SDInstanceConstrainer
 from umlshapes.sd.UmlInstanceName import UmlInstanceName
+from umlshapes.sd.UmlSDMessage import UmlSDMessage
 
 
 class UmlSDLifeLine(RectangleShape, TopLeftMixin):
@@ -60,3 +61,19 @@ class UmlSDLifeLine(RectangleShape, TopLeftMixin):
 
         self.SetY(lifeLineTopY)
         self.logger.debug(f'------------------')
+
+    def addMessage(self, umlSDMessage: UmlSDMessage, destinationLifeLine: 'UmlSDLifeLine'):
+        """
+
+        Args:
+            umlSDMessage:           The message between us and the 'other' life line
+            destinationLifeLine:    The 'other'
+
+        Returns:
+
+        """
+
+        self.AddLine(line=umlSDMessage, other=destinationLifeLine)
+
+        # umlLink.sourceShape      = self
+        # umlLink.destinationShape = destinationClass

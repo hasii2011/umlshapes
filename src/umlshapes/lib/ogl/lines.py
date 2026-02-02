@@ -556,7 +556,9 @@ class LineShape(Shape):
             # Now draw the text
             if region.GetFont():
                 dc.SetFont(region.GetFont())
-                dc.DrawRectangle(xp - w / 2.0, yp - h / 2.0, w, h)
+                topLeft:  int = xp - w // 2
+                topRight: int = yp - h // 2
+                dc.DrawRectangle(topLeft, topRight, w, h)
 
                 if self._pen:
                     dc.SetPen(self._pen)
@@ -589,7 +591,9 @@ class LineShape(Shape):
             dc.SetPen(self.GetBackgroundPen())
             dc.SetBrush(self.GetBackgroundBrush())
 
-            dc.DrawRectangle(xp - w / 2.0, yp - h / 2.0, w, h)
+            rectX: int = xp - w // 2
+            rectY: int = yp - h // 2
+            dc.DrawRectangle(rectX, rectY, w, h)
 
     def GetLabelPosition(self, position):
         """

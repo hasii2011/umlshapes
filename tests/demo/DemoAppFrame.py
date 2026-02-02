@@ -60,6 +60,7 @@ from umlshapes.links.UmlLollipopInterface import UmlLollipopInterface
 from umlshapes.links.eventhandlers.UmlLollipopInterfaceEventHandler import UmlLollipopInterfaceEventHandler
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
+from umlshapes.sd.SDMessageHandler import SDMessageHandler
 
 from umlshapes.shapes.UmlClass import UmlClass
 from umlshapes.sd.UmlSDInstance import UmlSDInstance
@@ -119,12 +120,15 @@ class DemoAppFrame(SizedFrame):
         self.CreateStatusBar()  # should always do this when there's a resize border
         self.SetAutoLayout(True)
 
-        self.SetPosition(pt=Point(x=20, y=40))
+        # For running UI tests
+        #  self.SetPosition(pt=Point(x=20, y=40))
 
         self.Show(True)
 
-        self._shapeCreator: ShapeCreator   = ShapeCreator(umlPubSubEngine=self._umlPubSubEngine)
-        self._linkCreator:  LinkCreator    = LinkCreator(umlPubSubEngine=self._umlPubSubEngine)
+        self._shapeCreator:     ShapeCreator     = ShapeCreator(umlPubSubEngine=self._umlPubSubEngine)
+        self._linkCreator:      LinkCreator      = LinkCreator(umlPubSubEngine=self._umlPubSubEngine)
+        self._sdMessageHandler: SDMessageHandler = SDMessageHandler(umlPubSubEngine=self._umlPubSubEngine, sequenceDiagramFrame=self._currentFrame)
+
         self._preferences:  UmlPreferences = UmlPreferences()
 
         self._interfaceCount: int = 0
@@ -295,6 +299,11 @@ class DemoAppFrame(SizedFrame):
 
             self._createSDInstance(diagramFrame=diagramFrame, instanceName='instance1', xCoordinate=100)
             self._createSDInstance(diagramFrame=diagramFrame, instanceName='instance2', xCoordinate=300)
+            self._umlPubSubEngine.sendMessage(
+                UmlMessageType.UPDATE_APPLICATION_STATUS,
+                frameId=self._currentFrame.id,
+                message='Click on source lifeline'
+            )
 
         else:
             msgDlg: MessageDialog = MessageDialog(
@@ -437,7 +446,11 @@ class DemoAppFrame(SizedFrame):
         sdInstance: SDInstance = SDInstance()
         sdInstance.instanceName = instanceName
 
-        umlSDInstance: UmlSDInstance = UmlSDInstance(sdInstance=sdInstance, diagramFrame=diagramFrame)
+        umlSDInstance: UmlSDInstance = UmlSDInstance(
+            sdInstance=sdInstance,
+            diagramFrame=diagramFrame,
+            umlPubSubEngine=self._umlPubSubEngine
+        )
 
         instanceY:   int         = self._preferences.instanceYPosition
         umlPosition: UmlPosition = UmlPosition(x=xCoordinate, y=instanceY)

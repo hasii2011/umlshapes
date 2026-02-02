@@ -11,6 +11,8 @@ class UmlMessageType(Enum):
     FRAME_MODIFIED     = 'Frame Modified'
     SHAPE_MOVING       = 'Shape Moving'         # Only the 'master' shape issues this message
 
+    SD_LIFELINE_CLICKED  = 'SDLifeLine Clicked'
+
     CREATE_LOLLIPOP           = 'Create Lollipop'
     REQUEST_LOLLIPOP_LOCATION = 'Request Lollipop Location'
     UPDATE_APPLICATION_STATUS = 'Update Application Status'

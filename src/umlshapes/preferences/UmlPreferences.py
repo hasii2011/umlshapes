@@ -121,6 +121,7 @@ SEQUENCE_DIAGRAM_PREFERENCES: ValueDescriptions = ValueDescriptions(
         KeyName('instanceNameRelativeHeight'):       ValueDescription(defaultValue='0.10', deserializer=SecureConversions.secureFloat),
         KeyName('enableCompositeShapeLiveDragging'): ValueDescription(defaultValue='True', deserializer=SecureConversions.secureBoolean),
         KeyName('initialLifeLineLength'):            ValueDescription(defaultValue='360',  deserializer=SecureConversions.secureInteger),
+        KeyName('messageArrowHeadSize'):             ValueDescription(defaultValue='10.0', deserializer=SecureConversions.secureFloat),
     }
 )
 ASSOCIATION_PREFERENCES: ValueDescriptions = ValueDescriptions(
