@@ -4,13 +4,14 @@ from logging import getLogger
 
 from dataclasses import dataclass
 
-from umlshapes.frames.UmlFrame import UmlFrame
 from umlshapes.lib.ogl import ShapeEvtHandler
 
-from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
-from umlshapes.pubsubengine.UmlMessageType import UmlMessageType
+from umlshapes.frames.UmlFrame import UmlFrame
 
 from umlshapes.types.UmlPosition import UmlPosition
+
+from umlshapes.pubsubengine.UmlMessageType import UmlMessageType
+from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 
 from umlshapes.sd.UmlSDLifeLine import UmlSDLifeLine
 

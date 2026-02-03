@@ -1,20 +1,24 @@
 
 from logging import Logger
 from logging import getLogger
+from typing import cast
 
 from umlshapes.lib.ogl import RectangleShape
 
 from umlshapes.frames.SequenceDiagramFrame import SequenceDiagramFrame
 
+from umlshapes.mixins.IdentifierMixin import IdentifierMixin
 from umlshapes.mixins.TopLeftMixin import TopLeftMixin
+
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
 from umlshapes.sd.SDInstanceConstrainer import SDInstanceConstrainer
 from umlshapes.sd.UmlInstanceName import UmlInstanceName
 from umlshapes.sd.UmlSDMessage import UmlSDMessage
+from umlshapes.sd.UmlSDMessage import UmlSDMessages
 
 
-class UmlSDLifeLine(RectangleShape, TopLeftMixin):
+class UmlSDLifeLine(IdentifierMixin, RectangleShape, TopLeftMixin):
 
     def __init__(self, sequenceDiagramFrame: SequenceDiagramFrame, instanceName: UmlInstanceName, instanceConstrainer: SDInstanceConstrainer):
 
@@ -24,6 +28,7 @@ class UmlSDLifeLine(RectangleShape, TopLeftMixin):
         width:  int = 1
         height: int = self._preferences.initialLifeLineLength
 
+        IdentifierMixin.__init__(self)
         RectangleShape.__init__(self, w=width, h=height)
         TopLeftMixin.__init__(self, umlShape=self, width=width, height=height)
 
@@ -42,6 +47,10 @@ class UmlSDLifeLine(RectangleShape, TopLeftMixin):
     @property
     def instanceConstrainer(self) -> SDInstanceConstrainer:
         return self._instanceConstrainer
+
+    @property
+    def messages(self) -> UmlSDMessages:
+        return cast(UmlSDMessages, self._lines)
 
     def adjustLifeLineTopPosition(self):
 
@@ -75,5 +84,8 @@ class UmlSDLifeLine(RectangleShape, TopLeftMixin):
 
         self.AddLine(line=umlSDMessage, other=destinationLifeLine)
 
-        # umlLink.sourceShape      = self
-        # umlLink.destinationShape = destinationClass
+    def __str__(self) -> str:
+        return f'UmlSDLifeLine: {self.id}'
+
+    def __repr__(self) -> str:
+        return self.__str__()

@@ -39,6 +39,8 @@ class SDMessageHandler:
         self._startDetails:              LifeLineClickDetails = NO_START_DETAILS
         self._messageCreationInProgress: bool                 = False
 
+        self._messageCount: int = 0     # temp until I get possible message names in
+
     @property
     def sequenceDiagramFrame(self) -> SequenceDiagramFrame:
         """
@@ -88,18 +90,19 @@ class SDMessageHandler:
             endDetails:
 
         """
-        self.logger.debug(f'\n{endDetails=}')
+        self.logger.info(f'\n{endDetails=}')
 
         modelMessage: SDMessage    = SDMessage(
-            message='demoMessage',
+            message=f'demoMessage-{self._messageCount:04d}',
             src=self._startDetails.lifeLine.umlInstanceName.sdInstance,
             sourceY=self._startDetails.clickPosition.y,
             dst=endDetails.lifeLine.umlInstanceName.sdInstance,
             destinationY=endDetails.clickPosition.y,
-
         )
+        self._messageCount += 1
         umlSDMessage: UmlSDMessage = UmlSDMessage(sdMessage=modelMessage)
         # umlSDMessage.MakeLineControlPoints(n=2)
+        self.logger.info(f'Created message: {umlSDMessage.sdMessage.message}')
 
         self._startDetails.lifeLine.addMessage(umlSDMessage=umlSDMessage, destinationLifeLine=endDetails.lifeLine)
 
@@ -109,6 +112,9 @@ class SDMessageHandler:
             x2=endDetails.clickPosition.x,
             y2=endDetails.clickPosition.y
         )
+        umlSDMessage.fromY = self._startDetails.clickPosition.y
+        umlSDMessage.toY   = endDetails.clickPosition.y
+
         umlSDMessage.Show(True)
         self._sequenceDiagramFrame.umlDiagram.AddShape(umlSDMessage)
         self._sequenceDiagramFrame.refresh()
