@@ -9,6 +9,7 @@ from logging import getLogger
 from enum import Enum
 
 from wx import Brush
+from wx import ClientDC
 from wx import WHITE
 from wx import BLACK_BRUSH
 from wx import BRUSHSTYLE_TRANSPARENT
@@ -106,6 +107,35 @@ class UmlSDMessage(LineShape, IdentifierMixin):
         Returns:  our precomputed transparent brush
         """
         return self._messageBackGroundBrush
+
+    def OnMoveLink(self, dc: ClientDC, moveControlPoints: bool = True):
+        """
+        Copied from original but modified to use the original Y positions;  Did
+        not copy the self link code;
+
+        TODO: revisit when we support self links
+
+        Args:
+            dc:
+            moveControlPoints:
+        """
+        # super().OnMoveLink(dc=dc, moveControlPoints=moveControlPoints)
+
+        if not self._from or not self._to:
+            return
+
+        # Do each end - nothing in the middle. User has to move other points
+        # manually if necessary
+        endX, endY, otherEndX, otherEndY = self.FindLineEndPoints()
+
+        self.SetEnds(endX, self.fromY, otherEndX, self.toY)
+
+        if len(self._lineControlPoints) > 2:
+            self.Initialise()
+
+        # Do a second time, because one may depend on the other
+        endX, endY, otherEndX, otherEndY = self.FindLineEndPoints()
+        self.SetEnds(endX, self.fromY, otherEndX, self.fromY)
 
     def __str__(self) -> str:
         return f'UmlSDMessage: `{self._sdMessage.message}`'
