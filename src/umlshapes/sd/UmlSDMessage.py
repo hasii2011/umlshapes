@@ -1,7 +1,7 @@
 
 from typing import List
-from typing import cast
 from typing import NewType
+from typing import TYPE_CHECKING
 
 from logging import Logger
 from logging import getLogger
@@ -25,6 +25,9 @@ from umlmodel.SDMessage import SDMessage
 from umlshapes.mixins.IdentifierMixin import IdentifierMixin
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
+if TYPE_CHECKING:
+    from umlshapes.sd.UmlSDLifeLine import UmlSDLifeLine
+
 
 class SD_MESSAGE_TYPE(Enum):
     SYNCHRONOUS_MESSAGE = 'Synchronous Message'
@@ -32,8 +35,6 @@ class SD_MESSAGE_TYPE(Enum):
 
 class UmlSDMessage(LineShape, IdentifierMixin):
     def __init__(self, sdMessage: SDMessage, messageType: SD_MESSAGE_TYPE = SD_MESSAGE_TYPE.SYNCHRONOUS_MESSAGE):
-
-        from umlshapes.sd.UmlSDLifeLine import UmlSDLifeLine
 
         self.logger: Logger = getLogger(__name__)
         IdentifierMixin.__init__(self)
@@ -63,10 +64,12 @@ class UmlSDMessage(LineShape, IdentifierMixin):
 
         self.SetDraggable(True, recursive=True)
         self.MakeLineControlPoints(n=2)
-        self._fromLifeline: UmlSDLifeLine = cast(UmlSDLifeLine, None)
-        self._toLifeLine:   UmlSDLifeLine = cast(UmlSDLifeLine, None)
+
         self._fromY: int = 0
         self._toY:   int = 0
+
+        self._relativeFromY: int = 0
+        self._relativeToY:   int = 0
 
     @property
     def fromY(self) -> int:
@@ -74,6 +77,12 @@ class UmlSDMessage(LineShape, IdentifierMixin):
 
     @fromY.setter
     def fromY(self, newFromY: int):
+        from umlshapes.sd.UmlSDLifeLine import UmlSDLifeLine
+
+        sdLifeLine: UmlSDLifeLine = self.GetFrom()
+        if sdLifeLine:
+            self._relativeFromY = newFromY - sdLifeLine.rectangle.top
+
         self._fromY = newFromY
 
     @property
@@ -82,6 +91,11 @@ class UmlSDMessage(LineShape, IdentifierMixin):
 
     @toY.setter
     def toY(self, newToY: int):
+        from umlshapes.sd.UmlSDLifeLine import UmlSDLifeLine
+
+        sdLifeLine: UmlSDLifeLine = self.GetTo()
+        if sdLifeLine:
+            self._relativeToY = newToY - sdLifeLine.rectangle.top
         self._toY = newToY
 
     @property
@@ -119,8 +133,6 @@ class UmlSDMessage(LineShape, IdentifierMixin):
             dc:
             moveControlPoints:
         """
-        # super().OnMoveLink(dc=dc, moveControlPoints=moveControlPoints)
-
         if not self._from or not self._to:
             return
 
@@ -128,14 +140,19 @@ class UmlSDMessage(LineShape, IdentifierMixin):
         # manually if necessary
         endX, endY, otherEndX, otherEndY = self.FindLineEndPoints()
 
-        self.SetEnds(endX, self.fromY, otherEndX, self.toY)
+        fromY: int = self._computeAbsoluteY(umlSDLifeLine=self.GetFrom(), relativeY=self._relativeFromY)
+        toY:   int = self._computeAbsoluteY(umlSDLifeLine=self.GetTo(), relativeY=self._relativeToY)
+        self.SetEnds(endX, fromY, otherEndX, toY)
 
         if len(self._lineControlPoints) > 2:
             self.Initialise()
 
         # Do a second time, because one may depend on the other
         endX, endY, otherEndX, otherEndY = self.FindLineEndPoints()
-        self.SetEnds(endX, self.fromY, otherEndX, self.fromY)
+        self.SetEnds(endX, fromY, otherEndX, toY)
+
+    def _computeAbsoluteY(self, umlSDLifeLine: 'UmlSDLifeLine', relativeY: int) -> int:
+        return umlSDLifeLine.rectangle.top + relativeY
 
     def __str__(self) -> str:
         return f'UmlSDMessage: `{self._sdMessage.message}`'
