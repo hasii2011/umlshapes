@@ -27,6 +27,7 @@ from umlshapes.preferences.UmlPreferences import UmlPreferences
 
 if TYPE_CHECKING:
     from umlshapes.sd.UmlSDLifeLine import UmlSDLifeLine
+    from umlshapes.frames.SequenceDiagramFrame import SequenceDiagramFrame
 
 
 class SD_MESSAGE_TYPE(Enum):
@@ -70,6 +71,14 @@ class UmlSDMessage(LineShape, IdentifierMixin):
 
         self._relativeFromY: int = 0
         self._relativeToY:   int = 0
+
+    @property
+    def umlFrame(self) -> 'SequenceDiagramFrame':
+        return self.GetCanvas()
+
+    @umlFrame.setter
+    def umlFrame(self, frame: 'SequenceDiagramFrame'):
+        self.SetCanvas(frame)
 
     @property
     def fromY(self) -> int:

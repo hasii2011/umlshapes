@@ -1,8 +1,12 @@
 
-from logging import Logger
-from logging import getLogger
 from typing import cast
 
+from logging import Logger
+from logging import getLogger
+
+from wx import MemoryDC
+
+from umlshapes.UmlUtils import UmlUtils
 from umlshapes.lib.ogl import RectangleShape
 
 from umlshapes.frames.SequenceDiagramFrame import SequenceDiagramFrame
@@ -83,6 +87,10 @@ class UmlSDLifeLine(IdentifierMixin, RectangleShape, TopLeftMixin):
         """
 
         self.AddLine(line=umlSDMessage, other=destinationLifeLine)
+
+    def OnDraw(self, dc: MemoryDC):
+        self.SetPen(UmlUtils.blackSolidPen())
+        super().OnDraw(dc=dc)
 
     def __str__(self) -> str:
         return f'UmlSDLifeLine: {self.id}'

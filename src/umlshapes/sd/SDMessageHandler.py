@@ -12,6 +12,7 @@ from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 
 from umlshapes.sd.eventhandlers.UmlSDLifeLineEventHandler import LifeLineClickDetails
 from umlshapes.sd.UmlSDMessage import UmlSDMessage
+from umlshapes.sd.eventhandlers.UmlSDMessageEventHandler import UmlSDMessageEventHandler
 
 NO_START_DETAILS = cast(LifeLineClickDetails, None)
 
@@ -101,7 +102,7 @@ class SDMessageHandler:
         )
         self._messageCount += 1
         umlSDMessage: UmlSDMessage = UmlSDMessage(sdMessage=modelMessage)
-        # umlSDMessage.MakeLineControlPoints(n=2)
+        umlSDMessage.umlFrame = self._sequenceDiagramFrame
         self.logger.info(f'Created message: {umlSDMessage.sdMessage.message}')
 
         self._startDetails.lifeLine.addMessage(umlSDMessage=umlSDMessage, destinationLifeLine=endDetails.lifeLine)
@@ -120,3 +121,10 @@ class SDMessageHandler:
         self._sequenceDiagramFrame.refresh()
 
         self.reset()
+
+        eventHandler: UmlSDMessageEventHandler = UmlSDMessageEventHandler(
+            umlSDMessage=umlSDMessage,
+            umlPubSubEngine=self._umlPubSubEngine,
+            previousEventHandler=umlSDMessage.GetEventHandler()
+        )
+        umlSDMessage.SetEventHandler(eventHandler)

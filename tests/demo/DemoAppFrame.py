@@ -29,7 +29,6 @@ from wx import MenuBar
 from wx import Notebook
 from wx import CommandEvent
 from wx import BookCtrlEvent
-from wx import Point
 from wx import MenuItem
 from wx import MessageDialog
 
