@@ -115,6 +115,16 @@ class UmlSDMessage(LineShape, IdentifierMixin):
         """
         return self._sdMessage
 
+    @sdMessage.setter
+    def sdMessage(self, sdMessage: SDMessage):
+        """
+
+        Args:
+            sdMessage:  The updated model class
+        """
+        self._sdMessage = sdMessage
+        self.updateMessage()
+
     def updateMessage(self):
         """
         Update the message

@@ -2,11 +2,22 @@
 from logging import Logger
 from logging import getLogger
 
-# from umlshapes.frames.UmlFrame import UmlFrame
+from wx import OK
 
 from umlshapes.lib.ogl import ShapeEvtHandler
-from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
+
+from umlmodel.SDMessage import SDMessage
+
+from umlshapes.dialogs.DlgEditSDMessage import Message
+from umlshapes.dialogs.DlgEditSDMessage import MessageList
+from umlshapes.dialogs.DlgEditSDMessage import DlgEditSDMessage
+
+
+from umlshapes.frames.UmlFrame import UmlFrame
+
 from umlshapes.sd.UmlSDMessage import UmlSDMessage
+
+from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 
 
 class UmlSDMessageEventHandler(ShapeEvtHandler):
@@ -23,7 +34,7 @@ class UmlSDMessageEventHandler(ShapeEvtHandler):
 
         super().__init__(prev=previousEventHandler, shape=umlSDMessage)
 
-        self._umlSDMessage:    UmlSDMessage      = umlSDMessage
+        self._umlSDMessage:    UmlSDMessage     = umlSDMessage
         self._umlPubSubEngine: IUmlPubSubEngine = umlPubSubEngine
 
     def OnLeftClick(self, x: int, y: int, keys: int, attachment: int):
@@ -38,7 +49,19 @@ class UmlSDMessageEventHandler(ShapeEvtHandler):
 
         self.logger.info(f'xy: ({x},{y})')
 
-        # umlSDMessage: UmlSDMessage = self._umlSDMessage
-        # umlFrame:     UmlFrame     = umlSDMessage.umlFrame
-
         super().OnLeftClick(x, y, keys, attachment)
+
+    def OnLeftDoubleClick(self, x: int, y: int, keys: int = 0, attachment: int = 0):
+
+        super().OnLeftDoubleClick(x=x, y=y, keys=keys, attachment=attachment)
+
+        umlSDMessage: UmlSDMessage = self._umlSDMessage
+        umlFrame:     UmlFrame     = umlSDMessage.umlFrame
+        modelClass:   SDMessage    = umlSDMessage.sdMessage
+
+        messages: MessageList = MessageList([Message('message1'), Message('message2')])
+
+        with DlgEditSDMessage(parent=umlFrame, sdMessage=modelClass, messages=messages) as dlg:
+            if dlg.ShowModal() == OK:
+                umlFrame.refresh()
+                umlSDMessage.sdMessage = dlg.sdMessage
