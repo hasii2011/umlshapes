@@ -59,7 +59,7 @@ from umlshapes.links.UmlLollipopInterface import UmlLollipopInterface
 from umlshapes.links.eventhandlers.UmlLollipopInterfaceEventHandler import UmlLollipopInterfaceEventHandler
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
-from umlshapes.sd.SDMessageHandler import SDMessageHandler
+from umlshapes.sd.SDMessageCreationHandler import SDMessageCreationHandler
 
 from umlshapes.shapes.UmlClass import UmlClass
 from umlshapes.sd.UmlSDInstance import UmlSDInstance
@@ -94,6 +94,7 @@ class DemoAppFrame(SizedFrame):
         self._umlPubSubEngine: UmlPubSubEngine = UmlPubSubEngine()
         self._editMenu:        Menu            = cast(Menu, None)
         self._shapeItem:       MenuItem        = cast(MenuItem, None)
+        self._messageItem:     MenuItem        = cast(MenuItem, None)
 
         self._noteBook: Notebook = Notebook(parent=sizedPanel)
         self._noteBook.SetSizerProps(expand=True, proportion=1)
@@ -126,7 +127,7 @@ class DemoAppFrame(SizedFrame):
 
         self._shapeCreator:     ShapeCreator     = ShapeCreator(umlPubSubEngine=self._umlPubSubEngine)
         self._linkCreator:      LinkCreator      = LinkCreator(umlPubSubEngine=self._umlPubSubEngine)
-        self._sdMessageHandler: SDMessageHandler = SDMessageHandler(umlPubSubEngine=self._umlPubSubEngine, sequenceDiagramFrame=self._currentFrame)
+        self._sdMessageHandler: SDMessageCreationHandler = SDMessageCreationHandler(umlPubSubEngine=self._umlPubSubEngine, sequenceDiagramFrame=self._currentFrame)
 
         self._preferences:  UmlPreferences = UmlPreferences()
 
@@ -152,15 +153,18 @@ class DemoAppFrame(SizedFrame):
     def _createApplicationMenuBar(self):
 
         menuBar:  MenuBar = MenuBar()
-        fileMenu: Menu    = Menu()
-        editMenu: Menu    = Menu()
-        viewMenu: Menu    = Menu()
+        fileMenu:   Menu  = Menu()
+        editMenu:   Menu  = Menu()
+        viewMenu:   Menu  = Menu()
+        actionMenu: Menu  = Menu()
 
-        self._shapeItem = fileMenu.AppendCheckItem(Identifiers.ID_DEMO_SHAPE_BOUNDARIES, item='Shape Boundaries', help='Demo Shape Boundaries')
+        self._shapeItem   = fileMenu.AppendCheckItem(Identifiers.ID_DEMO_SHAPE_BOUNDARIES, item='Shape Boundaries', help='Demo Shape Boundaries')
         fileMenu.AppendSeparator()
         fileMenu.Append(ID_EXIT, '&Quit', "Quit Application")
         fileMenu.AppendSeparator()
         fileMenu.Append(ID_PREFERENCES, "P&references", "Uml preferences")
+
+        self._messageItem = actionMenu.AppendCheckItem(Identifiers.ID_CREATE_SD_MESSAGE, item='Create SD Message', help='Demo SD Message')
 
         #
         # Use all the stock properties
@@ -191,13 +195,12 @@ class DemoAppFrame(SizedFrame):
         viewMenu.Append(id=Identifiers.ID_DISPLAY_SEQUENCE_DIAGRAM,    item='Sequence Diagram', helpString='Display Sequence Diagram')
         viewMenu.AppendSeparator()
 
-        menuBar.Append(fileMenu, 'File')
-        menuBar.Append(editMenu, 'Edit')
-        menuBar.Append(viewMenu, 'View')
+        menuBar.Append(fileMenu,   'File')
+        menuBar.Append(editMenu,   'Edit')
+        menuBar.Append(viewMenu,   'View')
+        menuBar.Append(actionMenu, 'Action')
 
         self.SetMenuBar(menuBar)
-
-        # self.Bind(EVT_MENU, self._onOglPreferences, id=ID_PREFERENCES)
 
         self._editMenu = editMenu
 
@@ -226,6 +229,8 @@ class DemoAppFrame(SizedFrame):
         self.Bind(EVT_MENU, self._onEditMenu, id=ID_PASTE)
         self.Bind(EVT_MENU, self._onEditMenu, id=ID_SELECTALL)
 
+        self.Bind(EVT_MENU, self._onDemoSDMessageCreation, id=Identifiers.ID_CREATE_SD_MESSAGE)
+
     # noinspection PyUnusedLocal
     def _onDemoShapeBoundaries(self, event: CommandEvent):
 
@@ -244,6 +249,24 @@ class DemoAppFrame(SizedFrame):
             self._currentFrame.drawShapeBoundary = False
         self._currentFrame.refresh()
         self.logger.info(f'Drawing Shapes Boundary=`{self._currentFrame.drawShapeBoundary}` frame=`{self._currentFrame.id}`')
+
+    def _onDemoSDMessageCreation(self, event: CommandEvent):
+
+        if event.IsChecked() is True:
+            diagramFrame: SequenceDiagramFrame = self._currentFrame
+            if isinstance(diagramFrame, SequenceDiagramFrame) is True:
+                self._sdMessageHandler.enableMessageCreation = True
+            else:
+                msgDlg: MessageDialog = MessageDialog(
+                    parent=None,
+                    message='Sequence Diagram Messages must be placed on a Sequence Diagram frame',
+                    caption='Bad News',
+                    style=OK | ICON_ERROR
+                )
+                msgDlg.ShowModal()
+
+        else:
+            self._sdMessageHandler.enableMessageCreation = False
 
     def _onDisplayElement(self, event: CommandEvent):
 
@@ -298,12 +321,6 @@ class DemoAppFrame(SizedFrame):
 
             self._createSDInstance(diagramFrame=diagramFrame, instanceName='instance1', xCoordinate=100)
             self._createSDInstance(diagramFrame=diagramFrame, instanceName='instance2', xCoordinate=300)
-            self._umlPubSubEngine.sendMessage(
-                UmlMessageType.UPDATE_APPLICATION_STATUS,
-                frameId=self._currentFrame.id,
-                message='Click on source lifeline'
-            )
-
         else:
             msgDlg: MessageDialog = MessageDialog(
                 parent=None,

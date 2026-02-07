@@ -12,7 +12,6 @@ from umlshapes.dialogs.DlgEditSDMessage import Message
 from umlshapes.dialogs.DlgEditSDMessage import MessageList
 from umlshapes.dialogs.DlgEditSDMessage import DlgEditSDMessage
 
-
 from umlshapes.frames.UmlFrame import UmlFrame
 
 from umlshapes.sd.UmlSDMessage import UmlSDMessage
@@ -63,5 +62,5 @@ class UmlSDMessageEventHandler(ShapeEvtHandler):
 
         with DlgEditSDMessage(parent=umlFrame, sdMessage=modelClass, messages=messages) as dlg:
             if dlg.ShowModal() == OK:
-                umlFrame.refresh()
                 umlSDMessage.sdMessage = dlg.sdMessage
+                umlFrame.refresh()

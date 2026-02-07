@@ -1,22 +1,22 @@
-
 from typing import List
 from typing import NewType
 
 from logging import Logger
 from logging import getLogger
 
+from copy import deepcopy
+
 from wx import CB_SORT
-from wx import DefaultSize
 from wx import EVT_TEXT
-from wx import EVT_TEXT_ENTER
 from wx import ID_ANY
 from wx import CB_DROPDOWN
 from wx import EVT_COMBOBOX
+from wx import EVT_TEXT_ENTER
 from wx import TE_PROCESS_ENTER
 
-
-from wx import ComboBox
 from wx import Window
+from wx import ComboBox
+from wx import DefaultSize
 from wx import CommandEvent
 
 from wx.lib.sized_controls import SizedPanel
@@ -78,7 +78,7 @@ class DlgEditSDMessage(BaseEditDialog):
         Returns:  The updated SD Message model object
         """
         self._sdMessage.message = self._cb.GetValue()
-        return self._sdMessage
+        return deepcopy(self._sdMessage)
 
     def _onEventComboBox(self, event: CommandEvent):
         message: str = event.GetString()

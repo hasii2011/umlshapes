@@ -80,7 +80,7 @@ class UmlSDInstance(ControlPointMixin, IdentifierMixin, CompositeShape, TopLeftM
         sdLifeLine.SetDraggable(False)
 
         # If we don't do this the shape will take all left-clicks for itself
-        constrainingShape.SetSensitivityFilter(OP_NONE, recursive=True)
+        constrainingShape.SetSensitivityFilter(OP_NONE)
         self.SetCentreResize(False)
 
         wxCallAfter(sdLifeLine.adjustLifeLineTopPosition)
@@ -115,3 +115,9 @@ class UmlSDInstance(ControlPointMixin, IdentifierMixin, CompositeShape, TopLeftM
             previousEventHandler=umlSDLifeLine.GetEventHandler()
         )
         umlSDLifeLine.SetEventHandler(eventHandler)
+
+    def __str__(self) -> str:
+        return f'UmlSDInstance: `{self.id}` {self._sdInstance.instanceName}'
+
+    def __repr__(self) -> str:
+        return self.__str__()
