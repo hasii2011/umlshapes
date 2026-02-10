@@ -1,6 +1,6 @@
 from typing import cast
 
-from umlshapes.pubsubengine.UmlPubSubEngine import UmlPubSubEngine
+from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 
 
 class PubSubMixin:
@@ -9,9 +9,9 @@ class PubSubMixin:
     engine into a component
     """
     def __init__(self):
-        self._umlPubSubEngine: UmlPubSubEngine = cast(UmlPubSubEngine, None)
+        self._umlPubSubEngine: IUmlPubSubEngine = cast(IUmlPubSubEngine, None)
 
-    def _setUmlPubSubEngine(self, umlPubSubEngine: UmlPubSubEngine):
+    def _setUmlPubSubEngine(self, umlPubSubEngine: IUmlPubSubEngine):
         self._umlPubSubEngine = umlPubSubEngine
 
     # noinspection PyTypeChecker

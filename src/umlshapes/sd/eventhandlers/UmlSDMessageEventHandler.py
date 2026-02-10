@@ -8,6 +8,8 @@ from umlshapes.lib.ogl import ShapeEvtHandler
 
 from umlmodel.SDMessage import SDMessage
 
+from umlshapes.UmlBaseEventHandler import UmlBaseEventHandler
+
 from umlshapes.dialogs.DlgEditSDMessage import Message
 from umlshapes.dialogs.DlgEditSDMessage import MessageList
 from umlshapes.dialogs.DlgEditSDMessage import DlgEditSDMessage
@@ -19,7 +21,7 @@ from umlshapes.sd.UmlSDMessage import UmlSDMessage
 from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 
 
-class UmlSDMessageEventHandler(ShapeEvtHandler):
+class UmlSDMessageEventHandler(UmlBaseEventHandler):
     def __init__(self, umlSDMessage: UmlSDMessage, umlPubSubEngine: IUmlPubSubEngine, previousEventHandler: ShapeEvtHandler):
         """
 
@@ -31,12 +33,32 @@ class UmlSDMessageEventHandler(ShapeEvtHandler):
 
         self.logger: Logger = getLogger(__name__)
 
-        super().__init__(prev=previousEventHandler, shape=umlSDMessage)
+        super().__init__(previousEventHandler=previousEventHandler, shape=umlSDMessage)
 
         self._umlSDMessage:    UmlSDMessage     = umlSDMessage
         self._umlPubSubEngine: IUmlPubSubEngine = umlPubSubEngine
 
-    def OnLeftClick(self, x: int, y: int, keys: int, attachment: int):
+    def OnBeginDragLeft(self, x, y, keys=0, attachment=0):
+        self.logger.info(f'x,y: ({x},{y}) {keys=} {attachment=}')
+
+    def OnDragLeft(self, draw, x, y, keys=0, attachment=0):
+        """
+        We want to move both ends of the message
+        Args:
+            draw:
+            x:
+            y:
+            keys:
+            attachment:
+
+        """
+        self.logger.info(f'xy: ({x},{y})')
+        super().OnDragLeft(draw, x, y, keys, attachment)
+
+    def OnEndDragLeft(self, x, y, keys=0, attachment=0):
+        self.logger.info(f'x,y: ({x},{y}) {keys=} {attachment=}')
+
+    def OnLeftClick(self, x: int, y: int, keys: int = 0, attachment: int = 0):
         """
 
         Args:
@@ -47,7 +69,6 @@ class UmlSDMessageEventHandler(ShapeEvtHandler):
         """
 
         self.logger.info(f'xy: ({x},{y})')
-
         super().OnLeftClick(x, y, keys, attachment)
 
     def OnLeftDoubleClick(self, x: int, y: int, keys: int = 0, attachment: int = 0):

@@ -1,7 +1,8 @@
 
+from typing import cast
+
 from logging import Logger
 from logging import getLogger
-from typing import cast
 
 from umlmodel.SDMessage import SDMessage
 
@@ -11,8 +12,9 @@ from umlshapes.pubsubengine.UmlMessageType import UmlMessageType
 from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 
 from umlshapes.sd.eventhandlers.UmlSDLifeLineEventHandler import LifeLineClickDetails
-from umlshapes.sd.UmlSDMessage import UmlSDMessage
 from umlshapes.sd.eventhandlers.UmlSDMessageEventHandler import UmlSDMessageEventHandler
+
+from umlshapes.sd.UmlSDMessage import UmlSDMessage
 
 NO_START_DETAILS = cast(LifeLineClickDetails, None)
 
@@ -116,7 +118,7 @@ class SDMessageCreationHandler:
             destinationY=endDetails.clickPosition.y,
         )
         self._messageCount += 1
-        umlSDMessage: UmlSDMessage = UmlSDMessage(sdMessage=modelMessage)
+        umlSDMessage: UmlSDMessage = UmlSDMessage(sdMessage=modelMessage, umlPubSubEngine=self._umlPubSubEngine)
         umlSDMessage.umlFrame = self._sequenceDiagramFrame
         self.logger.info(f'Created message: {umlSDMessage.sdMessage.message}')
 
@@ -143,6 +145,8 @@ class SDMessageCreationHandler:
             previousEventHandler=umlSDMessage.GetEventHandler()
         )
         umlSDMessage.SetEventHandler(eventHandler)
+
+        self._sequenceDiagramFrame._moveShapeToFront(umlSDMessage)
 
     def _reset(self):
         self._startDetails = NO_START_DETAILS

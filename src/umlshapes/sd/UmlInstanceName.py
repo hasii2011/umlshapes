@@ -6,13 +6,14 @@ from umlmodel.SDInstance import SDInstance
 
 from umlshapes.UmlUtils import UmlUtils
 from umlshapes.lib.ogl import RectangleShape
+from umlshapes.mixins.TopLeftMixin import TopLeftMixin
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
 from umlshapes.types.UmlDimensions import UmlDimensions
 
 
-class UmlInstanceName(RectangleShape):
+class UmlInstanceName(RectangleShape, TopLeftMixin):
     """
     Use Shape's capabilities to create a name value
     """
@@ -30,6 +31,7 @@ class UmlInstanceName(RectangleShape):
         height: int = round(instanceDimensions.height * self._preferences.instanceNameRelativeHeight)
 
         super().__init__(w=width, h=height)
+        TopLeftMixin.__init__(self, umlShape=self, width=width, height=height)
         self.SetFont(UmlUtils.defaultFont())
         self.AddText(sdInstance.instanceName)
         self.SetCentreResize(False)

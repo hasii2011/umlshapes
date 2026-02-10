@@ -26,7 +26,7 @@ class UmlSdInstanceEventHandler(UmlBaseEventHandler):
 
     def OnEndSize(self, x, y):
         """
-        We want to tell the lifeline to stretch to shrink to new size
+        We want to tell the lifeline to stretch or shrink to new size
 
         Args:
             x:

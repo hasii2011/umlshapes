@@ -251,7 +251,7 @@ class LabelShape(RectangleShape):
         if self._cornerRadius > 0:
             dc.DrawRoundedRectangle(x1, y1, self._width, self._height, self._cornerRadius)
         else:
-            dc.DrawRectangle(x1, y1, self._width, self._height)
+            dc.DrawRectangle(round(x1), round(y1), round(self._width), round(self._height))
 
     def OnDrawContents(self, dc):
         """not implemented???"""
