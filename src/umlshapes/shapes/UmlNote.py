@@ -1,8 +1,9 @@
 
+from typing import TYPE_CHECKING
+
 from logging import Logger
 from logging import getLogger
 
-from umlmodel.Note import Note
 from wx import Brush
 from wx import Colour
 from wx import MemoryDC
@@ -10,6 +11,8 @@ from wx import MemoryDC
 from umlshapes.lib.ogl import FORMAT_CENTRE_HORIZ
 from umlshapes.lib.ogl import FORMAT_CENTRE_VERT
 from umlshapes.lib.ogl import RectangleShape
+
+from umlmodel.Note import Note
 
 from umlshapes.UmlUtils import UmlUtils
 
@@ -28,6 +31,9 @@ from umlshapes.types.UmlDimensions import UmlDimensions
 from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
 from umlshapes.frames.UseCaseDiagramFrame import UseCaseDiagramFrame
 from umlshapes.frames.SequenceDiagramFrame import SequenceDiagramFrame
+
+if TYPE_CHECKING:
+    from umlshapes.ShapeTypes import UmlLinks
 
 
 class UmlNote(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin):
@@ -94,6 +100,10 @@ class UmlNote(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin):
         self._modelNote = newNote
 
     @property
+    def links(self) -> 'UmlLinks':
+        return self.GetLines()
+
+    @property
     def umlFrame(self) -> ClassDiagramFrame | UseCaseDiagramFrame | SequenceDiagramFrame:
         return self.GetCanvas()
 
@@ -117,8 +127,7 @@ class UmlNote(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin):
         super().OnDraw(dc)
 
         if self.Selected() is True:
-            if self.Selected() is True:
-                UmlUtils.drawSelectedRectangle(dc=dc, shape=self)
+            UmlUtils.drawSelectedRectangle(dc=dc, shape=self)
 
         w:     int = self.GetWidth()
         h:     int = self.GetHeight()

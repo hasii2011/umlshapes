@@ -17,6 +17,7 @@ from umlmodel.Class import Class
 from umlmodel.Field import Fields
 from umlmodel.Method import Method
 from umlmodel.Method import Methods
+
 from umlmodel.enumerations.DisplayMethods import DisplayMethods
 from umlmodel.enumerations.DisplayParameters import DisplayParameters
 from umlmodel.enumerations.Stereotype import Stereotype
@@ -41,6 +42,7 @@ from umlshapes.mixins.ControlPointMixin import ControlPointMixin
 
 if TYPE_CHECKING:
     from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
+    from umlshapes.ShapeTypes import UmlLinks
 
 DUNDER_METHOD_INDICATOR: str = '__'
 CONSTRUCTOR_NAME:        str = '__init__'
@@ -118,6 +120,10 @@ class UmlClass(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
     @selected.setter
     def selected(self, select: bool):
         self.Select(select=select)
+
+    @property
+    def links(self) -> 'UmlLinks':
+        return self.GetLines()
 
     def addLink(self, umlLink: UmlLink, destinationClass: 'UmlClass'):
 
@@ -360,7 +366,7 @@ class UmlClass(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
         modelClass: Class = self.modelClass
 
         # Add space above
-        if len(modelClass.fields) > 0:
+        if modelClass.fields:
             yOffset += textHeight
 
         # This code depends on the excellent string representations of fields
@@ -374,7 +380,7 @@ class UmlClass(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
                 yOffset += textHeight
 
         # Add space below
-        if len(modelClass.fields) > 0:
+        if modelClass.fields:
             yOffset += textHeight
 
         return yOffset
@@ -576,12 +582,12 @@ class UmlClass(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
 
         currentHeight: int = singleLineHeight * 5
 
-        if len(modelClass.fields) > 0 and modelClass.showFields is True:
+        if modelClass.fields and modelClass.showFields is True:
             currentHeight += singleLineHeight * 2   # Above and below margins
-            currentHeight += singleLineHeight * len(modelClass.fields)
+            currentHeight += singleLineHeight * len(cast(list, modelClass.fields))
 
-        if len(modelClass.methods) > 0 and modelClass.showMethods is True:
-            currentHeight += singleLineHeight * len(modelClass.methods)
+        if modelClass.methods and modelClass.showMethods is True:
+            currentHeight += singleLineHeight * len(cast(list, modelClass.methods))
 
         currentHeight += singleLineHeight   # Add space after last method
 
@@ -638,7 +644,7 @@ class UmlClass(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
         fields:     Fields = modelClass.fields
 
         maxWidth: int = 0
-        if len(fields) > 0 and modelClass.showFields is True:
+        if fields and modelClass.showFields is True:
             for field in fields:
 
                 fieldStr:   str = str(field)
