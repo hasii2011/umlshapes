@@ -1,5 +1,4 @@
 
-from typing import List
 from typing import Tuple
 from typing import cast
 from typing import TYPE_CHECKING
@@ -39,9 +38,10 @@ from umlshapes.shapes.eventhandlers.UmlLineControlPointEventHandler import UmlLi
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
 from umlshapes.types.Common import TAB
-from umlshapes.types.Common import EndPoints
+from umlshapes.types.Common import EndPositions
 from umlshapes.types.Common import NAME_IDX
 from umlshapes.types.UmlPosition import UmlPosition
+from umlshapes.types.UmlPosition import UmlPositions
 
 if TYPE_CHECKING:
     from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
@@ -95,10 +95,6 @@ class UmlLink(IdentifierMixin, LineShape, PubSubMixin):
         self.SetCanvas(frame)
 
     @property
-    def controlPoints(self) -> List[UmlLineControlPoint]:
-        return self._controlPoints
-
-    @property
     def modelLink(self) -> Link:
         return self._link
 
@@ -123,22 +119,41 @@ class UmlLink(IdentifierMixin, LineShape, PubSubMixin):
         self.Select(select=select)
 
     @property
-    def endPoints(self) -> EndPoints:
+    def controlPositions(self) -> UmlPositions:
+        """
+
+        Returns:  The UmlPositions
+        """
+        umlPositions: UmlPositions = UmlPositions([])
+
+        for cp in self._controlPoints:
+            lineControlPoint: UmlLineControlPoint = cast(UmlLineControlPoint, cp)
+            point: Point = lineControlPoint.point
+
+            umlPosition: UmlPosition = UmlPosition(x=point.x, y=point.y)
+            umlPositions.append(umlPosition)
+
+        return umlPositions
+
+    @property
+    def endPositions(self) -> EndPositions:
         """
         Syntactic sugar around the .GetEnds() and .SetEnd() methods
-        Returns:
+
+        Returns: The EndPositions data class
+
         """
 
         #    fromX, fromY, toX, toY
         ends: Tuple[int, int, int, int] = self.GetEnds()
 
-        return EndPoints(
+        return EndPositions(
             fromPosition=UmlPosition(x=ends[0], y=ends[1]),
             toPosition=UmlPosition(x=ends[2], y=ends[3])
         )
 
-    @endPoints.setter
-    def endPoints(self, endPoints: EndPoints):
+    @endPositions.setter
+    def endPositions(self, endPoints: EndPositions):
 
         fromPosition: UmlPosition = endPoints.fromPosition
         toPosition:   UmlPosition = endPoints.toPosition

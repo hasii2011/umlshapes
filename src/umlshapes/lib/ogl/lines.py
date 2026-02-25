@@ -17,6 +17,8 @@ beginning and end.
 import sys
 import math
 
+from wx import Point
+
 from .basic import Shape, ShapeRegion, ShapeTextLine, ControlPoint, RectangleShape
 from .oglmisc import *
 
@@ -59,6 +61,10 @@ class LineControlPoint(ControlPoint):
         self._type = the_type
         self._point = None
         self._originalPos = None
+
+    @property
+    def point(self) -> Point:
+        return self._point
 
     def OnDraw(self, dc):
         """The draw handler."""

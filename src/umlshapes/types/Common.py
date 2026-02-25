@@ -81,7 +81,7 @@ class Rectangle:
 
 
 @dataclass
-class EndPoints:
+class EndPositions:
     fromPosition: UmlPosition
     toPosition:   UmlPosition
 

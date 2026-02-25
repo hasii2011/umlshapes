@@ -15,7 +15,7 @@ from umlshapes.frames.DiagramFrame import DiagramFrame
 from umlshapes.shapes.UmlLineControlPoint import UmlLineControlPoint
 from umlshapes.shapes.UmlLineControlPoint import UmlLineControlPointType
 
-from umlshapes.types.Common import EndPoints
+from umlshapes.types.Common import EndPositions
 from umlshapes.types.Common import Rectangle
 
 from umlshapes.types.UmlPosition import UmlPosition
@@ -87,12 +87,12 @@ class UmlLineControlPointEventHandler(ShapeEvtHandler):
 
         self.logger.debug(f'{umlLink=} {umlClass=} {borderPosition=}')
 
-        endPoints: EndPoints = umlLink.endPoints
-        newTo:     EndPoints = EndPoints(
+        endPoints: EndPositions = umlLink.endPositions
+        newTo:     EndPositions = EndPositions(
             fromPosition=endPoints.fromPosition,
             toPosition=borderPosition
         )
-        umlLink.endPoints            = newTo
+        umlLink.endPositions         = newTo
         umlLineControlPoint.position = borderPosition
 
     def _moveTheFromPoint(self, umlLineControlPoint, umlLink, x, y):
@@ -112,15 +112,15 @@ class UmlLineControlPointEventHandler(ShapeEvtHandler):
 
         self.logger.debug(f'{umlLink=} {umlClass=} {borderPosition=}')
 
-        endPoints: EndPoints = umlLink.endPoints
-        newFrom:   EndPoints = EndPoints(
+        endPoints: EndPositions = umlLink.endPositions
+        newFrom:   EndPositions = EndPositions(
             fromPosition=borderPosition,
             toPosition=endPoints.toPosition
         )
         #
         # Move the line and the control point
         #
-        umlLink.endPoints            = newFrom
+        umlLink.endPositions         = newFrom
         umlLineControlPoint.position = borderPosition
 
     def _isThisAnEndLineControlPoint(self, umlLineControlPointType: UmlLineControlPointType) -> bool:

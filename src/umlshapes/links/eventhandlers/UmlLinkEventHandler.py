@@ -251,6 +251,7 @@ class UmlLinkEventHandler(UmlBaseEventHandler):
         umlLink: UmlLink = self.GetShape()
         umlLink.addLineControlPoint(umlPosition=UmlPosition(x=clickPoint.x, y=clickPoint.y))
 
+        self.logger.debug(f'{umlLink.controlPositions=}')
         frame: UmlFrame = self.GetShape().GetCanvas()
         frame.Refresh()
         self._indicateFrameModified()
