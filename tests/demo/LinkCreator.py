@@ -16,6 +16,7 @@ from umlmodel.Note import Note
 from umlmodel.enumerations.LinkType import LinkType
 
 from umlshapes.UmlDiagram import UmlDiagram
+from umlshapes.commands.CreateLinkCommand import CreateLinkCommand
 
 from umlshapes.pubsubengine.UmlPubSubEngine import UmlPubSubEngine
 
@@ -27,7 +28,6 @@ from umlshapes.links.UmlAssociation import UmlAssociation
 from umlshapes.links.UmlAggregation import UmlAggregation
 from umlshapes.links.UmlComposition import UmlComposition
 from umlshapes.links.UmlInheritance import UmlInheritance
-from umlshapes.links.UmlInterface import UmlInterface
 from umlshapes.links.UmlNoteLink import UmlNoteLink
 
 from umlshapes.links.eventhandlers.UmlAssociationEventHandler import UmlAssociationEventHandler
@@ -107,24 +107,14 @@ class LinkCreator:
         sourceUmlClass, destinationUmlClass = self._createClassPair(diagramFrame=diagramFrame)
         self.logger.info(f'{sourceUmlClass.id=} {destinationUmlClass.id=}')
 
-        modelLink = self._createAssociationModelLink(linkType=associationDescription.linkType)
-
-        modelLink.name = f'{associationDescription.linkType}-{self._associationCounter}'
-        self._associationCounter += 1
-
-        umlAssociation: UmlAssociation = associationDescription.associationClass(link=modelLink)
-
-        umlAssociation.umlFrame = diagramFrame
-        umlAssociation.umlPubSubEngine = self._umlPubSubEngine
-        umlAssociation.MakeLineControlPoints(n=2)       # Make this configurable
-
-        sourceUmlClass.addLink(umlLink=umlAssociation, destinationClass=destinationUmlClass)
-
-        diagramFrame.umlDiagram.AddShape(umlAssociation)
-        umlAssociation.Show(True)
-        #
-        # I know this looks weird but we do not need the variable
-        UmlAssociationEventHandler(umlAssociation=umlAssociation, umlPubSubEngine=self._umlPubSubEngine)
+        createLinkCommand: CreateLinkCommand = CreateLinkCommand(
+            partialName=f'{associationDescription.linkType}',
+            sourceShape=sourceUmlClass,
+            destinationShape=destinationUmlClass,
+            linkType=associationDescription.linkType,
+            umlPubSubEngine=self._umlPubSubEngine
+        )
+        diagramFrame.commandProcessor.Submit(command=createLinkCommand, storeIt=True)
 
     def displayUmlInheritance(self, diagramFrame: ClassDiagramFrame):
         """
@@ -133,21 +123,14 @@ class LinkCreator:
         baseUmlClass.modelClass.name = 'Base Class'
         subUmlClass.modelClass.name  = 'SubClass'
 
-        modelInheritance: Link = self._createInheritanceModelLink(baseUmlClass=baseUmlClass, subUmlClass=subUmlClass)
-
-        umlInheritance: UmlInheritance = UmlInheritance(link=modelInheritance, baseClass=baseUmlClass, subClass=subUmlClass)
-        umlInheritance.umlFrame = diagramFrame
-        umlInheritance.MakeLineControlPoints(n=2)       # Make this configurable
-
-        # REMEMBER:   from subclass to base class
-        subUmlClass.addLink(umlLink=umlInheritance, destinationClass=baseUmlClass)
-
-        diagramFrame.umlDiagram.AddShape(umlInheritance)
-        umlInheritance.Show(True)
-
-        eventHandler: UmlLinkEventHandler = UmlLinkEventHandler(umlLink=umlInheritance, previousEventHandler=umlInheritance.GetEventHandler())
-        eventHandler.umlPubSubEngine = self._umlPubSubEngine
-        umlInheritance.SetEventHandler(eventHandler)
+        createLinkCommand: CreateLinkCommand = CreateLinkCommand(
+            partialName=f'{LinkType.INHERITANCE}',
+            sourceShape=subUmlClass,
+            destinationShape=baseUmlClass,
+            linkType=LinkType.INHERITANCE,
+            umlPubSubEngine=self._umlPubSubEngine
+        )
+        diagramFrame.commandProcessor.Submit(command=createLinkCommand, storeIt=True)
 
     def displayUmlInterface(self, diagramFrame: ClassDiagramFrame):
 
@@ -158,58 +141,36 @@ class LinkCreator:
         implementingClass.modelClass.name  = f'ImplementingClass-{self._classCounter}'
         self._classCounter += 1
 
-        modelInterface: Link = self._createInterfaceModelLink()
-
-        modelInterface.destination  = implementingClass.modelClass
-        modelInterface.source       = interfaceClass.modelClass
-
-        umlInterface: UmlInterface = UmlInterface(link=modelInterface, interfaceClass=interfaceClass, implementingClass=implementingClass)
-        umlInterface.umlFrame = diagramFrame
-        umlInterface.MakeLineControlPoints(n=2)
-
-        implementingClass.addLink(umlLink=umlInterface, destinationClass=interfaceClass)
-
-        diagramFrame.umlDiagram.AddShape(umlInterface)
-        umlInterface.Show(True)
-
-        eventHandler: UmlLinkEventHandler = UmlLinkEventHandler(umlLink=umlInterface, previousEventHandler=umlInterface.GetEventHandler())
-        eventHandler.umlPubSubEngine = self._umlPubSubEngine
-        umlInterface.SetEventHandler(eventHandler)
+        createLinkCommand: CreateLinkCommand = CreateLinkCommand(
+            partialName=f'{LinkType.INTERFACE}',
+            sourceShape=implementingClass,
+            destinationShape=interfaceClass,
+            linkType=LinkType.INTERFACE,
+            umlPubSubEngine=self._umlPubSubEngine
+        )
+        diagramFrame.commandProcessor.Submit(command=createLinkCommand, storeIt=True)
 
     def displayNoteLink(self, diagramFrame: ClassDiagramFrame):
         classPosition: UmlPosition = UmlPosition(x=450, y=100)
 
         umlNote: UmlNote = self._createUmlNote()
 
-        modelClass: Class = self._createSimpleModelClass(classCounter=self._classCounter)
-        umlClass:  UmlClass  = UmlClass(modelClass=modelClass, size=UmlDimensions(100, 50))
-
-        self._displayUmlClass(umlClass=umlClass, umlPosition=classPosition, diagramFrame=diagramFrame)
-
-        modelLink:    Link    = Link(linkType=LinkType.NOTELINK)
-        umlNoteLink: UmlNoteLink = UmlNoteLink(link=modelLink)
-        umlNoteLink.MakeLineControlPoints(2)
-        umlNoteLink.sourceNote       = umlNote
-        umlNoteLink.destinationClass = umlClass
-        umlNoteLink.umlPubSubEngine  = self._umlPubSubEngine
+        modelClass: Class     = self._createSimpleModelClass(classCounter=self._classCounter)
+        umlClass:   UmlClass  = UmlClass(modelClass=modelClass, size=UmlDimensions(100, 50))
 
         umlNote.umlFrame  = diagramFrame
-
-        umlClass.umlFrame = diagramFrame
-
         diagramFrame.umlDiagram.AddShape(umlNote)
-        diagramFrame.umlDiagram.AddShape(umlClass)
-        diagramFrame.umlDiagram.AddShape(umlNoteLink)
-
         umlNote.Show(True)
-        umlNoteLink.Show(True)
-
         self._associateClassEventHandler(umlClass=umlClass)
-        self._associateNoteLinkEventHandler(umlNoteLink=umlNoteLink)
-
-        umlNote.addLink(umlNoteLink=umlNoteLink, umlClass=umlClass)
-
-        diagramFrame.refresh()
+        self._displayUmlClass(umlClass=umlClass, umlPosition=classPosition, diagramFrame=diagramFrame)
+        createLinkCommand: CreateLinkCommand = CreateLinkCommand(
+            partialName=f'{LinkType.NOTELINK}',
+            sourceShape=umlNote,
+            destinationShape=umlClass,
+            linkType=LinkType.NOTELINK,
+            umlPubSubEngine=self._umlPubSubEngine
+        )
+        diagramFrame.commandProcessor.Submit(command=createLinkCommand, storeIt=True)
 
     def displayOrthogonalLink(self, diagramFrame: ClassDiagramFrame):
         baseClassPosition: UmlPosition = UmlPosition(x=180, y=205)

@@ -108,8 +108,8 @@ class DemoAppFrame(SizedFrame):
             umlPubSubEngine=self._umlPubSubEngine,
         )
 
-        self._noteBook.AddPage(page=self._diagramFrame1, text='Class Diagram',    select=False)
-        self._noteBook.AddPage(page=self._diagramFrame2, text='Sequence Diagram', select=True)
+        self._noteBook.AddPage(page=self._diagramFrame1, text='Class Diagram',    select=True)
+        self._noteBook.AddPage(page=self._diagramFrame2, text='Sequence Diagram', select=False)
 
         self._currentFrame: DemoClassDiagramFrame | SequenceDiagramFrame = cast(DemoFrame, self._noteBook.GetCurrentPage())
 
