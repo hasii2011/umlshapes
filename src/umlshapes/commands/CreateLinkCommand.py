@@ -9,6 +9,10 @@ from umlshapes.commands.BaseLinkCommand import BaseLinkCommand
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 from umlshapes.shapes.UmlClass import UmlClass
+from umlshapes.types.UmlPosition import NO_POSITION
+from umlshapes.types.UmlPosition import NO_POSITIONS
+from umlshapes.types.UmlPosition import UmlPosition
+from umlshapes.types.UmlPosition import UmlPositions
 
 if TYPE_CHECKING:
     from umlshapes.ShapeTypes import UmlShapeGenre
@@ -18,10 +22,34 @@ class CreateLinkCommand(BaseLinkCommand):
 
     LinkCounter: int = 0
 
-    def __init__(self, partialName: str, sourceShape: 'UmlShapeGenre', destinationShape: 'UmlShapeGenre', linkType: LinkType, umlPubSubEngine: IUmlPubSubEngine):
+    def __init__(self,
+                 partialName: str,
+                 sourceShape: 'UmlShapeGenre',
+                 destinationShape: 'UmlShapeGenre',
+                 linkType: LinkType,
+                 umlPubSubEngine: IUmlPubSubEngine,
+                 linkSourcePosition:      UmlPosition = NO_POSITION,
+                 linkDestinationPosition: UmlPosition = NO_POSITION,
+                 linkControlPositions:    UmlPositions = NO_POSITIONS
+                 ):
+        """
+
+        Args:
+            partialName:    A partial name for the link
+            sourceShape:
+            destinationShape:
+            linkType:
+            umlPubSubEngine:    The shape pub/sub engine
+            linkSourcePosition:
+            linkDestinationPosition:
+            linkControlPositions:
+        """
         super().__init__(
             partialName=partialName,
             umlPubSubEngine=umlPubSubEngine,
+            linkSourcePosition=linkSourcePosition,
+            linkDestinationPosition=linkDestinationPosition,
+            linkControlPositions=linkControlPositions
         )
         self._preferences: UmlPreferences = UmlPreferences()
 

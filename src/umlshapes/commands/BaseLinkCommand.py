@@ -14,11 +14,14 @@ from umlmodel.Link import Link
 from umlmodel.enumerations.LinkType import LinkType
 
 from umlshapes.UmlDiagram import UmlDiagram
+from umlshapes.types.Common import EndPositions
 
 from umlshapes.types.UmlPosition import NO_POSITION
+from umlshapes.types.UmlPosition import NO_POSITIONS
 from umlshapes.types.UmlPosition import UmlPosition
 
 from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
+from umlshapes.types.UmlPosition import UmlPositions
 
 if TYPE_CHECKING:
     from umlshapes.ShapeTypes import UmlLinkGenre
@@ -46,7 +49,8 @@ class BaseLinkCommand(Command):
                  partialName: str,
                  umlPubSubEngine:  IUmlPubSubEngine,
                  linkSourcePosition:      UmlPosition = NO_POSITION,
-                 linkDestinationPosition: UmlPosition = NO_POSITION
+                 linkDestinationPosition: UmlPosition = NO_POSITION,
+                 linkControlPositions:    UmlPositions = NO_POSITIONS
                  ):
         """
 
@@ -55,6 +59,7 @@ class BaseLinkCommand(Command):
             umlPubSubEngine:    The shap pub/sub engine
             linkSourcePosition:         The link source position
             linkDestinationPosition:    The link destination position
+            linkControlPositions:       Intermediate bends on the link
         """
         from umlshapes.ShapeTypes import UmlShapeGenre
         from umlshapes.frames.UmlFrame import UmlFrame
@@ -96,12 +101,14 @@ class BaseLinkCommand(Command):
         """
         self._linkSourcePosition:      UmlPosition  = linkSourcePosition
         """
-        The starting shape of the link.         
+        The starting position of the link.         
         """
         self._linkDestinationPosition: UmlPosition = linkDestinationPosition
         """
-        The ending shape of the link.  
+        The ending position of the link.  
         """
+        self._linkControlPositions: UmlPositions = linkControlPositions
+
         super().__init__(canUndo=True, name=self._name)
 
     @property
@@ -153,7 +160,7 @@ class BaseLinkCommand(Command):
         from umlshapes.links.UmlInterface import UmlInterface
         from umlshapes.links.UmlNoteLink import UmlNoteLink
 
-        sourceUmlShape: UmlClass = cast(UmlClass, self._sourceUmlShape)  # noqa
+        sourceUmlShape:      UmlClass = cast(UmlClass, self._sourceUmlShape)  # noqa
         destinationUmlShape: UmlClass = cast(UmlClass, self._destinationUmlShape)  # noqa
         umlDiagram: UmlDiagram = self._umlFrame.umlDiagram
 
@@ -188,6 +195,11 @@ class BaseLinkCommand(Command):
             umlNoteLink.Show(True)
             # RECREATED !!!
             self._umlLink = umlNoteLink
+        #
+        # Add any specified end points and/or line control points
+        #
+        self._addCustomEndPoints()
+        self._addBends()
 
     def _createUmlAssociation(self, sourceUmlShape: 'UmlClass', destinationUmlShape: 'UmlClass') -> 'UmlAssociation':
         """
@@ -283,3 +295,19 @@ class BaseLinkCommand(Command):
         umlNote.addLink(umlNoteLink=umlNoteLink, umlClass=umlClass)
 
         return umlNoteLink
+
+    def _addCustomEndPoints(self):
+        """
+        Add specific end positions if the were specified by the link creator
+        """
+        if self._linkSourcePosition is not NO_POSITION and self._linkDestinationPosition is not NO_POSITION:
+            self._umlLink.endPositions = EndPositions(fromPosition=self._linkSourcePosition, toPosition=self._linkDestinationPosition)
+
+    def _addBends(self):
+        """
+        Add in bends in the link if the link creator provided some
+
+        """
+        if self._linkControlPositions is not NO_POSITIONS:
+            for umlPosition in self._linkControlPositions:
+                self._umlLink.addLineControlPoint(umlPosition)
