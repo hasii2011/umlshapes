@@ -2,8 +2,8 @@
 from typing import Union
 from typing import cast
 from typing import Dict
-from typing import NewType
 from typing import Tuple
+from typing import NewType
 
 from logging import Logger
 from logging import getLogger
@@ -16,6 +16,7 @@ from umlmodel.Note import Note
 from umlmodel.enumerations.LinkType import LinkType
 
 from umlshapes.UmlDiagram import UmlDiagram
+
 from umlshapes.commands.CreateLinkCommand import CreateLinkCommand
 
 from umlshapes.pubsubengine.UmlPubSubEngine import UmlPubSubEngine
@@ -24,11 +25,10 @@ from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
+from umlshapes.links.UmlNoteLink import UmlNoteLink
 from umlshapes.links.UmlAssociation import UmlAssociation
 from umlshapes.links.UmlAggregation import UmlAggregation
 from umlshapes.links.UmlComposition import UmlComposition
-from umlshapes.links.UmlInheritance import UmlInheritance
-from umlshapes.links.UmlNoteLink import UmlNoteLink
 
 from umlshapes.links.eventhandlers.UmlAssociationEventHandler import UmlAssociationEventHandler
 from umlshapes.links.eventhandlers.UmlLinkEventHandler import UmlLinkEventHandler
@@ -40,8 +40,9 @@ from umlshapes.shapes.UmlNote import UmlNote
 from umlshapes.shapes.eventhandlers.UmlClassEventHandler import UmlClassEventHandler
 from umlshapes.shapes.eventhandlers.UmlNoteEventHandler import UmlNoteEventHandler
 
-from umlshapes.types.UmlDimensions import UmlDimensions
 from umlshapes.types.UmlPosition import UmlPosition
+from umlshapes.types.UmlPosition import UmlPositions
+from umlshapes.types.UmlDimensions import UmlDimensions
 
 from tests.demo.DemoCommon import Identifiers
 from tests.demo.DemoCommon import ID_REFERENCE
@@ -163,6 +164,7 @@ class LinkCreator:
         umlNote.Show(True)
         self._associateClassEventHandler(umlClass=umlClass)
         self._displayUmlClass(umlClass=umlClass, umlPosition=classPosition, diagramFrame=diagramFrame)
+
         createLinkCommand: CreateLinkCommand = CreateLinkCommand(
             partialName=f'{LinkType.NOTELINK}',
             sourceShape=umlNote,
@@ -188,36 +190,17 @@ class LinkCreator:
         self._associateClassEventHandler(umlClass=baseUmlClass)
         self._associateClassEventHandler(umlClass=subClassUmlClass)
 
-        self._createOrthogonalLink(baseUmlClass=baseUmlClass, subClassUmlClass=subClassUmlClass, diagramFrame=diagramFrame)
-
-    def _createOrthogonalLink(self, baseUmlClass: UmlClass, subClassUmlClass: UmlClass, diagramFrame: ClassDiagramFrame):
-
-        # name: str = f'Inherits From'
-        name: str = f''
-
-        modelInheritance: Link = Link(name=name, linkType=LinkType.INHERITANCE)
-
-        modelInheritance.destination  = baseUmlClass.modelClass
-        modelInheritance.source       = subClassUmlClass.modelClass
-
-        umlInheritance: UmlInheritance = UmlInheritance(link=modelInheritance, baseClass=baseUmlClass, subClass=subClassUmlClass)
-        umlInheritance.umlFrame = diagramFrame
-        umlInheritance.MakeLineControlPoints(n=2)       # Make this configurable
-
-        # REMEMBER:   from subclass to base class
-        subClassUmlClass.addLink(umlLink=umlInheritance, destinationClass=baseUmlClass)
-
-        umlInheritance.setLinkEnds(
-            fromPosition=UmlPosition(x=625, y=480),
-            toPosition=UmlPosition(x=327, y=250)
+        createLinkCommand: CreateLinkCommand = CreateLinkCommand(
+            partialName=f'{LinkType.INHERITANCE}',
+            sourceShape=baseUmlClass,
+            destinationShape=subClassUmlClass,
+            linkType=LinkType.INHERITANCE,
+            umlPubSubEngine=self._umlPubSubEngine,
+            linkSourcePosition=UmlPosition(x=625, y=480),
+            linkDestinationPosition=UmlPosition(x=327, y=250),
+            linkControlPositions=UmlPositions([UmlPosition(x=625, y=250)])
         )
-        umlInheritance.addLineControlPoint(umlPosition=UmlPosition(x=625, y=250))
-        diagramFrame.umlDiagram.AddShape(umlInheritance)
-        umlInheritance.Show(True)
-
-        eventHandler: UmlLinkEventHandler = UmlLinkEventHandler(umlLink=umlInheritance, previousEventHandler=umlInheritance.GetEventHandler())
-        eventHandler.umlPubSubEngine = self._umlPubSubEngine
-        umlInheritance.SetEventHandler(eventHandler)
+        diagramFrame.commandProcessor.Submit(command=createLinkCommand, storeIt=True)
 
     def _createClassPair(self, diagramFrame: ClassDiagramFrame) -> Tuple[UmlClass, UmlClass]:
 
