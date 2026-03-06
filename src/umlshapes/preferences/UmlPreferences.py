@@ -2,13 +2,15 @@
 from logging import Logger
 from logging import getLogger
 
-from codeallybasic.SecureConversions import SecureConversions
 from codeallybasic.SingletonV3 import SingletonV3
+from codeallybasic.SecureConversions import SecureConversions
 
 from umlshapes.types.DeltaXY import DeltaXY
 from umlshapes.types.UmlColor import UmlColor
-from umlshapes.types.UmlDimensions import UmlDimensions
 from umlshapes.types.UmlPenStyle import UmlPenStyle
+from umlshapes.types.UmlPosition import UmlPosition
+from umlshapes.types.WiggleFactor import WiggleFactor
+from umlshapes.types.UmlDimensions import UmlDimensions
 from umlshapes.types.UmlFontFamily import UmlFontFamily
 
 from umlshapes.links.UmlAssociationLabelFormat import UmlAssociationLabelFormat
@@ -20,7 +22,6 @@ from codeallybasic.DynamicConfiguration import Sections
 from codeallybasic.DynamicConfiguration import ValueDescription
 from codeallybasic.DynamicConfiguration import ValueDescriptions
 
-from umlshapes.types.UmlPosition import UmlPosition
 
 MODULE_NAME:           str = 'umlshapes'
 PREFERENCES_FILE_NAME: str = f'{MODULE_NAME}.ini'
@@ -80,6 +81,7 @@ UML_SHAPE_PREFERENCES: ValueDescriptions = ValueDescriptions(
         KeyName('lineHeightAdjustment'):     ValueDescription(defaultValue='1',    deserializer=SecureConversions.secureInteger),
         KeyName('autoResizeShapesOnEdit'):   ValueDescription(defaultValue='True', deserializer=SecureConversions.secureBoolean),
         KeyName('controlPointSize'):         ValueDescription(defaultValue='4',    deserializer=SecureConversions.secureInteger),
+        KeyName('shapeWiggleFactor'):        ValueDescription(defaultValue=str(WiggleFactor()), deserializer=WiggleFactor.deSerialize),
 
     }
 )

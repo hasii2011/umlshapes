@@ -15,6 +15,7 @@ INCREMENT_Y: int = 25
 
 class Identifiers:
     ID_DEMO_SHAPE_BOUNDARIES: ID_REFERENCE = wxNewIdRef()
+    ID_DEMO_WIGGLE_SHAPES:     ID_REFERENCE = wxNewIdRef()
 
     ID_DISPLAY_UML_TEXT:     ID_REFERENCE = wxNewIdRef()
     ID_DISPLAY_UML_NOTE:     ID_REFERENCE = wxNewIdRef()

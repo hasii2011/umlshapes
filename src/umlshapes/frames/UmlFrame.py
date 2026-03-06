@@ -19,10 +19,10 @@ from wx import WXK_DELETE
 from wx import WXK_DOWN
 
 from wx import ClientDC
-from wx import CommandProcessor
 from wx import MouseEvent
 from wx import KeyEvent
 from wx import Window
+from wx import CommandProcessor
 
 from umlshapes.lib.ogl import Shape
 from umlshapes.lib.ogl import ShapeCanvas
@@ -43,6 +43,7 @@ from umlshapes.preferences.UmlPreferences import UmlPreferences
 from umlshapes.types.UmlLine import UmlLine
 from umlshapes.types.UmlPosition import UmlPoint
 from umlshapes.types.UmlPosition import UmlPosition
+from umlshapes.types.WiggleFactor import WiggleFactor
 from umlshapes.types.UmlDimensions import UmlDimensions
 
 if TYPE_CHECKING:
@@ -276,6 +277,24 @@ class UmlFrame(DiagramFrame):
         self._selector = cast(ShapeSelector, None)
 
         return True
+
+    def wiggleShape(self, shape):
+
+        from umlshapes.ShapeTypes import UmlShapeGenre
+        from umlshapes.UmlBaseEventHandler import UmlBaseEventHandler
+
+        umlShape:     UmlShapeGenre = cast(UmlShapeGenre, shape)
+        wiggleFactor: WiggleFactor = self._preferences.shapeWiggleFactor
+
+        oldX: int = umlShape.GetX()
+        oldY: int = umlShape.GetY()
+        newX: int = oldX + wiggleFactor.xFactor
+        newY: int = oldY + wiggleFactor.yFactor
+
+        eventHandler: UmlBaseEventHandler = umlShape.GetEventHandler()
+
+        eventHandler.OnDragLeft(draw=True, x=newX, y=newY)
+        eventHandler.OnDragLeft(draw=True, x=oldX, y=oldY)
 
     def _onProcessKeystrokes(self, event: KeyEvent):
         """

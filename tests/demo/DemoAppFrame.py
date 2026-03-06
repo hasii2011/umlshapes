@@ -158,7 +158,9 @@ class DemoAppFrame(SizedFrame):
         viewMenu:   Menu  = Menu()
         actionMenu: Menu  = Menu()
 
-        self._shapeItem   = fileMenu.AppendCheckItem(Identifiers.ID_DEMO_SHAPE_BOUNDARIES, item='Shape Boundaries', help='Demo Shape Boundaries')
+        self._shapeItem  = fileMenu.AppendCheckItem(Identifiers.ID_DEMO_SHAPE_BOUNDARIES, item='Shape Boundaries', help='Demo Shape Boundaries')
+
+        fileMenu.Append(Identifiers.ID_DEMO_WIGGLE_SHAPES, 'Wiggle Shapes', 'Demonstrate work around')
         fileMenu.AppendSeparator()
         fileMenu.Append(ID_EXIT, '&Quit', "Quit Application")
         fileMenu.AppendSeparator()
@@ -204,6 +206,7 @@ class DemoAppFrame(SizedFrame):
 
         self._editMenu = editMenu
 
+        self.Bind(EVT_MENU, self._onWiggleShapes, id=Identifiers.ID_DEMO_WIGGLE_SHAPES)
         self.Bind(EVT_MENU, self._onDemoShapeBoundaries, id=Identifiers.ID_DEMO_SHAPE_BOUNDARIES)
 
         self.Bind(EVT_MENU, self._onDisplayElement, id=Identifiers.ID_DISPLAY_UML_TEXT)
@@ -249,6 +252,19 @@ class DemoAppFrame(SizedFrame):
             self._currentFrame.drawShapeBoundary = False
         self._currentFrame.refresh()
         self.logger.info(f'Drawing Shapes Boundary=`{self._currentFrame.drawShapeBoundary}` frame=`{self._currentFrame.id}`')
+
+    # noinspection PyUnusedLocal
+    def _onWiggleShapes(self, event: CommandEvent):
+
+        frame: UmlFrame = self._currentFrame
+
+        if len(frame.umlShapes) == 0:  # noqa
+            with MessageDialog(parent=None, message='There are no shapes on the current frame', caption='You messed up!', style=OK | ICON_ERROR) as dlg:
+                dlg.ShowModal()
+        else:
+            for s in frame.umlShapes:
+                if isinstance(s, UmlClass):
+                    frame.wiggleShape(s)
 
     def _onDemoSDMessageCreation(self, event: CommandEvent):
 
