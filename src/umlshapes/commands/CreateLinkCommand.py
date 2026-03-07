@@ -16,6 +16,7 @@ from umlshapes.types.UmlPosition import UmlPositions
 
 if TYPE_CHECKING:
     from umlshapes.ShapeTypes import UmlShapeGenre
+    from umlshapes.ShapeTypes import UmlLinkGenre
 
 
 class CreateLinkCommand(BaseLinkCommand):
@@ -72,6 +73,19 @@ class CreateLinkCommand(BaseLinkCommand):
 
         self._linkType            = linkType
         self._umlFrame            = sourceShape.umlFrame
+
+    @property
+    def umlLink(self) -> 'UmlLinkGenre':
+        """
+        Not valid until after the calling code has 'Submit()',ed the command
+
+        Returns:  The 'created link'
+
+        """
+        if self._umlLink is None:
+            raise AttributeError(f'Developer Error.  This property not valid until you .Submit() the command')
+
+        return self._umlLink
 
     def Do(self) -> bool:
 
