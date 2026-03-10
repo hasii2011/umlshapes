@@ -77,21 +77,26 @@ class UmlFrameOperationsListener:
 
         self._clipboard: ModelObjects = ModelObjects([])            # will be re-created at every copy
 
-        self._setupListeners()
+        self._setupListeners(umlFrame=umlFrame)
 
-    def _setupListeners(self):
-        self._umlPubSubEngine.subscribe(messageType=UmlMessageType.UNDO, frameId=self._umlFrame.id, listener=self._undoListener)
-        self._umlPubSubEngine.subscribe(messageType=UmlMessageType.REDO, frameId=self._umlFrame.id, listener=self._redoListener)
+    def _setupListeners(self, umlFrame: 'UmlFrame'):
+        """
 
-        self._umlPubSubEngine.subscribe(messageType=UmlMessageType.CUT_SHAPES,   frameId=self._umlFrame.id, listener=self._cutShapesListener)
-        self._umlPubSubEngine.subscribe(messageType=UmlMessageType.COPY_SHAPES,  frameId=self._umlFrame.id, listener=self._copyShapesListener)
-        self._umlPubSubEngine.subscribe(messageType=UmlMessageType.PASTE_SHAPES, frameId=self._umlFrame.id, listener=self._pasteShapesListener)
+        """
+        from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
+        from umlshapes.frames.UseCaseDiagramFrame import UseCaseDiagramFrame
 
-        self._umlPubSubEngine.subscribe(messageType=UmlMessageType.SELECT_ALL_SHAPES, frameId=self._umlFrame.id, listener=self._selectAllShapesListener)
-        #
-        #  TODO: This shapeMovingListener is only for Class and Use Case diagrams
-        #
-        # self._umlPubSubEngine.subscribe(messageType=UmlMessageType.SHAPE_MOVING,      frameId=self._umlFrame.id, listener=self._shapeMovingListener)
+        self._umlPubSubEngine.subscribe(messageType=UmlMessageType.UNDO, frameId=umlFrame.id, listener=self._undoListener)
+        self._umlPubSubEngine.subscribe(messageType=UmlMessageType.REDO, frameId=umlFrame.id, listener=self._redoListener)
+
+        self._umlPubSubEngine.subscribe(messageType=UmlMessageType.CUT_SHAPES,   frameId=umlFrame.id, listener=self._cutShapesListener)
+        self._umlPubSubEngine.subscribe(messageType=UmlMessageType.COPY_SHAPES,  frameId=umlFrame.id, listener=self._copyShapesListener)
+        self._umlPubSubEngine.subscribe(messageType=UmlMessageType.PASTE_SHAPES, frameId=umlFrame.id, listener=self._pasteShapesListener)
+
+        self._umlPubSubEngine.subscribe(messageType=UmlMessageType.SELECT_ALL_SHAPES, frameId=umlFrame.id, listener=self._selectAllShapesListener)
+
+        if isinstance(umlFrame, ClassDiagramFrame) or isinstance(umlFrame, UseCaseDiagramFrame):
+            self._umlPubSubEngine.subscribe(messageType=UmlMessageType.SHAPE_MOVING, frameId=umlFrame.id, listener=self._shapeMovingListener)
 
     def _undoListener(self):
         self._umlFrame.commandProcessor.Undo()
