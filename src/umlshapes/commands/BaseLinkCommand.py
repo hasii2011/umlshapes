@@ -35,6 +35,8 @@ if TYPE_CHECKING:
 
 MODEL_ASSOCIATION_LINK_TYPE: List[LinkType] = [LinkType.ASSOCIATION, LinkType.AGGREGATION, LinkType.COMPOSITION]
 
+END_POINT_COUNT: int = 2
+
 class BaseLinkCommand(Command):
     """
     BaseLinkCommand is a base class (inheriting from wx.Command) designed to centralize the lifecycle management of UML links within the
@@ -225,7 +227,7 @@ class BaseLinkCommand(Command):
 
         umlAssociation.umlFrame = self._umlFrame
         umlAssociation.umlPubSubEngine = self._umlPubSubEngine
-        umlAssociation.MakeLineControlPoints(n=2)  # Make this configurable
+        umlAssociation.MakeLineControlPoints(n=END_POINT_COUNT)
 
         # Looks weird but we do not need the result
         UmlAssociationEventHandler(umlAssociation=umlAssociation, umlPubSubEngine=self._umlPubSubEngine)
@@ -247,8 +249,9 @@ class BaseLinkCommand(Command):
         from umlshapes.links.eventhandlers.UmlLinkEventHandler import UmlLinkEventHandler
 
         umlInheritance: UmlInheritance = UmlInheritance(link=self._modelLink, baseClass=baseClass, subClass=subClass)
-        umlInheritance.umlFrame = self._umlFrame
-        umlInheritance.MakeLineControlPoints(n=2)       # Make this configurable
+        umlInheritance.umlFrame        = self._umlFrame
+        umlInheritance.umlPubSubEngine = self._umlPubSubEngine
+        umlInheritance.MakeLineControlPoints(n=END_POINT_COUNT)
 
         eventHandler: UmlLinkEventHandler = UmlLinkEventHandler(umlLink=umlInheritance, previousEventHandler=umlInheritance.GetEventHandler())
         eventHandler.umlPubSubEngine = self._umlPubSubEngine
@@ -264,8 +267,9 @@ class BaseLinkCommand(Command):
         from umlshapes.links.UmlInterface import UmlInterface
 
         umlInterface: UmlInterface = UmlInterface(link=self._modelLink, interfaceClass=interfaceClass, implementingClass=implementingClass)
-        umlInterface.umlFrame = self._umlFrame
-        umlInterface.MakeLineControlPoints(n=2)     # Make this configurable
+        umlInterface.umlFrame        = self._umlFrame
+        umlInterface.umlPubSubEngine = self._umlPubSubEngine
+        umlInterface.MakeLineControlPoints(n=END_POINT_COUNT)
 
         eventHandler: UmlLinkEventHandler = UmlLinkEventHandler(umlLink=umlInterface, previousEventHandler=umlInterface.GetEventHandler())
         eventHandler.umlPubSubEngine = self._umlPubSubEngine
@@ -281,8 +285,9 @@ class BaseLinkCommand(Command):
         from umlshapes.links.eventhandlers.UmlNoteLinkEventHandler import UmlNoteLinkEventHandler
 
         umlNoteLink: UmlNoteLink = UmlNoteLink(link=self._modelLink)
-        umlNoteLink.umlFrame  = self._umlFrame
-        umlNoteLink.MakeLineControlPoints(2)        # Make this configurable
+        umlNoteLink.umlFrame        = self._umlFrame
+        umlNoteLink.umlPubSubEngine = self._umlPubSubEngine
+        umlNoteLink.MakeLineControlPoints(END_POINT_COUNT)
 
         umlNoteLink.sourceNote       = umlNote
         umlNoteLink.destinationClass = umlClass
