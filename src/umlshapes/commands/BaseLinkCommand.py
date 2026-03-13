@@ -167,7 +167,7 @@ class BaseLinkCommand(Command):
         umlDiagram: UmlDiagram = self._umlFrame.umlDiagram
 
         if self._modelLink.linkType in MODEL_ASSOCIATION_LINK_TYPE:
-            umlAssociation: UmlAssociation = self._createUmlAssociation(destinationUmlShape, sourceUmlShape)
+            umlAssociation: UmlAssociation = self._createUmlAssociation(destinationUmlShape=destinationUmlShape, sourceUmlShape=sourceUmlShape)
 
             umlDiagram.AddShape(umlAssociation)
             umlAssociation.Show(True)
