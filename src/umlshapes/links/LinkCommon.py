@@ -6,7 +6,7 @@ from wx import Point as wxPoint
 if TYPE_CHECKING:
     from umlshapes.links.UmlLink import UmlLink
 
-from umlshapes.links.UmlAssociationLabel import UmlAssociationLabel
+from umlshapes.links.UmlLinkLabel import UmlLinkLabel
 
 from umlshapes.types.ClosestPoint import ClosestPoint
 from umlshapes.types.ClosestPoint import FromPoint
@@ -16,13 +16,13 @@ from umlshapes.types.ClosestPoint import determineClosestPoint
 from umlshapes.types.UmlPosition import UmlPosition
 
 
-def getClosestPointOnLine(umlLink: 'UmlLink', umlAssociationLabel: UmlAssociationLabel):
+def getClosestPointOnLine(umlLink: 'UmlLink', umlLinkLabel: UmlLinkLabel):
     """
     The line may have multiple segments.  Test each segment
 
     Args:
         umlLink:
-        umlAssociationLabel:
+        umlLinkLabel:
 
     Returns:  The closest point on a given line segment
 
@@ -41,7 +41,7 @@ def getClosestPointOnLine(umlLink: 'UmlLink', umlAssociationLabel: UmlAssociatio
             x=wxPoint2.x,
             y=wxPoint2.y
         )
-        topLeft: UmlPosition = umlAssociationLabel.position
+        topLeft: UmlPosition = umlLinkLabel.position
 
         fromPoint: FromPoint = FromPoint(
             x=topLeft.x,

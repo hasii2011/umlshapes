@@ -10,6 +10,7 @@ from logging import getLogger
 
 from dataclasses import dataclass
 
+from enum import StrEnum
 from umlmodel.Class import Class
 from umlmodel.Link import Link
 from umlmodel.Note import Note
@@ -65,6 +66,14 @@ class AssociationDescription:
 RelationshipDescription = NewType('RelationshipDescription', Dict[ID_REFERENCE, AssociationDescription])
 
 
+class SmartPlacement(StrEnum):
+    SOURCE_ABOVE  = 'Source Above'
+    SOURCE_BELOW  = 'Source Below'
+    SOURCE_LEFT   = 'Source Left'
+    SOURCE_RIGHT  = 'Source Right'
+    SOURCE_225    = 'Source 225'
+
+
 class LinkCreator:
     """
     Not those kinds, dork
@@ -100,6 +109,37 @@ class LinkCreator:
                 Identifiers.ID_DISPLAY_UML_AGGREGATION: aggregation,
             }
         )
+
+    def displaySmartPlacement(self, diagramFrame: ClassDiagramFrame, placement: SmartPlacement):
+        #
+        # default to source left
+        #
+        sourcePosition:      UmlPosition = UmlPosition(x=100, y=100)
+        destinationPosition: UmlPosition = UmlPosition(x=200, y=300)
+
+        if placement == SmartPlacement.SOURCE_RIGHT:
+            sourcePosition      = UmlPosition(x=200, y=300)
+            destinationPosition = UmlPosition(x=100, y=100)
+        elif placement == SmartPlacement.SOURCE_ABOVE:
+            sourcePosition      = UmlPosition(x=200, y=300)
+            destinationPosition = UmlPosition(x=200, y=600)
+        elif placement == SmartPlacement.SOURCE_BELOW:
+            sourcePosition      = UmlPosition(x=200, y=600)
+            destinationPosition = UmlPosition(x=200, y=300)
+        elif placement == SmartPlacement.SOURCE_225:
+            sourcePosition      = UmlPosition(x=300, y=100)
+            destinationPosition = UmlPosition(x=400, y=400)
+
+        sourceUmlClass, destinationUmlClass = self._createClassPair(diagramFrame=diagramFrame, sourcePosition=sourcePosition, destinationPosition=destinationPosition)
+
+        createLinkCommand: CreateLinkCommand = CreateLinkCommand(
+            partialName=f'{LinkType.AGGREGATION}',
+            sourceShape=sourceUmlClass,
+            destinationShape=destinationUmlClass,
+            linkType=LinkType.AGGREGATION,
+            umlPubSubEngine=self._umlPubSubEngine
+        )
+        diagramFrame.commandProcessor.Submit(command=createLinkCommand, storeIt=True)
 
     def displayAssociation(self, idReference: ID_REFERENCE, diagramFrame: ClassDiagramFrame):
 
@@ -202,10 +242,11 @@ class LinkCreator:
         )
         diagramFrame.commandProcessor.Submit(command=createLinkCommand, storeIt=True)
 
-    def _createClassPair(self, diagramFrame: ClassDiagramFrame) -> Tuple[UmlClass, UmlClass]:
-
-        sourcePosition:       UmlPosition = UmlPosition(x=100, y=100)       # fix this should be input
-        destinationPosition:  UmlPosition = UmlPosition(x=200, y=300)
+    def _createClassPair(self,
+                         diagramFrame:        ClassDiagramFrame,
+                         sourcePosition:      UmlPosition = UmlPosition(x=100, y=100),
+                         destinationPosition: UmlPosition = UmlPosition(x=200, y=300),
+                         ) -> Tuple[UmlClass, UmlClass]:
 
         sourceModelClass:      Class   = self._createSimpleModelClass(classCounter=self._classCounter)
         self._classCounter += 1

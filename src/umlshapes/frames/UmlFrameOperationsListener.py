@@ -222,14 +222,14 @@ class UmlFrameOperationsListener:
             deltaXY:
         """
         from umlshapes.links.UmlLink import UmlLink
-        from umlshapes.links.UmlAssociationLabel import UmlAssociationLabel
+        from umlshapes.links.UmlLinkLabel import UmlLinkLabel
         from umlshapes.ShapeTypes import UmlShapeGenre
 
         self.logger.debug(f'{deltaXY=}')
         shapes = self._umlFrame.selectedShapes
         for s in shapes:
             umlShape: UmlShapeGenre = cast(UmlShapeGenre, s)
-            if not isinstance(umlShape, UmlLink) and not isinstance(umlShape, UmlAssociationLabel):
+            if not isinstance(umlShape, UmlLink) and not isinstance(umlShape, UmlLinkLabel):
                 if umlShape.moveMaster is False:
                     umlShape.position = UmlPosition(
                         x=umlShape.position.x + deltaXY.deltaX,

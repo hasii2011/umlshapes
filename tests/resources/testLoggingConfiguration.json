@@ -42,6 +42,7 @@
         },
         "codeallybasic.UnitTestBase": {
             "level": "INFO",
+            "handlers": ["consoleHandler"],
             "propagate": false
         }
     }

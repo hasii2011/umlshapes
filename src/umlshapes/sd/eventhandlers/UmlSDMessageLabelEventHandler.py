@@ -1,7 +1,7 @@
 
-from umlshapes.links.eventhandlers.UmlAssociationLabelEventHandler import UmlAssociationLabelEventHandler
+from umlshapes.links.eventhandlers.UmlLinkLabelEventHandler import UmlLinkLabelEventHandler
 
-class UmlSDMessageLabelEventHandler(UmlAssociationLabelEventHandler):
+class UmlSDMessageLabelEventHandler(UmlLinkLabelEventHandler):
     """
     Syntactic sugar
     """

@@ -136,6 +136,7 @@ class UmlClass(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
 
         if isinstance(umlLink, UmlAssociation):
             umlLink.createAssociationLabels()
+            umlLink.smartPlaceLabels()
 
     def OnDraw(self, dc: MemoryDC):
 

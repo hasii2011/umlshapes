@@ -31,7 +31,7 @@ from umlshapes.pubsubengine.UmlMessageType import UmlMessageType
 from umlshapes.frames.UmlFrame import UmlFrame
 
 from umlshapes.links.LabelType import LabelType
-from umlshapes.links.UmlAssociationLabel import UmlAssociationLabel
+from umlshapes.links.UmlLinkLabel import UmlLinkLabel
 
 from umlshapes.UmlBaseEventHandler import UmlBaseEventHandler
 
@@ -145,7 +145,7 @@ class UmlLinkEventHandler(UmlBaseEventHandler):
         super().OnMoveLink(dc=dc, moveControlPoints=moveControlPoints)
 
         umlLink: UmlAssociation = self.GetShape()
-        associationName:        UmlAssociationLabel = umlLink.linkName
+        associationName:        UmlLinkLabel = umlLink.linkName
         #
         if associationName is not None and associationName.labelType == LabelType.ASSOCIATION_NAME:
             labelX, labelY = umlLink.GetLabelPosition(NAME_IDX)

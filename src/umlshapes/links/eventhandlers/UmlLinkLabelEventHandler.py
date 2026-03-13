@@ -9,7 +9,7 @@ from umlshapes.lib.ogl import ShapeEvtHandler
 from umlshapes.types.DeltaXY import DeltaXY
 
 from umlshapes.links.LabelType import LabelType
-from umlshapes.links.UmlAssociationLabel import UmlAssociationLabel
+from umlshapes.links.UmlLinkLabel import UmlLinkLabel
 
 from umlshapes.shapes.PositionReporter import PositionReporter
 
@@ -25,7 +25,7 @@ from umlshapes.types.UmlPosition import UmlPosition
 REPORT_INTERVAL: int = 10
 
 
-class UmlAssociationLabelEventHandler(UmlBaseEventHandler):
+class UmlLinkLabelEventHandler(UmlBaseEventHandler):
     """
     BTW, I hate local imports
     """
@@ -54,27 +54,27 @@ class UmlAssociationLabelEventHandler(UmlBaseEventHandler):
         """
         super().OnMovePost(dc, x, y, oldX, oldY, display)
 
-        umlAssociationLabel: UmlAssociationLabel = cast(UmlAssociationLabel, self.GetShape())
-        umlLink:             PositionReporter    = umlAssociationLabel.parent
+        umlLinkLabel: UmlLinkLabel     = cast(UmlLinkLabel, self.GetShape())
+        umlLink:      PositionReporter = umlLinkLabel.parent
 
-        self._debugPrint(f'label type: {umlAssociationLabel.labelType} xy=({x},{y})')
+        self._debugPrint(f'label type: {umlLinkLabel.labelType} xy=({x},{y})')
 
-        if umlAssociationLabel.labelType == LabelType.ASSOCIATION_NAME or umlAssociationLabel.labelType == LabelType.SD_MESSAGE_NAME:
+        if umlLinkLabel.labelType == LabelType.ASSOCIATION_NAME or umlLinkLabel.labelType == LabelType.SD_MESSAGE_NAME:
             linkLabelX, linkLabelY = umlLink.GetLabelPosition(NAME_IDX)
-        elif umlAssociationLabel.labelType == LabelType.SOURCE_CARDINALITY:
+        elif umlLinkLabel.labelType == LabelType.SOURCE_CARDINALITY:
             linkLabelX, linkLabelY = umlLink.GetLabelPosition(SOURCE_CARDINALITY_IDX)
-        elif umlAssociationLabel.labelType == LabelType.DESTINATION_CARDINALITY:
+        elif umlLinkLabel.labelType == LabelType.DESTINATION_CARDINALITY:
             linkLabelX, linkLabelY = umlLink.GetLabelPosition(DESTINATION_CARDINALITY_IDX)
         else:
             assert False, 'Developer error unknown label type'
 
-        labelPosition: UmlPosition = umlAssociationLabel.position
+        labelPosition: UmlPosition = umlLinkLabel.position
         #
         #
         #
-        leftCoordinate: LeftCoordinate = self._convertToTopLeft(x=x, y=y, umlAssociationLabel=umlAssociationLabel)
-        deltaXY = self._calculateDelta(labelPosition, leftCoordinate, linkLabelX, linkLabelY)
-        umlAssociationLabel.linkDelta = deltaXY
+        leftCoordinate: LeftCoordinate = self._convertToTopLeft(x=x, y=y, umlAssociationLabel=umlLinkLabel)
+        deltaXY:        DeltaXY        = self._calculateDelta(labelPosition, leftCoordinate, linkLabelX, linkLabelY)
+        umlLinkLabel.linkDelta = deltaXY
 
     def _calculateDelta(self, labelPosition: UmlPosition, leftCoordinate: LeftCoordinate, linkLabelX, linkLabelY) -> DeltaXY:
         """
@@ -104,7 +104,7 @@ class UmlAssociationLabelEventHandler(UmlBaseEventHandler):
         self.logger.debug(f'{leftCoordinate=} {deltaXY=}')
         return deltaXY
 
-    def _convertToTopLeft(self, x: int, y: int, umlAssociationLabel: UmlAssociationLabel) -> LeftCoordinate:
+    def _convertToTopLeft(self, x: int, y: int, umlAssociationLabel: UmlLinkLabel) -> LeftCoordinate:
         """
 
         Args:

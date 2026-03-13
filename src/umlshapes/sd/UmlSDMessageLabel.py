@@ -1,8 +1,8 @@
 
-from umlshapes.links.UmlAssociationLabel import UmlAssociationLabel
+from umlshapes.links.UmlLinkLabel import UmlLinkLabel
 
 
-class UmlSDMessageLabel(UmlAssociationLabel):
+class UmlSDMessageLabel(UmlLinkLabel):
     """
     Syntactic Sugar
     """

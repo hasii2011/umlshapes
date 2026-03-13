@@ -24,8 +24,8 @@ from umlshapes.UmlUtils import UmlUtils
 from umlshapes.frames.UmlFrame import UmlFrame
 
 from umlshapes.links.LabelType import LabelType
-from umlshapes.links.UmlAssociationLabel import UmlAssociationLabel
-from umlshapes.links.eventhandlers.UmlAssociationLabelEventHandler import UmlAssociationLabelEventHandler
+from umlshapes.links.UmlLinkLabel import UmlLinkLabel
+from umlshapes.links.eventhandlers.UmlLinkLabelEventHandler import UmlLinkLabelEventHandler
 
 from umlshapes.mixins.IdentifierMixin import IdentifierMixin
 from umlshapes.mixins.PubSubMixin import PubSubMixin
@@ -65,7 +65,7 @@ class UmlLink(IdentifierMixin, LineShape, PubSubMixin):
         self._preferences: UmlPreferences = UmlPreferences()
 
         self._link:     Link                = link
-        self._linkName: UmlAssociationLabel = cast(UmlAssociationLabel, None)
+        self._linkName: UmlLinkLabel = cast(UmlLinkLabel, None)
 
         self.SetFormatMode(mode=FORMAT_SIZE_TO_CONTENTS)
         self.SetDraggable(True, recursive=True)
@@ -103,11 +103,11 @@ class UmlLink(IdentifierMixin, LineShape, PubSubMixin):
         self._link = link
 
     @property
-    def linkName(self) -> UmlAssociationLabel:
+    def linkName(self) -> UmlLinkLabel:
         return self._linkName
 
     @linkName.setter
-    def linkName(self, linkName: UmlAssociationLabel):
+    def linkName(self, linkName: UmlLinkLabel):
         self._linkName = linkName
 
     @property
@@ -203,7 +203,7 @@ class UmlLink(IdentifierMixin, LineShape, PubSubMixin):
     def OnDraw(self, dc: MemoryDC):
         if self._linkName is None:
             self._linkName = self._createLinkName()
-            self._setupAssociationLabel(umlAssociationLabel=self._linkName)
+            self._setupLinkText(umlAssociationLabel=self._linkName)
 
         if self.Selected() is True:
             self.SetPen(UmlUtils.redSolidPen())
@@ -295,27 +295,35 @@ class UmlLink(IdentifierMixin, LineShape, PubSubMixin):
 
         umlLineControlPoint.SetEventHandler(eventHandler)
 
-    def _createLinkName(self) -> UmlAssociationLabel:
+    def _createLinkName(self) -> UmlLinkLabel:
 
         labelX, labelY = self.GetLabelPosition(position=NAME_IDX)
-        return self._createAssociationLabel(x=labelX, y=labelY, text=self.modelLink.name, labelType=LabelType.ASSOCIATION_NAME)
+        return self._createLinkLabel(x=labelX, y=labelY, text=self.modelLink.name, labelType=LabelType.ASSOCIATION_NAME)
 
-    def _createAssociationLabel(self, x: int, y: int, text: str, labelType: LabelType) -> UmlAssociationLabel:
+    def _createLinkLabel(self, x: int, y: int, text: str, labelType: LabelType) -> UmlLinkLabel:
+        """
+
+        Args:
+            x:      The label x position
+            y:      The label y position
+            text:   The label text
+            labelType: Determines if the label initially appears at the link start, end, or in the middle
+        """
 
         assert text is not None, 'Developer error'
 
-        umlAssociationLabel: UmlAssociationLabel = UmlAssociationLabel(label=text, labelType=labelType)
+        umlAssociationLabel: UmlLinkLabel = UmlLinkLabel(label=text, labelType=labelType)
 
         umlAssociationLabel.position = UmlPosition(x=x, y=y)
         #
         # Maybe not necessary, but let's be consistent
         #
         self._children.append(umlAssociationLabel)
-        self._setupAssociationLabel(umlAssociationLabel)
+        self._setupLinkText(umlAssociationLabel)
 
         return umlAssociationLabel
 
-    def _setupAssociationLabel(self, umlAssociationLabel):
+    def _setupLinkText(self, umlAssociationLabel: UmlLinkLabel):
         """
 
         Args:
@@ -328,15 +336,15 @@ class UmlLink(IdentifierMixin, LineShape, PubSubMixin):
         diagram: UmlDiagram = umlFrame.umlDiagram
         diagram.AddShape(umlAssociationLabel)
 
-        self._associateAssociationLabelEventHandler(umlAssociationLabel)
+        self._setupLinkTextEventHandler(umlAssociationLabel)
 
-    def _associateAssociationLabelEventHandler(self, umlAssociationLabel: UmlAssociationLabel):
+    def _setupLinkTextEventHandler(self, umlAssociationLabel: UmlLinkLabel):
         """
 
         Args:
             umlAssociationLabel:
         """
-        eventHandler: UmlAssociationLabelEventHandler = UmlAssociationLabelEventHandler(previousEventHandler=umlAssociationLabel.GetEventHandler())
+        eventHandler: UmlLinkLabelEventHandler = UmlLinkLabelEventHandler(previousEventHandler=umlAssociationLabel.GetEventHandler())
 
         eventHandler.SetShape(umlAssociationLabel)
         eventHandler.umlPubSubEngine = self._umlPubSubEngine

@@ -12,34 +12,41 @@ from math import atan
 from math import cos
 from math import sin
 
-from wx import BLACK_BRUSH
-from wx import BLACK_PEN
-from wx import BLUE_PEN
 from wx import DC
-from wx import RED_BRUSH
 from wx import RED_PEN
+from wx import BLUE_PEN
+from wx import BLACK_PEN
+from wx import RED_BRUSH
+from wx import BLACK_BRUSH
 from wx import WHITE_BRUSH
 
 from wx import Point
-from wx import MemoryDC
 from wx import Pen
+from wx import MemoryDC
 
 from umlmodel.Link import Link
 
-from umlshapes.links.LabelType import LabelType
+from umlshapes.UmlUtils import LeftTopRectangleIndicator
+from umlshapes.UmlUtils import RelativeRectangleResult
+from umlshapes.UmlUtils import UmlUtils
+
 from umlshapes.links.UmlLink import UmlLink
-from umlshapes.links.UmlAssociationLabel import UmlAssociationLabel
+from umlshapes.links.LabelType import LabelType
+from umlshapes.links.UmlLinkLabel import UmlLinkLabel
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
-from umlshapes.types.Common import DESTINATION_CARDINALITY_IDX
 from umlshapes.types.Common import NAME_IDX
+from umlshapes.types.Common import Rectangle
 from umlshapes.types.Common import SOURCE_CARDINALITY_IDX
+from umlshapes.types.Common import DESTINATION_CARDINALITY_IDX
+from umlshapes.types.DeltaXY import DeltaXY
+from umlshapes.types.UmlPosition import UmlPosition
 
 SegmentPoint  = NewType('SegmentPoint',  Tuple[int, int])
 Segments      = NewType('Segments',      List[SegmentPoint])
 
-DiamondPoint    = NewType('DiamondPoint', Tuple[int, int])
+DiamondPoint    = NewType('DiamondPoint',  Tuple[int, int])
 DiamondPoints   = NewType('DiamondPoints', List[DiamondPoint])
 
 PI_6:         float = pi / 6
@@ -55,11 +62,11 @@ class UmlAssociation(UmlLink):
 
         self.associationLogger: Logger = getLogger(__name__)
 
-        self._sourceCardinality:      UmlAssociationLabel = cast(UmlAssociationLabel, None)
-        self._destinationCardinality: UmlAssociationLabel = cast(UmlAssociationLabel, None)
+        self._sourceCardinality:      UmlLinkLabel = cast(UmlLinkLabel, None)
+        self._destinationCardinality: UmlLinkLabel = cast(UmlLinkLabel, None)
 
     @property
-    def associationName(self) -> UmlAssociationLabel:
+    def associationName(self) -> UmlLinkLabel:
         """
         Syntactic sugar around link name
 
@@ -68,23 +75,23 @@ class UmlAssociation(UmlLink):
         return self._linkName
 
     @associationName.setter
-    def associationName(self, newValue: UmlAssociationLabel):
+    def associationName(self, newValue: UmlLinkLabel):
         self._linkName = newValue
 
     @property
-    def sourceCardinality(self) -> UmlAssociationLabel:
+    def sourceCardinality(self) -> UmlLinkLabel:
         return self._sourceCardinality
 
     @sourceCardinality.setter
-    def sourceCardinality(self, newValue: UmlAssociationLabel):
+    def sourceCardinality(self, newValue: UmlLinkLabel):
         self._sourceCardinality = newValue
 
     @property
-    def destinationCardinality(self) -> UmlAssociationLabel:
+    def destinationCardinality(self) -> UmlLinkLabel:
         return self._destinationCardinality
 
     @destinationCardinality.setter
-    def destinationCardinality(self, newValue: UmlAssociationLabel):
+    def destinationCardinality(self, newValue: UmlLinkLabel):
         self._destinationCardinality = newValue
 
     @property
@@ -112,6 +119,26 @@ class UmlAssociation(UmlLink):
         self._sourceCardinality      = self._createSourceCardinality()
         self._destinationCardinality = self._createDestinationCardinality()
 
+    def smartPlaceLabels(self):
+        """
+        Association labels that appear either down from the other end or
+        right from the other end are always obscured.
+        See: https://github.com/hasii2011/umlshapes/issues/1
+
+        """
+        sourceShape      = self.sourceShape
+        destinationShape = self.destinationShape
+
+        rectangle1: Rectangle = sourceShape.rectangle
+        rectangle2: Rectangle = destinationShape.rectangle
+
+        result: RelativeRectangleResult = UmlUtils.computeRelativeRectanglePosition(rectangle1=rectangle1, rectangle2=rectangle2)
+
+        if result.leftMostTopMostShape == LeftTopRectangleIndicator.RECTANGLE_1 and result.isOtherToBottom is True:
+            self._repositionUmlLinkLabel(umlLinkLabel=self.destinationCardinality)
+        elif result.leftMostTopMostShape == LeftTopRectangleIndicator.RECTANGLE_2 and result.isOtherToBottom is True:
+            self._repositionUmlLinkLabel(umlLinkLabel=self.sourceCardinality)
+
     def OnDraw(self, dc: MemoryDC):
 
         super().OnDraw(dc=dc)
@@ -125,15 +152,33 @@ class UmlAssociation(UmlLink):
             dc.DrawRectangle(labelX, labelY, 5, 5)
             dc.SetPen(savePen)
 
-    def _createDestinationCardinality(self) -> UmlAssociationLabel:
+    def _repositionUmlLinkLabel(self, umlLinkLabel: UmlLinkLabel):
+        """
+
+        Args:
+            umlLinkLabel:   The label to reposition
+        """
+
+        oldSourcePosition:         UmlPosition = umlLinkLabel.position
+        associationLabelOffsetFix: int         = self._preferences.associationLabelOffsetFix
+        newSourceCardinalityPosition: UmlPosition = UmlPosition(x=oldSourcePosition.x, y=oldSourcePosition.y - associationLabelOffsetFix)
+        umlLinkLabel.position = newSourceCardinalityPosition
+
+        deltaXY: DeltaXY = DeltaXY(
+            deltaX=abs(newSourceCardinalityPosition.x - oldSourcePosition.x),
+            deltaY=abs(newSourceCardinalityPosition.y - oldSourcePosition.y)
+        )
+        umlLinkLabel.linkDelta = deltaXY
+
+    def _createDestinationCardinality(self) -> UmlLinkLabel:
 
         dstCardX, dstCardY = self.GetLabelPosition(position=DESTINATION_CARDINALITY_IDX)
-        return self._createAssociationLabel(x=dstCardX, y=dstCardY, text=self.modelLink.destinationCardinality, labelType=LabelType.DESTINATION_CARDINALITY)
+        return self._createLinkLabel(x=dstCardX, y=dstCardY, text=self.modelLink.destinationCardinality, labelType=LabelType.DESTINATION_CARDINALITY)
 
-    def _createSourceCardinality(self) -> UmlAssociationLabel:
+    def _createSourceCardinality(self) -> UmlLinkLabel:
 
         srcCardX, srcCardY = self.GetLabelPosition(position=SOURCE_CARDINALITY_IDX)
-        return self._createAssociationLabel(x=srcCardX, y=srcCardY, text=self.modelLink.sourceCardinality, labelType=LabelType.SOURCE_CARDINALITY)
+        return self._createLinkLabel(x=srcCardX, y=srcCardY, text=self.modelLink.sourceCardinality, labelType=LabelType.SOURCE_CARDINALITY)
 
     def _drawDiamond(self, dc: DC, filled: bool = False):
         """
