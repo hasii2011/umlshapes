@@ -398,14 +398,14 @@ class UmlFrame(DiagramFrame):
         Returns: True if the shape is one of our ignore shapes
         """
         from umlshapes.shapes.UmlControlPoint import UmlControlPoint
-        from umlshapes.links.UmlAssociationLabel import UmlAssociationLabel
+        from umlshapes.links.UmlLinkLabel import UmlLinkLabel
         from umlshapes.links.UmlLollipopInterface import UmlLollipopInterface
         from umlshapes.shapes.UmlLineControlPoint import UmlLineControlPoint
 
         ignore: bool = False
 
         if (isinstance(shapeToCheck, UmlControlPoint) or
-                isinstance(shapeToCheck, UmlAssociationLabel) or
+                isinstance(shapeToCheck, UmlLinkLabel) or
                 isinstance(shapeToCheck, UmlLollipopInterface) or
                 isinstance(shapeToCheck, UmlLineControlPoint)):
             ignore = True

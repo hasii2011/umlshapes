@@ -29,7 +29,7 @@ if TYPE_CHECKING:
     from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
 
 
-class UmlAssociationLabel(ControlPointMixin, TextShape, TopLeftMixin):
+class UmlLinkLabel(ControlPointMixin, TextShape, TopLeftMixin):
 
     def __init__(self, label: str = '', size: UmlDimensions = None, labelType: LabelType = LabelType.NOT_SET):
         """
@@ -154,7 +154,7 @@ class UmlAssociationLabel(ControlPointMixin, TextShape, TopLeftMixin):
         return x, y
 
     def __str__(self) -> str:
-        return f'UmlAssociationLabel - `{self.label}`'
+        return f'UmlLinkLabel - `{self.label}`'
 
     def __repr__(self) -> str:
-        return f'UmlAssociationLabel - `{self.label}` type={self.labelType}'
+        return f'UmlLinkLabel - `{self.label}` type={self.labelType}'

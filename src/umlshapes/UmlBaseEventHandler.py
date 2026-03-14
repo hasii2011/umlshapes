@@ -55,7 +55,7 @@ class UmlBaseEventHandler(ShapeEvtHandler):
 
         """
 
-        from umlshapes.links.UmlAssociationLabel import UmlAssociationLabel
+        from umlshapes.links.UmlLinkLabel import UmlLinkLabel
         from umlshapes.links.UmlLink import UmlLink
         # self._baseLogger.info(f'{draw=} x,y:({x},{y}) {attachment=}')
         from umlshapes.ShapeTypes import UmlShapeGenre
@@ -67,7 +67,7 @@ class UmlBaseEventHandler(ShapeEvtHandler):
             umlShape.moveMaster = True
             self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.FRAME_MODIFIED, frameId=umlShape.umlFrame.id, modifiedFrameId=umlShape.umlFrame.id)
         else:
-            if not isinstance(umlShape, UmlAssociationLabel) and not isinstance(umlShape, UmlLink):
+            if not isinstance(umlShape, UmlLinkLabel) and not isinstance(umlShape, UmlLink):
 
                 deltaXY: DeltaXY = DeltaXY(
                     deltaX=x - self._previousPosition.x,

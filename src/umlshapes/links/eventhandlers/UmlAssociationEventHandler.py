@@ -6,7 +6,7 @@ from wx import DC
 
 
 from umlshapes.links.UmlAssociation import UmlAssociation
-from umlshapes.links.UmlAssociationLabel import UmlAssociationLabel
+from umlshapes.links.UmlLinkLabel import UmlLinkLabel
 from umlshapes.links.eventhandlers.UmlLinkEventHandler import UmlLinkEventHandler
 from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 
@@ -41,8 +41,8 @@ class UmlAssociationEventHandler(UmlLinkEventHandler):
 
         umlLink: UmlAssociation = self.GetShape()
 
-        sourceCardinality:      UmlAssociationLabel = umlLink.sourceCardinality
-        destinationCardinality: UmlAssociationLabel = umlLink.destinationCardinality
+        sourceCardinality:      UmlLinkLabel = umlLink.sourceCardinality
+        destinationCardinality: UmlLinkLabel = umlLink.destinationCardinality
 
         if sourceCardinality is not None:
             srcCardX, srcCardY = umlLink.GetLabelPosition(SOURCE_CARDINALITY_IDX)

@@ -29,7 +29,7 @@ from umlshapes.UmlUtils import UmlUtils
 
 from umlshapes.links.UmlLink import UmlLink
 from umlshapes.links.LabelType import LabelType
-from umlshapes.links.UmlAssociationLabel import UmlAssociationLabel
+from umlshapes.links.UmlLinkLabel import UmlLinkLabel
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
@@ -56,11 +56,11 @@ class UmlAssociation(UmlLink):
 
         self.associationLogger: Logger = getLogger(__name__)
 
-        self._sourceCardinality:      UmlAssociationLabel = cast(UmlAssociationLabel, None)
-        self._destinationCardinality: UmlAssociationLabel = cast(UmlAssociationLabel, None)
+        self._sourceCardinality:      UmlLinkLabel = cast(UmlLinkLabel, None)
+        self._destinationCardinality: UmlLinkLabel = cast(UmlLinkLabel, None)
 
     @property
-    def associationName(self) -> UmlAssociationLabel:
+    def associationName(self) -> UmlLinkLabel:
         """
         Syntactic sugar around link name
 
@@ -69,23 +69,23 @@ class UmlAssociation(UmlLink):
         return self._linkName
 
     @associationName.setter
-    def associationName(self, newValue: UmlAssociationLabel):
+    def associationName(self, newValue: UmlLinkLabel):
         self._linkName = newValue
 
     @property
-    def sourceCardinality(self) -> UmlAssociationLabel:
+    def sourceCardinality(self) -> UmlLinkLabel:
         return self._sourceCardinality
 
     @sourceCardinality.setter
-    def sourceCardinality(self, newValue: UmlAssociationLabel):
+    def sourceCardinality(self, newValue: UmlLinkLabel):
         self._sourceCardinality = newValue
 
     @property
-    def destinationCardinality(self) -> UmlAssociationLabel:
+    def destinationCardinality(self) -> UmlLinkLabel:
         return self._destinationCardinality
 
     @destinationCardinality.setter
-    def destinationCardinality(self, newValue: UmlAssociationLabel):
+    def destinationCardinality(self, newValue: UmlLinkLabel):
         self._destinationCardinality = newValue
 
     @property
@@ -140,12 +140,12 @@ class UmlAssociation(UmlLink):
             dc.DrawRectangle(labelX, labelY, 5, 5)
             dc.SetPen(savePen)
 
-    def _createDestinationCardinality(self) -> UmlAssociationLabel:
+    def _createDestinationCardinality(self) -> UmlLinkLabel:
 
         dstCardX, dstCardY = self.GetLabelPosition(position=DESTINATION_CARDINALITY_IDX)
         return self._createLinkLabel(x=dstCardX, y=dstCardY, text=self.modelLink.destinationCardinality, labelType=LabelType.DESTINATION_CARDINALITY)
 
-    def _createSourceCardinality(self) -> UmlAssociationLabel:
+    def _createSourceCardinality(self) -> UmlLinkLabel:
 
         srcCardX, srcCardY = self.GetLabelPosition(position=SOURCE_CARDINALITY_IDX)
         return self._createLinkLabel(x=srcCardX, y=srcCardY, text=self.modelLink.sourceCardinality, labelType=LabelType.SOURCE_CARDINALITY)
