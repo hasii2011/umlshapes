@@ -25,7 +25,7 @@ from umlshapes.types.UmlPosition import UmlPosition
 REPORT_INTERVAL: int = 10
 
 
-class UmlAssociationLabelEventHandler(UmlBaseEventHandler):
+class UmlLinkLabelEventHandler(UmlBaseEventHandler):
     """
     BTW, I hate local imports
     """

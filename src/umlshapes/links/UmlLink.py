@@ -25,7 +25,7 @@ from umlshapes.frames.UmlFrame import UmlFrame
 
 from umlshapes.links.LabelType import LabelType
 from umlshapes.links.UmlLinkLabel import UmlLinkLabel
-from umlshapes.links.eventhandlers.UmlAssociationLabelEventHandler import UmlAssociationLabelEventHandler
+from umlshapes.links.eventhandlers.UmlLinkLabelEventHandler import UmlLinkLabelEventHandler
 
 from umlshapes.mixins.IdentifierMixin import IdentifierMixin
 from umlshapes.mixins.PubSubMixin import PubSubMixin
@@ -344,7 +344,7 @@ class UmlLink(IdentifierMixin, LineShape, PubSubMixin):
         Args:
             umlAssociationLabel:
         """
-        eventHandler: UmlAssociationLabelEventHandler = UmlAssociationLabelEventHandler(previousEventHandler=umlAssociationLabel.GetEventHandler())
+        eventHandler: UmlLinkLabelEventHandler = UmlLinkLabelEventHandler(previousEventHandler=umlAssociationLabel.GetEventHandler())
 
         eventHandler.SetShape(umlAssociationLabel)
         eventHandler.umlPubSubEngine = self._umlPubSubEngine
