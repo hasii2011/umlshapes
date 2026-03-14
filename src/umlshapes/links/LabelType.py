@@ -9,3 +9,6 @@ class LabelType(StrEnum):
     SD_MESSAGE_NAME         = 'SD Message Name'
 
     NOT_SET = 'Not Set'
+
+    def __repr__(self) -> str:
+        return f'LabelType: {self}'

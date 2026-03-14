@@ -2,10 +2,18 @@
 from typing import cast
 from typing import List
 from typing import Tuple
+from typing import NewType
 
 from logging import Logger
 from logging import getLogger
 from logging import DEBUG
+
+from math import atan2
+from math import degrees
+
+from dataclasses import dataclass
+
+from enum import Enum
 
 from wx import BLACK
 from wx import Bitmap
@@ -49,6 +57,20 @@ from umlshapes.types.UmlLine import UmlLine
 from umlshapes.types.UmlPosition import UmlPoint
 from umlshapes.types.UmlPosition import UmlPosition
 from umlshapes.types.UmlPosition import UmlPositions
+
+Degrees = NewType('Degrees', float)
+
+class LeftMostTopMostShape(Enum):
+    RECTANGLE_1 = 'Rectangle 1'
+    RECTANGLE_2 = 'Rectangle 2'
+    NotSet      = 'Not Set'
+
+@dataclass
+class RelativeRectangleResult:
+    leftMostTopMostShape: LeftMostTopMostShape = LeftMostTopMostShape.NotSet
+    isSecondaryToRight:   bool = False
+    isSecondaryToBottom:  bool = False
+    directionToSecondary: Degrees = Degrees(0.0)
 
 
 class UmlUtils:
@@ -323,6 +345,66 @@ class UmlUtils:
     @classmethod
     def getID(cls) -> str:
         return generate_id()
+
+    @classmethod
+    def computeRelativeRectanglePosition(cls, rectangle1: Rectangle, rectangle2: Rectangle) -> RelativeRectangleResult:
+        """
+        Computes the relative position and direction between two LTRB rectangles.
+        Identifies the primary (leftmost or topmost) shape and computes direction
+        towards the other shape.
+
+        Args:
+            rectangle1: First rectangle definition
+            rectangle2: Second rectangle definition
+
+        Returns:
+                A RectangleRelativeResult dataclass
+        """
+        # Identify the leftmost/topmost shape (Primary)
+        if rectangle1.left < rectangle2.left:
+            primary, secondary, primaryIndex = rectangle1, rectangle2, 1
+        elif rectangle2.left < rectangle1.left:
+            primary, secondary, primaryIndex = rectangle2, rectangle1, 2
+        else:
+            # Same left coordinate, use top coordinate as tie-breaker
+            if rectangle1.top <= rectangle2.top:
+                primary, secondary, primaryIndex = rectangle1, rectangle2, 1
+            else:
+                primary, secondary, primaryIndex = rectangle2, rectangle1, 2
+
+        # Relative positioning: Is secondary to the right/bottom of primary?
+        # Based on simple coordinate comparison
+        isSecondaryToRight:  bool = secondary.left > primary.left
+        isSecondaryToBottom: bool = secondary.top > primary.top
+
+        # Centers for direction calculation
+        p_cx: float = (primary.left + primary.right) / 2.0
+        p_cy: float = (primary.top + primary.bottom) / 2.0
+        s_cx: float = (secondary.left + secondary.right) / 2.0
+        s_cy: float = (secondary.top + secondary.bottom) / 2.0
+
+        dx:    float = s_cx - p_cx
+        dy:    float = s_cy - p_cy
+        angle: float = degrees(atan2(dy, dx))
+
+        # Convert to 0-360 degree value
+        # 0° = Right
+        # 90° = Down
+        # 180° = Left
+        # 270° = Up
+        direction: Degrees = Degrees((angle + 360) % 360)
+
+        result: RelativeRectangleResult = RelativeRectangleResult()
+
+        if primaryIndex == 1:
+            result.leftMostTopMostShape = LeftMostTopMostShape.RECTANGLE_1
+        else:
+            result.leftMostTopMostShape = LeftMostTopMostShape.RECTANGLE_2
+        result.isSecondaryToRight   = isSecondaryToRight
+        result.isSecondaryToBottom  = isSecondaryToBottom
+        result.directionToSecondary = direction
+
+        return result
 
     @staticmethod
     def snapCoordinatesToGrid(x: int, y: int, gridInterval: int) -> Tuple[int, int]:

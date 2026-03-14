@@ -1,4 +1,3 @@
-
 from typing import List
 from typing import NewType
 from typing import Tuple
@@ -12,34 +11,36 @@ from math import atan
 from math import cos
 from math import sin
 
-from wx import BLACK_BRUSH
-from wx import BLACK_PEN
-from wx import BLUE_PEN
 from wx import DC
-from wx import RED_BRUSH
 from wx import RED_PEN
+from wx import BLUE_PEN
+from wx import BLACK_PEN
+from wx import RED_BRUSH
+from wx import BLACK_BRUSH
 from wx import WHITE_BRUSH
 
 from wx import Point
-from wx import MemoryDC
 from wx import Pen
+from wx import MemoryDC
 
 from umlmodel.Link import Link
 
-from umlshapes.links.LabelType import LabelType
+from umlshapes.UmlUtils import UmlUtils
+
 from umlshapes.links.UmlLink import UmlLink
+from umlshapes.links.LabelType import LabelType
 from umlshapes.links.UmlAssociationLabel import UmlAssociationLabel
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
-from umlshapes.types.Common import DESTINATION_CARDINALITY_IDX
 from umlshapes.types.Common import NAME_IDX
 from umlshapes.types.Common import SOURCE_CARDINALITY_IDX
+from umlshapes.types.Common import DESTINATION_CARDINALITY_IDX
 
 SegmentPoint  = NewType('SegmentPoint',  Tuple[int, int])
 Segments      = NewType('Segments',      List[SegmentPoint])
 
-DiamondPoint    = NewType('DiamondPoint', Tuple[int, int])
+DiamondPoint    = NewType('DiamondPoint',  Tuple[int, int])
 DiamondPoints   = NewType('DiamondPoints', List[DiamondPoint])
 
 PI_6:         float = pi / 6
@@ -112,6 +113,20 @@ class UmlAssociation(UmlLink):
         self._sourceCardinality      = self._createSourceCardinality()
         self._destinationCardinality = self._createDestinationCardinality()
 
+    def smartPlaceLabels(self):
+        """
+        Association labels that appear either down from the other end or
+        right from the other end are always obscured.
+        See: https://github.com/hasii2011/umlshapes/issues/1
+
+        """
+        sourceShape      = self.sourceShape
+        destinationShape = self.destinationShape
+
+        # direction: float = UmlUtils.computeDirection(start=sourceShape.position, end=destinationShape.position)
+        #
+        # self.associationLogger.info(f'{direction=}')
+
     def OnDraw(self, dc: MemoryDC):
 
         super().OnDraw(dc=dc)
@@ -128,12 +143,12 @@ class UmlAssociation(UmlLink):
     def _createDestinationCardinality(self) -> UmlAssociationLabel:
 
         dstCardX, dstCardY = self.GetLabelPosition(position=DESTINATION_CARDINALITY_IDX)
-        return self._createAssociationLabel(x=dstCardX, y=dstCardY, text=self.modelLink.destinationCardinality, labelType=LabelType.DESTINATION_CARDINALITY)
+        return self._createLinkLabel(x=dstCardX, y=dstCardY, text=self.modelLink.destinationCardinality, labelType=LabelType.DESTINATION_CARDINALITY)
 
     def _createSourceCardinality(self) -> UmlAssociationLabel:
 
         srcCardX, srcCardY = self.GetLabelPosition(position=SOURCE_CARDINALITY_IDX)
-        return self._createAssociationLabel(x=srcCardX, y=srcCardY, text=self.modelLink.sourceCardinality, labelType=LabelType.SOURCE_CARDINALITY)
+        return self._createLinkLabel(x=srcCardX, y=srcCardY, text=self.modelLink.sourceCardinality, labelType=LabelType.SOURCE_CARDINALITY)
 
     def _drawDiamond(self, dc: DC, filled: bool = False):
         """

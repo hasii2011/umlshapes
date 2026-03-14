@@ -4,6 +4,8 @@ from unittest import main as unitTestMain
 
 from codeallybasic.UnitTestBase import UnitTestBase
 
+from umlshapes.UmlUtils import LeftMostTopMostShape
+from umlshapes.UmlUtils import RelativeRectangleResult
 from umlshapes.UmlUtils import UmlUtils
 
 from umlshapes.mixins.TopLeftMixin import Rectangle
@@ -338,6 +340,51 @@ class TestUmlUtils(UnitTestBase):
 
     def testIsVerticalSideLeft(self):
         self.assertTrue(UmlUtils.isVerticalSide(AttachmentSide.LEFT))
+
+    def test_computeRelativeRectPosition_r2_right_bottom(self):
+
+        r1: Rectangle = Rectangle(0, 0, 10, 10)
+        r2: Rectangle = Rectangle(20, 20, 30, 30)
+
+        result: RelativeRectangleResult = UmlUtils.computeRelativeRectanglePosition(rectangle1=r1, rectangle2=r2)
+
+        self.assertEqual(result.leftMostTopMostShape, LeftMostTopMostShape.RECTANGLE_1, 'Incorrect left most shape')
+        self.assertTrue(result.isSecondaryToRight,   'It is to the right!')
+        self.assertTrue(result.isSecondaryToBottom,  'It is below !')
+        self.assertEqual(result.directionToSecondary, 45.0, 'Direction was incorrectly calculated')
+
+    def test_computeRelativeRectPosition_r1_right_bottom(self):
+        r1: Rectangle = Rectangle(20, 20, 30, 30)
+        r2: Rectangle = Rectangle(0, 0, 10, 10)
+
+        result: RelativeRectangleResult = UmlUtils.computeRelativeRectanglePosition(rectangle1=r1, rectangle2=r2)
+
+        self.assertEqual(result.leftMostTopMostShape, LeftMostTopMostShape.RECTANGLE_2, 'Incorrect left most shape')
+        self.assertTrue(result.isSecondaryToRight,   'It is to the right!')
+        self.assertTrue(result.isSecondaryToBottom,  'It is below !')
+        self.assertEqual(result.directionToSecondary, 45.0, 'Direction was incorrectly calculated')
+
+    def test_computeRelativeRectPosition_same_left_r1_below(self):
+
+        r1: Rectangle = Rectangle(0, 20, 10, 30)
+        r2: Rectangle = Rectangle(0, 0, 10, 10)
+        result: RelativeRectangleResult = UmlUtils.computeRelativeRectanglePosition(r1, r2)
+
+        self.assertEqual(result.leftMostTopMostShape, LeftMostTopMostShape.RECTANGLE_2, 'Incorrect left most shape')
+        self.assertFalse(result.isSecondaryToRight, 'It is NOT to the right!')
+        self.assertTrue(result.isSecondaryToBottom,  'It is below !')
+        self.assertEqual(result.directionToSecondary, 90.0, 'Direction was incorrectly calculated')
+
+    def test_computeRelativeRectPosition_r2_right_top(self):
+        r1 = Rectangle(0, 0, 10, 10)
+        r2 = Rectangle(20, -20, 30, -10)
+
+        result = UmlUtils.computeRelativeRectanglePosition(r1, r2)
+
+        self.assertEqual(result.leftMostTopMostShape, LeftMostTopMostShape.RECTANGLE_1, 'Incorrect left most shape')
+        self.assertTrue(result.isSecondaryToRight, 'It is to the right!')
+        self.assertFalse(result.isSecondaryToBottom,  'It is not below !')
+        self.assertEqual(result.directionToSecondary, 315.0, 'Direction was incorrectly calculated')
 
 
 def suite() -> TestSuite:
