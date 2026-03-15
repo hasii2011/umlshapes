@@ -128,10 +128,11 @@ SEQUENCE_DIAGRAM_PREFERENCES: ValueDescriptions = ValueDescriptions(
 )
 ASSOCIATION_PREFERENCES: ValueDescriptions = ValueDescriptions(
     {
-        KeyName('associationTextFontSize'): ValueDescription(defaultValue='12', deserializer=SecureConversions.secureInteger),
-        KeyName('diamondSize'):             ValueDescription(defaultValue='7',  deserializer=SecureConversions.secureInteger),
-        KeyName('associationLabelSize'):    ValueDescription(defaultValue=DEFAULT_ASSOCIATION_LABEL_SIZE,   deserializer=UmlDimensions.deSerialize),
-        KeyName('associationLabelFormat'):  ValueDescription(defaultValue=DEFAULT_ASSOCIATION_LABEL_FORMAT, deserializer=UmlAssociationLabelFormat.toWxFormat),
+        KeyName('associationTextFontSize'):   ValueDescription(defaultValue='12', deserializer=SecureConversions.secureInteger),
+        KeyName('diamondSize'):               ValueDescription(defaultValue='7',  deserializer=SecureConversions.secureInteger),
+        KeyName('associationLabelSize'):      ValueDescription(defaultValue=DEFAULT_ASSOCIATION_LABEL_SIZE,   deserializer=UmlDimensions.deSerialize),
+        KeyName('associationLabelFormat'):    ValueDescription(defaultValue=DEFAULT_ASSOCIATION_LABEL_FORMAT, deserializer=UmlAssociationLabelFormat.toWxFormat),
+        KeyName('associationLabelOffsetFix'): ValueDescription(defaultValue='30', deserializer=SecureConversions.secureInteger),
     }
 )
 

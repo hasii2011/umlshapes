@@ -1,3 +1,4 @@
+
 from typing import List
 from typing import NewType
 from typing import Tuple
@@ -25,6 +26,8 @@ from wx import MemoryDC
 
 from umlmodel.Link import Link
 
+from umlshapes.UmlUtils import LeftTopRectangleIndicator
+from umlshapes.UmlUtils import RelativeRectangleResult
 from umlshapes.UmlUtils import UmlUtils
 
 from umlshapes.links.UmlLink import UmlLink
@@ -34,8 +37,11 @@ from umlshapes.links.UmlLinkLabel import UmlLinkLabel
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
 from umlshapes.types.Common import NAME_IDX
+from umlshapes.types.Common import Rectangle
 from umlshapes.types.Common import SOURCE_CARDINALITY_IDX
 from umlshapes.types.Common import DESTINATION_CARDINALITY_IDX
+from umlshapes.types.DeltaXY import DeltaXY
+from umlshapes.types.UmlPosition import UmlPosition
 
 SegmentPoint  = NewType('SegmentPoint',  Tuple[int, int])
 Segments      = NewType('Segments',      List[SegmentPoint])
@@ -123,9 +129,15 @@ class UmlAssociation(UmlLink):
         sourceShape      = self.sourceShape
         destinationShape = self.destinationShape
 
-        # direction: float = UmlUtils.computeDirection(start=sourceShape.position, end=destinationShape.position)
-        #
-        # self.associationLogger.info(f'{direction=}')
+        rectangle1: Rectangle = sourceShape.rectangle
+        rectangle2: Rectangle = destinationShape.rectangle
+
+        result: RelativeRectangleResult = UmlUtils.computeRelativeRectanglePosition(rectangle1=rectangle1, rectangle2=rectangle2)
+
+        if result.leftMostTopMostShape == LeftTopRectangleIndicator.RECTANGLE_1 and result.isOtherToBottom is True:
+            self._repositionUmlLinkLabel(umlLinkLabel=self.destinationCardinality)
+        elif result.leftMostTopMostShape == LeftTopRectangleIndicator.RECTANGLE_2 and result.isOtherToBottom is True:
+            self._repositionUmlLinkLabel(umlLinkLabel=self.sourceCardinality)
 
     def OnDraw(self, dc: MemoryDC):
 
@@ -139,6 +151,24 @@ class UmlAssociation(UmlLink):
             dc.DrawText(f'({labelX},{labelY})', x=labelX, y=labelY)
             dc.DrawRectangle(labelX, labelY, 5, 5)
             dc.SetPen(savePen)
+
+    def _repositionUmlLinkLabel(self, umlLinkLabel: UmlLinkLabel):
+        """
+
+        Args:
+            umlLinkLabel:   The label to reposition
+        """
+
+        oldSourcePosition:         UmlPosition = umlLinkLabel.position
+        associationLabelOffsetFix: int         = self._preferences.associationLabelOffsetFix
+        newSourceCardinalityPosition: UmlPosition = UmlPosition(x=oldSourcePosition.x, y=oldSourcePosition.y - associationLabelOffsetFix)
+        umlLinkLabel.position = newSourceCardinalityPosition
+
+        deltaXY: DeltaXY = DeltaXY(
+            deltaX=abs(newSourceCardinalityPosition.x - oldSourcePosition.x),
+            deltaY=abs(newSourceCardinalityPosition.y - oldSourcePosition.y)
+        )
+        umlLinkLabel.linkDelta = deltaXY
 
     def _createDestinationCardinality(self) -> UmlLinkLabel:
 

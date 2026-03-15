@@ -7,7 +7,6 @@ from logging import getLogger
 
 from pathlib import Path
 
-from wx import ClientDC
 from wx import OK
 from wx import ID_CUT
 from wx import ID_COPY
@@ -26,6 +25,7 @@ from wx import EVT_NOTEBOOK_PAGE_CHANGED
 
 from wx import Menu
 from wx import MenuBar
+from wx import ClientDC
 from wx import Notebook
 from wx import CommandEvent
 from wx import BookCtrlEvent
@@ -40,6 +40,7 @@ from umlmodel.Interface import Interfaces
 from umlmodel.ModelTypes import ClassName
 from umlmodel.SDInstance import SDInstance
 
+from tests.demo.LinkCreator import SmartPlacement
 from umlshapes.UmlUtils import UmlUtils
 from umlshapes.ShapeTypes import UmlShapeGenre
 from umlshapes.UmlDiagram import UmlDiagram
@@ -192,10 +193,20 @@ class DemoAppFrame(SizedFrame):
         viewMenu.Append(id=Identifiers.ID_DISPLAY_UML_NOTE,        item='Uml Note',           helpString='Display Uml Note')
         viewMenu.Append(id=Identifiers.ID_DISPLAY_UML_USE_CASE,    item='Uml Use Case',       helpString='Display Uml Use Case')
         viewMenu.Append(id=Identifiers.ID_DISPLAY_UML_ACTOR,       item='Uml Actor',          helpString='Display Uml Actor')
+        viewMenu.AppendSeparator()
         viewMenu.Append(id=Identifiers.ID_DISPLAY_ORTHOGONAL_LINK, item='Orthogonal Link',    helpString='Display Orthogonal Link')
-
+        viewMenu.AppendSeparator()
         viewMenu.Append(id=Identifiers.ID_DISPLAY_SEQUENCE_DIAGRAM,    item='Sequence Diagram', helpString='Display Sequence Diagram')
         viewMenu.AppendSeparator()
+
+        smartPlacementMenu: Menu = Menu()
+        smartPlacementMenu.Append(id=Identifiers.ID_SOURCE_TOP,    item='Source Above', helpString='Place source shape above destination shape')
+        smartPlacementMenu.Append(id=Identifiers.ID_SOURCE_BOTTOM, item='Source Below', helpString='Place source shape below destination shape')
+        smartPlacementMenu.Append(id=Identifiers.ID_SOURCE_LEFT,   item='Source Left',  helpString='Place source shape left of destination shape')
+        smartPlacementMenu.Append(id=Identifiers.ID_SOURCE_RIGHT,  item='Source Right', helpString='Place source shape right of destination shape')
+        smartPlacementMenu.Append(id=Identifiers.ID_SOURCE_225,    item='Source 225',   helpString='Place source shape 225 degrees from destination')
+
+        viewMenu.AppendSubMenu(smartPlacementMenu, 'Smart Placement Demo')
 
         menuBar.Append(fileMenu,   'File')
         menuBar.Append(editMenu,   'Edit')
@@ -206,7 +217,7 @@ class DemoAppFrame(SizedFrame):
 
         self._editMenu = editMenu
 
-        self.Bind(EVT_MENU, self._onWiggleShapes, id=Identifiers.ID_DEMO_WIGGLE_SHAPES)
+        self.Bind(EVT_MENU, self._onWiggleShapes,        id=Identifiers.ID_DEMO_WIGGLE_SHAPES)
         self.Bind(EVT_MENU, self._onDemoShapeBoundaries, id=Identifiers.ID_DEMO_SHAPE_BOUNDARIES)
 
         self.Bind(EVT_MENU, self._onDisplayElement, id=Identifiers.ID_DISPLAY_UML_TEXT)
@@ -222,6 +233,12 @@ class DemoAppFrame(SizedFrame):
         self.Bind(EVT_MENU, self._onDisplayElement, id=Identifiers.ID_DISPLAY_UML_NOTE_LINK)
         self.Bind(EVT_MENU, self._onDisplayElement, id=Identifiers.ID_DISPLAY_ORTHOGONAL_LINK)
         self.Bind(EVT_MENU, self._onDisplayElement, id=Identifiers.ID_DISPLAY_SEQUENCE_DIAGRAM)
+
+        self.Bind(EVT_MENU, self._onDisplayElement, id=Identifiers.ID_SOURCE_TOP)
+        self.Bind(EVT_MENU, self._onDisplayElement, id=Identifiers.ID_SOURCE_BOTTOM)
+        self.Bind(EVT_MENU, self._onDisplayElement, id=Identifiers.ID_SOURCE_LEFT)
+        self.Bind(EVT_MENU, self._onDisplayElement, id=Identifiers.ID_SOURCE_RIGHT)
+        self.Bind(EVT_MENU, self._onDisplayElement, id=Identifiers.ID_SOURCE_225)
 
         self.Bind(EVT_MENU, self._onUmlShapePreferences, id=ID_PREFERENCES)
 
@@ -322,7 +339,18 @@ class DemoAppFrame(SizedFrame):
                 linkCreator.displayOrthogonalLink(diagramFrame=self._currentFrame)
             case Identifiers.ID_DISPLAY_SEQUENCE_DIAGRAM:
                 self._displaySequenceDiagram(diagramFrame=self._currentFrame)
-                # self._displaySequenceDiagram2(diagramFrame=self._currentFrame)
+
+            case Identifiers.ID_SOURCE_TOP:
+                linkCreator.displaySmartPlacement(diagramFrame=self._currentFrame, placement=SmartPlacement.SOURCE_ABOVE)
+            case Identifiers.ID_SOURCE_BOTTOM:
+                linkCreator.displaySmartPlacement(diagramFrame=self._currentFrame, placement=SmartPlacement.SOURCE_BELOW)
+            case Identifiers.ID_SOURCE_LEFT:
+                linkCreator.displaySmartPlacement(diagramFrame=self._currentFrame, placement=SmartPlacement.SOURCE_LEFT)
+            case Identifiers.ID_SOURCE_RIGHT:
+                linkCreator.displaySmartPlacement(diagramFrame=self._currentFrame, placement=SmartPlacement.SOURCE_RIGHT)
+            case Identifiers.ID_SOURCE_225:
+                linkCreator.displaySmartPlacement(diagramFrame=self._currentFrame, placement=SmartPlacement.SOURCE_225)
+
             case _:
                 self.logger.error(f'WTH!  I am not handling that menu item')
 

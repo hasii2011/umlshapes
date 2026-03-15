@@ -1,4 +1,3 @@
-
 from typing import cast
 from typing import List
 from typing import Tuple
@@ -13,28 +12,28 @@ from math import degrees
 
 from dataclasses import dataclass
 
-from enum import Enum
+from enum import StrEnum
 
-from wx import BLACK
-from wx import Bitmap
-from wx import Brush
-from wx import FONTFAMILY_MODERN
-from wx import FONTFAMILY_ROMAN
-from wx import FONTFAMILY_SCRIPT
-from wx import FONTFAMILY_SWISS
-from wx import FONTFAMILY_TELETYPE
-from wx import FONTSTYLE_NORMAL
-from wx import FONTWEIGHT_NORMAL
-from wx import PENSTYLE_SHORT_DASH
-from wx import PENSTYLE_SOLID
-from wx import Point
 from wx import RED
+from wx import BLACK
+from wx import PENSTYLE_SOLID
+from wx import FONTFAMILY_ROMAN
+from wx import FONTSTYLE_NORMAL
+from wx import FONTFAMILY_SWISS
+from wx import FONTWEIGHT_NORMAL
+from wx import FONTFAMILY_MODERN
+from wx import FONTFAMILY_SCRIPT
+from wx import PENSTYLE_SHORT_DASH
+from wx import FONTFAMILY_TELETYPE
 
-from wx import Font
-from wx import MemoryDC
 from wx import DC
 from wx import Pen
+from wx import Font
 from wx import Size
+from wx import Brush
+from wx import Point
+from wx import Bitmap
+from wx import MemoryDC
 
 from umlshapes.lib.ogl import EllipseShape
 from umlshapes.lib.ogl import RectangleShape
@@ -42,35 +41,39 @@ from umlshapes.lib.ogl import RectangleShape
 from human_id import generate_id
 
 from umlshapes.links.LollipopInflator import LollipopInflator
+
 from umlshapes.resources.images.Display import embeddedImage as displayImage
-from umlshapes.resources.images.DoNotDisplay import embeddedImage as doNotDisplayImage
 from umlshapes.resources.images.UnSpecified import embeddedImage as unSpecifiedImage
+from umlshapes.resources.images.DoNotDisplay import embeddedImage as doNotDisplayImage
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
-from umlshapes.mixins.TopLeftMixin import Rectangle
 
+from umlshapes.types.Common import Rectangle
 from umlshapes.types.Common import AttachmentSide
 from umlshapes.types.Common import LollipopCoordinates
+
+from umlshapes.types.UmlLine import UmlLine
 from umlshapes.types.UmlColor import UmlColor
 from umlshapes.types.UmlFontFamily import UmlFontFamily
-from umlshapes.types.UmlLine import UmlLine
+
 from umlshapes.types.UmlPosition import UmlPoint
 from umlshapes.types.UmlPosition import UmlPosition
 from umlshapes.types.UmlPosition import UmlPositions
 
 Degrees = NewType('Degrees', float)
 
-class LeftMostTopMostShape(Enum):
+class LeftTopRectangleIndicator(StrEnum):
     RECTANGLE_1 = 'Rectangle 1'
     RECTANGLE_2 = 'Rectangle 2'
     NotSet      = 'Not Set'
 
+
 @dataclass
 class RelativeRectangleResult:
-    leftMostTopMostShape: LeftMostTopMostShape = LeftMostTopMostShape.NotSet
-    isSecondaryToRight:   bool = False
-    isSecondaryToBottom:  bool = False
-    directionToSecondary: Degrees = Degrees(0.0)
+    leftMostTopMostShape: LeftTopRectangleIndicator = LeftTopRectangleIndicator.NotSet
+    isOtherToRight:   bool    = False
+    isOtherToBottom:  bool    = False
+    directionToOther: Degrees = Degrees(0.0)
 
 
 class UmlUtils:
@@ -350,9 +353,10 @@ class UmlUtils:
     def computeRelativeRectanglePosition(cls, rectangle1: Rectangle, rectangle2: Rectangle) -> RelativeRectangleResult:
         """
         Computes the relative position and direction between two LTRB rectangles.
-        Identifies the primary (leftmost or topmost) shape and computes direction
-        towards the other shape.
+        Identifies the leftmost and topmost rectangle and computes direction
+        towards the other rectangle.
 
+        Note:  This code initially authored by Gemini.   I feel so dirty
         Args:
             rectangle1: First rectangle definition
             rectangle2: Second rectangle definition
@@ -360,31 +364,21 @@ class UmlUtils:
         Returns:
                 A RectangleRelativeResult dataclass
         """
-        # Identify the leftmost/topmost shape (Primary)
-        if rectangle1.left < rectangle2.left:
-            primary, secondary, primaryIndex = rectangle1, rectangle2, 1
-        elif rectangle2.left < rectangle1.left:
-            primary, secondary, primaryIndex = rectangle2, rectangle1, 2
-        else:
-            # Same left coordinate, use top coordinate as tie-breaker
-            if rectangle1.top <= rectangle2.top:
-                primary, secondary, primaryIndex = rectangle1, rectangle2, 1
-            else:
-                primary, secondary, primaryIndex = rectangle2, rectangle1, 2
+        leftTopRectangle, otherRectangle, leftTopIndicator = cls.identifyLeftMostTopMostRectangle(rectangle1=rectangle1, rectangle2=rectangle2)
 
-        # Relative positioning: Is secondary to the right/bottom of primary?
+        # Relative positioning: Is otherRectangle to the right/bottom of primary?
         # Based on simple coordinate comparison
-        isSecondaryToRight:  bool = secondary.left > primary.left
-        isSecondaryToBottom: bool = secondary.top > primary.top
+        isOtherToRight:  bool = otherRectangle.left > leftTopRectangle.left
+        isOtherToBottom: bool = otherRectangle.top > leftTopRectangle.top
 
         # Centers for direction calculation
-        p_cx: float = (primary.left + primary.right) / 2.0
-        p_cy: float = (primary.top + primary.bottom) / 2.0
-        s_cx: float = (secondary.left + secondary.right) / 2.0
-        s_cy: float = (secondary.top + secondary.bottom) / 2.0
+        leftTopCenterX: float = (leftTopRectangle.left + leftTopRectangle.right) / 2.0
+        leftTopCenterY: float = (leftTopRectangle.top + leftTopRectangle.bottom) / 2.0
+        otherCenterX:   float = (otherRectangle.left + otherRectangle.right) / 2.0
+        otherCenterY:   float = (otherRectangle.top + otherRectangle.bottom) / 2.0
 
-        dx:    float = s_cx - p_cx
-        dy:    float = s_cy - p_cy
+        dx:    float = otherCenterX - leftTopCenterX
+        dy:    float = otherCenterY - leftTopCenterY
         angle: float = degrees(atan2(dy, dx))
 
         # Convert to 0-360 degree value
@@ -396,15 +390,38 @@ class UmlUtils:
 
         result: RelativeRectangleResult = RelativeRectangleResult()
 
-        if primaryIndex == 1:
-            result.leftMostTopMostShape = LeftMostTopMostShape.RECTANGLE_1
-        else:
-            result.leftMostTopMostShape = LeftMostTopMostShape.RECTANGLE_2
-        result.isSecondaryToRight   = isSecondaryToRight
-        result.isSecondaryToBottom  = isSecondaryToBottom
-        result.directionToSecondary = direction
+        result.leftMostTopMostShape = leftTopIndicator
+        result.isOtherToRight   = isOtherToRight
+        result.isOtherToBottom  = isOtherToBottom
+        result.directionToOther = direction
 
         return result
+
+    @classmethod
+    def identifyLeftMostTopMostRectangle(cls, rectangle1: Rectangle, rectangle2: Rectangle) -> tuple[Rectangle, Rectangle, LeftTopRectangleIndicator]:
+        """
+        Identify the leftmost/topmost shape
+
+        Args:
+            rectangle1:
+            rectangle2:
+
+        Returns:  A tuple that has the values leftTopRectangle, otherRectangle, leftTopIndicator
+
+        """
+
+        if rectangle1.left < rectangle2.left:
+            leftTopRectangle, otherRectangle, leftTopIndicator = rectangle1, rectangle2, LeftTopRectangleIndicator.RECTANGLE_1
+        elif rectangle2.left < rectangle1.left:
+            leftTopRectangle, otherRectangle, leftTopIndicator = rectangle2, rectangle1, LeftTopRectangleIndicator.RECTANGLE_2
+        else:
+            # Same left coordinate, use top coordinate as tie-breaker
+            if rectangle1.top <= rectangle2.top:
+                leftTopRectangle, otherRectangle, leftTopIndicator = rectangle1, rectangle2, LeftTopRectangleIndicator.RECTANGLE_1
+            else:
+                leftTopRectangle, otherRectangle, leftTopIndicator = rectangle2, rectangle1, LeftTopRectangleIndicator.RECTANGLE_2
+
+        return leftTopRectangle, otherRectangle, leftTopIndicator
 
     @staticmethod
     def snapCoordinatesToGrid(x: int, y: int, gridInterval: int) -> Tuple[int, int]:
