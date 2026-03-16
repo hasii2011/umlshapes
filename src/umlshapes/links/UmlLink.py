@@ -312,16 +312,17 @@ class UmlLink(IdentifierMixin, LineShape, PubSubMixin):
 
         assert text is not None, 'Developer error'
 
-        umlAssociationLabel: UmlLinkLabel = UmlLinkLabel(label=text, labelType=labelType)
+        umlLinkLabel: UmlLinkLabel = UmlLinkLabel(label=text, labelType=labelType)
 
-        umlAssociationLabel.position = UmlPosition(x=x, y=y)
+        umlLinkLabel.umlPubSubEngine = self._umlPubSubEngine
+        umlLinkLabel.position        = UmlPosition(x=x, y=y)
         #
         # Maybe not necessary, but let's be consistent
         #
-        self._children.append(umlAssociationLabel)
-        self._setupLinkText(umlAssociationLabel)
+        self._children.append(umlLinkLabel)
+        self._setupLinkText(umlLinkLabel)
 
-        return umlAssociationLabel
+        return umlLinkLabel
 
     def _setupLinkText(self, umlAssociationLabel: UmlLinkLabel):
         """
