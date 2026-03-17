@@ -11,6 +11,7 @@ from copy import deepcopy
 
 from functools import singledispatch
 
+from wx import ID_OK
 from wx import OK
 from wx import ICON_ERROR
 
@@ -97,6 +98,7 @@ class UmlFrameOperationsListener:
 
         if isinstance(umlFrame, ClassDiagramFrame) or isinstance(umlFrame, UseCaseDiagramFrame):
             self._umlPubSubEngine.subscribe(messageType=UmlMessageType.SHAPE_MOVING, frameId=umlFrame.id, listener=self._shapeMovingListener)
+            self._umlPubSubEngine.subscribe(messageType=UmlMessageType.EDIT_CLASS,   frameId=umlFrame.id, listener=self._editClassListener)
 
     def _undoListener(self):
         self._umlFrame.commandProcessor.Undo()
@@ -238,6 +240,24 @@ class UmlFrameOperationsListener:
                     dc: ClientDC = ClientDC(umlShape.umlFrame)
                     umlShape.umlFrame.PrepareDC(dc)
                     umlShape.MoveLinks(dc)
+
+    def _editClassListener(self, modelClass: Class):
+        """
+        This handles the case when a new UML Class is created
+
+        Args:
+            modelClass:
+
+        """
+        from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
+        from umlshapes.dialogs.umlclass.DlgEditClass import DlgEditClass
+
+        self.logger.debug(f"Edit: {modelClass}")
+        umlFrame: ClassDiagramFrame = cast(ClassDiagramFrame, self._umlFrame)
+        with DlgEditClass(umlFrame, umlPubSubEngine=self._umlPubSubEngine, modelClass=modelClass) as dlg:
+            if dlg.ShowModal() == ID_OK:
+                umlFrame.refresh()
+                umlFrame.frameModified = True
 
     def _cutShapes(self, selectedShapes: 'UmlShapes'):
 

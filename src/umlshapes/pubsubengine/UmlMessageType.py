@@ -1,8 +1,8 @@
 
-from enum import Enum
+from enum import StrEnum
 
 
-class UmlMessageType(Enum):
+class UmlMessageType(StrEnum):
     """
 
     """
@@ -24,3 +24,7 @@ class UmlMessageType(Enum):
     COPY_SHAPES       = 'CopyShapes'
     PASTE_SHAPES      = 'PasteShapes'
     SELECT_ALL_SHAPES = 'SelectAllShapes'
+
+    EDIT_CLASS = 'Edit Class'
+    EDIT_NOTE  = 'Edit Note'
+    EDIT_TEXT  = 'Edit Text'
