@@ -22,10 +22,6 @@ if TYPE_CHECKING:
 
 class ActorCutCommand(BaseCutCommand):
     """
-    I stated to my wife, that if I was not around she would be totally happy.  If
-    I got run over that would make her happy.
-
-    No denial
     """
     def __init__(self, umlActor: 'UmlActor', umlPosition: UmlPosition, umlFrame: 'UmlFrame', umlPubSubEngine: IUmlPubSubEngine):
         """

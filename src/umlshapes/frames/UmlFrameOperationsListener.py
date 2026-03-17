@@ -11,6 +11,7 @@ from copy import deepcopy
 
 from functools import singledispatch
 
+from wx import ID_OK
 from wx import OK
 from wx import ICON_ERROR
 
@@ -95,8 +96,16 @@ class UmlFrameOperationsListener:
 
         self._umlPubSubEngine.subscribe(messageType=UmlMessageType.SELECT_ALL_SHAPES, frameId=umlFrame.id, listener=self._selectAllShapesListener)
 
+        self._umlPubSubEngine.subscribe(messageType=UmlMessageType.EDIT_NOTE, frameId=umlFrame.id, listener=self._editNoteListener)
+        self._umlPubSubEngine.subscribe(messageType=UmlMessageType.EDIT_TEXT, frameId=umlFrame.id, listener=self._editTextListener)
+
         if isinstance(umlFrame, ClassDiagramFrame) or isinstance(umlFrame, UseCaseDiagramFrame):
             self._umlPubSubEngine.subscribe(messageType=UmlMessageType.SHAPE_MOVING, frameId=umlFrame.id, listener=self._shapeMovingListener)
+            self._umlPubSubEngine.subscribe(messageType=UmlMessageType.EDIT_CLASS,   frameId=umlFrame.id, listener=self._editClassListener)
+
+        if isinstance(umlFrame, UseCaseDiagramFrame):
+            self._umlPubSubEngine.subscribe(messageType=UmlMessageType.EDIT_USE_CASE, frameId=umlFrame.id, listener=self._editUseCaseListener)
+            self._umlPubSubEngine.subscribe(messageType=UmlMessageType.EDIT_ACTOR,    frameId=umlFrame.id, listener=self._editActorListener)
 
     def _undoListener(self):
         self._umlFrame.commandProcessor.Undo()
@@ -238,6 +247,80 @@ class UmlFrameOperationsListener:
                     dc: ClientDC = ClientDC(umlShape.umlFrame)
                     umlShape.umlFrame.PrepareDC(dc)
                     umlShape.MoveLinks(dc)
+
+    def _editClassListener(self, modelClass: Class):
+        """
+        This handles the case when a new UML Class is created
+
+        Args:
+            modelClass:
+
+        """
+        from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
+        from umlshapes.dialogs.umlclass.DlgEditClass import DlgEditClass
+
+        self.logger.debug(f"Edit: {modelClass}")
+        umlFrame: ClassDiagramFrame = cast(ClassDiagramFrame, self._umlFrame)
+        with DlgEditClass(umlFrame, umlPubSubEngine=self._umlPubSubEngine, modelClass=modelClass) as dlg:
+            if dlg.ShowModal() == ID_OK:
+                umlFrame.refresh()
+                umlFrame.frameModified = True
+
+    def _editNoteListener(self, modelNote: Note):
+        """
+        This handles the case when a new UML Note is created
+
+        Args:
+
+            modelNote:
+        """
+        from umlshapes.dialogs.DlgEditNote import DlgEditNote
+
+        umlFrame = self._umlFrame
+
+        with DlgEditNote(umlFrame, note=modelNote) as dlg:
+            if dlg.ShowModal() == ID_OK:
+                umlFrame.refresh()
+                umlFrame.frameModified = True
+
+    def _editTextListener(self, modelText: Text):
+        """
+        This handles the case when a new UML Text is created
+
+        Args:
+            modelText:
+
+        """
+        from umlshapes.dialogs.DlgEditText import DlgEditText
+
+        umlFrame = self._umlFrame
+
+        with DlgEditText(umlFrame, text=modelText) as dlg:
+            if dlg.ShowModal() == ID_OK:
+                umlFrame.refresh()
+                umlFrame.frameModified = True
+
+    def _editUseCaseListener(self, modelUseCase: UseCase):
+        from umlshapes.dialogs.DlgEditUseCase import DlgEditUseCase
+
+        umlFrame = self._umlFrame
+
+        with DlgEditUseCase(umlFrame, useCaseName=modelUseCase.name) as dlg:
+            if dlg.ShowModal() == ID_OK:
+                modelUseCase.name = dlg.useCaseName
+                umlFrame.refresh()
+                umlFrame.frameModified = True
+
+    def _editActorListener(self, modelActor: Actor):
+        from umlshapes.dialogs.DlgEditActor import DlgEditActor
+
+        umlFrame = self._umlFrame
+
+        with DlgEditActor(umlFrame, actorName=modelActor.name) as dlg:
+            if dlg.ShowModal() == ID_OK:
+                modelActor.name = dlg.actorName
+                umlFrame.refresh()
+                umlFrame.frameModified = True
 
     def _cutShapes(self, selectedShapes: 'UmlShapes'):
 
