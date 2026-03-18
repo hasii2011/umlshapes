@@ -18,6 +18,9 @@ from umlshapes.types.UmlPosition import UmlPosition
 
 
 class CreateUmlClassCommand(BaseCreateCommand):
+    """
+    Command that creates a new UML Class on the UML frame
+    """
 
     def __init__(self, umlFrame: UmlFrame, umlPosition: UmlPosition, umlPubSubEngine: IUmlPubSubEngine, modelClass: Class = None):
         """

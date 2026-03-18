@@ -1,9 +1,6 @@
 
 from typing import cast
 
-from logging import Logger
-from logging import getLogger
-
 from umlmodel.Note import Note
 
 from umlshapes.frames.UmlFrame import UmlFrame
@@ -17,14 +14,17 @@ from umlshapes.commands.BaseCreateCommand import BaseCreateCommand
 
 
 class CreateUmlNoteCommand(BaseCreateCommand):
+    """
+    Command that creates a new UML Note on the UML frame
+    """
 
     def __init__(self, umlFrame: UmlFrame, umlPosition: UmlPosition, umlPubSubEngine: IUmlPubSubEngine):
 
-        name: str = f'Create Note- {self.timeStamp}'
+        self._uniqueId: int = self.timeStamp
+
+        name: str = f'Create Note-{self._uniqueId}'
 
         super().__init__(canUndo=True, name=name, umlFrame=umlFrame, umlPosition=umlPosition, umlPubSubEngine=umlPubSubEngine)
-
-        self.logger: Logger = getLogger(__name__)
 
     def _createPrototypeInstance(self) -> UmlNote:
         """
@@ -32,12 +32,12 @@ class CreateUmlNoteCommand(BaseCreateCommand):
 
         Returns:    The newly created note
         """
-        noteName: str = f'UmlNote{self.timeStamp}'
+        noteName: str = f'UmlNote{self._uniqueId}'
 
         modelNote: Note = Note(content=self._umlPreferences.noteText)
         modelNote.name = noteName
 
-        umlNote: UmlNote  = UmlNote(modelNote)
+        umlNote: UmlNote = UmlNote(modelNote)
 
         return umlNote
 

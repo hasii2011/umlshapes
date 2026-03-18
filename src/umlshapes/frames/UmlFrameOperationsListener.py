@@ -97,6 +97,7 @@ class UmlFrameOperationsListener:
         self._umlPubSubEngine.subscribe(messageType=UmlMessageType.SELECT_ALL_SHAPES, frameId=umlFrame.id, listener=self._selectAllShapesListener)
 
         self._umlPubSubEngine.subscribe(messageType=UmlMessageType.EDIT_NOTE, frameId=umlFrame.id, listener=self._editNoteListener)
+        self._umlPubSubEngine.subscribe(messageType=UmlMessageType.EDIT_TEXT, frameId=umlFrame.id, listener=self._editTextListener)
 
         if isinstance(umlFrame, ClassDiagramFrame) or isinstance(umlFrame, UseCaseDiagramFrame):
             self._umlPubSubEngine.subscribe(messageType=UmlMessageType.SHAPE_MOVING, frameId=umlFrame.id, listener=self._shapeMovingListener)
@@ -274,6 +275,23 @@ class UmlFrameOperationsListener:
         umlFrame = self._umlFrame
 
         with DlgEditNote(umlFrame, note=modelNote) as dlg:
+            if dlg.ShowModal() == ID_OK:
+                umlFrame.refresh()
+                umlFrame.frameModified = True
+
+    def _editTextListener(self, modelText: Text):
+        """
+        This handles the case when a new UML Text is created
+
+        Args:
+            modelText:
+
+        """
+        from umlshapes.dialogs.DlgEditText import DlgEditText
+
+        umlFrame = self._umlFrame
+
+        with DlgEditText(umlFrame, text=modelText) as dlg:
             if dlg.ShowModal() == ID_OK:
                 umlFrame.refresh()
                 umlFrame.frameModified = True
