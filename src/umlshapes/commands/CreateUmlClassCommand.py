@@ -32,14 +32,13 @@ class CreateUmlClassCommand(BaseCreateCommand):
             umlPosition:
             umlPubSubEngine:
         """
-        self._uniqueId: int = self.timeStamp
+        self._uniqueId:   float          = self.timeStamp
+        self._modelClass: Class | None = modelClass     # Must be here before super().__init__()
 
         name: str = f'Create Class-{self._uniqueId}'
         super().__init__(canUndo=True, name=name, umlFrame=umlFrame, umlPosition=umlPosition, umlPubSubEngine=umlPubSubEngine)
 
         self.logger: Logger = getLogger(__name__)
-
-        self._modelClass: Class | None = modelClass
 
     def Undo(self) -> bool:
 

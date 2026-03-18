@@ -4,6 +4,8 @@ from typing import cast
 from logging import Logger
 from logging import getLogger
 
+from datetime import datetime
+
 from wx import Command
 
 from umlmodel.LinkedObject import LinkedObject
@@ -41,6 +43,19 @@ class BaseWxCommand(Command):
 
         self._umlPreferences:  UmlPreferences        = UmlPreferences()
 
+    @property
+    def timeStamp(self) -> int:
+
+        dt = datetime.now()
+
+        return dt.microsecond
+
+    def GetName(self) -> str:
+        return self._name
+
+    def CanUndo(self):
+        return True
+
     def _removeUmlShapeFromFrame(self, umlFrame: UmlFrame, umlShape: UmlShapeGenre, modelClass: LinkedObject | None = None):
 
         umlShapes: UmlShapes = umlFrame.umlShapes
@@ -48,9 +63,9 @@ class BaseWxCommand(Command):
         for obj in umlShapes:
 
             potentialObject: UmlClass = cast(UmlClass, obj)
-
-            # TODO: implement __eq__ for UmlNote, UmlText, UmlUseCase, UmlActor
-            # if self._isSameShape(objectToRemove=umlShape, potentialObject=potentialObject):
+            #
+            #  Assumes UML Shapes use the IdentifierMixin
+            #
             if umlShape == potentialObject:
                 umlDiagram:   UmlDiagram   = umlFrame.umlDiagram
                 linkedObject: LinkedObject = self._getLinkedObject(umlShape=potentialObject)
@@ -63,30 +78,6 @@ class BaseWxCommand(Command):
                 umlDiagram.RemoveShape(potentialObject)
                 self._baseLogger.info(f'{potentialObject} deleted')
                 umlFrame.refresh()
-
-    def _isSameShape(self, objectToRemove: UmlShapeGenre, potentialObject: UmlShapeGenre) -> bool:
-        """
-        This probably could be done by updating the UML Shapes with the __equ__ dunder method.
-        Wait until the umlshapes project updates
-
-        Args:
-            objectToRemove:   Object we were told to remove
-            potentialObject:  The one that is on the frame
-
-        Returns:  `True` if they are one and the same, else `False`
-
-        """
-        ans: bool = False
-
-        # if isinstance(objectToRemove, UmlSDInstance):
-        #     nonOglObject: OglSDInstance = cast(OglSDInstance, objectToRemove)
-        #     if nonOglObject.sdInstance.id == nonOglObject.sdInstance.id:
-        #         ans = True
-        # else:
-        if objectToRemove.id == potentialObject.id:
-            ans = True
-
-        return ans
 
     def _getLinkedObject(self, umlShape: UmlActor | UmlClass | UmlNote | UmlUseCase) -> LinkedObject:
 

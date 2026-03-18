@@ -7,7 +7,6 @@ from logging import getLogger
 from abc import ABCMeta
 from abc import abstractmethod
 
-from datetime import datetime
 from umlshapes.ShapeTypes import UmlShapeGenre
 from umlshapes.UmlBaseEventHandler import UmlBaseEventHandler
 from umlshapes.UmlDiagram import UmlDiagram
@@ -49,19 +48,6 @@ class BaseCreateCommand(BaseWxCommand, metaclass=MyMetaBaseWxCommand):
         self._umlPosition:        UmlPosition = umlPosition
 
         self._shape: UmlShapeGenre = self._createPrototypeInstance()
-
-    @property
-    def timeStamp(self) -> int:
-
-        dt = datetime.now()
-
-        return dt.microsecond
-
-    def GetName(self) -> str:
-        return self._name
-
-    def CanUndo(self):
-        return True
 
     def Do(self) -> bool:
         self._placeShapeOnFrame()
