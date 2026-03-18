@@ -19,19 +19,24 @@ from umlshapes.types.UmlPosition import UmlPosition
 
 class CreateUmlClassCommand(BaseCreateCommand):
 
-    def __init__(self, umlFrame: UmlFrame, umlPosition: UmlPosition, umlPubSubEngine: IUmlPubSubEngine):
+    def __init__(self, umlFrame: UmlFrame, umlPosition: UmlPosition, umlPubSubEngine: IUmlPubSubEngine, modelClass: Class = None):
         """
         If the caller provides a ready-made class this command uses it and does not
         invoke the class editor
 
         Args:
+            umlFrame
             umlPosition:
             umlPubSubEngine:
         """
-        name: str = f'Create Class- {self.timeStamp}'
+        self._uniqueId: int = self.timeStamp
+
+        name: str = f'Create Class-{self._uniqueId}'
         super().__init__(canUndo=True, name=name, umlFrame=umlFrame, umlPosition=umlPosition, umlPubSubEngine=umlPubSubEngine)
 
         self.logger: Logger = getLogger(__name__)
+
+        self._modelClass: Class | None = modelClass
 
     def Undo(self) -> bool:
 
@@ -50,8 +55,12 @@ class CreateUmlClassCommand(BaseCreateCommand):
 
         Returns:    The newly created class
         """
-        className: str       = f'{self._umlPreferences.defaultClassName}{self.timeStamp}'
-        modelClass: Class    = Class(name=className)
+        if self._modelClass is None:
+            className:  str   = f'{self._umlPreferences.defaultClassName}{self._uniqueId}'
+            modelClass: Class = Class(name=className)
+        else:
+            modelClass = self._modelClass
+
         umlClass:   UmlClass = UmlClass(modelClass)
 
         return umlClass
