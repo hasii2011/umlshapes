@@ -96,6 +96,8 @@ class UmlFrameOperationsListener:
 
         self._umlPubSubEngine.subscribe(messageType=UmlMessageType.SELECT_ALL_SHAPES, frameId=umlFrame.id, listener=self._selectAllShapesListener)
 
+        self._umlPubSubEngine.subscribe(messageType=UmlMessageType.EDIT_NOTE, frameId=umlFrame.id, listener=self._editNoteListener)
+
         if isinstance(umlFrame, ClassDiagramFrame) or isinstance(umlFrame, UseCaseDiagramFrame):
             self._umlPubSubEngine.subscribe(messageType=UmlMessageType.SHAPE_MOVING, frameId=umlFrame.id, listener=self._shapeMovingListener)
             self._umlPubSubEngine.subscribe(messageType=UmlMessageType.EDIT_CLASS,   frameId=umlFrame.id, listener=self._editClassListener)
@@ -255,6 +257,23 @@ class UmlFrameOperationsListener:
         self.logger.debug(f"Edit: {modelClass}")
         umlFrame: ClassDiagramFrame = cast(ClassDiagramFrame, self._umlFrame)
         with DlgEditClass(umlFrame, umlPubSubEngine=self._umlPubSubEngine, modelClass=modelClass) as dlg:
+            if dlg.ShowModal() == ID_OK:
+                umlFrame.refresh()
+                umlFrame.frameModified = True
+
+    def _editNoteListener(self, modelNote: Note):
+        """
+        This handles the case when a new UML Note is created
+
+        Args:
+
+            modelNote:
+        """
+        from umlshapes.dialogs.DlgEditNote import DlgEditNote
+
+        umlFrame = self._umlFrame
+
+        with DlgEditNote(umlFrame, note=modelNote) as dlg:
             if dlg.ShowModal() == ID_OK:
                 umlFrame.refresh()
                 umlFrame.frameModified = True

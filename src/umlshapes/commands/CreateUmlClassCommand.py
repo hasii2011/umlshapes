@@ -19,8 +19,6 @@ from umlshapes.types.UmlPosition import UmlPosition
 
 class CreateUmlClassCommand(BaseCreateCommand):
 
-    clsCounter: int = 1
-
     def __init__(self, umlFrame: UmlFrame, umlPosition: UmlPosition, umlPubSubEngine: IUmlPubSubEngine):
         """
         If the caller provides a ready-made class this command uses it and does not
@@ -30,7 +28,7 @@ class CreateUmlClassCommand(BaseCreateCommand):
             umlPosition:
             umlPubSubEngine:
         """
-        name: str = f'Create Class- {CreateUmlClassCommand.clsCounter}'
+        name: str = f'Create Class- {self.timeStamp}'
         super().__init__(canUndo=True, name=name, umlFrame=umlFrame, umlPosition=umlPosition, umlPubSubEngine=umlPubSubEngine)
 
         self.logger: Logger = getLogger(__name__)
@@ -52,11 +50,9 @@ class CreateUmlClassCommand(BaseCreateCommand):
 
         Returns:    The newly created class
         """
-        className: str       = f'{self._umlPreferences.defaultClassName}{CreateUmlClassCommand.clsCounter}'
+        className: str       = f'{self._umlPreferences.defaultClassName}{self.timeStamp}'
         modelClass: Class    = Class(name=className)
         umlClass:   UmlClass = UmlClass(modelClass)
-
-        CreateUmlClassCommand.clsCounter += 1
 
         return umlClass
 
@@ -71,5 +67,4 @@ class CreateUmlClassCommand(BaseCreateCommand):
 
         self._umlFrame.refresh()
 
-        # TODO:  Use the Uml Pub Sub Engine
         self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.EDIT_CLASS, frameId=self._umlFrame.id, modelClass=modelClass)
