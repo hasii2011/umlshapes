@@ -34,6 +34,9 @@ from wx import OK
 from umlshapes.ShapeTypes import UmlShapeGenre
 
 from umlshapes.UmlDiagram import UmlDiagram
+from umlshapes.commands.CreateUmlClassCommand import CreateUmlClassCommand
+from umlshapes.commands.CreateUmlNoteCommand import CreateUmlNoteCommand
+from umlshapes.commands.CreateUmlTextCommand import CreateUmlTextCommand
 
 from umlshapes.dialogs.DlgEditActor import DlgEditActor
 from umlshapes.dialogs.DlgEditNote import DlgEditNote
@@ -147,7 +150,45 @@ class ShapeCreator:
             }
         )
 
-    def displayShape(self, idReference: ID_REFERENCE, diagramFrame: ClassDiagramFrame,):
+    def displayUndoableUmlClass(self, diagramFrame: ClassDiagramFrame):
+
+        umlPosition: UmlPosition = self._computePosition()
+
+        cmd: CreateUmlClassCommand = CreateUmlClassCommand(
+            umlFrame=diagramFrame,
+            umlPosition=umlPosition,
+            umlPubSubEngine=self._umlPubSubEngine
+        )
+        submitStatus: bool = diagramFrame.commandProcessor.Submit(command=cmd, storeIt=True)
+        self.logger.debug(f'Create class submission status: {submitStatus}')
+
+    def displayUndoableUmlNote(self, diagramFrame: ClassDiagramFrame):
+
+        umlPosition: UmlPosition = self._computePosition()
+
+        cmd: CreateUmlNoteCommand = CreateUmlNoteCommand(
+            umlFrame=diagramFrame,
+            umlPosition=umlPosition,
+            umlPubSubEngine=self._umlPubSubEngine
+        )
+
+        submitStatus: bool = diagramFrame.commandProcessor.Submit(command=cmd, storeIt=True)
+        self.logger.debug(f'Create note submission status: {submitStatus}')
+
+    def displayUndoableUmlText(self, diagramFrame: ClassDiagramFrame):
+
+        umlPosition: UmlPosition = self._computePosition()
+
+        cmd: CreateUmlTextCommand = CreateUmlTextCommand(
+            umlFrame=diagramFrame,
+            umlPosition=umlPosition,
+            umlPubSubEngine=self._umlPubSubEngine
+        )
+
+        submitStatus: bool = diagramFrame.commandProcessor.Submit(command=cmd, storeIt=True)
+        self.logger.debug(f'Create text submission status: {submitStatus}')
+
+    def displayShape(self, idReference: ID_REFERENCE, diagramFrame: ClassDiagramFrame):
 
         shapeDescription: ShapeDescription = self._shapes[idReference]
 

@@ -1,6 +1,9 @@
 
 from typing import cast
 
+from logging import Logger
+from logging import getLogger
+
 from umlmodel.Note import Note
 
 from umlshapes.frames.UmlFrame import UmlFrame
@@ -25,6 +28,20 @@ class CreateUmlNoteCommand(BaseCreateCommand):
         name: str = f'Create Note-{self._uniqueId}'
 
         super().__init__(canUndo=True, name=name, umlFrame=umlFrame, umlPosition=umlPosition, umlPubSubEngine=umlPubSubEngine)
+
+        self.logger: Logger = getLogger(__name__)
+
+    def Undo(self) -> bool:
+
+        assert isinstance(self._shape, UmlNote), 'It can only be this for this command'
+
+        umlNote:    UmlNote = self._shape
+        modelClass: Note    = umlNote.modelNote
+        self._removeLinkedUmlShapeFromFrame(umlFrame=self._umlFrame, umlShape=self._shape, modelClass=modelClass)
+
+        self.logger.debug(f'Undo create: {modelClass}')
+
+        return True
 
     def _createPrototypeInstance(self) -> UmlNote:
         """

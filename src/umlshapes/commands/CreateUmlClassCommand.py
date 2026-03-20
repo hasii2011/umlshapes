@@ -42,13 +42,13 @@ class CreateUmlClassCommand(BaseCreateCommand):
 
     def Undo(self) -> bool:
 
-        self.logger.info(f'{self._umlFrame=}')
-        # SD Instance will not appear here
         assert isinstance(self._shape, UmlClass), 'It can only be this for this command'
+
         umlClass:   UmlClass = self._shape
         modelClass: Class    = umlClass.modelClass
-        self._removeUmlShapeFromFrame(umlFrame=self._umlFrame, umlShape=self._shape, modelClass=modelClass)
+        self._removeLinkedUmlShapeFromFrame(umlFrame=self._umlFrame, umlShape=self._shape, modelClass=modelClass)
 
+        self.logger.debug(f'Undo create: {modelClass}')
         return True
 
     def _createPrototypeInstance(self) -> UmlClass:

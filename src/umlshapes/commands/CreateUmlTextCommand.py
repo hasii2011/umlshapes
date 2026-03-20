@@ -1,6 +1,9 @@
 
 from typing import cast
 
+from logging import Logger
+from logging import getLogger
+
 from umlmodel.Text import Text
 
 from umlshapes.frames.UmlFrame import UmlFrame
@@ -27,6 +30,31 @@ class CreateUmlTextCommand(BaseCreateCommand):
         name: str = f'Create Text-{self._uniqueId}'
 
         super().__init__(canUndo=True, name=name, umlFrame=umlFrame, umlPosition=umlPosition, umlPubSubEngine=umlPubSubEngine)
+
+        self.logger: Logger = getLogger(__name__)
+
+    def Undo(self) -> bool:
+        """
+        We do a simpler removing of shape because UML Text shapes
+        are not linked shapes
+
+        Returns: True
+
+        """
+
+        from umlshapes.frames.DiagramFrame import DiagramFrame
+        from umlshapes.UmlDiagram import UmlDiagram
+
+        assert isinstance(self._shape, UmlText), 'It can only be this for this command'
+
+        umlFrame:   DiagramFrame = self._umlFrame
+        umlDiagram: UmlDiagram   = umlFrame.umlDiagram
+
+        self.logger.debug(f'Undo create {self._shape}')
+        umlDiagram.RemoveShape(self._shape)
+        umlFrame.refresh()
+
+        return True
 
     def _createPrototypeInstance(self) -> UmlText:
         """

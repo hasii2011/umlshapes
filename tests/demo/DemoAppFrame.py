@@ -310,12 +310,15 @@ class DemoAppFrame(SizedFrame):
         # noinspection PyUnreachableCode
         match menuId:
             case Identifiers.ID_DISPLAY_UML_CLASS:
-                shapeCreator.displayShape(Identifiers.ID_DISPLAY_UML_CLASS, self._currentFrame)
-                self.SetStatusText('See the shape !!')
+                shapeCreator.displayUndoableUmlClass(diagramFrame=self._currentFrame)
+                self.SetStatusText('See the class !!')
             case Identifiers.ID_DISPLAY_UML_TEXT:
-                shapeCreator.displayShape(Identifiers.ID_DISPLAY_UML_TEXT, self._currentFrame)
+                shapeCreator.displayUndoableUmlText(diagramFrame=self._currentFrame)
+                self.SetStatusText('See the text !!')
             case Identifiers.ID_DISPLAY_UML_NOTE:
-                shapeCreator.displayShape(Identifiers.ID_DISPLAY_UML_NOTE, self._currentFrame)
+                shapeCreator.displayUndoableUmlNote(diagramFrame=self._currentFrame)
+                self.SetStatusText('See the note !!')
+
             case Identifiers.ID_DISPLAY_UML_USE_CASE:
                 shapeCreator.displayShape(Identifiers.ID_DISPLAY_UML_USE_CASE, self._currentFrame)
             case Identifiers.ID_DISPLAY_UML_ACTOR:
