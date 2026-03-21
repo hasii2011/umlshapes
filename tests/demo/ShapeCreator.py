@@ -34,6 +34,7 @@ from wx import OK
 from umlshapes.ShapeTypes import UmlShapeGenre
 
 from umlshapes.UmlDiagram import UmlDiagram
+from umlshapes.commands.CreateUmlActorCommand import CreateUmlActorCommand
 from umlshapes.commands.CreateUmlClassCommand import CreateUmlClassCommand
 from umlshapes.commands.CreateUmlNoteCommand import CreateUmlNoteCommand
 from umlshapes.commands.CreateUmlTextCommand import CreateUmlTextCommand
@@ -42,6 +43,7 @@ from umlshapes.dialogs.DlgEditActor import DlgEditActor
 from umlshapes.dialogs.DlgEditNote import DlgEditNote
 from umlshapes.dialogs.DlgEditText import DlgEditText
 from umlshapes.dialogs.DlgEditUseCase import DlgEditUseCase
+from umlshapes.frames.UseCaseDiagramFrame import UseCaseDiagramFrame
 
 from umlshapes.pubsubengine.UmlPubSubEngine import UmlPubSubEngine
 from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
@@ -187,6 +189,18 @@ class ShapeCreator:
 
         submitStatus: bool = diagramFrame.commandProcessor.Submit(command=cmd, storeIt=True)
         self.logger.debug(f'Create text submission status: {submitStatus}')
+
+    def displayUndoableUmlActor(self, diagramFrame: UseCaseDiagramFrame):
+        umlPosition: UmlPosition = self._computePosition()
+
+        cmd: CreateUmlActorCommand = CreateUmlActorCommand(
+            umlFrame=diagramFrame,
+            umlPosition=umlPosition,
+            umlPubSubEngine=self._umlPubSubEngine
+        )
+
+        submitStatus: bool = diagramFrame.commandProcessor.Submit(command=cmd, storeIt=True)
+        self.logger.debug(f'Create actor submission status: {submitStatus}')
 
     def displayShape(self, idReference: ID_REFERENCE, diagramFrame: ClassDiagramFrame):
 

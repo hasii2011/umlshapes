@@ -33,7 +33,7 @@ class UseCaseCutCommand(BaseCutCommand):
         """
         from umlshapes.shapes.UmlUseCase import UmlUseCase
 
-        super().__init__(partialName='TextCutCommand', umlModelBase=umlUseCase.modelUseCase, umlPosition=umlPosition, umlFrame=umlFrame, umlPubSubEngine=umlPubSubEngine)
+        super().__init__(partialName='UseCaseCutCommand', umlModelBase=umlUseCase.modelUseCase, umlPosition=umlPosition, umlFrame=umlFrame, umlPubSubEngine=umlPubSubEngine)
 
         self.logger: Logger = getLogger(__name__)
 

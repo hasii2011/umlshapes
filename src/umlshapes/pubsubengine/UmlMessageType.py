@@ -25,6 +25,9 @@ class UmlMessageType(StrEnum):
     PASTE_SHAPES      = 'PasteShapes'
     SELECT_ALL_SHAPES = 'SelectAllShapes'
 
-    EDIT_CLASS = 'Edit Class'
-    EDIT_NOTE  = 'Edit Note'
-    EDIT_TEXT  = 'Edit Text'
+    EDIT_CLASS    = 'Edit Class'
+    EDIT_NOTE     = 'Edit Note'
+    EDIT_TEXT     = 'Edit Text'
+    EDIT_ACTOR    = 'Edit Actor'
+    EDIT_USE_CASE = 'Edit Use Case'
+

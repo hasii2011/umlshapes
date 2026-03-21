@@ -13,7 +13,7 @@ class DlgEditActor(TextEntryDialog):
     editing an actor's name
     Usage:
 
-        with DlgEditActor(umlFrame, useCaseName=actor.name) as dlg:
+        with DlgEditActor(umlFrame, actorName=actor.name) as dlg:
             if dlg.ShowModal() == ID_OK:
                 actor.name = dlg.actorName
     """

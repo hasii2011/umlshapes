@@ -47,6 +47,7 @@ from umlshapes.UmlDiagram import UmlDiagram
 
 from umlshapes.dialogs.DlgEditInterface import DlgEditInterface
 from umlshapes.frames.SequenceDiagramFrame import SequenceDiagramFrame
+from umlshapes.frames.UseCaseDiagramFrame import UseCaseDiagramFrame
 
 from umlshapes.pubsubengine.UmlMessageType import UmlMessageType
 from umlshapes.pubsubengine.UmlPubSubEngine import UmlPubSubEngine
@@ -108,15 +109,22 @@ class DemoAppFrame(SizedFrame):
             parent=self._noteBook,
             umlPubSubEngine=self._umlPubSubEngine,
         )
+        self._diagramFrame3 = UseCaseDiagramFrame(
+            parent=self._noteBook,
+            umlPubSubEngine=self._umlPubSubEngine
+        )
 
         self._noteBook.AddPage(page=self._diagramFrame1, text='Class Diagram',    select=True)
         self._noteBook.AddPage(page=self._diagramFrame2, text='Sequence Diagram', select=False)
+        self._noteBook.AddPage(page=self._diagramFrame3, text='Use Case Diagram', select=False)
+        self._noteBook.SetSelection(2)      # Hard code while I am testing creating Actors and Use Cases
 
-        self._currentFrame: DemoClassDiagramFrame | SequenceDiagramFrame = cast(DemoFrame, self._noteBook.GetCurrentPage())
+        self._currentFrame: DemoClassDiagramFrame | SequenceDiagramFrame | UseCaseDiagramFrame = cast(DemoFrame, self._noteBook.GetCurrentPage())
 
         self._createApplicationMenuBar()
         self._diagramFrame1.commandProcessor.SetEditMenu(menu=self._editMenu)
         self._diagramFrame2.commandProcessor.SetEditMenu(menu=self._editMenu)
+        self._diagramFrame3.commandProcessor.SetEditMenu(menu=self._editMenu)
 
         self.CreateStatusBar()  # should always do this when there's a resize border
         self.SetAutoLayout(True)
@@ -136,6 +144,7 @@ class DemoAppFrame(SizedFrame):
 
         self._subscribeFrameToRelevantFrameTopics(frameId=self._diagramFrame1.id)
         self._subscribeFrameToRelevantFrameTopics(frameId=self._diagramFrame2.id)
+        self._subscribeFrameToRelevantFrameTopics(frameId=self._diagramFrame3.id)
 
         self.Bind(EVT_NOTEBOOK_PAGE_CHANGED, self._onFrameDisplayedChanged)
         self.Bind(EVT_CLOSE,    self.Close)
@@ -318,11 +327,11 @@ class DemoAppFrame(SizedFrame):
             case Identifiers.ID_DISPLAY_UML_NOTE:
                 shapeCreator.displayUndoableUmlNote(diagramFrame=self._currentFrame)
                 self.SetStatusText('See the note !!')
+            case Identifiers.ID_DISPLAY_UML_ACTOR:
+                shapeCreator.displayUndoableUmlActor(diagramFrame=self._currentFrame)
 
             case Identifiers.ID_DISPLAY_UML_USE_CASE:
                 shapeCreator.displayShape(Identifiers.ID_DISPLAY_UML_USE_CASE, self._currentFrame)
-            case Identifiers.ID_DISPLAY_UML_ACTOR:
-                shapeCreator.displayShape(Identifiers.ID_DISPLAY_UML_ACTOR, self._currentFrame)
 
             case Identifiers.ID_DISPLAY_UML_ASSOCIATION:
                 linkCreator.displayAssociation(idReference=Identifiers.ID_DISPLAY_UML_ASSOCIATION, diagramFrame=self._currentFrame)
@@ -393,8 +402,6 @@ class DemoAppFrame(SizedFrame):
                 self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.CUT_SHAPES, frameId=frameId)
             case wx.ID_COPY:
                 self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.COPY_SHAPES, frameId=frameId)
-            case wx.ID_PASTE:
-                self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.PASTE_SHAPES, frameId=frameId)
             case wx.ID_PASTE:
                 self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.PASTE_SHAPES, frameId=frameId)
             case wx.ID_SELECTALL:
