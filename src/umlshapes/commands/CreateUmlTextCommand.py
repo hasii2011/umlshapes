@@ -80,6 +80,6 @@ class CreateUmlTextCommand(BaseCreateCommand):
 
         self._addUmlShapeToFrame(umlFrame=self._umlFrame, umlShape=umlText, umlPosition=self._umlPosition)
 
-        self._umlFrame.refresh()
-
         self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.EDIT_TEXT, frameId=self._umlFrame.id, modelText=modelText)
+
+        self._umlFrame.refresh()

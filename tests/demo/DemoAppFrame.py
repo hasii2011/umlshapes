@@ -329,9 +329,10 @@ class DemoAppFrame(SizedFrame):
                 self.SetStatusText('See the note !!')
             case Identifiers.ID_DISPLAY_UML_ACTOR:
                 shapeCreator.displayUndoableUmlActor(diagramFrame=self._currentFrame)
-
+                self.SetStatusText('See the actor !!')
             case Identifiers.ID_DISPLAY_UML_USE_CASE:
-                shapeCreator.displayShape(Identifiers.ID_DISPLAY_UML_USE_CASE, self._currentFrame)
+                shapeCreator.displayUndoableUmlUseCase(diagramFrame=self._currentFrame)
+                self.SetStatusText('See the use case !!')
 
             case Identifiers.ID_DISPLAY_UML_ASSOCIATION:
                 linkCreator.displayAssociation(idReference=Identifiers.ID_DISPLAY_UML_ASSOCIATION, diagramFrame=self._currentFrame)

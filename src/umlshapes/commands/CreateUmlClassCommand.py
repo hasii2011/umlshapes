@@ -76,6 +76,6 @@ class CreateUmlClassCommand(BaseCreateCommand):
 
         self._addUmlShapeToFrame(umlFrame=self._umlFrame, umlShape=umlClass, umlPosition=self._umlPosition)
 
-        self._umlFrame.refresh()
-
         self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.EDIT_CLASS, frameId=self._umlFrame.id, modelClass=modelClass)
+
+        self._umlFrame.refresh()

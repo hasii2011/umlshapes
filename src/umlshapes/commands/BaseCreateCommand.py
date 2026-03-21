@@ -146,7 +146,7 @@ class BaseCreateCommand(Command, metaclass=MyMetaCommand):
 
         for obj in umlShapes:
 
-            potentialObject: UmlClass = cast(UmlClass, obj)
+            potentialObject: UmlShapeGenre = cast(UmlShapeGenre, obj)
             #
             #  Assumes UML Shapes use the IdentifierMixin
             #

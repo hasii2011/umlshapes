@@ -61,6 +61,6 @@ class CreateUmlActorCommand(BaseCreateCommand):
 
         self._addUmlShapeToFrame(umlFrame=self._umlFrame, umlShape=umlActor, umlPosition=self._umlPosition)
 
-        self._umlFrame.refresh()
-
         self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.EDIT_ACTOR, frameId=self._umlFrame.id, modelActor=modelActor)
+
+        self._umlFrame.refresh()

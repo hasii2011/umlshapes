@@ -67,6 +67,6 @@ class CreateUmlNoteCommand(BaseCreateCommand):
 
         self._addUmlShapeToFrame(umlFrame=self._umlFrame, umlShape=umlNote, umlPosition=self._umlPosition)
 
-        self._umlFrame.refresh()
-
         self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.EDIT_NOTE, frameId=self._umlFrame.id, modelNote=modelNote)
+
+        self._umlFrame.refresh()
