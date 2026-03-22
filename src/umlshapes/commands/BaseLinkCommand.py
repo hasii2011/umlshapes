@@ -212,6 +212,9 @@ class BaseLinkCommand(Command):
 
         Returns:  The appropriate UML Association based on the model Link Type
         """
+        from umlshapes.shapes.UmlActor import UmlActor
+        from umlshapes.shapes.UmlUseCase import UmlUseCase
+
         from umlshapes.links.UmlAssociation import UmlAssociation
         from umlshapes.links.UmlComposition import UmlComposition
         from umlshapes.links.UmlAggregation import UmlAggregation
@@ -232,7 +235,12 @@ class BaseLinkCommand(Command):
         # Looks weird but we do not need the result
         UmlAssociationEventHandler(umlAssociation=umlAssociation, umlPubSubEngine=self._umlPubSubEngine)
 
-        sourceUmlShape.addLink(umlLink=umlAssociation, destinationClass=destinationUmlShape)
+        if isinstance(sourceUmlShape, UmlActor):
+            assert isinstance(destinationUmlShape, UmlUseCase)
+            umlUseCase: UmlUseCase = destinationUmlShape
+            sourceUmlShape.addLink(umlAssociation=umlAssociation, umlUseCase=umlUseCase)
+        else:
+            sourceUmlShape.addLink(umlLink=umlAssociation, destinationClass=destinationUmlShape)
 
         return umlAssociation
 
