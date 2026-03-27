@@ -462,13 +462,13 @@ class DemoAppFrame(SizedFrame):
 
     def _frameModifiedListener(self, modifiedFrameId: str):
 
-        self.logger.info(f'Frame Modified - {modifiedFrameId=}')
+        self.logger.debug(f'Frame Modified - {modifiedFrameId=}')
 
     def _frameLeftClickListener(self, frame: UmlFrame, umlPosition: UmlPosition):
-        self.logger.info(f'Frame {frame.id}, clicked at {umlPosition=}')
+        self.logger.debug(f'Frame {frame.id}, clicked at {umlPosition=}')
 
     def _umlShapeListener(self, umlShape: UmlShapeGenre):
-        self.logger.info(f'Shape was selected: {umlShape}')
+        self.logger.debug(f'Shape was selected: {umlShape}')
 
     # noinspection PyUnusedLocal
     def _onUmlShapePreferences(self, event: CommandEvent):

@@ -50,6 +50,7 @@ MENU_ADD_BEND_ID:      int = wxNewIdRef()
 MENU_REMOVE_BEND_ID:   int = wxNewIdRef()
 MENU_TOGGLE_SPLINE_ID: int = wxNewIdRef()
 MENU_STRAIGHTEN_ID:    int = wxNewIdRef()
+MENU_OPTIMIZE_LINE_ID: int = wxNewIdRef()
 
 LineControlPoints = NewType('LineControlPoints', List[Point])
 
@@ -160,6 +161,7 @@ class UmlLinkEventHandler(UmlBaseEventHandler):
         menu.Append(MENU_REMOVE_BEND_ID,   'Remove Bend',   'Remove Bend closest to click point')
         menu.Append(MENU_TOGGLE_SPLINE_ID, 'Toggle Spline', 'Best with at least one bend')
         menu.Append(MENU_STRAIGHTEN_ID,    'Straighten',    'Wonder what this does')
+        menu.Append(MENU_OPTIMIZE_LINE_ID, 'Optimize Line', 'Adjust so link length is minimized')
 
         return menu
 
@@ -182,6 +184,12 @@ class UmlLinkEventHandler(UmlBaseEventHandler):
             link: UmlLink = self.GetShape()
             link.Straighten()
             link.umlFrame.refresh()
+            self._indicateFrameModified()
+        elif eventId == MENU_OPTIMIZE_LINE_ID:
+            link = self.GetShape()
+            link.optimizeLink()
+            link.umlFrame.refresh()
+
             self._indicateFrameModified()
 
     def _computeRelativePosition(self, labelX: int, labelY: int, linkDelta: DeltaXY):

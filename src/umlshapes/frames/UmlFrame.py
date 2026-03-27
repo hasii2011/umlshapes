@@ -12,6 +12,8 @@ from collections.abc import Iterable
 
 from dataclasses import dataclass
 
+from deprecated import deprecated
+from wx import DC
 from wx import WXK_UP
 from wx import EVT_CHAR
 from wx import EVT_MOTION
@@ -43,7 +45,6 @@ from umlshapes.preferences.UmlPreferences import UmlPreferences
 from umlshapes.types.UmlLine import UmlLine
 from umlshapes.types.UmlPosition import UmlPoint
 from umlshapes.types.UmlPosition import UmlPosition
-from umlshapes.types.WiggleFactor import WiggleFactor
 from umlshapes.types.UmlDimensions import UmlDimensions
 
 if TYPE_CHECKING:
@@ -278,23 +279,24 @@ class UmlFrame(DiagramFrame):
 
         return True
 
+    def createDC(self) -> DC:
+        w, h = self.GetSize()
+        dc   = self._createDC(w=w, h=h)
+
+        return dc
+
+    # noinspection PyUnusedLocal
+    @deprecated(version='2.0.0', reason='Use the .redrawShapes')
     def wiggleShape(self, shape):
+        self.redrawShapes()
 
-        from umlshapes.ShapeTypes import UmlShapeGenre
-        from umlshapes.UmlBaseEventHandler import UmlBaseEventHandler
+    def redrawShapes(self):
+        """
+        Better than refresh
 
-        umlShape:     UmlShapeGenre = cast(UmlShapeGenre, shape)
-        wiggleFactor: WiggleFactor = self._preferences.shapeWiggleFactor
-
-        oldX: int = umlShape.GetX()
-        oldY: int = umlShape.GetY()
-        newX: int = oldX + wiggleFactor.xFactor
-        newY: int = oldY + wiggleFactor.yFactor
-
-        eventHandler: UmlBaseEventHandler = umlShape.GetEventHandler()
-
-        eventHandler.OnDragLeft(draw=True, x=newX, y=newY)
-        eventHandler.OnDragLeft(draw=True, x=oldX, y=oldY)
+        """
+        dc = self.createDC()
+        self.umlDiagram.Redraw(dc=dc)
 
     def _onProcessKeystrokes(self, event: KeyEvent):
         """

@@ -218,7 +218,7 @@ class LinkCreator:
         baseClassPosition: UmlPosition = UmlPosition(x=180, y=205)
         subClassPosition:  UmlPosition = UmlPosition(x=550, y=480)
 
-        baseModelClass:    Class  = Class(name='BaseClass')
+        baseModelClass:     Class  = Class(name='BaseClass')
         subClassModelClass: Class = Class(name='SubClass')
 
         baseUmlClass:     UmlClass = UmlClass(modelClass=baseModelClass)
@@ -232,8 +232,8 @@ class LinkCreator:
 
         createLinkCommand: CreateLinkCommand = CreateLinkCommand(
             partialName=f'{LinkType.INHERITANCE}',
-            sourceShape=baseUmlClass,
-            destinationShape=subClassUmlClass,
+            sourceShape=subClassUmlClass,
+            destinationShape=baseUmlClass,
             linkType=LinkType.INHERITANCE,
             umlPubSubEngine=self._umlPubSubEngine,
             linkSourcePosition=UmlPosition(x=625, y=480),

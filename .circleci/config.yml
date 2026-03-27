@@ -42,6 +42,7 @@ jobs:
             pip install umlmodel==3.4.0
             pip install six==1.16.0
             pip install attrdict3
+            pip install Deprecated==1.3.1
             pip install -v -U -f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-24.04  wxPython
             pip install codeallyadvanced==2.2.0
             pip install human_id==0.2.0

@@ -29,6 +29,7 @@ from umlshapes.links.eventhandlers.UmlLinkLabelEventHandler import UmlLinkLabelE
 
 from umlshapes.mixins.IdentifierMixin import IdentifierMixin
 from umlshapes.mixins.PubSubMixin import PubSubMixin
+from umlshapes.pubsubengine.UmlMessageType import UmlMessageType
 
 from umlshapes.shapes.UmlLineControlPoint import UmlLineControlPoint
 from umlshapes.shapes.UmlLineControlPoint import UmlLineControlPointType
@@ -199,6 +200,20 @@ class UmlLink(IdentifierMixin, LineShape, PubSubMixin):
             umlPosition:  The UML x,y coordinates
         """
         self.InsertLineControlPoint(point=Point(x=umlPosition.x, y=umlPosition.y))
+
+    def optimizeLink(self):
+        """
+            Optimize the link, so as to minimize the link length
+        """
+        dc = self.umlFrame.createDC()
+        self.OnMoveLink(dc=dc, moveControlPoints=True)
+        self.selected = False
+
+        self._umlPubSubEngine.sendMessage(
+            messageType=UmlMessageType.FRAME_MODIFIED,
+            frameId=self.umlFrame.id,
+            modifiedFrameId=self.umlFrame.id
+        )
 
     def OnDraw(self, dc: MemoryDC):
         if self._linkName is None:
