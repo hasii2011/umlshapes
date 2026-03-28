@@ -108,7 +108,7 @@ class UmlLinkEventHandler(UmlBaseEventHandler):
                         umlLink.modelLink = originalLink        # redundant
                         self._updateAssociationLabels(umlLink=umlLink, modelLink=dlg.value)
                         umlFrame.refresh()
-                        self._umlPubSubEngine.sendMessage(UmlMessageType.FRAME_MODIFIED, frameId=umlFrame.id, modifiedFrameId=umlFrame.id)
+                        self._indicateFrameModified()
 
     def OnRightClick(self, x: int, y: int, keys: int = 0, attachment: int = 0):
         """
@@ -154,14 +154,15 @@ class UmlLinkEventHandler(UmlBaseEventHandler):
         """
         super().OnMoveLink(dc=dc, moveControlPoints=moveControlPoints)
 
-        umlLink: UmlAssociation = self.GetShape()
-        associationName:        UmlLinkLabel = umlLink.linkName
+        umlLink:         UmlAssociation = self.GetShape()
+        associationName: UmlLinkLabel   = umlLink.linkName
         #
         if associationName is not None and associationName.labelType == LabelType.ASSOCIATION_NAME:
             labelX, labelY = umlLink.GetLabelPosition(NAME_IDX)
             associationName.position = self._computeRelativePosition(labelX=labelX, labelY=labelY, linkDelta=associationName.linkDelta)
 
         self.GetShape().GetCanvas().refresh()
+        self._indicateFrameModified()
 
     def _createContextMenu(self) -> Menu:
 

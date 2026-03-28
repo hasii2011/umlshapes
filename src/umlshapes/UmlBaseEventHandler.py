@@ -6,8 +6,8 @@ from typing import NewType
 from logging import Logger
 from logging import getLogger
 
-from wx import ClientDC
 from wx import MOD_CMD
+from wx import ClientDC
 
 from umlshapes.lib.ogl import Shape
 from umlshapes.lib.ogl import ShapeCanvas
@@ -17,8 +17,8 @@ from umlshapes.pubsubengine.UmlMessageType import UmlMessageType
 from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 
 from umlshapes.types.DeltaXY import DeltaXY
-from umlshapes.types.UmlPosition import NO_POSITION
 from umlshapes.types.UmlPosition import UmlPosition
+from umlshapes.types.UmlPosition import NO_POSITION
 from umlshapes.types.UmlDimensions import UmlDimensions
 
 ShapeList = NewType('ShapeList', List[Shape])
@@ -54,10 +54,8 @@ class UmlBaseEventHandler(ShapeEvtHandler):
             attachment:
 
         """
-
         from umlshapes.links.UmlLinkLabel import UmlLinkLabel
         from umlshapes.links.UmlLink import UmlLink
-        # self._baseLogger.info(f'{draw=} x,y:({x},{y}) {attachment=}')
         from umlshapes.ShapeTypes import UmlShapeGenre
 
         umlShape: UmlShapeGenre = cast(UmlShapeGenre, self.GetShape())

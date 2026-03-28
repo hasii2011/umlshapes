@@ -1,4 +1,6 @@
 
+from typing import cast
+
 from logging import Logger
 from logging import getLogger
 
@@ -11,6 +13,8 @@ from umlshapes.lib.ogl import ShapeEvtHandler
 from umlshapes.UmlUtils import UmlUtils
 
 from umlshapes.frames.DiagramFrame import DiagramFrame
+from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
+from umlshapes.pubsubengine.UmlMessageType import UmlMessageType
 
 from umlshapes.shapes.UmlLineControlPoint import UmlLineControlPoint
 from umlshapes.shapes.UmlLineControlPoint import UmlLineControlPointType
@@ -23,12 +27,23 @@ from umlshapes.types.UmlPosition import UmlPosition
 
 class UmlLineControlPointEventHandler(ShapeEvtHandler):
     """
-    Nothing special here;  Just some syntactic sugar and a canvas refresh
+    Add in the following custom behavior
+        * Don't use the funky cursor
+        * Indicate a change was made on the diagram
+        * Move the end control points
     """
     def __init__(self):
         self.logger: Logger = getLogger(__name__)
 
+        self._umlPubSubEngine:  IUmlPubSubEngine = cast(IUmlPubSubEngine, None)
+
         super().__init__()
+
+    def _setUmlPubSubEngine(self, umlPubSubEngine: IUmlPubSubEngine):
+        self._umlPubSubEngine = umlPubSubEngine
+
+    # noinspection PyTypeChecker
+    umlPubSubEngine = property(fget=None, fset=_setUmlPubSubEngine)
 
     def OnDragLeft(self, draw: bool, x: int, y: int, keys: int = 0, attachment: int = 0):
         """
@@ -66,8 +81,9 @@ class UmlLineControlPointEventHandler(ShapeEvtHandler):
         else:
             super().OnDragLeft(draw, x, y, keys, attachment)
 
-        canvas: DiagramFrame = umlLineControlPoint.GetCanvas()
-        canvas.refresh()
+        diagramFrame: DiagramFrame = umlLineControlPoint.GetCanvas()
+        diagramFrame.refresh()
+        self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.FRAME_MODIFIED, frameId=diagramFrame.id, modifiedFrameId=diagramFrame.id)
 
     def _moveTheToPoint(self, umlLineControlPoint, umlLink, x, y):
         """

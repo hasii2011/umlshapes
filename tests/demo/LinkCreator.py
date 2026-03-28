@@ -145,7 +145,7 @@ class LinkCreator:
 
         associationDescription: AssociationDescription = self._associations[idReference]
 
-        sourceUmlClass, destinationUmlClass = self._createClassPair(diagramFrame=diagramFrame)
+        sourceUmlClass, destinationUmlClass = self._createClassPair(diagramFrame=diagramFrame, destinationPosition=UmlPosition(200, y=400))
         self.logger.info(f'{sourceUmlClass.id=} {destinationUmlClass.id=}')
 
         createLinkCommand: CreateLinkCommand = CreateLinkCommand(

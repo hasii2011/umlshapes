@@ -305,6 +305,7 @@ class UmlLink(IdentifierMixin, LineShape, PubSubMixin):
         """
 
         eventHandler: UmlLineControlPointEventHandler = UmlLineControlPointEventHandler()
+        eventHandler.umlPubSubEngine = self._umlPubSubEngine
         eventHandler.SetShape(umlLineControlPoint)
         eventHandler.SetPreviousHandler(umlLineControlPoint.GetEventHandler())
 
