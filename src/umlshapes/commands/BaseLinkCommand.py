@@ -19,9 +19,9 @@ from umlshapes.types.Common import EndPositions
 from umlshapes.types.UmlPosition import NO_POSITION
 from umlshapes.types.UmlPosition import NO_POSITIONS
 from umlshapes.types.UmlPosition import UmlPosition
+from umlshapes.types.UmlPosition import UmlPositions
 
 from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
-from umlshapes.types.UmlPosition import UmlPositions
 
 if TYPE_CHECKING:
     from umlshapes.ShapeTypes import UmlLinkGenre
@@ -162,6 +162,8 @@ class BaseLinkCommand(Command):
         from umlshapes.links.UmlInterface import UmlInterface
         from umlshapes.links.UmlNoteLink import UmlNoteLink
 
+        from umlshapes.BasicUtils import BasicUtils
+
         sourceUmlShape:      UmlClass = cast(UmlClass, self._sourceUmlShape)  # noqa
         destinationUmlShape: UmlClass = cast(UmlClass, self._destinationUmlShape)  # noqa
         umlDiagram: UmlDiagram = self._umlFrame.umlDiagram
@@ -197,6 +199,7 @@ class BaseLinkCommand(Command):
             umlNoteLink.Show(True)
             # RECREATED !!!
             self._umlLink = umlNoteLink
+        BasicUtils.rationalizeTheLinkDataModel(umlLink=self._umlLink)
         #
         # Add any specified end points and/or line control points
         #
