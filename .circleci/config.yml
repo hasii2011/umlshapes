@@ -24,8 +24,6 @@ jobs:
       - run:
           name: Install library dependencies
           command: |
-            python -m venv venv
-            . venv/bin/activate
             echo "***************************************************"
             uname -a
             sudo apt update
@@ -55,7 +53,5 @@ jobs:
       - run:
             name: run tests
             command: | 
-              python3 -m venv venv
-              . venv/bin/activate
               pip install buildlackey
               unittests
