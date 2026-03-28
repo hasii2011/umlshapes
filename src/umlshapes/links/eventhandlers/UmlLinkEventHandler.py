@@ -6,14 +6,16 @@ from typing import TYPE_CHECKING
 from logging import Logger
 from logging import getLogger
 
-from wx import DC
-from wx import EVT_MENU
-from wx import Menu
-from wx import MenuItem
-from wx import OK
+from copy import deepcopy
 
-from wx import CommandEvent
+from wx import DC
+from wx import OK
+from wx import Menu
+from wx import EVT_MENU
+from wx import MenuItem
+
 from wx import Point
+from wx import CommandEvent
 
 from wx import NewIdRef as wxNewIdRef
 
@@ -89,17 +91,24 @@ class UmlLinkEventHandler(UmlBaseEventHandler):
 
         super().OnLeftDoubleClick(x=x, y=y, keys=keys, attachment=attachment)
 
-        umlLink:  UmlAssociation = self.GetShape()
-        link:     Link           = umlLink.modelLink
-        umlFrame: UmlFrame       = umlLink.GetCanvas()
+        umlLink: UmlAssociation = self.GetShape()
 
-        if self._isLinkEditable(linkType=link.linkType):
+        originalLink: Link     = umlLink.modelLink
+        linkCopy:     Link     = deepcopy(originalLink)
+        umlFrame:     UmlFrame = umlLink.GetCanvas()
 
-            with DlgEditLink(parent=umlFrame, link=link) as dlg:
+        if self._isLinkEditable(linkType=originalLink.linkType):
+
+            with DlgEditLink(parent=umlFrame, link=linkCopy) as dlg:
                 if dlg.ShowModal() == OK:
-                    umlFrame.refresh()
-                    self.logger.info(f'{link=}')
-                    self._updateAssociationLabels(umlLink=umlLink, modelLink=dlg.value)
+                    self.logger.info(f'{linkCopy=}')
+                    linkCopy = dlg.value
+                    if linkCopy != originalLink:
+                        originalLink = deepcopy(linkCopy)
+                        umlLink.modelLink = originalLink        # redundant
+                        self._updateAssociationLabels(umlLink=umlLink, modelLink=dlg.value)
+                        umlFrame.refresh()
+                        self._umlPubSubEngine.sendMessage(UmlMessageType.FRAME_MODIFIED, frameId=umlFrame.id, modifiedFrameId=umlFrame.id)
 
     def OnRightClick(self, x: int, y: int, keys: int = 0, attachment: int = 0):
         """

@@ -117,7 +117,7 @@ class DemoAppFrame(SizedFrame):
         self._noteBook.AddPage(page=self._diagramFrame1, text='Class Diagram',    select=True)
         self._noteBook.AddPage(page=self._diagramFrame2, text='Sequence Diagram', select=False)
         self._noteBook.AddPage(page=self._diagramFrame3, text='Use Case Diagram', select=False)
-        self._noteBook.SetSelection(2)      # Hard code while I am testing creating Actors and Use Cases
+        self._noteBook.SetSelection(0)      # Hard code while working on 2.1.0
 
         self._currentFrame: DemoClassDiagramFrame | SequenceDiagramFrame | UseCaseDiagramFrame = cast(DemoFrame, self._noteBook.GetCurrentPage())
 
@@ -462,7 +462,7 @@ class DemoAppFrame(SizedFrame):
 
     def _frameModifiedListener(self, modifiedFrameId: str):
 
-        self.logger.debug(f'Frame Modified - {modifiedFrameId=}')
+        self.logger.info(f'Frame Modified - {modifiedFrameId=}')
 
     def _frameLeftClickListener(self, frame: UmlFrame, umlPosition: UmlPosition):
         self.logger.debug(f'Frame {frame.id}, clicked at {umlPosition=}')
