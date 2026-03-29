@@ -2,8 +2,6 @@
 from unittest import TestSuite
 from unittest import main as unitTestMain
 
-from codeallyadvanced.ui.UnitTestBaseW import UnitTestBaseW
-
 from umlmodel.Actor import Actor
 from umlmodel.Class import Class
 from umlmodel.Link import Link
@@ -18,6 +16,8 @@ from umlshapes.shapes.UmlClass import UmlClass
 from umlshapes.shapes.UmlNote import UmlNote
 from umlshapes.shapes.UmlText import UmlText
 from umlshapes.shapes.UmlUseCase import UmlUseCase
+
+from codeallyadvanced.ui.UnitTestBaseW import UnitTestBaseW
 
 
 class TestIdentifierMixin(UnitTestBaseW):
