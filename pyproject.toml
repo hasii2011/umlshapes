@@ -31,7 +31,7 @@ dependencies = [
 
 [project.optional-dependencies]
 test = [
-    'mypy==1.19.0',
+    'mypy==1.19.1',
     'mypy-extensions==1.1.0',
     'types-Deprecated==1.2.9.20240311',
     'html-testRunner~=1.2.1',
