@@ -7,8 +7,6 @@ workflows:
   main:
     jobs:
       - build:
-          machine:
-          image: 'ubuntu-24.04'     # Specify your desired Linux version here
           filters:
             tags:
               only: /.*/
