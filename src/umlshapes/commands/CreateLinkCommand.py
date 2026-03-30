@@ -61,8 +61,8 @@ class CreateLinkCommand(BaseLinkCommand):
             self._modelLink = self._createAssociationModelLink(linkType=linkType)
         elif linkType == LinkType.INHERITANCE:
             self._modelLink = self._createInheritanceModelLink(
-                baseUmlClass=cast(UmlClass, self._destinationUmlShape),     # noqa
-                subUmlClass=cast(UmlClass, self._sourceUmlShape)            # noqa
+                baseUmlClass=cast(UmlClass, self._destinationUmlShape),
+                subUmlClass=cast(UmlClass, self._sourceUmlShape)
             )
         elif linkType == LinkType.INTERFACE:
             self._modelLink = self._createInterfaceModelLink()

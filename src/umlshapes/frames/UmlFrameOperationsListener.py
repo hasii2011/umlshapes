@@ -122,7 +122,7 @@ class UmlFrameOperationsListener:
         for direct removal
         """
         selectedShapes: UmlShapes = self._umlFrame.selectedShapes
-        if len(selectedShapes) == 0:        # noqa
+        if len(selectedShapes) == 0:
             with MessageDialog(parent=None, message='No shapes selected', caption='', style=OK | ICON_ERROR) as dlg:
                 dlg.ShowModal()
         else:
@@ -134,7 +134,7 @@ class UmlFrameOperationsListener:
         """
 
         selectedShapes: UmlShapes = self._umlFrame.selectedShapes
-        if len(selectedShapes) == 0:        # noqa
+        if len(selectedShapes) == 0:
             with MessageDialog(parent=None, message='No shapes selected', caption='', style=OK | ICON_ERROR) as dlg:
                 dlg.ShowModal()
         else:
@@ -142,7 +142,7 @@ class UmlFrameOperationsListener:
 
             self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.UPDATE_APPLICATION_STATUS,
                                               frameId=self._umlFrame.id,
-                                              message=f'Copied {len(self._clipboard)} shapes')  # noqa
+                                              message=f'Copied {len(self._clipboard)} shapes')
 
     def _pasteShapesListener(self):
         """
@@ -151,7 +151,7 @@ class UmlFrameOperationsListener:
         Assumes that the model objects are deep copies and that the ID has been made unique
 
         """
-        self.logger.info(f'Pasting {len(self._clipboard)} shapes')  # noqa
+        self.logger.info(f'Pasting {len(self._clipboard)} shapes')
 
         # Get the objects out of the internal clipboard and let the appropriate command process them
         pasteStart:   UmlPosition = self._preferences.pasteStart
@@ -211,7 +211,7 @@ class UmlFrameOperationsListener:
         self.frameModified = True
         self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.UPDATE_APPLICATION_STATUS,
                                           frameId=self._umlFrame.id,
-                                          message=f'Pasted {len(self._clipboard)} shape')       # noqa
+                                          message=f'Pasted {len(self._clipboard)} shape')
 
     def _selectAllShapesListener(self):
 
@@ -394,7 +394,7 @@ class UmlFrameOperationsListener:
 
         self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.UPDATE_APPLICATION_STATUS,
                                           frameId=self._umlFrame.id,
-                                          message=f'Cut {len(self._clipboard)} shapes')     # noqa
+                                          message=f'Cut {len(self._clipboard)} shapes')
 
     def _copyToInternalClipboard(self, selectedShapes: 'UmlShapes'):
         """

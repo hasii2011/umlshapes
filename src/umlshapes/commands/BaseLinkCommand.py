@@ -164,8 +164,8 @@ class BaseLinkCommand(Command):
 
         from umlshapes.BasicUtils import BasicUtils
 
-        sourceUmlShape:      UmlClass = cast(UmlClass, self._sourceUmlShape)  # noqa
-        destinationUmlShape: UmlClass = cast(UmlClass, self._destinationUmlShape)  # noqa
+        sourceUmlShape:      UmlClass = cast(UmlClass, self._sourceUmlShape)
+        destinationUmlShape: UmlClass = cast(UmlClass, self._destinationUmlShape)
         umlDiagram: UmlDiagram = self._umlFrame.umlDiagram
 
         if self._modelLink.linkType in MODEL_ASSOCIATION_LINK_TYPE:

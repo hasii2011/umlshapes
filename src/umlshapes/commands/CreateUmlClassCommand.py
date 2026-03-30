@@ -71,7 +71,7 @@ class CreateUmlClassCommand(BaseCreateCommand):
         """
         Place self._shape on the UML frame
         """
-        umlClass:   UmlClass = cast(UmlClass, self._shape)      # noqa        # get old
+        umlClass:   UmlClass = cast(UmlClass, self._shape)      # get old
         modelClass: Class    = umlClass.modelClass
 
         self._addUmlShapeToFrame(umlFrame=self._umlFrame, umlShape=umlClass, umlPosition=self._umlPosition)

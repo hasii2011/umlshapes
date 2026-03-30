@@ -1,4 +1,3 @@
-
 from typing import cast
 
 from logging import Logger
@@ -56,7 +55,7 @@ class CreateUmlActorCommand(BaseCreateCommand):
         """
         Place self._shape on the UML frame
         """
-        umlActor:   UmlActor = cast(UmlActor, self._shape)       # noqa        # get old
+        umlActor:   UmlActor = cast(UmlActor, self._shape)      # get old
         modelActor: Actor    = umlActor.modelActor
 
         self._addUmlShapeToFrame(umlFrame=self._umlFrame, umlShape=umlActor, umlPosition=self._umlPosition)

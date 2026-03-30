@@ -120,7 +120,7 @@ class UmlFrame(DiagramFrame):
         """
         Clears the commands an ensures that CommandProcess.isDirty() is rationale
         """
-        self.commandProcessor.MarkAsSaved(),
+        self.commandProcessor.MarkAsSaved()
         self.commandProcessor.ClearCommands()
 
     @property
@@ -435,7 +435,7 @@ class UmlFrame(DiagramFrame):
 
         selectedShapes = self.selectedShapes
 
-        if len(selectedShapes) > 0:         # noqa
+        if len(selectedShapes) > 0:
             for shape in selectedShapes:
                 if isinstance(shape, UmlShapeGenre):
                     callback(shape)

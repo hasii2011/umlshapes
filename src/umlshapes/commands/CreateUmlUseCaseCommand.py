@@ -56,7 +56,7 @@ class CreateUmlUseCaseCommand(BaseCreateCommand):
         """
         Place self._shape on the UML frame
         """
-        umlUseCase:   UmlUseCase = cast(UmlUseCase, self._shape)       # noqa        # get old
+        umlUseCase:   UmlUseCase = cast(UmlUseCase, self._shape)       # get old
         modelUseCase: UseCase    = umlUseCase.modelUseCase
 
         self._addUmlShapeToFrame(umlFrame=self._umlFrame, umlShape=umlUseCase, umlPosition=self._umlPosition)

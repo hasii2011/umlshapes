@@ -158,7 +158,7 @@ class UmlBaseEventHandler(ShapeEvtHandler):
                     # shapes too!) and bad things will happen...
                     toUnselect.append(s)
 
-            if len(toUnselect) > 0:     # noqa
+            if len(toUnselect) > 0:
                 for s in toUnselect:
                     s.Select(False, dc)
 

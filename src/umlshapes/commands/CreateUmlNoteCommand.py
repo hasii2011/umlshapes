@@ -62,7 +62,7 @@ class CreateUmlNoteCommand(BaseCreateCommand):
         """
         Place self._shape on the UML frame
         """
-        umlNote:   UmlNote = cast(UmlNote, self._shape)       # noqa        # get old
+        umlNote:   UmlNote = cast(UmlNote, self._shape)         # get old
         modelNote: Note    = umlNote.modelNote
 
         self._addUmlShapeToFrame(umlFrame=self._umlFrame, umlShape=umlNote, umlPosition=self._umlPosition)

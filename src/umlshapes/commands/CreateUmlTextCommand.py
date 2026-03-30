@@ -75,7 +75,7 @@ class CreateUmlTextCommand(BaseCreateCommand):
         """
         Place self._shape on the UML frame
         """
-        umlText:   UmlText = cast(UmlText, self._shape)     # noqa             # get old
+        umlText:   UmlText = cast(UmlText, self._shape)     # get old
         modelText: Text    = umlText.modelText
 
         self._addUmlShapeToFrame(umlFrame=self._umlFrame, umlShape=umlText, umlPosition=self._umlPosition)

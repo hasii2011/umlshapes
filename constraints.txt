@@ -1,0 +1,2 @@
+wheel==0.44.0
+setuptools==70.1.1
