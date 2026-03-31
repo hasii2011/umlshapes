@@ -5,11 +5,11 @@ build-backend = "setuptools.build_meta"
 [project]
 name        = 'umlshapes'
 dynamic     = ["version"]
-description = 'Pyut Ogl without homegrown miniogl'
+description = 'UML Shapes for the UML Diagrammer'
 readme      = "README.md"
 authors     = [{name = 'Humberto A. Sanchez II', email = 'Humberto.A.Sanchez.II@gmail.com'}]
 maintainers = [{name = 'Humberto A. Sanchez II', email = 'Humberto.A.Sanchez.II@gmail.com'}]
-keywords    = ['pyut,graphical shapes,python']
+keywords    = ['umldiagrammer,graphical shapes,python']
 license     = 'AGPL-1.0-or-later'
 
 classifiers = [
@@ -49,7 +49,7 @@ deploy = [
 ]
 
 [project.urls]
-Repository = 'https://github.com/hasii2011/uml'
+Repository = 'https://github.com/hasii2011/umlshapes'
 
 
 [tool.setuptools.packages.find]
