@@ -1,5 +1,5 @@
 
-from umlshapes.UmlUtils import UmlUtils
+from umlshapes.utils.IDUtil import IDUtil
 
 from umlshapes.lib.ogl import Shape
 
@@ -14,11 +14,13 @@ class IDMixin:
 
     This is still implemented because Lollipop interface has its
     own __equ__ implementation
+
+    TODO: move this code to Lollipop interface and remove this mixin
     """
     def __init__(self, shape: Shape):
 
         self._shape: Shape = shape
-        self._shape.SetId(UmlUtils.getID())
+        self._shape.SetId(IDUtil.getID())
 
     @property
     def id(self) -> str:

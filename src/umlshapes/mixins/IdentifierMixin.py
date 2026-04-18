@@ -1,5 +1,6 @@
 
-from umlshapes.UmlUtils import UmlUtils
+from umlshapes.utils.IDUtil import IDUtil
+
 
 class InvalidOperationError(Exception):
     pass
@@ -17,7 +18,7 @@ class IdentifierMixin:
     """
     def __init__(self):
 
-        self._identifier: str = UmlUtils.getID()
+        self._identifier: str = IDUtil.getID()
         self._moveMaster: bool = False
 
     @property

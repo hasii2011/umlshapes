@@ -1,6 +1,6 @@
 
-from typing import Callable
 from typing import cast
+from typing import Callable
 from typing import TYPE_CHECKING
 
 from logging import Logger
@@ -13,6 +13,7 @@ from collections.abc import Iterable
 from dataclasses import dataclass
 
 from deprecated import deprecated
+
 from wx import DC
 from wx import WXK_UP
 from wx import EVT_CHAR
@@ -36,26 +37,29 @@ from umlshapes.frames.UmlFrameOperationsListener import UmlFrameOperationsListen
 from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 from umlshapes.pubsubengine.UmlMessageType import UmlMessageType
 
-from umlshapes.UmlUtils import UmlUtils
+from umlshapes.utils.CoordinateUtils import CoordinateUtils
 
 from umlshapes.UmlDiagram import UmlDiagram
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
+from umlshapes.types.DeltaXY import DeltaXY
 from umlshapes.types.UmlLine import UmlLine
 from umlshapes.types.UmlPosition import UmlPoint
 from umlshapes.types.UmlPosition import UmlPosition
 from umlshapes.types.UmlDimensions import UmlDimensions
 
 if TYPE_CHECKING:
+    from umlshapes.frames.ShapeMoveInfo import ShapeId
+    from umlshapes.frames.ShapeMoveInfo import MovedShapes
+
     from umlshapes.ShapeTypes import UmlShapes
+    from umlshapes.ShapeTypes import UmlShapeGenre
 
 A4_FACTOR:     float = 1.41
 
 PIXELS_PER_UNIT_X: int = 20
 PIXELS_PER_UNIT_Y: int = 20
-
-# ModelObjects = NewType('ModelObjects', List[UmlModelBase])
 
 BIG_NUM: int = 10000    # Hopefully, there are less than this number of shapes on frame
 
@@ -71,7 +75,6 @@ class Ltrb:
     right:  int = 0
     bottom: int = 0
 
-
 class UmlFrame(DiagramFrame):
 
     KEY_CODE_DELETE: int = WXK_DELETE
@@ -83,6 +86,8 @@ class UmlFrame(DiagramFrame):
 
     def __init__(self, parent: Window, umlPubSubEngine: IUmlPubSubEngine):
 
+        from umlshapes.frames.ShapeMoveInfo import MovedShapes
+
         self.ufLogger:         Logger           = getLogger(__name__)
         self._preferences:     UmlPreferences   = UmlPreferences()
         self._umlPubSubEngine: IUmlPubSubEngine = umlPubSubEngine
@@ -93,35 +98,28 @@ class UmlFrame(DiagramFrame):
         self.DisableKeyboardScrolling()
 
         self._commandProcessor: CommandProcessor = CommandProcessor()
-        self._maxWidth:  int  = self._preferences.virtualWindowWidth
-        self._maxHeight: int = int(self._maxWidth / A4_FACTOR)  # 1.41 is for A4 support
-
-        nbrUnitsX: int = self._maxWidth // PIXELS_PER_UNIT_X
-        nbrUnitsY: int = self._maxHeight // PIXELS_PER_UNIT_Y
-        initPosX:  int = 0
-        initPosY:  int = 0
-        self.SetScrollbars(PIXELS_PER_UNIT_X, PIXELS_PER_UNIT_Y, nbrUnitsX, nbrUnitsY, initPosX, initPosY, False)
+        self._setupFrameScrollbars()
 
         self.setInfinite(True)
-        self._currentReportInterval: int = self._preferences.trackMouseInterval
-        self._frameModified: bool = False
-
-        # self._clipboard: ModelObjects = ModelObjects([])            # will be re-created at every copy
+        self._currentReportInterval: int  = self._preferences.trackMouseInterval
+        self._frameModified:         bool = False
+        self._shapesMoving:          bool = False
+        self._movedShapes:           MovedShapes = MovedShapes({})
 
         # TODO this needs to move to each type of frame
         self._umlFrameOperationsListener: UmlFrameOperationsListener = UmlFrameOperationsListener(
             umlFrame=self,
             umlPubSubEngine=self._umlPubSubEngine
         )
-        # self._setupListeners()
         self.Bind(EVT_CHAR, self._onProcessKeystrokes)
 
-    def markFrameSaved(self):
-        """
-        Clears the commands an ensures that CommandProcess.isDirty() is rationale
-        """
-        self.commandProcessor.MarkAsSaved()
-        self.commandProcessor.ClearCommands()
+    @property
+    def movedShapes(self) -> 'MovedShapes':
+        return self._movedShapes
+
+    @property
+    def shapesMoving(self) -> bool:
+        return self._shapesMoving
 
     @property
     def frameModified(self) -> bool:
@@ -266,18 +264,25 @@ class UmlFrame(DiagramFrame):
                     umlLink: UmlLink | UmlSDMessage = s
                     x1, y1, x2, y2 = umlLink.GetEnds()
                     umlLine: UmlLine = UmlLine(start=UmlPoint(x=x1, y=y1), end=UmlPoint(x=x2, y=y2))
-                    if UmlUtils.isLineWhollyContainedByRectangle(boundingRectangle=self._selector.rectangle, umlLine=umlLine) is True:
+                    if CoordinateUtils.isLineWhollyContainedByRectangle(boundingRectangle=self._selector.rectangle, umlLine=umlLine) is True:
                         umlLink.selected = True
                 else:
                     from umlshapes.ShapeTypes import UmlShapeGenre
                     shape: UmlShapeGenre = cast(UmlShapeGenre, s)
-                    if UmlUtils.isShapeInRectangle(boundingRectangle=self._selector.rectangle, shapeRectangle=shape.rectangle) is True:
+                    if CoordinateUtils.isShapeInRectangle(boundingRectangle=self._selector.rectangle, shapeRectangle=shape.rectangle) is True:
                         shape.selected = True
 
         self.refresh()
         self._selector = cast(ShapeSelector, None)
 
         return True
+
+    def markFrameSaved(self):
+        """
+        Clears the commands an ensures that CommandProcess.isDirty() is rationale
+        """
+        self.commandProcessor.MarkAsSaved()
+        self.commandProcessor.ClearCommands()
 
     def createDC(self) -> DC:
         w, h = self.GetSize()
@@ -297,6 +302,74 @@ class UmlFrame(DiagramFrame):
         """
         dc = self.createDC()
         self.umlDiagram.Redraw(dc=dc)
+
+    def moveSelectedShapes(self, deltaXY: DeltaXY):
+        """
+        The move master is sending the message;  We don't need to move it
+
+        Args:
+            deltaXY:  The difference between the current position and the new position
+        """
+        from umlshapes.links.UmlLink import UmlLink
+        from umlshapes.ShapeTypes import UmlShapeGenre
+        from umlshapes.links.UmlLinkLabel import UmlLinkLabel
+
+        self.ufLogger.debug(f'{deltaXY=}')
+        shapes = self.selectedShapes
+
+        if self._shapesMoving is False:
+            from umlshapes.links.UmlLink import UmlLink
+            from umlshapes.links.UmlLinkLabel import UmlLinkLabel
+
+            for s in shapes:
+                if not isinstance(s, (UmlLink, UmlLinkLabel)):
+                    self.markShapeAsMoved(umlShape=s)
+            self._shapesMoving = True
+
+        for s in shapes:
+            umlShape: UmlShapeGenre = cast(UmlShapeGenre, s)
+            if not isinstance(umlShape, UmlLink) and not isinstance(umlShape, UmlLinkLabel):
+                # move master moves himself
+                if umlShape.moveMaster is False:
+                    #
+                    # But we change the positions visa the move delta
+                    # to get smooth scrolling
+                    umlShape.position = UmlPosition(
+                        x=umlShape.position.x + deltaXY.deltaX,
+                        y=umlShape.position.y + deltaXY.deltaY
+                    )
+
+                dc: ClientDC = ClientDC(umlShape.umlFrame)
+                umlShape.umlFrame.PrepareDC(dc)
+                umlShape.MoveLinks(dc)
+
+    def markShapeAsMoved(self, umlShape: 'UmlShapeGenre'):
+        """
+
+        Args:
+            umlShape:
+
+        """
+        from umlshapes.frames.ShapeMoveInfo import ShapeMoveInfo
+        from umlshapes.frames.ShapeMoveInfo import ShapeId
+
+        shapeId: ShapeId  = ShapeId(umlShape.id)
+        self.ufLogger.info(f'{shapeId=}')
+        if shapeId not in self._movedShapes:
+            self._movedShapes[shapeId] = ShapeMoveInfo(
+                umlShape=umlShape,
+                originalPosition=umlShape.position
+            )
+
+    def clearMovedShapes(self):
+        """
+        We are no longer moving
+
+        """
+        from umlshapes.frames.ShapeMoveInfo import MovedShapes
+
+        self._movedShapes  = MovedShapes({})
+        self._shapesMoving = False
 
     def _onProcessKeystrokes(self, event: KeyEvent):
         """
@@ -469,3 +542,14 @@ class UmlFrame(DiagramFrame):
             currentShapes.remove(s)
 
         self.umlDiagram.shapes = shapesToMove + currentShapes
+
+    def _setupFrameScrollbars(self):
+
+        self._maxWidth:  int = self._preferences.virtualWindowWidth
+        self._maxHeight: int = int(self._maxWidth / A4_FACTOR)  # 1.41 is for A4 support
+
+        nbrUnitsX: int = self._maxWidth // PIXELS_PER_UNIT_X
+        nbrUnitsY: int = self._maxHeight // PIXELS_PER_UNIT_Y
+        initPosX:  int = 0
+        initPosY:  int = 0
+        self.SetScrollbars(PIXELS_PER_UNIT_X, PIXELS_PER_UNIT_Y, nbrUnitsX, nbrUnitsY, initPosX, initPosY, False)

@@ -35,7 +35,8 @@ from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
 from umlshapes.frames.UseCaseDiagramFrame import UseCaseDiagramFrame
 from umlshapes.frames.SequenceDiagramFrame import SequenceDiagramFrame
 
-from umlshapes.UmlUtils import UmlUtils
+from umlshapes.utils.DrawingUtils import DrawingUtils
+from umlshapes.utils.ResourceUtils import ResourceUtils
 
 
 class UmlText(ControlPointMixin, IdentifierMixin, TextShape, TopLeftMixin):
@@ -84,7 +85,7 @@ class UmlText(ControlPointMixin, IdentifierMixin, TextShape, TopLeftMixin):
         self._isBold:         bool = self._preferences.textBold
         self._isItalicized:   bool = self._preferences.textItalicize
 
-        self._defaultFont: Font = UmlUtils.defaultFont()
+        self._defaultFont: Font = ResourceUtils.defaultFont()
         self._textFont:    Font = self._defaultFont.GetBaseFont()
 
         self._redColor:   Colour = ColourDatabase().Find('Red')
@@ -194,7 +195,7 @@ class UmlText(ControlPointMixin, IdentifierMixin, TextShape, TopLeftMixin):
         dc.SetBrush(self._brush)
 
         if self.Selected() is True:
-            UmlUtils.drawSelectedRectangle(dc=dc, shape=self)
+            DrawingUtils.drawSelectedRectangle(dc=dc, shape=self)
 
     def OnDrawContents(self, dc):
 
@@ -232,7 +233,7 @@ class UmlText(ControlPointMixin, IdentifierMixin, TextShape, TopLeftMixin):
             self._textFont.SetStyle(FONTSTYLE_NORMAL)
 
         self._textFont.SetPointSize(self.textSize)
-        self._textFont.SetFamily(UmlUtils.umlFontFamilyToWxFontFamily(self.textFontFamily))
+        self._textFont.SetFamily(ResourceUtils.umlFontFamilyToWxFontFamily(self.textFontFamily))
 
         self.SetFont(self._textFont)
 

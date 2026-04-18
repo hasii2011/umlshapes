@@ -7,7 +7,8 @@ from wx import WHITE_BRUSH
 from umlshapes.lib.ogl import ControlPoint
 from umlshapes.lib.ogl import Shape
 
-from umlshapes.UmlUtils import UmlUtils
+from umlshapes.utils.ResourceUtils import ResourceUtils
+
 from umlshapes.frames.UmlFrame import UmlFrame
 
 
@@ -41,5 +42,5 @@ class UmlControlPoint(ControlPoint):
         self.logger: Logger = getLogger(__name__)
 
         # Override parent class
-        self.SetPen(UmlUtils.redSolidPen())
+        self.SetPen(ResourceUtils.redSolidPen())
         self.SetBrush(WHITE_BRUSH)

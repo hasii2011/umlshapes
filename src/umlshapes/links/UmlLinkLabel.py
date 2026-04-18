@@ -11,7 +11,8 @@ from wx import TRANSPARENT_BRUSH
 
 from umlshapes.lib.ogl import TextShape
 
-from umlshapes.UmlUtils import UmlUtils
+from umlshapes.utils.DrawingUtils import DrawingUtils
+
 from umlshapes.types.DeltaXY import DeltaXY
 from umlshapes.links.LabelType import LabelType
 
@@ -79,7 +80,7 @@ class UmlLinkLabel(ControlPointMixin, TextShape, TopLeftMixin, PubSubMixin):
         dc.SetBrush(self._brush)
 
         if self.Selected() is True:
-            UmlUtils.drawSelectedRectangle(dc=dc, shape=self)
+            DrawingUtils.drawSelectedRectangle(dc=dc, shape=self)
 
     def OnDrawContents(self, dc):
 
@@ -147,7 +148,7 @@ class UmlLinkLabel(ControlPointMixin, TextShape, TopLeftMixin, PubSubMixin):
         from umlshapes.shapes.UmlClass import UmlClass
 
         if self.parent is not None:
-            umlClass: UmlClass = cast(UmlClass, self.parent)
+            umlClass: UmlClass = cast(UmlClass, self.parent)        # noqa
             ox: int = umlClass.position.x
             oy: int = umlClass.position.y
             x -= ox

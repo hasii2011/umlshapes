@@ -1,6 +1,6 @@
 
-from typing import NewType
 from typing import cast
+from typing import NewType
 from typing import TYPE_CHECKING
 
 from logging import Logger
@@ -32,9 +32,9 @@ from wx import Window
 
 from umlshapes.lib.ogl import ShapeCanvas
 
-from umlshapes.frames.ShapeSelector import ShapeSelector
+from umlshapes.utils.IDUtil import IDUtil
 
-from umlshapes.UmlUtils import UmlUtils
+from umlshapes.frames.ShapeSelector import ShapeSelector
 
 from umlshapes.types.UmlColor import UmlColor
 from umlshapes.types.UmlPenStyle import UmlPenStyle
@@ -100,7 +100,7 @@ class DiagramFrame(ShapeCanvas):
 
         self._isInfinite: bool    = False    # Indicates if the frame is infinite
         # The ShapeCanvas ID is an integer;  use our own
-        self._id: FrameId = FrameId(UmlUtils.getID())
+        self._id: FrameId = FrameId(IDUtil.getID())
 
         self._selector: ShapeSelector = cast(ShapeSelector, None)
 

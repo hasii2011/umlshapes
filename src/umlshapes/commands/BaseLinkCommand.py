@@ -162,7 +162,7 @@ class BaseLinkCommand(Command):
         from umlshapes.links.UmlInterface import UmlInterface
         from umlshapes.links.UmlNoteLink import UmlNoteLink
 
-        from umlshapes.BasicUtils import BasicUtils
+        from umlshapes.utils.BasicUtils import BasicUtils
 
         sourceUmlShape:      UmlClass = cast(UmlClass, self._sourceUmlShape)
         destinationUmlShape: UmlClass = cast(UmlClass, self._destinationUmlShape)

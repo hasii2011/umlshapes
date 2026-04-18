@@ -11,7 +11,7 @@ from umlmodel.Link import Link
 
 from umlshapes.lib.ogl import LineShape
 
-from umlshapes.UmlUtils import UmlUtils
+from umlshapes.utils.ResourceUtils import ResourceUtils
 
 from umlshapes.links.UmlLink import UmlLink
 
@@ -57,9 +57,9 @@ class UmlNoteLink(UmlLink):
         assert dc is not None, 'Where is my DC'
 
         if self.Selected() is True:
-            self.SetPen(UmlUtils.redDashedPen())
+            self.SetPen(ResourceUtils.redDashedPen())
         else:
-            self.SetPen(UmlUtils.blackDashedPen())
+            self.SetPen(ResourceUtils.blackDashedPen())
         # Hack:
         #       I want to skip the UmlLink OnDraw so this line will be drawn
         LineShape.OnDraw(self=self, dc=dc)

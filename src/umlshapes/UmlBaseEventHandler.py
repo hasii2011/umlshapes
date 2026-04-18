@@ -2,7 +2,9 @@
 from typing import cast
 from typing import List
 from typing import NewType
+from typing import TYPE_CHECKING
 
+from logging import INFO
 from logging import Logger
 from logging import getLogger
 
@@ -21,12 +23,17 @@ from umlshapes.types.UmlPosition import UmlPosition
 from umlshapes.types.UmlPosition import NO_POSITION
 from umlshapes.types.UmlDimensions import UmlDimensions
 
+
+if TYPE_CHECKING:
+    from umlshapes.frames.UmlFrame import UmlFrame
+
 ShapeList = NewType('ShapeList', List[Shape])
 
 
 class UmlBaseEventHandler(ShapeEvtHandler):
 
     def __init__(self, previousEventHandler: ShapeEvtHandler, shape: Shape = None):
+        from umlshapes.frames.ShapeMoveInfo import InitialPositions
 
         self._baseLogger: Logger = getLogger(__name__)
 
@@ -34,6 +41,8 @@ class UmlBaseEventHandler(ShapeEvtHandler):
 
         self._umlPubSubEngine:  IUmlPubSubEngine = cast(IUmlPubSubEngine, None)
         self._previousPosition: UmlPosition      = NO_POSITION
+
+        self._initialPositions:  InitialPositions = InitialPositions({})
 
     def _setUmlPubSubEngine(self, umlPubSubEngine: IUmlPubSubEngine):
         self._umlPubSubEngine = umlPubSubEngine
@@ -52,17 +61,28 @@ class UmlBaseEventHandler(ShapeEvtHandler):
             y:          new y position
             keys:
             attachment:
-
         """
-        from umlshapes.links.UmlLinkLabel import UmlLinkLabel
         from umlshapes.links.UmlLink import UmlLink
+        from umlshapes.links.UmlLinkLabel import UmlLinkLabel
+
         from umlshapes.ShapeTypes import UmlShapeGenre
 
-        umlShape: UmlShapeGenre = cast(UmlShapeGenre, self.GetShape())
+        from umlshapes.frames.UmlFrame import UmlFrame
+        from umlshapes.frames.ShapeMoveInfo import ShapeId
 
+        umlShape: UmlShapeGenre = cast(UmlShapeGenre, self.GetShape())
+        umlFrame: UmlFrame      = self._extractFrame()
+        #
+        # Only the move master moves himself
+        # The first time through we have no way of calculating the delta
+        # The other selected shapes get moved by the frame operations listener (indirectly)
+        #
         if self._previousPosition is NO_POSITION:
             self._previousPosition = UmlPosition(x=x, y=y)
             umlShape.moveMaster = True
+            self._saveSelectedShapesInitialPositions()
+
+            umlFrame.markShapeAsMoved(umlShape=umlShape)
             self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.FRAME_MODIFIED, frameId=umlShape.umlFrame.id, modifiedFrameId=umlShape.umlFrame.id)
         else:
             if not isinstance(umlShape, UmlLinkLabel) and not isinstance(umlShape, UmlLink):
@@ -78,12 +98,36 @@ class UmlBaseEventHandler(ShapeEvtHandler):
         super().OnDragLeft(draw, x, y, keys, attachment)
 
     def OnEndDragLeft(self, x, y, keys=0, attachment=0):
-        from umlshapes.ShapeTypes import UmlShapeGenre
+        """
 
-        # self._baseLogger.info(f'x,y:({x},{y}) {keys=} {attachment=}')
+        Args:
+            x:
+            y:
+            keys:
+            attachment:
+
+        """
+        from umlshapes.frames.UmlFrame import UmlFrame
+        from umlshapes.ShapeTypes import UmlShapeGenre
+        from umlshapes.commands.ShapesMovedCommand import ShapesMovedCommand
+
         self._previousPosition = NO_POSITION
         umlShape: UmlShapeGenre = cast(UmlShapeGenre, self.GetShape())
+        self._baseLogger.info(f'{umlShape.id} - {umlShape.moveMaster}')
         umlShape.moveMaster = False
+
+        umlFrame: UmlFrame = umlShape.umlFrame
+        shapesMovedCommand: ShapesMovedCommand = ShapesMovedCommand(
+            umlFrame=umlFrame,
+            movedShapes=umlFrame.movedShapes,
+            initialPositions=self._initialPositions
+        )
+        umlFrame.commandProcessor.Submit(command=shapesMovedCommand, storeIt=True)
+        self._baseLogger.info(f'Pre clear {umlFrame.shapesMoving=}')
+
+        self._debugDumpMovedShapes(umlFrame)
+        umlFrame.clearMovedShapes()
+        self._baseLogger.info(f'Post clear {umlFrame.shapesMoving=}')
 
         super().OnEndDragLeft(x, y, keys, attachment)
 
@@ -163,3 +207,53 @@ class UmlBaseEventHandler(ShapeEvtHandler):
                     s.Select(False, dc)
 
                 canvas.Refresh(False)
+
+    def _saveSelectedShapesInitialPositions(self):
+        """
+        Save initial positions of selected shapes so when the drag ends we can
+        inject them into the `ShapesMovedCommand`
+        """
+        from umlshapes.frames.ShapeMoveInfo import ShapeId
+
+        from umlshapes.links.UmlLink import UmlLink
+        from umlshapes.ShapeTypes import UmlShapeGenre
+        from umlshapes.frames.UmlFrame import UmlFrame
+        from umlshapes.links.UmlLinkLabel import UmlLinkLabel
+
+        umlFrame: UmlFrame = self._extractFrame()
+
+        shapes = umlFrame.selectedShapes
+        for s in shapes:
+            umlShape: UmlShapeGenre = cast(UmlShapeGenre, s)
+            if not isinstance(umlShape, UmlLink) and not isinstance(umlShape, UmlLinkLabel):
+                self._initialPositions[ShapeId(umlShape.id)] = umlShape.position
+
+    def _extractFrame(self) -> 'UmlFrame':
+        """
+        Convenience method so I can isolate this deep coupling
+
+        Returns:  The frame we are working on
+
+        """
+        from umlshapes.ShapeTypes import UmlShapeGenre
+
+        umlShape: UmlShapeGenre = cast(UmlShapeGenre, self.GetShape())
+
+        return umlShape.umlFrame
+
+    def _debugDumpMovedShapes(self, umlFrame):
+        """
+        TODO: Change to DEBUG or put in a flag in the preferences
+
+        """
+        from os import linesep
+
+        if self._baseLogger.isEnabledFor(INFO):
+            self._baseLogger.info(f'----------- Start -----------')
+            self._baseLogger.info(f'Pre clear {umlFrame.shapesMoving=}')
+            debugLines: str = ''
+            for umlId, shapeMovedInfo in umlFrame.movedShapes.items():
+                debugLines = f'{debugLines}{linesep}{shapeMovedInfo=}'
+
+            self._baseLogger.info(debugLines)
+            self._baseLogger.info(f'----------- End -----------')

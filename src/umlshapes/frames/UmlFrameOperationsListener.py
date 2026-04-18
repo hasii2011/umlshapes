@@ -15,7 +15,6 @@ from wx import ID_OK
 from wx import OK
 from wx import ICON_ERROR
 
-from wx import ClientDC
 from wx import MessageDialog
 
 from umlmodel.Actor import Actor
@@ -27,7 +26,7 @@ from umlmodel.UseCase import UseCase
 from umlmodel.UmlModelBase import UmlModelBase
 from umlmodel.LinkedObject import LinkedObject
 
-from umlshapes.UmlUtils import UmlUtils
+from umlshapes.utils.IDUtil import IDUtil
 
 from umlshapes.commands.ActorCutCommand import ActorCutCommand
 from umlshapes.commands.ActorPasteCommand import ActorPasteCommand
@@ -227,26 +226,11 @@ class UmlFrameOperationsListener:
     def _shapeMovingListener(self, deltaXY: DeltaXY):
         """
         The move master is sending the message;  We don't need to move it
+
         Args:
             deltaXY:
         """
-        from umlshapes.links.UmlLink import UmlLink
-        from umlshapes.links.UmlLinkLabel import UmlLinkLabel
-        from umlshapes.ShapeTypes import UmlShapeGenre
-
-        self.logger.debug(f'{deltaXY=}')
-        shapes = self._umlFrame.selectedShapes
-        for s in shapes:
-            umlShape: UmlShapeGenre = cast(UmlShapeGenre, s)
-            if not isinstance(umlShape, UmlLink) and not isinstance(umlShape, UmlLinkLabel):
-                if umlShape.moveMaster is False:
-                    umlShape.position = UmlPosition(
-                        x=umlShape.position.x + deltaXY.deltaX,
-                        y=umlShape.position.y + deltaXY.deltaY
-                    )
-                    dc: ClientDC = ClientDC(umlShape.umlFrame)
-                    umlShape.umlFrame.PrepareDC(dc)
-                    umlShape.MoveLinks(dc)
+        self._umlFrame.moveSelectedShapes(deltaXY=deltaXY)
 
     def _editClassListener(self, modelClass: Class):
         """
@@ -435,6 +419,6 @@ class UmlFrameOperationsListener:
                 self.logger.warning(f'Unhandled copy of shape {type(umlShape)}')
 
             if linkedObject is not None:
-                linkedObject.id = UmlUtils.getID()
+                linkedObject.id = IDUtil.getID()
                 linkedObject.links = Links([])  # we don't want to copy the links
                 self._clipboard.append(linkedObject)

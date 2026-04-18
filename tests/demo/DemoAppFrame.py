@@ -41,7 +41,7 @@ from umlmodel.ModelTypes import ClassName
 from umlmodel.SDInstance import SDInstance
 
 from tests.demo.LinkCreator import SmartPlacement
-from umlshapes.UmlUtils import UmlUtils
+from umlshapes.utils.ShapeRelationshipUtils import ShapeRelationshipUtils
 from umlshapes.ShapeTypes import UmlShapeGenre
 from umlshapes.UmlDiagram import UmlDiagram
 
@@ -430,9 +430,9 @@ class DemoAppFrame(SizedFrame):
         umlLollipopInterface: UmlLollipopInterface = UmlLollipopInterface(interface=interface)
         umlLollipopInterface.attachedTo            = requestingUmlClass
 
-        attachmentSide: AttachmentSide      = UmlUtils.attachmentSide(x=perimeterPoint.x, y=perimeterPoint.y, rectangle=requestingUmlClass.rectangle)
+        attachmentSide: AttachmentSide      = ShapeRelationshipUtils.attachmentSide(x=perimeterPoint.x, y=perimeterPoint.y, rectangle=requestingUmlClass.rectangle)
         umlLollipopInterface.attachmentSide = attachmentSide
-        umlLollipopInterface.lineCentum     = UmlUtils.computeLineCentum(attachmentSide=attachmentSide, umlPosition=perimeterPoint, rectangle=requestingUmlClass.rectangle)
+        umlLollipopInterface.lineCentum     = ShapeRelationshipUtils.computeLineCentum(attachmentSide=attachmentSide, umlPosition=perimeterPoint, rectangle=requestingUmlClass.rectangle)
 
         self.logger.debug(f'{umlLollipopInterface.attachmentSide=} {umlLollipopInterface.lineCentum=}')
 
@@ -462,7 +462,7 @@ class DemoAppFrame(SizedFrame):
 
     def _frameModifiedListener(self, modifiedFrameId: str):
 
-        self.logger.info(f'Frame Modified - {modifiedFrameId=}')
+        self.logger.debug(f'Frame Modified - {modifiedFrameId=}')
 
     def _frameLeftClickListener(self, frame: UmlFrame, umlPosition: UmlPosition):
         self.logger.debug(f'Frame {frame.id}, clicked at {umlPosition=}')

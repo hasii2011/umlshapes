@@ -17,9 +17,9 @@ from wx import Size
 
 from umlmodel.Interface import Interface
 
+from umlshapes.utils.ResourceUtils import ResourceUtils
 from umlshapes.lib.ogl import Shape
 
-from umlshapes.UmlUtils import UmlUtils
 from umlshapes.mixins.IDMixin import IDMixin
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
@@ -28,6 +28,8 @@ from umlshapes.mixins.TopLeftMixin import Rectangle
 from umlshapes.types.Common import AttachmentSide
 from umlshapes.types.Common import LollipopCoordinates
 from umlshapes.types.UmlPosition import UmlPosition
+
+from umlshapes.utils.ShapeRelationshipUtils import ShapeRelationshipUtils
 
 if TYPE_CHECKING:
     from umlshapes.shapes.UmlClass import UmlClass
@@ -54,11 +56,11 @@ class UmlLollipopInterface(Shape, IDMixin):
         self.logger: Logger = getLogger(__name__)
 
         self._lineCentum:  float = 0.1
-        self._defaultFont: Font  = UmlUtils.defaultFont()
+        self._defaultFont: Font  = ResourceUtils.defaultFont()
         self._pixelSize:   Size  = self._defaultFont.GetPixelSize()
 
-        self._attachedTo:     UmlClass       = cast('UmlClass', None)
-        self._attachmentSide: AttachmentSide = cast(AttachmentSide, None)
+        self._attachedTo:     UmlClass       = cast('UmlClass', None)           # noqa
+        self._attachmentSide: AttachmentSide = cast(AttachmentSide, None)       # noqa
 
     @property
     def umlFrame(self) -> 'ClassDiagramFrame':
@@ -157,7 +159,7 @@ class UmlLollipopInterface(Shape, IDMixin):
         rectangle: Rectangle = self._attachedTo.rectangle
         lollipopCoordinates: LollipopCoordinates = self._computeLollipopCoordinates(rectangle)
 
-        lollipopWasAbused: bool = UmlUtils.lollipopHitTest(x=x, y=y, attachmentSide=self.attachmentSide, lollipopCoordinates=lollipopCoordinates)
+        lollipopWasAbused: bool = ShapeRelationshipUtils.lollipopHitTest(x=x, y=y, attachmentSide=self.attachmentSide, lollipopCoordinates=lollipopCoordinates)
 
         if lollipopWasAbused:
             return 0, self
@@ -172,7 +174,7 @@ class UmlLollipopInterface(Shape, IDMixin):
 
         Returns:    The appropriate coordinates
         """
-        if UmlUtils.isVerticalSide(side=self.attachmentSide):
+        if ShapeRelationshipUtils.isVerticalSide(side=self.attachmentSide):
             lollipopCoordinates: LollipopCoordinates = self._computeVerticalSideCoordinates(rectangle)
         else:
             lollipopCoordinates = self._computeHorizontalSideCoordinates(rectangle)

@@ -4,9 +4,12 @@ from unittest import main as unitTestMain
 
 from codeallybasic.UnitTestBase import UnitTestBase
 
-from umlshapes.UmlUtils import LeftTopRectangleIndicator
-from umlshapes.UmlUtils import RelativeRectangleResult
-from umlshapes.UmlUtils import UmlUtils
+from umlshapes.utils.ShapeAnalysisUtils import LeftTopRectangleIndicator
+from umlshapes.utils.ShapeAnalysisUtils import RelativeRectangleResult
+from umlshapes.utils.ShapeAnalysisUtils import ShapeAnalysisUtils
+from umlshapes.utils.ProximityUtils import ProximityUtils
+from umlshapes.utils.TransformationUtils import TransformationUtils
+from umlshapes.utils.ShapeRelationshipUtils import ShapeRelationshipUtils
 
 from umlshapes.mixins.TopLeftMixin import Rectangle
 
@@ -61,88 +64,12 @@ class TestUmlUtils(UnitTestBase):
     def tearDown(self):
         super().tearDown()
 
-    def testIsLineWhollyContainedByRectangleTrue(self):
-
-        rectangle: Rectangle = Rectangle(left=100, top=100, right=400, bottom=400)
-        umlLine:   UmlLine   = UmlLine(start=UmlPoint(x=200, y=200), end=UmlPoint(x=300, y=300))
-
-        answer: bool = UmlUtils.isLineWhollyContainedByRectangle(umlLine=umlLine, boundingRectangle=rectangle)
-        self.assertTrue(answer, 'The line is inside the rectangle')
-
-    def testIsLineWhollyContainedByRectangleFalseEndPointBelow(self):
-
-        rectangle: Rectangle = Rectangle(left=100, top=100, right=400, bottom=400)
-        umlLine:   UmlLine   = UmlLine(start=UmlPoint(x=200, y=200), end=UmlPoint(x=500, y=500))
-
-        answer: bool = UmlUtils.isLineWhollyContainedByRectangle(umlLine=umlLine, boundingRectangle=rectangle)
-        self.assertFalse(answer, 'The line end is outside the rectangle')
-
-    def testIsLineWhollyContainedByRectangleFalseStartPointAbove(self):
-
-        rectangle: Rectangle = Rectangle(left=100, top=100, right=50, bottom=50)
-        umlLine:   UmlLine   = UmlLine(start=UmlPoint(x=200, y=200), end=UmlPoint(x=300, y=300))
-
-        answer: bool = UmlUtils.isLineWhollyContainedByRectangle(umlLine=umlLine, boundingRectangle=rectangle)
-        self.assertFalse(answer, 'The line start is outside the rectangle')
-
-    def testIsPointInsideRectangleTrue(self):
-        """
-        Just inside the rectangle
-        """
-
-        umlPoint: UmlPoint = UmlPoint(x=BOUNDING_RECTANGLE.left + 5, y=BOUNDING_RECTANGLE.top + 9)
-
-        ans: bool = UmlUtils.isPointInsideRectangle(point=umlPoint, rectangle=BOUNDING_RECTANGLE)
-        self.assertTrue(ans, 'oops the point should be in the rectangle')
-
-    def testIsPointInsideRectangleFalse(self):
-        """
-        Just outside the rectangle
-        """
-
-        umlPoint: UmlPoint = UmlPoint(x=BOUNDING_RECTANGLE.right + 5, y=BOUNDING_RECTANGLE.bottom + 9)
-
-        ans: bool = UmlUtils.isPointInsideRectangle(point=umlPoint, rectangle=BOUNDING_RECTANGLE)
-        self.assertFalse(ans, 'oops the point should be outside the rectangle')
-
-    def testIsShapeInRectangleTrue(self):
-        boundingRectangle: Rectangle = Rectangle(
-            left=100,
-            top=100,
-            right=500,
-            bottom=500
-        )
-        testShape: Rectangle = Rectangle(
-            left=120,
-            top=120,
-            right=200,
-            bottom=200
-        )
-        ans: bool = UmlUtils.isShapeInRectangle(boundingRectangle=boundingRectangle, shapeRectangle=testShape)
-        self.assertTrue(ans, 'Hey!!  This shape is wholly contained')
-
-    def testIsPartialShapeInRectangleFalse(self):
-        boundingRectangle: Rectangle = Rectangle(
-            left=100,
-            top=100,
-            right=500,
-            bottom=500
-        )
-        testShape: Rectangle = Rectangle(
-            left=300,
-            top=300,
-            right=400,
-            bottom=700
-        )
-        ans: bool = UmlUtils.isShapeInRectangle(boundingRectangle=boundingRectangle, shapeRectangle=testShape)
-        self.assertFalse(ans, 'Hey!!  This shape is not wholly contained')
-
     def testBasicDistance(self):
         pt1: UmlPosition = UmlPosition(x=2, y=3)
         pt2: UmlPosition = UmlPosition(x=5, y=7)
 
         expectedDistance: float = 5.0
-        actualDistance:   float = UmlUtils.distance(pt1=pt1, pt2=pt2)
+        actualDistance:   float = ProximityUtils.distance(pt1=pt1, pt2=pt2)
 
         self.assertAlmostEqual(expectedDistance, actualDistance, places=3, msg='Not close enough')
 
@@ -152,7 +79,7 @@ class TestUmlUtils(UnitTestBase):
         pt2: UmlPosition = UmlPosition(x=100, y=100)
 
         expectedDistance: float = 141.42
-        actualDistance:   float = UmlUtils.distance(pt1=pt1, pt2=pt2)
+        actualDistance:   float = ProximityUtils.distance(pt1=pt1, pt2=pt2)
 
         self.assertAlmostEqual(expectedDistance, actualDistance, places=2, msg='Not close enough')
 
@@ -163,7 +90,7 @@ class TestUmlUtils(UnitTestBase):
             ]
         )
         expectedClosest: UmlPosition = UmlPosition(100, 250)
-        actualClosest:   UmlPosition = UmlUtils.closestPoint(referencePosition=UmlPosition(600, 250), umlPositions=umlPositions)
+        actualClosest:   UmlPosition = ProximityUtils.closestPoint(referencePosition=UmlPosition(600, 250), umlPositions=umlPositions)
 
         self.assertEqual(expectedClosest, actualClosest, 'Basic computation failed')
 
@@ -175,7 +102,7 @@ class TestUmlUtils(UnitTestBase):
         )
 
         expectedClosest: UmlPosition = UmlPosition(410, 350)
-        actualClosest:   UmlPosition = UmlUtils.closestPoint(referencePosition=UmlPosition(360, 410), umlPositions=umlPositions)
+        actualClosest:   UmlPosition = ProximityUtils.closestPoint(referencePosition=UmlPosition(360, 410), umlPositions=umlPositions)
 
         self.assertEqual(expectedClosest, actualClosest, 'Basic computation failed')
 
@@ -188,83 +115,83 @@ class TestUmlUtils(UnitTestBase):
              ]
         )
         expectedClosest: UmlPosition = UmlPosition(20, 63)
-        actualClosest:   UmlPosition = UmlUtils.closestPoint(referencePosition=UmlPosition(0, 238), umlPositions=umlPositions)
+        actualClosest:   UmlPosition = ProximityUtils.closestPoint(referencePosition=UmlPosition(0, 238), umlPositions=umlPositions)
         self.assertEqual(expectedClosest, actualClosest, 'Numpy computation failed')
 
     def testLineCentumTopFixToMin(self):
         umlPosition: UmlPosition = UmlPosition(x=RECTANGLE_LEFT + 20, y=RECTANGLE_TOP)
-        distance:    float       = UmlUtils.computeLineCentum(attachmentSide=AttachmentSide.TOP, umlPosition=umlPosition, rectangle=self._rectangle)
+        distance:    float       = ShapeRelationshipUtils.computeLineCentum(attachmentSide=AttachmentSide.TOP, umlPosition=umlPosition, rectangle=self._rectangle)
 
         self.assertEqual(0.1, distance, 'Incorrect distance')
 
     def testCLineCentumTopFixToMax(self):
         umlPosition: UmlPosition = UmlPosition(x=self._rectangle.right, y=RECTANGLE_TOP)
-        distance:    float       = UmlUtils.computeLineCentum(attachmentSide=AttachmentSide.TOP, umlPosition=umlPosition, rectangle=self._rectangle)
+        distance:    float       = ShapeRelationshipUtils.computeLineCentum(attachmentSide=AttachmentSide.TOP, umlPosition=umlPosition, rectangle=self._rectangle)
 
         self.assertEqual(0.9, distance, 'Incorrect distance')
 
     def testLineCentumBottomMiddle(self):
         half:        int         = (RECTANGLE_RIGHT - RECTANGLE_LEFT) // 2
         umlPosition: UmlPosition = UmlPosition(x=RECTANGLE_LEFT + half, y=RECTANGLE_BOTTOM)
-        distance:    float       = UmlUtils.computeLineCentum(attachmentSide=AttachmentSide.BOTTOM, umlPosition=umlPosition, rectangle=self._rectangle)
+        distance:    float       = ShapeRelationshipUtils.computeLineCentum(attachmentSide=AttachmentSide.BOTTOM, umlPosition=umlPosition, rectangle=self._rectangle)
 
         self.assertEqual(0.5, distance, 'Incorrect distance')
 
     def testLineCentumLeft(self):
         third:       int         = (RECTANGLE_BOTTOM - RECTANGLE_TOP) // 3
         umlPosition: UmlPosition = UmlPosition(x=RECTANGLE_LEFT, y=RECTANGLE_TOP + third)
-        distance:    float       = UmlUtils.computeLineCentum(attachmentSide=AttachmentSide.LEFT, umlPosition=umlPosition, rectangle=self._rectangle)
+        distance:    float       = ShapeRelationshipUtils.computeLineCentum(attachmentSide=AttachmentSide.LEFT, umlPosition=umlPosition, rectangle=self._rectangle)
 
         self.assertEqual(0.3, distance, 'Incorrect distance')
 
     def testLineCentumRight(self):
         third:       int         = (RECTANGLE_BOTTOM - RECTANGLE_TOP) // 3
         umlPosition: UmlPosition = UmlPosition(x=RECTANGLE_RIGHT, y=RECTANGLE_TOP + third * 2)
-        distance:    float       = UmlUtils.computeLineCentum(attachmentSide=AttachmentSide.LEFT, umlPosition=umlPosition, rectangle=self._rectangle)
+        distance:    float       = ShapeRelationshipUtils.computeLineCentum(attachmentSide=AttachmentSide.LEFT, umlPosition=umlPosition, rectangle=self._rectangle)
 
         self.assertEqual(0.7, distance, 'Incorrect distance')
 
     def testComputePercentageDistance(self):
         umlPosition: UmlPosition = UmlPosition(x=RECTANGLE_LEFT + 20, y=RECTANGLE_TOP)
-        distance: float = UmlUtils.computeLineCentum(attachmentSide=AttachmentSide.BOTTOM, umlPosition=umlPosition, rectangle=self._rectangle)
+        distance: float = ShapeRelationshipUtils.computeLineCentum(attachmentSide=AttachmentSide.BOTTOM, umlPosition=umlPosition, rectangle=self._rectangle)
 
         self.assertEqual(0.1, distance, 'Incorrect distance')
 
     def testAttachmentSideTop(self):
         x1: int = RECTANGLE_LEFT + 5
         y1: int = RECTANGLE_TOP
-        attachmentSide: AttachmentSide = UmlUtils.attachmentSide(x=x1, y=y1, rectangle=self._rectangle)
+        attachmentSide: AttachmentSide = ShapeRelationshipUtils.attachmentSide(x=x1, y=y1, rectangle=self._rectangle)
         self.assertEqual(AttachmentSide.TOP, attachmentSide, 'Incorrect calculation')
 
     def testAttachmentSideBottom(self):
         x1: int = RECTANGLE_LEFT + 5
         y1: int = RECTANGLE_BOTTOM
-        attachmentSide: AttachmentSide = UmlUtils.attachmentSide(x=x1, y=y1, rectangle=self._rectangle)
+        attachmentSide: AttachmentSide = ShapeRelationshipUtils.attachmentSide(x=x1, y=y1, rectangle=self._rectangle)
         self.assertEqual(AttachmentSide.BOTTOM, attachmentSide, 'Incorrect calculation')
 
     def testAttachmentSideLeft(self):
         x1: int = RECTANGLE_LEFT
         y1: int = RECTANGLE_BOTTOM + 6
-        attachmentSide: AttachmentSide = UmlUtils.attachmentSide(x=x1, y=y1, rectangle=self._rectangle)
+        attachmentSide: AttachmentSide = ShapeRelationshipUtils.attachmentSide(x=x1, y=y1, rectangle=self._rectangle)
         self.assertEqual(AttachmentSide.LEFT, attachmentSide, 'Incorrect calculation')
 
     def testAttachmentSideRight(self):
         x1: int = RECTANGLE_RIGHT
         y1: int = RECTANGLE_BOTTOM + 6
-        attachmentSide: AttachmentSide = UmlUtils.attachmentSide(x=x1, y=y1, rectangle=self._rectangle)
+        attachmentSide: AttachmentSide = ShapeRelationshipUtils.attachmentSide(x=x1, y=y1, rectangle=self._rectangle)
         self.assertEqual(AttachmentSide.RIGHT, attachmentSide, 'Incorrect calculation')
 
     def testAttachmentPointNotOnPerimeter(self):
 
         x: int = 22
         y: int = 44
-        self.assertRaises(AssertionError, lambda: UmlUtils.attachmentSide(x, y, self._rectangle))
+        self.assertRaises(AssertionError, lambda: ShapeRelationshipUtils.attachmentSide(x, y, self._rectangle))
 
     def testConvertToAbsoluteCoordinatesRight(self):
         relativeCoordinates: UmlPosition = UmlPosition(x=RIGHT_RELATIVE_POSITION_X, y=RIGHT_RELATIVE_POSITION_Y)
 
         expectedAbsolutePosition: UmlPosition = UmlPosition(x=700, y=1200)
-        absolutePosition:         UmlPosition = UmlUtils.convertToAbsoluteCoordinates(relativePosition=relativeCoordinates, rectangle=self._rectangle)
+        absolutePosition:         UmlPosition = TransformationUtils.convertToAbsoluteCoordinates(relativePosition=relativeCoordinates, rectangle=self._rectangle)
 
         self.assertEqual(expectedAbsolutePosition, absolutePosition, 'Incorrect right absolute coordinates')
 
@@ -272,7 +199,7 @@ class TestUmlUtils(UnitTestBase):
         relativeCoordinates: UmlPosition = UmlPosition(x=TOP_RELATIVE_POSITION_X, y=TOP_RELATIVE_POSITION_Y)
 
         expectedAbsolutePosition: UmlPosition = UmlPosition(x=600, y=1000)
-        absolutePosition:         UmlPosition = UmlUtils.convertToAbsoluteCoordinates(relativePosition=relativeCoordinates, rectangle=self._rectangle)
+        absolutePosition:         UmlPosition = TransformationUtils.convertToAbsoluteCoordinates(relativePosition=relativeCoordinates, rectangle=self._rectangle)
 
         self.assertEqual(expectedAbsolutePosition, absolutePosition, 'Incorrect top absolute coordinates')
 
@@ -281,10 +208,10 @@ class TestUmlUtils(UnitTestBase):
         y: int = 950
         #
         # This will return us an absolute position on the shape/rectangle
-        absolutePosition: UmlPosition = UmlUtils.getNearestPointOnRectangle(x=x, y=y, rectangle=self._rectangle)
+        absolutePosition: UmlPosition = ProximityUtils.getNearestPointOnRectangle(x=x, y=y, rectangle=self._rectangle)
 
         expectedRelativePosition: UmlPosition = UmlPosition(x=TOP_RELATIVE_POSITION_X, y=TOP_RELATIVE_POSITION_Y)
-        relativePosition:         UmlPosition = UmlUtils.convertToRelativeCoordinates(absolutePosition=absolutePosition, rectangle=self._rectangle)
+        relativePosition:         UmlPosition = TransformationUtils.convertToRelativeCoordinates(absolutePosition=absolutePosition, rectangle=self._rectangle)
 
         self.assertEqual(expectedRelativePosition, relativePosition, 'Incorrect relative position')
 
@@ -292,9 +219,9 @@ class TestUmlUtils(UnitTestBase):
         x: int = 800
         y: int = 1300
 
-        absolutePosition:         UmlPosition = UmlUtils.getNearestPointOnRectangle(x=x, y=y, rectangle=self._rectangle)
+        absolutePosition:         UmlPosition = ProximityUtils.getNearestPointOnRectangle(x=x, y=y, rectangle=self._rectangle)
         expectedRelativePosition: UmlPosition = UmlPosition(x=RIGHT_RELATIVE_POSITION_X, y=RIGHT_RELATIVE_POSITION_Y)
-        relativePosition:         UmlPosition = UmlUtils.convertToRelativeCoordinates(absolutePosition=absolutePosition, rectangle=self._rectangle)
+        relativePosition:         UmlPosition = TransformationUtils.convertToRelativeCoordinates(absolutePosition=absolutePosition, rectangle=self._rectangle)
 
         self.assertEqual(expectedRelativePosition, relativePosition, 'Incorrect relative position')
 
@@ -303,7 +230,7 @@ class TestUmlUtils(UnitTestBase):
         y: int = 950
 
         expectedPoint: UmlPosition = UmlPosition(600, 1000)
-        actualPoint:   UmlPosition = UmlUtils.getNearestPointOnRectangle(x=x, y=y, rectangle=self._rectangle)
+        actualPoint:   UmlPosition = ProximityUtils.getNearestPointOnRectangle(x=x, y=y, rectangle=self._rectangle)
 
         self.logger.debug(f'{actualPoint=}')
 
@@ -315,7 +242,7 @@ class TestUmlUtils(UnitTestBase):
         y: int = 1100
 
         expectedPoint: UmlPosition = UmlPosition(500, 1100)
-        actualPoint:   UmlPosition = UmlUtils.getNearestPointOnRectangle(x=x, y=y, rectangle=self._rectangle)
+        actualPoint:   UmlPosition = ProximityUtils.getNearestPointOnRectangle(x=x, y=y, rectangle=self._rectangle)
 
         self.assertEqual(expectedPoint, actualPoint, 'Calculation for left outside is wrong')
 
@@ -325,28 +252,28 @@ class TestUmlUtils(UnitTestBase):
         y: int = 1100
 
         expectedPoint: UmlPosition = UmlPosition(700, 1100)
-        actualPoint:   UmlPosition = UmlUtils.getNearestPointOnRectangle(x=x, y=y, rectangle=self._rectangle)
+        actualPoint:   UmlPosition = ProximityUtils.getNearestPointOnRectangle(x=x, y=y, rectangle=self._rectangle)
 
         self.assertEqual(expectedPoint, actualPoint, 'Calculation for left outside is wrong')
 
     def testIsVerticalSideTop(self):
-        self.assertFalse(UmlUtils.isVerticalSide(AttachmentSide.TOP))
+        self.assertFalse(ShapeRelationshipUtils.isVerticalSide(AttachmentSide.TOP))
 
     def testIsVerticalSideBottom(self):
-        self.assertFalse(UmlUtils.isVerticalSide(AttachmentSide.BOTTOM))
+        self.assertFalse(ShapeRelationshipUtils.isVerticalSide(AttachmentSide.BOTTOM))
 
     def testIsVerticalSideRight(self):
-        self.assertTrue(UmlUtils.isVerticalSide(AttachmentSide.RIGHT))
+        self.assertTrue(ShapeRelationshipUtils.isVerticalSide(AttachmentSide.RIGHT))
 
     def testIsVerticalSideLeft(self):
-        self.assertTrue(UmlUtils.isVerticalSide(AttachmentSide.LEFT))
+        self.assertTrue(ShapeRelationshipUtils.isVerticalSide(AttachmentSide.LEFT))
 
     def testComputeRelativeRectanglePosition_r2_right_bottom(self):
 
         r1: Rectangle = Rectangle(0, 0, 10, 10)
         r2: Rectangle = Rectangle(20, 20, 30, 30)
 
-        result: RelativeRectangleResult = UmlUtils.computeRelativeRectanglePosition(rectangle1=r1, rectangle2=r2)
+        result: RelativeRectangleResult = ShapeAnalysisUtils.computeRelativeRectanglePosition(rectangle1=r1, rectangle2=r2)
 
         self.assertEqual(result.leftMostTopMostShape, LeftTopRectangleIndicator.RECTANGLE_1, 'Incorrect left most shape')
         self.assertTrue(result.isOtherToRight, 'It is to the right!')
@@ -357,7 +284,7 @@ class TestUmlUtils(UnitTestBase):
         r1: Rectangle = Rectangle(20, 20, 30, 30)
         r2: Rectangle = Rectangle(0, 0, 10, 10)
 
-        result: RelativeRectangleResult = UmlUtils.computeRelativeRectanglePosition(rectangle1=r1, rectangle2=r2)
+        result: RelativeRectangleResult = ShapeAnalysisUtils.computeRelativeRectanglePosition(rectangle1=r1, rectangle2=r2)
 
         self.assertEqual(result.leftMostTopMostShape, LeftTopRectangleIndicator.RECTANGLE_2, 'Incorrect left most shape')
         self.assertTrue(result.isOtherToRight, 'It is to the right!')
@@ -368,7 +295,7 @@ class TestUmlUtils(UnitTestBase):
 
         r1: Rectangle = Rectangle(0, 20, 10, 30)
         r2: Rectangle = Rectangle(0, 0, 10, 10)
-        result: RelativeRectangleResult = UmlUtils.computeRelativeRectanglePosition(r1, r2)
+        result: RelativeRectangleResult = ShapeAnalysisUtils.computeRelativeRectanglePosition(r1, r2)
 
         self.assertEqual(result.leftMostTopMostShape, LeftTopRectangleIndicator.RECTANGLE_2, 'Incorrect left most shape')
         self.assertFalse(result.isOtherToRight, 'It is NOT to the right!')
@@ -379,7 +306,7 @@ class TestUmlUtils(UnitTestBase):
         r1 = Rectangle(0, 0, 10, 10)
         r2 = Rectangle(20, -20, 30, -10)
 
-        result = UmlUtils.computeRelativeRectanglePosition(r1, r2)
+        result = ShapeAnalysisUtils.computeRelativeRectanglePosition(r1, r2)
 
         self.assertEqual(result.leftMostTopMostShape, LeftTopRectangleIndicator.RECTANGLE_1, 'Incorrect left most shape')
         self.assertTrue(result.isOtherToRight, 'It is to the right!')
