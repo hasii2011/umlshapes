@@ -305,8 +305,9 @@ class LinkCreator:
 
         eventHandler: UmlClassEventHandler = UmlClassEventHandler(previousEventHandler=umlClass.GetEventHandler())
 
-        eventHandler.umlPubSubEngine = self._umlPubSubEngine
+        # Don't change the order. The umlPubSubEngine property assumes the shape was assiged
         eventHandler.SetShape(umlClass)
+        eventHandler.umlPubSubEngine = self._umlPubSubEngine
 
         umlClass.SetEventHandler(eventHandler)
 

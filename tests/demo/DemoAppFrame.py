@@ -462,7 +462,7 @@ class DemoAppFrame(SizedFrame):
 
     def _frameModifiedListener(self, modifiedFrameId: str):
 
-        self.logger.info(f'Frame Modified - {modifiedFrameId=}')
+        self.logger.debug(f'Frame Modified - {modifiedFrameId=}')
 
     def _frameLeftClickListener(self, frame: UmlFrame, umlPosition: UmlPosition):
         self.logger.debug(f'Frame {frame.id}, clicked at {umlPosition=}')

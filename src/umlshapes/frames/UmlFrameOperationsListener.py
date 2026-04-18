@@ -15,7 +15,6 @@ from wx import ID_OK
 from wx import OK
 from wx import ICON_ERROR
 
-from wx import ClientDC
 from wx import MessageDialog
 
 from umlmodel.Actor import Actor
@@ -227,26 +226,28 @@ class UmlFrameOperationsListener:
     def _shapeMovingListener(self, deltaXY: DeltaXY):
         """
         The move master is sending the message;  We don't need to move it
+
         Args:
             deltaXY:
         """
-        from umlshapes.links.UmlLink import UmlLink
-        from umlshapes.links.UmlLinkLabel import UmlLinkLabel
-        from umlshapes.ShapeTypes import UmlShapeGenre
-
-        self.logger.debug(f'{deltaXY=}')
-        shapes = self._umlFrame.selectedShapes
-        for s in shapes:
-            umlShape: UmlShapeGenre = cast(UmlShapeGenre, s)
-            if not isinstance(umlShape, UmlLink) and not isinstance(umlShape, UmlLinkLabel):
-                if umlShape.moveMaster is False:
-                    umlShape.position = UmlPosition(
-                        x=umlShape.position.x + deltaXY.deltaX,
-                        y=umlShape.position.y + deltaXY.deltaY
-                    )
-                    dc: ClientDC = ClientDC(umlShape.umlFrame)
-                    umlShape.umlFrame.PrepareDC(dc)
-                    umlShape.MoveLinks(dc)
+        self._umlFrame.moveSelectedShapes(deltaXY=deltaXY)
+        # from umlshapes.links.UmlLink import UmlLink
+        # from umlshapes.ShapeTypes import UmlShapeGenre
+        # from umlshapes.links.UmlLinkLabel import UmlLinkLabel
+        #
+        # self.logger.debug(f'{deltaXY=}')
+        # shapes = self._umlFrame.selectedShapes
+        # for s in shapes:
+        #     umlShape: UmlShapeGenre = cast(UmlShapeGenre, s)
+        #     if not isinstance(umlShape, UmlLink) and not isinstance(umlShape, UmlLinkLabel):
+        #         if umlShape.moveMaster is False:
+        #             umlShape.position = UmlPosition(
+        #                 x=umlShape.position.x + deltaXY.deltaX,
+        #                 y=umlShape.position.y + deltaXY.deltaY
+        #             )
+        #             dc: ClientDC = ClientDC(umlShape.umlFrame)
+        #             umlShape.umlFrame.PrepareDC(dc)
+        #             umlShape.MoveLinks(dc)
 
     def _editClassListener(self, modelClass: Class):
         """

@@ -3,6 +3,7 @@ from typing import cast
 from typing import List
 from typing import NewType
 
+from logging import INFO
 from logging import Logger
 from logging import getLogger
 
@@ -52,18 +53,25 @@ class UmlBaseEventHandler(ShapeEvtHandler):
             y:          new y position
             keys:
             attachment:
-
         """
-        from umlshapes.links.UmlLinkLabel import UmlLinkLabel
         from umlshapes.links.UmlLink import UmlLink
+        from umlshapes.frames.UmlFrame import UmlFrame
         from umlshapes.ShapeTypes import UmlShapeGenre
+        from umlshapes.links.UmlLinkLabel import UmlLinkLabel
 
         umlShape: UmlShapeGenre = cast(UmlShapeGenre, self.GetShape())
 
+        #
+        # Only the move master moves himself
+        # The first time through we have no way of calculating the delta
+        # The other selected shapes get moved by the frame operations listener (indirectly)
+        #
         if self._previousPosition is NO_POSITION:
             self._previousPosition = UmlPosition(x=x, y=y)
             umlShape.moveMaster = True
             self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.FRAME_MODIFIED, frameId=umlShape.umlFrame.id, modifiedFrameId=umlShape.umlFrame.id)
+            umlFrame: UmlFrame = umlShape.umlFrame
+            umlFrame.markShapeAsMoved(umlShape=umlShape)
         else:
             if not isinstance(umlShape, UmlLinkLabel) and not isinstance(umlShape, UmlLink):
 
@@ -78,12 +86,30 @@ class UmlBaseEventHandler(ShapeEvtHandler):
         super().OnDragLeft(draw, x, y, keys, attachment)
 
     def OnEndDragLeft(self, x, y, keys=0, attachment=0):
+        """
+
+        Args:
+            x:
+            y:
+            keys:
+            attachment:
+
+        """
+        from umlshapes.frames.UmlFrame import UmlFrame
         from umlshapes.ShapeTypes import UmlShapeGenre
 
         # self._baseLogger.info(f'x,y:({x},{y}) {keys=} {attachment=}')
         self._previousPosition = NO_POSITION
         umlShape: UmlShapeGenre = cast(UmlShapeGenre, self.GetShape())
+        self._baseLogger.info(f'{umlShape.id} - {umlShape.moveMaster}')
         umlShape.moveMaster = False
+
+        umlFrame: UmlFrame = umlShape.umlFrame
+        self._baseLogger.info(f'Pre clear {umlFrame.shapesMoving=}')
+
+        self._debugDumpMovedShapes(umlFrame)
+        umlFrame.clearMovedShapes()
+        self._baseLogger.info(f'Post clear {umlFrame.shapesMoving=}')
 
         super().OnEndDragLeft(x, y, keys, attachment)
 
@@ -163,3 +189,20 @@ class UmlBaseEventHandler(ShapeEvtHandler):
                     s.Select(False, dc)
 
                 canvas.Refresh(False)
+
+    def _debugDumpMovedShapes(self, umlFrame):
+        """
+        TODO: Change to DEBUG
+
+        """
+        from os import linesep
+
+        if self._baseLogger.isEnabledFor(INFO):
+            self._baseLogger.info(f'----------- Start -----------')
+            self._baseLogger.info(f'Pre clear {umlFrame.shapesMoving=}')
+            debugLines: str = ''
+            for umlId, shapeMovedInfo in umlFrame.movedShapes.items():
+                debugLines = f'{debugLines}{linesep}{shapeMovedInfo=}'
+
+            self._baseLogger.info(debugLines)
+            self._baseLogger.info(f'----------- End -----------')

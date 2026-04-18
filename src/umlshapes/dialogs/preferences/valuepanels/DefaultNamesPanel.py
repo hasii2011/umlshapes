@@ -54,9 +54,12 @@ class DefaultNamesPanel(SizedPanel):
         ]
         for nameData in self._nameData:
 
-            StaticText(self, ID_ANY, nameData.label)
+            sText = StaticText(self, ID_ANY, nameData.label)
+            sText.SetSizerProps(valign='center')
+
             nameData.textCtrl = TextCtrl(self, value=nameData.initialValue)
-            nameData.textCtrl.SetSizerProps(expand=True)
+            nameData.textCtrl.SetSizerProps(expand=True, valign='center')
+
             parent.Bind(EVT_TEXT, nameData.callback, nameData.textCtrl)
 
     def _onInterfaceNameChanged(self, event: CommandEvent):
