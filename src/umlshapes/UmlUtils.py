@@ -38,8 +38,6 @@ from wx import MemoryDC
 from umlshapes.lib.ogl import EllipseShape
 from umlshapes.lib.ogl import RectangleShape
 
-from human_id import generate_id
-
 from umlshapes.links.LollipopInflator import LollipopInflator
 
 from umlshapes.resources.images.Display import embeddedImage as displayImage
@@ -344,10 +342,6 @@ class UmlUtils:
             return UmlPosition(rectangle.left, point.y)
 
         return UmlPosition(rectangle.right, point.y)
-
-    @classmethod
-    def getID(cls) -> str:
-        return generate_id()
 
     @classmethod
     def computeRelativeRectanglePosition(cls, rectangle1: Rectangle, rectangle2: Rectangle) -> RelativeRectangleResult:

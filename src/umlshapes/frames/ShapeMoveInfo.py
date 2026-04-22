@@ -13,11 +13,16 @@ from umlshapes.types.UmlPosition import UmlPosition
 
 
 @dataclass
-class ShapeMovedInfo:
+class ShapeMoveInfo:
     umlShape:         UmlShapeGenre
     originalPosition: UmlPosition
 
 
 ShapeList   = NewType('ShapeList', List[Shape])
 ShapeId     = NewType('ShapeId', str)
-MovedShapes = NewType('MovedShapes', Dict[ShapeId, ShapeMovedInfo])
+MovedShapes = NewType('MovedShapes', Dict[ShapeId, ShapeMoveInfo])
+
+ShapePositions   = NewType('ShapePositions', Dict[ShapeId, UmlPosition])
+
+InitialPositions = ShapePositions
+FinalPositions   = ShapePositions

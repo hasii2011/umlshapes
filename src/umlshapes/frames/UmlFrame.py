@@ -50,8 +50,8 @@ from umlshapes.types.UmlPosition import UmlPosition
 from umlshapes.types.UmlDimensions import UmlDimensions
 
 if TYPE_CHECKING:
-    from umlshapes.frames.ShapedMoveInfo import ShapeId
-    from umlshapes.frames.ShapedMoveInfo import MovedShapes
+    from umlshapes.frames.ShapeMoveInfo import ShapeId
+    from umlshapes.frames.ShapeMoveInfo import MovedShapes
 
     from umlshapes.ShapeTypes import UmlShapes
     from umlshapes.ShapeTypes import UmlShapeGenre
@@ -86,7 +86,7 @@ class UmlFrame(DiagramFrame):
 
     def __init__(self, parent: Window, umlPubSubEngine: IUmlPubSubEngine):
 
-        from umlshapes.frames.ShapedMoveInfo import MovedShapes
+        from umlshapes.frames.ShapeMoveInfo import MovedShapes
 
         self.ufLogger:         Logger           = getLogger(__name__)
         self._preferences:     UmlPreferences   = UmlPreferences()
@@ -316,17 +316,21 @@ class UmlFrame(DiagramFrame):
 
         self.ufLogger.debug(f'{deltaXY=}')
         shapes = self.selectedShapes
+
+        if self._shapesMoving is False:
+            from umlshapes.links.UmlLink import UmlLink
+            from umlshapes.links.UmlLinkLabel import UmlLinkLabel
+
+            for s in shapes:
+                if not isinstance(s, (UmlLink, UmlLinkLabel)):
+                    self.markShapeAsMoved(umlShape=s)
+            self._shapesMoving = True
+
         for s in shapes:
             umlShape: UmlShapeGenre = cast(UmlShapeGenre, s)
             if not isinstance(umlShape, UmlLink) and not isinstance(umlShape, UmlLinkLabel):
                 # move master moves himself
                 if umlShape.moveMaster is False:
-                    #
-                    # Only mark that shapes are moving and their initial
-                    # position the first time
-                    if self._shapesMoving is False:
-                        self.markShapeAsMoved(umlShape=umlShape)
-                        self._shapesMoving = True
                     #
                     # But we change the positions visa the move delta
                     # to get smooth scrolling
@@ -346,13 +350,13 @@ class UmlFrame(DiagramFrame):
             umlShape:
 
         """
-        from umlshapes.frames.ShapedMoveInfo import ShapeMovedInfo
-        from umlshapes.frames.ShapedMoveInfo import ShapeId
+        from umlshapes.frames.ShapeMoveInfo import ShapeMoveInfo
+        from umlshapes.frames.ShapeMoveInfo import ShapeId
 
         shapeId: ShapeId  = ShapeId(umlShape.id)
         self.ufLogger.info(f'{shapeId=}')
         if shapeId not in self._movedShapes:
-            self._movedShapes[shapeId] = ShapeMovedInfo(
+            self._movedShapes[shapeId] = ShapeMoveInfo(
                 umlShape=umlShape,
                 originalPosition=umlShape.position
             )
@@ -362,7 +366,7 @@ class UmlFrame(DiagramFrame):
         We are no longer moving
 
         """
-        from umlshapes.frames.ShapedMoveInfo import MovedShapes
+        from umlshapes.frames.ShapeMoveInfo import MovedShapes
 
         self._movedShapes  = MovedShapes({})
         self._shapesMoving = False
