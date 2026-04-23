@@ -11,16 +11,20 @@ from wx import FONTFAMILY_SWISS
 from wx import FONTFAMILY_TELETYPE
 
 from wx import Font
-from wx import FontFamily
-
 from wx import Pen
 from wx import RED
 from wx import BLACK
 from wx import Brush
+from wx import Bitmap
+from wx import FontFamily
 from wx import PENSTYLE_SOLID
 from wx import FONTSTYLE_NORMAL
 from wx import FONTWEIGHT_NORMAL
 from wx import PENSTYLE_SHORT_DASH
+
+from umlshapes.resources.images.Display import embeddedImage as displayImage
+from umlshapes.resources.images.UnSpecified import embeddedImage as unSpecifiedImage
+from umlshapes.resources.images.DoNotDisplay import embeddedImage as doNotDisplayImage
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
@@ -32,14 +36,14 @@ class ResourceUtils:
 
     clsLogger: Logger = getLogger(__name__)
 
-    BLACK_SOLID_PEN:  Pen  = cast(Pen, None)
-    RED_SOLID_PEN:    Pen  = cast(Pen, None)
-    RED_DASHED_PEN:   Pen  = cast(Pen, None)
-    BLACK_DASHED_PEN: Pen  = cast(Pen, None)
+    BLACK_SOLID_PEN:  Pen  = cast(Pen, None)        # noqa
+    RED_SOLID_PEN:    Pen  = cast(Pen, None)        # noqa
+    RED_DASHED_PEN:   Pen  = cast(Pen, None)        # noqa
+    BLACK_DASHED_PEN: Pen  = cast(Pen, None)        # noqa
 
-    DEFAULT_FONT:     Font = cast(Font, None)
+    DEFAULT_FONT:     Font = cast(Font, None)       # noqa
 
-    DEFAULT_BACKGROUND_BRUSH: Brush = cast(Brush, None)
+    DEFAULT_BACKGROUND_BRUSH: Brush = cast(Brush, None) # noqa
 
     @classmethod
     def blackSolidPen(cls) -> Pen:
@@ -109,3 +113,20 @@ class ResourceUtils:
             return FONTFAMILY_SCRIPT
         elif enumValue == UmlFontFamily.TELETYPE:
             return FONTFAMILY_TELETYPE
+        else:
+            assert False, 'Developer error'
+
+    @classmethod
+    def displayIcon(cls) -> Bitmap:
+        bmp: Bitmap = displayImage.GetBitmap()
+        return bmp
+
+    @classmethod
+    def doNotDisplayIcon(cls) -> Bitmap:
+        bmp: Bitmap = doNotDisplayImage.GetBitmap()
+        return bmp
+
+    @classmethod
+    def unspecifiedDisplayIcon(cls) -> Bitmap:
+        bmp: Bitmap = unSpecifiedImage.GetBitmap()
+        return bmp

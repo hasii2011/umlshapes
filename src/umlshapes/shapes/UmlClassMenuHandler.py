@@ -22,7 +22,7 @@ from wx import MenuItem
 
 from wx import NewIdRef as wxNewIdRef
 
-from umlshapes.UmlUtils import UmlUtils
+from umlshapes.ResourceUtils import ResourceUtils
 
 from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 from umlshapes.pubsubengine.UmlMessageType import UmlMessageType
@@ -68,13 +68,13 @@ class UmlClassMenuHandler:
         self._umlClass:       'UmlClass'        = umlClass
         self._umlPubSubEngine: IUmlPubSubEngine = umlPubSubEngine
 
-        self._contextMenu:         Menu     = cast(Menu, None)
-        self._toggleStereotype:    MenuItem = cast(MenuItem, None)
-        self._toggleFields:        MenuItem = cast(MenuItem, None)
-        self._toggleMethods:       MenuItem = cast(MenuItem, None)
-        self._toggleParameters:    MenuItem = cast(MenuItem, None)
-        self._toggleConstructor:   MenuItem = cast(MenuItem, None)
-        self._toggleDunderMethods: MenuItem = cast(MenuItem, None)
+        self._contextMenu:         Menu     = cast(Menu, None)          # noqa
+        self._toggleStereotype:    MenuItem = cast(MenuItem, None)      # noqa
+        self._toggleFields:        MenuItem = cast(MenuItem, None)      # noqa
+        self._toggleMethods:       MenuItem = cast(MenuItem, None)      # noqa
+        self._toggleParameters:    MenuItem = cast(MenuItem, None)      # noqa
+        self._toggleConstructor:   MenuItem = cast(MenuItem, None)      # noqa
+        self._toggleDunderMethods: MenuItem = cast(MenuItem, None)      # noqa
 
         self._createContextMenu()
 
@@ -229,11 +229,11 @@ class UmlClassMenuHandler:
         # noinspection PyUnreachableCode
         match displayParameters:
             case DisplayParameters.UNSPECIFIED:
-                triStateData: TriStateData = TriStateData(bitMap=UmlUtils.unspecifiedDisplayIcon(), menuText='Unspecified Parameter Display')
+                triStateData: TriStateData = TriStateData(bitMap=ResourceUtils.unspecifiedDisplayIcon(), menuText='Unspecified Parameter Display')
             case DisplayParameters.DISPLAY_PARAMETERS:
-                triStateData = TriStateData(bitMap=UmlUtils.displayIcon(), menuText='Display Parameters')
+                triStateData = TriStateData(bitMap=ResourceUtils.displayIcon(), menuText='Display Parameters')
             case DisplayParameters.DO_NOT_DISPLAY_PARAMETERS:
-                triStateData = TriStateData(bitMap=UmlUtils.doNotDisplayIcon(), menuText='Do Not Display Parameters')
+                triStateData = TriStateData(bitMap=ResourceUtils.doNotDisplayIcon(), menuText='Do Not Display Parameters')
             case _:
                 self.logger.warning(f'Unknown Parameter Display type: {displayParameters}')
                 assert False, 'Developer error'
@@ -269,11 +269,11 @@ class UmlClassMenuHandler:
         match displayValue:
 
             case DisplayMethods.UNSPECIFIED:
-                return TriStateData(bitMap=UmlUtils.unspecifiedDisplayIcon(), menuText=f'Unspecified {displayName} Display')
+                return TriStateData(bitMap=ResourceUtils.unspecifiedDisplayIcon(), menuText=f'Unspecified {displayName} Display')
             case DisplayMethods.DISPLAY:
-                return TriStateData(bitMap=UmlUtils.displayIcon(), menuText=f'Display {displayName}')
+                return TriStateData(bitMap=ResourceUtils.displayIcon(), menuText=f'Display {displayName}')
             case DisplayMethods.DO_NOT_DISPLAY:
-                return TriStateData(bitMap=UmlUtils.doNotDisplayIcon(), menuText=f'Do Not Display {displayName}')
+                return TriStateData(bitMap=ResourceUtils.doNotDisplayIcon(), menuText=f'Do Not Display {displayName}')
             case _:
                 self.logger.warning(f'Unknown Method Display type: {displayValue}')
                 assert False, 'Developer error'

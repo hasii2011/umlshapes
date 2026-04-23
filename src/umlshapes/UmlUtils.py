@@ -17,13 +17,8 @@ from enum import StrEnum
 from wx import DC
 from wx import Size
 from wx import Point
-from wx import Bitmap
 
 from umlshapes.links.LollipopInflator import LollipopInflator
-
-from umlshapes.resources.images.Display import embeddedImage as displayImage
-from umlshapes.resources.images.UnSpecified import embeddedImage as unSpecifiedImage
-from umlshapes.resources.images.DoNotDisplay import embeddedImage as doNotDisplayImage
 
 from umlshapes.types.Common import Rectangle
 from umlshapes.types.Common import AttachmentSide
@@ -234,7 +229,7 @@ class UmlUtils:
         Returns:  A value 0.1 and 0.9
         """
         distance: float = 0.1
-        if UmlUtils.isVerticalSide(side=attachmentSide) is True:
+        if UmlUtils.isVerticalSide(side=attachmentSide):
             height:         int = rectangle.bottom - rectangle.top
             relativeHeight: int = umlPosition.y - rectangle.top
             distance = relativeHeight / height
@@ -460,18 +455,3 @@ class UmlUtils:
             newLines.append(newLine[:-1])
 
         return newLines
-
-    @classmethod
-    def displayIcon(cls) -> Bitmap:
-        bmp: Bitmap = displayImage.GetBitmap()
-        return bmp
-
-    @classmethod
-    def doNotDisplayIcon(cls) -> Bitmap:
-        bmp: Bitmap = doNotDisplayImage.GetBitmap()
-        return bmp
-
-    @classmethod
-    def unspecifiedDisplayIcon(cls) -> Bitmap:
-        bmp: Bitmap = unSpecifiedImage.GetBitmap()
-        return bmp
