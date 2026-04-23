@@ -23,7 +23,8 @@ from umlshapes.lib.ogl import ARROW_POSITION_END
 
 from umlmodel.SDMessage import SDMessage
 
-from umlshapes.UmlUtils import UmlUtils
+from umlshapes.ResourceUtils import ResourceUtils
+
 from umlshapes.UmlDiagram import UmlDiagram
 from umlshapes.frames.UmlFrame import UmlFrame
 
@@ -69,7 +70,7 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
         self._umlPubSubEngine = umlPubSubEngine
         self._messageBackGroundBrush: Brush = Brush(colour=WHITE, style=BRUSHSTYLE_TRANSPARENT)
 
-        self.SetFont(UmlUtils.defaultFont())
+        self.SetFont(ResourceUtils.defaultFont())
 
         self._messageLabel: UmlSDMessageLabel = cast(UmlSDMessageLabel, None)
 
@@ -81,7 +82,7 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
             end=ARROW_POSITION_END,
             size=self._preferences.messageArrowHeadSize
         )
-        self.SetPen(UmlUtils.blackSolidPen())
+        self.SetPen(ResourceUtils.blackSolidPen())
         self.SetBrush(BLACK_BRUSH)      # Required for solid arrow
 
         self.SetDraggable(True, recursive=True)
@@ -175,9 +176,9 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
             self._setupMessageLabel(umlSDMessageLabel=self._messageLabel)
 
         if self.Selected() is True:
-            self.SetPen(UmlUtils.redSolidPen())
+            self.SetPen(ResourceUtils.redSolidPen())
         else:
-            self.SetPen(UmlUtils.blackSolidPen())
+            self.SetPen(ResourceUtils.blackSolidPen())
 
         super().OnDraw(dc=dc)
 
@@ -203,7 +204,7 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
         toY:   int = self._computeAbsoluteY(umlSDLifeLine=self.GetTo(), relativeY=self._relativeToY)
         self.SetEnds(endX, fromY, otherEndX, toY)
 
-        if len(self._lineControlPoints) > 2:
+        if len(self._lineControlPoints) > 2:    # noqa
             self.Initialise()
 
         # Do a second time, because one may depend on the other

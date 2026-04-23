@@ -7,7 +7,8 @@ from wx import MemoryDC
 
 from umlshapes.lib.ogl import EllipseShape
 
-from umlshapes.UmlUtils import UmlUtils
+from umlshapes.DrawingUtils import DrawingUtils
+from umlshapes.ResourceUtils import ResourceUtils
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
@@ -48,7 +49,7 @@ class UmlUseCase(ControlPointMixin,  IdentifierMixin, EllipseShape, TopLeftMixin
 
         self.SetDraggable(drag=True)
 
-        self.SetFont(UmlUtils.defaultFont())
+        self.SetFont(ResourceUtils.defaultFont())
         self.AddText(self._modelUseCase.name)
 
     @property
@@ -90,7 +91,7 @@ class UmlUseCase(ControlPointMixin,  IdentifierMixin, EllipseShape, TopLeftMixin
 
         if self.Selected() is True:
             if self.Selected() is True:
-                UmlUtils.drawSelectedEllipse(dc=dc, shape=self)
+                DrawingUtils.drawSelectedEllipse(dc=dc, shape=self)
         else:
             super().OnDraw(dc)
 

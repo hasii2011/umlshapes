@@ -4,7 +4,8 @@ from logging import getLogger
 
 from umlmodel.SDInstance import SDInstance
 
-from umlshapes.UmlUtils import UmlUtils
+from umlshapes.ResourceUtils import ResourceUtils
+
 from umlshapes.lib.ogl import RectangleShape
 from umlshapes.mixins.TopLeftMixin import TopLeftMixin
 
@@ -32,7 +33,7 @@ class UmlInstanceName(RectangleShape, TopLeftMixin):
 
         super().__init__(w=width, h=height)
         TopLeftMixin.__init__(self, umlShape=self, width=width, height=height)
-        self.SetFont(UmlUtils.defaultFont())
+        self.SetFont(ResourceUtils.defaultFont())
         self.AddText(sdInstance.instanceName)
         self.SetCentreResize(False)
 

@@ -15,7 +15,8 @@ from umlshapes.lib.ogl import FORMAT_CENTRE_HORIZ
 from umlshapes.lib.ogl import FORMAT_CENTRE_VERT
 from umlshapes.lib.ogl import RectangleShape
 
-from umlshapes.UmlUtils import UmlUtils
+from umlshapes.DrawingUtils import DrawingUtils
+from umlshapes.ResourceUtils import ResourceUtils
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
@@ -181,8 +182,8 @@ class UmlActor(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
         Args:
             dc:
         """
-        dc.SetBrush(UmlUtils.backGroundBrush())
-        dc.SetFont(UmlUtils.defaultFont())
+        dc.SetBrush(ResourceUtils.backGroundBrush())
+        dc.SetFont(ResourceUtils.defaultFont())
         # Gets the minimum bounding box for the shape
         width:  int = self.size.width
         height: int = self.size.height
@@ -199,7 +200,7 @@ class UmlActor(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
         # drawing is restricted in the specified region of the device
         dc.SetClippingRegion(leftX, topY, width, height)
         if self.Selected() is True:
-            UmlUtils.drawSelectedRectangle(dc=dc, shape=self)
+            DrawingUtils.drawSelectedRectangle(dc=dc, shape=self)
 
         self._drawActor(dc=dc, x=x, y=y, width=width, height=height)
 

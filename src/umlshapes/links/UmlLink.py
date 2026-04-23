@@ -19,7 +19,7 @@ from umlshapes.lib.ogl import LineShape
 from umlshapes.lib.ogl import Shape
 
 from umlshapes.UmlDiagram import UmlDiagram
-from umlshapes.UmlUtils import UmlUtils
+from umlshapes.ResourceUtils import ResourceUtils
 
 from umlshapes.frames.UmlFrame import UmlFrame
 
@@ -221,9 +221,9 @@ class UmlLink(IdentifierMixin, LineShape, PubSubMixin):
             self._setupLinkText(umlAssociationLabel=self._linkName)
 
         if self.Selected() is True:
-            self.SetPen(UmlUtils.redSolidPen())
+            self.SetPen(ResourceUtils.redSolidPen())
         else:
-            self.SetPen(UmlUtils.blackSolidPen())
+            self.SetPen(ResourceUtils.blackSolidPen())
 
         super().OnDraw(dc=dc)
 

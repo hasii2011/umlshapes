@@ -1,4 +1,4 @@
-from typing import cast
+
 from typing import List
 from typing import Tuple
 from typing import NewType
@@ -14,29 +14,10 @@ from dataclasses import dataclass
 
 from enum import StrEnum
 
-from wx import RED
-from wx import BLACK
-from wx import PENSTYLE_SOLID
-from wx import FONTFAMILY_ROMAN
-from wx import FONTSTYLE_NORMAL
-from wx import FONTFAMILY_SWISS
-from wx import FONTWEIGHT_NORMAL
-from wx import FONTFAMILY_MODERN
-from wx import FONTFAMILY_SCRIPT
-from wx import PENSTYLE_SHORT_DASH
-from wx import FONTFAMILY_TELETYPE
-
 from wx import DC
-from wx import Pen
-from wx import Font
 from wx import Size
-from wx import Brush
 from wx import Point
 from wx import Bitmap
-from wx import MemoryDC
-
-from umlshapes.lib.ogl import EllipseShape
-from umlshapes.lib.ogl import RectangleShape
 
 from umlshapes.links.LollipopInflator import LollipopInflator
 
@@ -44,15 +25,11 @@ from umlshapes.resources.images.Display import embeddedImage as displayImage
 from umlshapes.resources.images.UnSpecified import embeddedImage as unSpecifiedImage
 from umlshapes.resources.images.DoNotDisplay import embeddedImage as doNotDisplayImage
 
-from umlshapes.preferences.UmlPreferences import UmlPreferences
-
 from umlshapes.types.Common import Rectangle
 from umlshapes.types.Common import AttachmentSide
 from umlshapes.types.Common import LollipopCoordinates
 
 from umlshapes.types.UmlLine import UmlLine
-from umlshapes.types.UmlColor import UmlColor
-from umlshapes.types.UmlFontFamily import UmlFontFamily
 
 from umlshapes.types.UmlPosition import UmlPoint
 from umlshapes.types.UmlPosition import UmlPosition
@@ -84,15 +61,6 @@ class UmlUtils:
     """
 
     clsLogger: Logger = getLogger(__name__)
-
-    BLACK_SOLID_PEN:  Pen  = cast(Pen, None)
-    RED_SOLID_PEN:    Pen  = cast(Pen, None)
-    RED_DASHED_PEN:   Pen  = cast(Pen, None)
-    BLACK_DASHED_PEN: Pen  = cast(Pen, None)
-
-    DEFAULT_FONT:     Font = cast(Font, None)
-
-    DEFAULT_BACKGROUND_BRUSH: Brush = cast(Brush, None)
 
     @classmethod
     def isShapeInRectangle(cls, boundingRectangle: Rectangle, shapeRectangle: Rectangle) -> bool:
@@ -429,93 +397,6 @@ class UmlUtils:
         return snappedX, snappedY
 
     @classmethod
-    def drawSelectedRectangle(cls, dc: MemoryDC, shape: RectangleShape):
-
-        dc.SetPen(UmlUtils.redDashedPen())
-        sx = shape.GetX()
-        sy = shape.GetY()
-
-        if isinstance(sx, float):
-            sx = UmlUtils.fixBadFloat(badFloat=sx, message='sx is float')
-
-        if isinstance(sy, float):
-            sy = UmlUtils.fixBadFloat(badFloat=sy, message='sy is float')
-
-        width = shape.GetWidth() + 3
-        height = shape.GetHeight() + 3
-
-        if isinstance(width, float):
-            width = UmlUtils.fixBadFloat(badFloat=width, message='width is float')
-
-        if isinstance(height, float):
-            height = UmlUtils.fixBadFloat(badFloat=height, message='height is float')
-
-        x1 = sx - width // 2
-        y1 = sy - height // 2
-
-        dc.DrawRectangle(x1, y1, width, height)
-
-    @classmethod
-    def drawSelectedEllipse(cls, dc: MemoryDC, shape: EllipseShape):
-
-        dc.SetPen(UmlUtils.redDashedPen())
-
-        dc.DrawEllipse(int(shape.GetX() - shape.GetWidth() / 2.0), int(shape.GetY() - shape.GetHeight() / 2.0), shape.GetWidth(), shape.GetHeight())
-
-    @classmethod
-    def blackSolidPen(cls) -> Pen:
-
-        if UmlUtils.BLACK_SOLID_PEN is None:
-            UmlUtils.BLACK_SOLID_PEN = Pen(BLACK, 1, PENSTYLE_SOLID)
-
-        return UmlUtils.BLACK_SOLID_PEN
-
-    @classmethod
-    def redSolidPen(cls) -> Pen:
-
-        if UmlUtils.RED_SOLID_PEN is None:
-            UmlUtils.RED_SOLID_PEN = Pen(RED, 1, PENSTYLE_SOLID)
-
-        return UmlUtils.RED_SOLID_PEN
-
-    @classmethod
-    def redDashedPen(cls) -> Pen:
-        if UmlUtils.RED_DASHED_PEN is None:
-            UmlUtils.RED_DASHED_PEN = Pen(RED, 1, PENSTYLE_SHORT_DASH)
-
-        return UmlUtils.RED_DASHED_PEN
-
-    @classmethod
-    def blackDashedPen(cls) -> Pen:
-        if UmlUtils.BLACK_DASHED_PEN is None:
-            UmlUtils.BLACK_DASHED_PEN = Pen(BLACK, 1, PENSTYLE_SHORT_DASH)
-
-        return UmlUtils.BLACK_DASHED_PEN
-
-    @classmethod
-    def defaultFont(cls) -> Font:
-        if UmlUtils.DEFAULT_FONT is None:
-            fontSize:      int           = UmlPreferences().textFontSize
-            fontFamilyStr: UmlFontFamily = UmlPreferences().textFontFamily
-            fontFamily:    int           = UmlUtils.umlFontFamilyToWxFontFamily(fontFamilyStr)
-
-            UmlUtils.DEFAULT_FONT = Font(fontSize, fontFamily, FONTSTYLE_NORMAL, FONTWEIGHT_NORMAL)
-            UmlUtils.clsLogger.debug(f'{UmlUtils.DEFAULT_FONT=}')
-
-        return UmlUtils.DEFAULT_FONT
-
-    @classmethod
-    def backGroundBrush(cls) -> Brush:
-        if UmlUtils.DEFAULT_BACKGROUND_BRUSH is None:
-            backGroundColor: UmlColor = UmlPreferences().backGroundColor
-            brush:           Brush    = Brush()
-            brush.SetColour(UmlColor.toWxColor(backGroundColor))
-
-            UmlUtils.DEFAULT_BACKGROUND_BRUSH = brush
-
-        return UmlUtils.DEFAULT_BACKGROUND_BRUSH
-
-    @classmethod
     def computeMidPoint(cls, srcPosition: UmlPosition, dstPosition: UmlPosition) -> UmlPosition:
         """
 
@@ -539,21 +420,6 @@ class UmlUtils:
         midPointY = abs(y1 + y2) // 2
 
         return UmlPosition(x=midPointX, y=midPointY)
-
-    # noinspection PyTypeChecker
-    @classmethod
-    def umlFontFamilyToWxFontFamily(cls, enumValue: UmlFontFamily) -> int:
-
-        if enumValue == UmlFontFamily.SWISS:
-            return FONTFAMILY_SWISS
-        elif enumValue == UmlFontFamily.MODERN:
-            return FONTFAMILY_MODERN
-        elif enumValue == UmlFontFamily.ROMAN:
-            return FONTFAMILY_ROMAN
-        elif enumValue == UmlFontFamily.SCRIPT:
-            return FONTFAMILY_SCRIPT
-        elif enumValue == UmlFontFamily.TELETYPE:
-            return FONTFAMILY_TELETYPE
 
     @classmethod
     def lineSplitter(cls, text: str, dc: DC, textWidth: int) -> List[str]:
@@ -609,11 +475,3 @@ class UmlUtils:
     def unspecifiedDisplayIcon(cls) -> Bitmap:
         bmp: Bitmap = unSpecifiedImage.GetBitmap()
         return bmp
-
-    @classmethod
-    def fixBadFloat(cls, badFloat: float, message: str) -> int:
-
-        UmlUtils.clsLogger.warning(f'{message}: {badFloat} - rounded')
-        goodInt: int = round(badFloat)
-
-        return goodInt

@@ -24,8 +24,6 @@ from umlmodel.enumerations.Stereotype import Stereotype
 
 from umlshapes.lib.ogl import RectangleShape
 
-from umlshapes.UmlUtils import UmlUtils
-
 from umlshapes.links.UmlLink import UmlLink
 
 from umlshapes.mixins.IdentifierMixin import IdentifierMixin
@@ -34,6 +32,8 @@ from umlshapes.types.Common import LeftCoordinate
 from umlshapes.types.UmlPosition import UmlPosition
 from umlshapes.types.UmlColor import UmlColor
 from umlshapes.types.UmlDimensions import UmlDimensions
+
+from umlshapes.ResourceUtils import ResourceUtils
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
@@ -82,11 +82,11 @@ class UmlClass(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
         backgroundColor:      Colour   = Colour(UmlColor.toWxColor(classBackgroundColor))
 
         self.SetBrush(Brush(backgroundColor))
-        self.SetFont(UmlUtils.defaultFont())
+        self.SetFont(ResourceUtils.defaultFont())
 
         umlTextColor:       UmlColor = self._preferences.classTextColor
         self._textColor:    Colour   = Colour(UmlColor.toWxColor(umlTextColor))
-        self._defaultFont:  Font     = UmlUtils.defaultFont()
+        self._defaultFont:  Font     = ResourceUtils.defaultFont()
         self._textHeight:   int      = cast(int, None)
         self._margin:       int      = self._preferences.classTextMargin
 
@@ -141,9 +141,9 @@ class UmlClass(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
     def OnDraw(self, dc: MemoryDC):
 
         if self.selected is True:
-            self.SetPen(UmlUtils.redDashedPen())
+            self.SetPen(ResourceUtils.redDashedPen())
         else:
-            self.SetPen(UmlUtils.blackSolidPen())
+            self.SetPen(ResourceUtils.blackSolidPen())
 
         super().OnDraw(dc)
 
@@ -300,7 +300,7 @@ class UmlClass(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
 
         return drawingYOffset
 
-    def _drawClassName(self, dc: MemoryDC, heightOffset: int, w: int, x: int, y: int):
+    def _drawClassName(self, dc: MemoryDC | ClientDC, heightOffset: int, w: int, x: int, y: int):
         """
 
         Args:
@@ -319,7 +319,7 @@ class UmlClass(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
 
         dc.DrawText(className, nameX, nameY)
 
-    def _drawStereotypeValue(self, dc: MemoryDC, leftX: int, leftY: int, shapeWidth: int, headerMargin: int, drawingYOffset: int) -> int:
+    def _drawStereotypeValue(self, dc: MemoryDC | ClientDC, leftX: int, leftY: int, shapeWidth: int, headerMargin: int, drawingYOffset: int) -> int:
         """
         Draw the stereotype value;  If class has no stereotype, just leave a blank space
 

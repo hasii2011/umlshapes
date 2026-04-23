@@ -16,10 +16,12 @@ from umlshapes.lib.ogl import CONTROL_POINT_LINE
 
 from umlshapes.lib.ogl import LineControlPoint
 
-from umlshapes.UmlUtils import UmlUtils
+from umlshapes.ResourceUtils import ResourceUtils
 
 from umlshapes.frames.UmlFrame import UmlFrame
+
 from umlshapes.mixins.TopLeftMixin import TopLeftMixin
+
 from umlshapes.types.UmlPosition import UmlPosition
 
 if TYPE_CHECKING:
@@ -76,7 +78,7 @@ class UmlLineControlPoint(LineControlPoint):
 
         self.SetDraggable(drag=True)
         # Override parent class
-        self.SetPen(UmlUtils.redSolidPen())
+        self.SetPen(ResourceUtils.redSolidPen())
         self.SetBrush(WHITE_BRUSH)
 
     @property

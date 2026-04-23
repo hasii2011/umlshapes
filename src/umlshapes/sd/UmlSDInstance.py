@@ -12,7 +12,7 @@ from umlshapes.lib.ogl import CompositeShape
 from umlshapes.lib.ogl import Constraint
 from umlshapes.lib.ogl import CONSTRAINT_ALIGNED_TOP
 
-from umlshapes.UmlUtils import UmlUtils
+from umlshapes.ResourceUtils import ResourceUtils
 
 from umlshapes.mixins.ControlPointMixin import ControlPointMixin
 from umlshapes.mixins.IdentifierMixin import IdentifierMixin
@@ -62,7 +62,7 @@ class UmlSDInstance(ControlPointMixin, IdentifierMixin, CompositeShape, TopLeftM
             sequenceDiagramFrame=diagramFrame
         )
 
-        instanceName.SetPen(UmlUtils.blackSolidPen())
+        instanceName.SetPen(ResourceUtils.blackSolidPen())
         instanceName.SetTextColour('Black')
 
         self.AddChild(constrainingShape)

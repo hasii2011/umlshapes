@@ -17,6 +17,7 @@ from wx import Size
 
 from umlmodel.Interface import Interface
 
+from umlshapes.ResourceUtils import ResourceUtils
 from umlshapes.lib.ogl import Shape
 
 from umlshapes.UmlUtils import UmlUtils
@@ -54,11 +55,11 @@ class UmlLollipopInterface(Shape, IDMixin):
         self.logger: Logger = getLogger(__name__)
 
         self._lineCentum:  float = 0.1
-        self._defaultFont: Font  = UmlUtils.defaultFont()
+        self._defaultFont: Font  = ResourceUtils.defaultFont()
         self._pixelSize:   Size  = self._defaultFont.GetPixelSize()
 
-        self._attachedTo:     UmlClass       = cast('UmlClass', None)
-        self._attachmentSide: AttachmentSide = cast(AttachmentSide, None)
+        self._attachedTo:     UmlClass       = cast('UmlClass', None)           # noqa
+        self._attachmentSide: AttachmentSide = cast(AttachmentSide, None)       # noqa
 
     @property
     def umlFrame(self) -> 'ClassDiagramFrame':

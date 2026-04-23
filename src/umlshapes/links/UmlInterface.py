@@ -11,7 +11,8 @@ from umlmodel.Link import Link
 from umlshapes.lib.ogl import ARROW_ARROW
 from umlshapes.lib.ogl import LineShape
 
-from umlshapes.UmlUtils import UmlUtils
+from umlshapes.ResourceUtils import ResourceUtils
+
 from umlshapes.links.UmlLink import UmlLink
 from umlshapes.shapes.UmlClass import UmlClass
 from umlshapes.types.Common import TAB
@@ -62,9 +63,9 @@ class UmlInterface(UmlLink):
             self._setupLinkText(umlAssociationLabel=self._linkName)
 
         if self.Selected() is True:
-            self.SetPen(UmlUtils.redDashedPen())
+            self.SetPen(ResourceUtils.redDashedPen())
         else:
-            self.SetPen(UmlUtils.blackDashedPen())
+            self.SetPen(ResourceUtils.blackDashedPen())
         # Hack:
         #       I want to skip the UmlLink OnDraw so this line will be drawn
         LineShape.OnDraw(self=self, dc=dc)

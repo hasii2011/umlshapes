@@ -15,6 +15,8 @@ from umlshapes.lib.ogl import RectangleShape
 from umlmodel.Note import Note
 
 from umlshapes.UmlUtils import UmlUtils
+from umlshapes.DrawingUtils import DrawingUtils
+from umlshapes.ResourceUtils import ResourceUtils
 
 from umlshapes.links.UmlNoteLink import UmlNoteLink
 
@@ -80,7 +82,7 @@ class UmlNote(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin):
         self.SetDraggable(drag=True)
         self.SetCentreResize(False)
 
-        self.SetFont(UmlUtils.defaultFont())
+        self.SetFont(ResourceUtils.defaultFont())
         self.SetFormatMode(mode=FORMAT_CENTRE_HORIZ | FORMAT_CENTRE_VERT)
 
     @property
@@ -127,7 +129,7 @@ class UmlNote(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin):
         super().OnDraw(dc)
 
         if self.Selected() is True:
-            UmlUtils.drawSelectedRectangle(dc=dc, shape=self)
+            DrawingUtils.drawSelectedRectangle(dc=dc, shape=self)
 
         w:     int = self.GetWidth()
         h:     int = self.GetHeight()
