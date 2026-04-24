@@ -1,18 +1,12 @@
 
 from typing import List
 from typing import Tuple
-from typing import NewType
 
 from logging import Logger
 from logging import getLogger
-from logging import DEBUG
 
 from math import atan2
 from math import degrees
-
-from dataclasses import dataclass
-
-from enum import StrEnum
 
 from wx import DC
 from wx import Size
@@ -24,26 +18,12 @@ from umlshapes.types.Common import Rectangle
 from umlshapes.types.Common import AttachmentSide
 from umlshapes.types.Common import LollipopCoordinates
 
-from umlshapes.types.UmlLine import UmlLine
-
-from umlshapes.types.UmlPosition import UmlPoint
 from umlshapes.types.UmlPosition import UmlPosition
 from umlshapes.types.UmlPosition import UmlPositions
 
-Degrees = NewType('Degrees', float)
-
-class LeftTopRectangleIndicator(StrEnum):
-    RECTANGLE_1 = 'Rectangle 1'
-    RECTANGLE_2 = 'Rectangle 2'
-    NotSet      = 'Not Set'
-
-
-@dataclass
-class RelativeRectangleResult:
-    leftMostTopMostShape: LeftTopRectangleIndicator = LeftTopRectangleIndicator.NotSet
-    isOtherToRight:   bool    = False
-    isOtherToBottom:  bool    = False
-    directionToOther: Degrees = Degrees(0.0)
+from umlshapes.utils.ShapeAnalysis import RelativeRectangleResult
+from umlshapes.utils.ShapeAnalysis import Degrees
+from umlshapes.utils.ShapeAnalysis import ShapeAnalysis
 
 
 class UmlUtils:
@@ -251,7 +231,7 @@ class UmlUtils:
         Returns:
                 A RectangleRelativeResult dataclass
         """
-        leftTopRectangle, otherRectangle, leftTopIndicator = cls.identifyLeftMostTopMostRectangle(rectangle1=rectangle1, rectangle2=rectangle2)
+        leftTopRectangle, otherRectangle, leftTopIndicator = ShapeAnalysis.identifyLeftMostTopMostRectangle(rectangle1=rectangle1, rectangle2=rectangle2)
 
         # Relative positioning: Is otherRectangle to the right/bottom of primary?
         # Based on simple coordinate comparison
@@ -284,32 +264,6 @@ class UmlUtils:
 
         return result
 
-    @classmethod
-    def identifyLeftMostTopMostRectangle(cls, rectangle1: Rectangle, rectangle2: Rectangle) -> tuple[Rectangle, Rectangle, LeftTopRectangleIndicator]:
-        """
-        Identify the leftmost/topmost shape
-
-        Args:
-            rectangle1:
-            rectangle2:
-
-        Returns:  A tuple that has the values leftTopRectangle, otherRectangle, leftTopIndicator
-
-        """
-
-        if rectangle1.left < rectangle2.left:
-            leftTopRectangle, otherRectangle, leftTopIndicator = rectangle1, rectangle2, LeftTopRectangleIndicator.RECTANGLE_1
-        elif rectangle2.left < rectangle1.left:
-            leftTopRectangle, otherRectangle, leftTopIndicator = rectangle2, rectangle1, LeftTopRectangleIndicator.RECTANGLE_2
-        else:
-            # Same left coordinate, use top coordinate as tie-breaker
-            if rectangle1.top <= rectangle2.top:
-                leftTopRectangle, otherRectangle, leftTopIndicator = rectangle1, rectangle2, LeftTopRectangleIndicator.RECTANGLE_1
-            else:
-                leftTopRectangle, otherRectangle, leftTopIndicator = rectangle2, rectangle1, LeftTopRectangleIndicator.RECTANGLE_2
-
-        return leftTopRectangle, otherRectangle, leftTopIndicator
-
     @staticmethod
     def snapCoordinatesToGrid(x: int, y: int, gridInterval: int) -> Tuple[int, int]:
 
@@ -322,36 +276,9 @@ class UmlUtils:
         return snappedX, snappedY
 
     @classmethod
-    def computeMidPoint(cls, srcPosition: UmlPosition, dstPosition: UmlPosition) -> UmlPosition:
-        """
-
-        Args:
-            srcPosition:        Tuple x,y source position
-            dstPosition:       Tuple x,y destination position
-
-        Returns:
-                A tuple that is the x,y position between `srcPosition` and `dstPosition`
-
-            [Reference]: https://mathbitsnotebook.com/Geometry/CoordinateGeometry/CGmidpoint.html
-        """
-        if UmlUtils.clsLogger.isEnabledFor(DEBUG):
-            UmlUtils.clsLogger.debug(f'{srcPosition=}  {dstPosition=}')
-        x1 = srcPosition.x
-        y1 = srcPosition.y
-        x2 = dstPosition.x
-        y2 = dstPosition.y
-
-        midPointX = abs(x1 + x2) // 2
-        midPointY = abs(y1 + y2) // 2
-
-        return UmlPosition(x=midPointX, y=midPointY)
-
-    @classmethod
     def lineSplitter(cls, text: str, dc: DC, textWidth: int) -> List[str]:
         """
         Split the `text` into lines that fit into `textWidth` pixels.
-
-        Note:  This is a copy of the one in codeallyadvanced
 
         Args:
             text:       The text to split

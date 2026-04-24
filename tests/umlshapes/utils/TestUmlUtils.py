@@ -4,8 +4,8 @@ from unittest import main as unitTestMain
 
 from codeallybasic.UnitTestBase import UnitTestBase
 
-from umlshapes.UmlUtils import LeftTopRectangleIndicator
-from umlshapes.UmlUtils import RelativeRectangleResult
+from umlshapes.utils.ShapeAnalysis import LeftTopRectangleIndicator
+from umlshapes.utils.ShapeAnalysis import RelativeRectangleResult
 from umlshapes.UmlUtils import UmlUtils
 
 from umlshapes.mixins.TopLeftMixin import Rectangle
