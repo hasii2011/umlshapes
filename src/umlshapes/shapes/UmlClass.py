@@ -33,7 +33,7 @@ from umlshapes.types.UmlPosition import UmlPosition
 from umlshapes.types.UmlColor import UmlColor
 from umlshapes.types.UmlDimensions import UmlDimensions
 
-from umlshapes.ResourceUtils import ResourceUtils
+from umlshapes.utils.ResourceUtils import ResourceUtils
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 

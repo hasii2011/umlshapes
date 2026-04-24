@@ -8,7 +8,7 @@ from wx import MemoryDC
 
 from umlshapes.lib.ogl import RectangleShape
 
-from umlshapes.ResourceUtils import ResourceUtils
+from umlshapes.utils.ResourceUtils import ResourceUtils
 
 from umlshapes.frames.SequenceDiagramFrame import SequenceDiagramFrame
 

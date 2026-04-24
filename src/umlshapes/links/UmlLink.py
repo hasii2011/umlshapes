@@ -19,7 +19,7 @@ from umlshapes.lib.ogl import LineShape
 from umlshapes.lib.ogl import Shape
 
 from umlshapes.UmlDiagram import UmlDiagram
-from umlshapes.ResourceUtils import ResourceUtils
+from umlshapes.utils.ResourceUtils import ResourceUtils
 
 from umlshapes.frames.UmlFrame import UmlFrame
 

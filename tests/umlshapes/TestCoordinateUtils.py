@@ -4,7 +4,7 @@ from unittest import main as unitTestMain
 
 from codeallybasic.UnitTestBase import UnitTestBase
 
-from umlshapes.CoordinateUtils import CoordinateUtils
+from umlshapes.utils.CoordinateUtils import CoordinateUtils
 from umlshapes.mixins.TopLeftMixin import Rectangle
 
 from umlshapes.types.UmlLine import UmlLine

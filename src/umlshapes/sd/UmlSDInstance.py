@@ -12,7 +12,7 @@ from umlshapes.lib.ogl import CompositeShape
 from umlshapes.lib.ogl import Constraint
 from umlshapes.lib.ogl import CONSTRAINT_ALIGNED_TOP
 
-from umlshapes.ResourceUtils import ResourceUtils
+from umlshapes.utils.ResourceUtils import ResourceUtils
 
 from umlshapes.mixins.ControlPointMixin import ControlPointMixin
 from umlshapes.mixins.IdentifierMixin import IdentifierMixin

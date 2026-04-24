@@ -23,7 +23,7 @@ from umlshapes.lib.ogl import ARROW_POSITION_END
 
 from umlmodel.SDMessage import SDMessage
 
-from umlshapes.ResourceUtils import ResourceUtils
+from umlshapes.utils.ResourceUtils import ResourceUtils
 
 from umlshapes.UmlDiagram import UmlDiagram
 from umlshapes.frames.UmlFrame import UmlFrame

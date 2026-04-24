@@ -35,8 +35,8 @@ from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
 from umlshapes.frames.UseCaseDiagramFrame import UseCaseDiagramFrame
 from umlshapes.frames.SequenceDiagramFrame import SequenceDiagramFrame
 
-from umlshapes.DrawingUtils import DrawingUtils
-from umlshapes.ResourceUtils import ResourceUtils
+from umlshapes.utils.DrawingUtils import DrawingUtils
+from umlshapes.utils.ResourceUtils import ResourceUtils
 
 
 class UmlText(ControlPointMixin, IdentifierMixin, TextShape, TopLeftMixin):

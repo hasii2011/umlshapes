@@ -37,8 +37,7 @@ from umlshapes.frames.UmlFrameOperationsListener import UmlFrameOperationsListen
 from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 from umlshapes.pubsubengine.UmlMessageType import UmlMessageType
 
-from umlshapes.UmlUtils import UmlUtils
-from umlshapes.CoordinateUtils import CoordinateUtils
+from umlshapes.utils.CoordinateUtils import CoordinateUtils
 
 from umlshapes.UmlDiagram import UmlDiagram
 

@@ -1,5 +1,5 @@
 
-from umlshapes.IDUtil import IDUtil
+from umlshapes.utils.IDUtil import IDUtil
 
 
 class InvalidOperationError(Exception):

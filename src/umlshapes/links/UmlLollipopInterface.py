@@ -17,7 +17,7 @@ from wx import Size
 
 from umlmodel.Interface import Interface
 
-from umlshapes.ResourceUtils import ResourceUtils
+from umlshapes.utils.ResourceUtils import ResourceUtils
 from umlshapes.lib.ogl import Shape
 
 from umlshapes.UmlUtils import UmlUtils

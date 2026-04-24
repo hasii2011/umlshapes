@@ -15,8 +15,8 @@ from umlshapes.lib.ogl import FORMAT_CENTRE_HORIZ
 from umlshapes.lib.ogl import FORMAT_CENTRE_VERT
 from umlshapes.lib.ogl import RectangleShape
 
-from umlshapes.DrawingUtils import DrawingUtils
-from umlshapes.ResourceUtils import ResourceUtils
+from umlshapes.utils.DrawingUtils import DrawingUtils
+from umlshapes.utils.ResourceUtils import ResourceUtils
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 

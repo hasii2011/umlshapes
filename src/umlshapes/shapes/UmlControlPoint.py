@@ -7,7 +7,7 @@ from wx import WHITE_BRUSH
 from umlshapes.lib.ogl import ControlPoint
 from umlshapes.lib.ogl import Shape
 
-from umlshapes.ResourceUtils import ResourceUtils
+from umlshapes.utils.ResourceUtils import ResourceUtils
 
 from umlshapes.frames.UmlFrame import UmlFrame
 

@@ -16,7 +16,7 @@ from umlshapes.lib.ogl import CONTROL_POINT_LINE
 
 from umlshapes.lib.ogl import LineControlPoint
 
-from umlshapes.ResourceUtils import ResourceUtils
+from umlshapes.utils.ResourceUtils import ResourceUtils
 
 from umlshapes.frames.UmlFrame import UmlFrame
 

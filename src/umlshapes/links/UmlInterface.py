@@ -11,7 +11,7 @@ from umlmodel.Link import Link
 from umlshapes.lib.ogl import ARROW_ARROW
 from umlshapes.lib.ogl import LineShape
 
-from umlshapes.ResourceUtils import ResourceUtils
+from umlshapes.utils.ResourceUtils import ResourceUtils
 
 from umlshapes.links.UmlLink import UmlLink
 from umlshapes.shapes.UmlClass import UmlClass

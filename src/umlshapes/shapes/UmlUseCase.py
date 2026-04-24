@@ -7,8 +7,8 @@ from wx import MemoryDC
 
 from umlshapes.lib.ogl import EllipseShape
 
-from umlshapes.DrawingUtils import DrawingUtils
-from umlshapes.ResourceUtils import ResourceUtils
+from umlshapes.utils.DrawingUtils import DrawingUtils
+from umlshapes.utils.ResourceUtils import ResourceUtils
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 

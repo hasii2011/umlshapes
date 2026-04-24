@@ -11,7 +11,7 @@ from wx import TRANSPARENT_BRUSH
 
 from umlshapes.lib.ogl import TextShape
 
-from umlshapes.DrawingUtils import DrawingUtils
+from umlshapes.utils.DrawingUtils import DrawingUtils
 
 from umlshapes.types.DeltaXY import DeltaXY
 from umlshapes.links.LabelType import LabelType

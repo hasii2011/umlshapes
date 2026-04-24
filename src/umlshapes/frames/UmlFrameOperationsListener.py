@@ -26,7 +26,7 @@ from umlmodel.UseCase import UseCase
 from umlmodel.UmlModelBase import UmlModelBase
 from umlmodel.LinkedObject import LinkedObject
 
-from umlshapes.IDUtil import IDUtil
+from umlshapes.utils.IDUtil import IDUtil
 
 from umlshapes.commands.ActorCutCommand import ActorCutCommand
 from umlshapes.commands.ActorPasteCommand import ActorPasteCommand

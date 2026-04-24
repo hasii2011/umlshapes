@@ -32,7 +32,7 @@ from wx import Window
 
 from umlshapes.lib.ogl import ShapeCanvas
 
-from umlshapes.IDUtil import IDUtil
+from umlshapes.utils.IDUtil import IDUtil
 
 from umlshapes.frames.ShapeSelector import ShapeSelector
 

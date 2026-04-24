@@ -15,8 +15,8 @@ from umlshapes.lib.ogl import RectangleShape
 from umlmodel.Note import Note
 
 from umlshapes.UmlUtils import UmlUtils
-from umlshapes.DrawingUtils import DrawingUtils
-from umlshapes.ResourceUtils import ResourceUtils
+from umlshapes.utils.DrawingUtils import DrawingUtils
+from umlshapes.utils.ResourceUtils import ResourceUtils
 
 from umlshapes.links.UmlNoteLink import UmlNoteLink
 

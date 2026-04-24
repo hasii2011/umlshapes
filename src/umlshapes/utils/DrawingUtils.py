@@ -7,7 +7,7 @@ from wx import MemoryDC
 from umlshapes.lib.ogl import EllipseShape
 from umlshapes.lib.ogl import RectangleShape
 
-from umlshapes.ResourceUtils import ResourceUtils
+from umlshapes.utils.ResourceUtils import ResourceUtils
 
 
 class DrawingUtils:

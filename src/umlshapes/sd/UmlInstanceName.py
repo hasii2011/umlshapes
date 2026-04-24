@@ -4,7 +4,7 @@ from logging import getLogger
 
 from umlmodel.SDInstance import SDInstance
 
-from umlshapes.ResourceUtils import ResourceUtils
+from umlshapes.utils.ResourceUtils import ResourceUtils
 
 from umlshapes.lib.ogl import RectangleShape
 from umlshapes.mixins.TopLeftMixin import TopLeftMixin
