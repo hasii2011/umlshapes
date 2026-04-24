@@ -38,6 +38,7 @@ from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 from umlshapes.pubsubengine.UmlMessageType import UmlMessageType
 
 from umlshapes.UmlUtils import UmlUtils
+from umlshapes.CoordinateUtils import CoordinateUtils
 
 from umlshapes.UmlDiagram import UmlDiagram
 
@@ -264,12 +265,12 @@ class UmlFrame(DiagramFrame):
                     umlLink: UmlLink | UmlSDMessage = s
                     x1, y1, x2, y2 = umlLink.GetEnds()
                     umlLine: UmlLine = UmlLine(start=UmlPoint(x=x1, y=y1), end=UmlPoint(x=x2, y=y2))
-                    if UmlUtils.isLineWhollyContainedByRectangle(boundingRectangle=self._selector.rectangle, umlLine=umlLine) is True:
+                    if CoordinateUtils.isLineWhollyContainedByRectangle(boundingRectangle=self._selector.rectangle, umlLine=umlLine) is True:
                         umlLink.selected = True
                 else:
                     from umlshapes.ShapeTypes import UmlShapeGenre
                     shape: UmlShapeGenre = cast(UmlShapeGenre, s)
-                    if UmlUtils.isShapeInRectangle(boundingRectangle=self._selector.rectangle, shapeRectangle=shape.rectangle) is True:
+                    if CoordinateUtils.isShapeInRectangle(boundingRectangle=self._selector.rectangle, shapeRectangle=shape.rectangle) is True:
                         shape.selected = True
 
         self.refresh()
