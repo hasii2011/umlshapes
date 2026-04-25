@@ -21,6 +21,7 @@ from umlshapes.utils.ResourceUtils import ResourceUtils
 from umlshapes.lib.ogl import Shape
 
 from umlshapes.utils.UmlUtils import UmlUtils
+from umlshapes.utils.ShapeRelationshipUtils import ShapeRelationshipUtils
 from umlshapes.mixins.IDMixin import IDMixin
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
@@ -173,7 +174,7 @@ class UmlLollipopInterface(Shape, IDMixin):
 
         Returns:    The appropriate coordinates
         """
-        if UmlUtils.isVerticalSide(side=self.attachmentSide):
+        if ShapeRelationshipUtils.isVerticalSide(side=self.attachmentSide):
             lollipopCoordinates: LollipopCoordinates = self._computeVerticalSideCoordinates(rectangle)
         else:
             lollipopCoordinates = self._computeHorizontalSideCoordinates(rectangle)

@@ -9,6 +9,7 @@ from umlshapes.utils.ShapeAnalysisUtils import RelativeRectangleResult
 from umlshapes.utils.UmlUtils import UmlUtils
 from umlshapes.utils.ProximityUtils import ProximityUtils
 from umlshapes.utils.TransformationUtils import TransformationUtils
+from umlshapes.utils.ShapeRelationshipUtils import ShapeRelationshipUtils
 
 from umlshapes.mixins.TopLeftMixin import Rectangle
 
@@ -119,72 +120,72 @@ class TestUmlUtils(UnitTestBase):
 
     def testLineCentumTopFixToMin(self):
         umlPosition: UmlPosition = UmlPosition(x=RECTANGLE_LEFT + 20, y=RECTANGLE_TOP)
-        distance:    float       = UmlUtils.computeLineCentum(attachmentSide=AttachmentSide.TOP, umlPosition=umlPosition, rectangle=self._rectangle)
+        distance:    float       = ShapeRelationshipUtils.computeLineCentum(attachmentSide=AttachmentSide.TOP, umlPosition=umlPosition, rectangle=self._rectangle)
 
         self.assertEqual(0.1, distance, 'Incorrect distance')
 
     def testCLineCentumTopFixToMax(self):
         umlPosition: UmlPosition = UmlPosition(x=self._rectangle.right, y=RECTANGLE_TOP)
-        distance:    float       = UmlUtils.computeLineCentum(attachmentSide=AttachmentSide.TOP, umlPosition=umlPosition, rectangle=self._rectangle)
+        distance:    float       = ShapeRelationshipUtils.computeLineCentum(attachmentSide=AttachmentSide.TOP, umlPosition=umlPosition, rectangle=self._rectangle)
 
         self.assertEqual(0.9, distance, 'Incorrect distance')
 
     def testLineCentumBottomMiddle(self):
         half:        int         = (RECTANGLE_RIGHT - RECTANGLE_LEFT) // 2
         umlPosition: UmlPosition = UmlPosition(x=RECTANGLE_LEFT + half, y=RECTANGLE_BOTTOM)
-        distance:    float       = UmlUtils.computeLineCentum(attachmentSide=AttachmentSide.BOTTOM, umlPosition=umlPosition, rectangle=self._rectangle)
+        distance:    float       = ShapeRelationshipUtils.computeLineCentum(attachmentSide=AttachmentSide.BOTTOM, umlPosition=umlPosition, rectangle=self._rectangle)
 
         self.assertEqual(0.5, distance, 'Incorrect distance')
 
     def testLineCentumLeft(self):
         third:       int         = (RECTANGLE_BOTTOM - RECTANGLE_TOP) // 3
         umlPosition: UmlPosition = UmlPosition(x=RECTANGLE_LEFT, y=RECTANGLE_TOP + third)
-        distance:    float       = UmlUtils.computeLineCentum(attachmentSide=AttachmentSide.LEFT, umlPosition=umlPosition, rectangle=self._rectangle)
+        distance:    float       = ShapeRelationshipUtils.computeLineCentum(attachmentSide=AttachmentSide.LEFT, umlPosition=umlPosition, rectangle=self._rectangle)
 
         self.assertEqual(0.3, distance, 'Incorrect distance')
 
     def testLineCentumRight(self):
         third:       int         = (RECTANGLE_BOTTOM - RECTANGLE_TOP) // 3
         umlPosition: UmlPosition = UmlPosition(x=RECTANGLE_RIGHT, y=RECTANGLE_TOP + third * 2)
-        distance:    float       = UmlUtils.computeLineCentum(attachmentSide=AttachmentSide.LEFT, umlPosition=umlPosition, rectangle=self._rectangle)
+        distance:    float       = ShapeRelationshipUtils.computeLineCentum(attachmentSide=AttachmentSide.LEFT, umlPosition=umlPosition, rectangle=self._rectangle)
 
         self.assertEqual(0.7, distance, 'Incorrect distance')
 
     def testComputePercentageDistance(self):
         umlPosition: UmlPosition = UmlPosition(x=RECTANGLE_LEFT + 20, y=RECTANGLE_TOP)
-        distance: float = UmlUtils.computeLineCentum(attachmentSide=AttachmentSide.BOTTOM, umlPosition=umlPosition, rectangle=self._rectangle)
+        distance: float = ShapeRelationshipUtils.computeLineCentum(attachmentSide=AttachmentSide.BOTTOM, umlPosition=umlPosition, rectangle=self._rectangle)
 
         self.assertEqual(0.1, distance, 'Incorrect distance')
 
     def testAttachmentSideTop(self):
         x1: int = RECTANGLE_LEFT + 5
         y1: int = RECTANGLE_TOP
-        attachmentSide: AttachmentSide = UmlUtils.attachmentSide(x=x1, y=y1, rectangle=self._rectangle)
+        attachmentSide: AttachmentSide = ShapeRelationshipUtils.attachmentSide(x=x1, y=y1, rectangle=self._rectangle)
         self.assertEqual(AttachmentSide.TOP, attachmentSide, 'Incorrect calculation')
 
     def testAttachmentSideBottom(self):
         x1: int = RECTANGLE_LEFT + 5
         y1: int = RECTANGLE_BOTTOM
-        attachmentSide: AttachmentSide = UmlUtils.attachmentSide(x=x1, y=y1, rectangle=self._rectangle)
+        attachmentSide: AttachmentSide = ShapeRelationshipUtils.attachmentSide(x=x1, y=y1, rectangle=self._rectangle)
         self.assertEqual(AttachmentSide.BOTTOM, attachmentSide, 'Incorrect calculation')
 
     def testAttachmentSideLeft(self):
         x1: int = RECTANGLE_LEFT
         y1: int = RECTANGLE_BOTTOM + 6
-        attachmentSide: AttachmentSide = UmlUtils.attachmentSide(x=x1, y=y1, rectangle=self._rectangle)
+        attachmentSide: AttachmentSide = ShapeRelationshipUtils.attachmentSide(x=x1, y=y1, rectangle=self._rectangle)
         self.assertEqual(AttachmentSide.LEFT, attachmentSide, 'Incorrect calculation')
 
     def testAttachmentSideRight(self):
         x1: int = RECTANGLE_RIGHT
         y1: int = RECTANGLE_BOTTOM + 6
-        attachmentSide: AttachmentSide = UmlUtils.attachmentSide(x=x1, y=y1, rectangle=self._rectangle)
+        attachmentSide: AttachmentSide = ShapeRelationshipUtils.attachmentSide(x=x1, y=y1, rectangle=self._rectangle)
         self.assertEqual(AttachmentSide.RIGHT, attachmentSide, 'Incorrect calculation')
 
     def testAttachmentPointNotOnPerimeter(self):
 
         x: int = 22
         y: int = 44
-        self.assertRaises(AssertionError, lambda: UmlUtils.attachmentSide(x, y, self._rectangle))
+        self.assertRaises(AssertionError, lambda: ShapeRelationshipUtils.attachmentSide(x, y, self._rectangle))
 
     def testConvertToAbsoluteCoordinatesRight(self):
         relativeCoordinates: UmlPosition = UmlPosition(x=RIGHT_RELATIVE_POSITION_X, y=RIGHT_RELATIVE_POSITION_Y)
@@ -256,16 +257,16 @@ class TestUmlUtils(UnitTestBase):
         self.assertEqual(expectedPoint, actualPoint, 'Calculation for left outside is wrong')
 
     def testIsVerticalSideTop(self):
-        self.assertFalse(UmlUtils.isVerticalSide(AttachmentSide.TOP))
+        self.assertFalse(ShapeRelationshipUtils.isVerticalSide(AttachmentSide.TOP))
 
     def testIsVerticalSideBottom(self):
-        self.assertFalse(UmlUtils.isVerticalSide(AttachmentSide.BOTTOM))
+        self.assertFalse(ShapeRelationshipUtils.isVerticalSide(AttachmentSide.BOTTOM))
 
     def testIsVerticalSideRight(self):
-        self.assertTrue(UmlUtils.isVerticalSide(AttachmentSide.RIGHT))
+        self.assertTrue(ShapeRelationshipUtils.isVerticalSide(AttachmentSide.RIGHT))
 
     def testIsVerticalSideLeft(self):
-        self.assertTrue(UmlUtils.isVerticalSide(AttachmentSide.LEFT))
+        self.assertTrue(ShapeRelationshipUtils.isVerticalSide(AttachmentSide.LEFT))
 
     def testComputeRelativeRectanglePosition_r2_right_bottom(self):
 
