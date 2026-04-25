@@ -2,15 +2,11 @@
 from typing import List
 from typing import Tuple
 
-from logging import Logger
-from logging import getLogger
-
 from math import atan2
 from math import degrees
 
 from wx import DC
 from wx import Size
-from wx import Point
 
 from umlshapes.links.LollipopInflator import LollipopInflator
 
@@ -19,7 +15,6 @@ from umlshapes.types.Common import AttachmentSide
 from umlshapes.types.Common import LollipopCoordinates
 
 from umlshapes.types.UmlPosition import UmlPosition
-from umlshapes.types.UmlPosition import UmlPositions
 
 from umlshapes.utils.ShapeAnalysis import RelativeRectangleResult
 from umlshapes.utils.ShapeAnalysis import Degrees
@@ -27,48 +22,6 @@ from umlshapes.utils.ShapeAnalysis import ShapeAnalysis
 
 
 class UmlUtils:
-    """
-    The class variables are NOT meant to be used directly.  They
-    are a cache for the class methods.
-
-    TODO:   Perhaps introduce an initialize method to get them set
-    and make the class methods private.
-    """
-
-    clsLogger: Logger = getLogger(__name__)
-
-    @classmethod
-    def distance(cls, pt1: UmlPosition, pt2: UmlPosition) -> float:
-        """
-
-        Args:
-            pt1:
-            pt2:
-
-        Returns:    This distance between the 2 points
-        """
-        x1: int = pt1.x
-        y1: int = pt1.y
-        x2: int = pt2.x
-        y2: int = pt2.y
-
-        distance = ((x1 - x2) ** 2 + (y1 - y2) ** 2) ** 0.5
-
-        return distance
-
-    @classmethod
-    def closestPoint(cls, referencePosition: UmlPosition, umlPositions: UmlPositions) -> UmlPosition:
-
-        closest:      UmlPosition = UmlPosition()
-        lastDistance: float       = 10000000.0          # some large number to start
-        for position in umlPositions:
-            dist: float = UmlUtils.distance(pt1=referencePosition, pt2=position)
-            if dist < lastDistance:
-                closest      = position
-                lastDistance = dist
-                UmlUtils.clsLogger.debug(f'{dist}')
-
-        return closest
 
     @classmethod
     def lollipopHitTest(cls, x: int, y: int, attachmentSide: AttachmentSide, lollipopCoordinates: LollipopCoordinates) -> bool:
@@ -101,7 +54,6 @@ class UmlUtils:
 
         return ans
 
-    # noinspection PyTypeChecker
     @classmethod
     def attachmentSide(cls, x, y, rectangle: Rectangle) -> AttachmentSide:
 
@@ -180,41 +132,6 @@ class UmlUtils:
 
         relativeCoordinates: UmlPosition = UmlPosition(x=relativeX, y=relativeY)
         return relativeCoordinates
-
-    @classmethod
-    def getNearestPointOnRectangle(cls, x, y, rectangle: Rectangle) -> UmlPosition:
-        """
-        https://stackoverflow.com/questions/20453545/how-to-find-the-nearest-point-in-the-perimeter-of-a-rectangle-to-a-given-point
-
-        Args:
-            x:  The x coordinate we are measuring from
-            y:  The y coordinate we are measuring from
-            rectangle:  The rectangle that describes our shape
-
-        Returns:  The near point on the rectangle
-        """
-        point: Point = Point()
-        point.x = max(rectangle.left, min(rectangle.right, x))
-        point.y = max(rectangle.top,  min(rectangle.bottom, y))
-
-        dl: int = abs(point.x - rectangle.left)
-        dr: int = abs(point.x - rectangle.right)
-        dt: int = abs(point.y - rectangle.top)
-        db: int = abs(point.y - rectangle.bottom)
-
-        m: int = min([dl, dr, dt, db])
-        UmlUtils.clsLogger.debug(f'{m=}')
-        #
-        # TODO: Rewrite this to have a single exit point
-        #
-        if m == dt:
-            return UmlPosition(point.x, rectangle.top)
-        if m == db:
-            return UmlPosition(point.x, rectangle.bottom)
-        if m == dl:
-            return UmlPosition(rectangle.left, point.y)
-
-        return UmlPosition(rectangle.right, point.y)
 
     @classmethod
     def computeRelativeRectanglePosition(cls, rectangle1: Rectangle, rectangle2: Rectangle) -> RelativeRectangleResult:

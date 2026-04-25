@@ -1,5 +1,5 @@
-from logging import Logger
 
+from logging import Logger
 from logging import getLogger
 
 from umlshapes.types.Common import Rectangle

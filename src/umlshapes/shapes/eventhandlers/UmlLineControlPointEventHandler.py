@@ -11,6 +11,7 @@ from wx import Cursor
 from umlshapes.lib.ogl import ShapeEvtHandler
 
 from umlshapes.UmlUtils import UmlUtils
+from umlshapes.utils.ProximityUtils import ProximityUtils
 
 from umlshapes.frames.DiagramFrame import DiagramFrame
 from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
@@ -99,7 +100,7 @@ class UmlLineControlPointEventHandler(ShapeEvtHandler):
 
         umlClass:       UmlClass    = umlLink.GetTo()
         rectangle:      Rectangle   = umlClass.rectangle
-        borderPosition: UmlPosition = UmlUtils.getNearestPointOnRectangle(x=x, y=y, rectangle=rectangle)
+        borderPosition: UmlPosition = ProximityUtils.getNearestPointOnRectangle(x=x, y=y, rectangle=rectangle)
 
         self.logger.debug(f'{umlLink=} {umlClass=} {borderPosition=}')
 
@@ -124,7 +125,7 @@ class UmlLineControlPointEventHandler(ShapeEvtHandler):
 
         umlClass:       UmlClass    = umlLink.GetFrom()
         rectangle:      Rectangle   = umlClass.rectangle
-        borderPosition: UmlPosition = UmlUtils.getNearestPointOnRectangle(x=x, y=y, rectangle=rectangle)
+        borderPosition: UmlPosition = ProximityUtils.getNearestPointOnRectangle(x=x, y=y, rectangle=rectangle)
 
         self.logger.debug(f'{umlLink=} {umlClass=} {borderPosition=}')
 

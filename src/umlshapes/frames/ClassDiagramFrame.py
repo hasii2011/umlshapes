@@ -16,6 +16,7 @@ from umlshapes.frames.UmlClassCtxMenuHandler import UmlClassCtxMenuHandler
 from umlshapes.frames.UmlFrame import UmlFrame
 
 from umlshapes.UmlUtils import UmlUtils
+from umlshapes.utils.ProximityUtils import ProximityUtils
 
 from umlshapes.shapes.UmlClass import UmlClass
 
@@ -98,7 +99,7 @@ class ClassDiagramFrame(UmlFrame):
 
         if self._requestingLollipopLocation:
             self.ufLogger.debug(f'Request location: x,y=({x},{y}) {self._requestingUmlClass=}')
-            nearestPoint: UmlPosition = UmlUtils.getNearestPointOnRectangle(x=x, y=y, rectangle=self._requestingUmlClass.rectangle)
+            nearestPoint: UmlPosition = ProximityUtils.getNearestPointOnRectangle(x=x, y=y, rectangle=self._requestingUmlClass.rectangle)
             self.ucdLogger.debug(f'Nearest point: {nearestPoint}')
 
             assert self._requestingUmlClass is not None, 'I need something to attach to'

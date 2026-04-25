@@ -27,6 +27,7 @@ from umlmodel.enumerations.LinkType import LinkType
 from umlshapes.lib.ogl import ShapeEvtHandler
 
 from umlshapes.UmlUtils import UmlUtils
+from umlshapes.utils.ProximityUtils import ProximityUtils
 from umlshapes.dialogs.DlgEditLink import DlgEditLink
 from umlshapes.pubsubengine.UmlMessageType import UmlMessageType
 
@@ -241,7 +242,7 @@ class UmlLinkEventHandler(UmlBaseEventHandler):
         """
         searchPoints: List[Point] = self._createSearchPoints(umlLink, lineControlPoints)
 
-        closestBend: UmlPosition = UmlUtils.closestPoint(referencePosition=clickPoint, umlPositions=self._toUmlPositions(searchPoints))
+        closestBend: UmlPosition = ProximityUtils.closestPoint(referencePosition=clickPoint, umlPositions=self._toUmlPositions(searchPoints))
         self.logger.debug(f'{closestBend=}')
 
         frame: UmlFrame = self.GetShape().GetCanvas()

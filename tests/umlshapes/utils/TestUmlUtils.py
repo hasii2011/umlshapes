@@ -7,6 +7,7 @@ from codeallybasic.UnitTestBase import UnitTestBase
 from umlshapes.utils.ShapeAnalysis import LeftTopRectangleIndicator
 from umlshapes.utils.ShapeAnalysis import RelativeRectangleResult
 from umlshapes.UmlUtils import UmlUtils
+from umlshapes.utils.ProximityUtils import ProximityUtils
 
 from umlshapes.mixins.TopLeftMixin import Rectangle
 
@@ -66,7 +67,7 @@ class TestUmlUtils(UnitTestBase):
         pt2: UmlPosition = UmlPosition(x=5, y=7)
 
         expectedDistance: float = 5.0
-        actualDistance:   float = UmlUtils.distance(pt1=pt1, pt2=pt2)
+        actualDistance:   float = ProximityUtils.distance(pt1=pt1, pt2=pt2)
 
         self.assertAlmostEqual(expectedDistance, actualDistance, places=3, msg='Not close enough')
 
@@ -76,7 +77,7 @@ class TestUmlUtils(UnitTestBase):
         pt2: UmlPosition = UmlPosition(x=100, y=100)
 
         expectedDistance: float = 141.42
-        actualDistance:   float = UmlUtils.distance(pt1=pt1, pt2=pt2)
+        actualDistance:   float = ProximityUtils.distance(pt1=pt1, pt2=pt2)
 
         self.assertAlmostEqual(expectedDistance, actualDistance, places=2, msg='Not close enough')
 
@@ -87,7 +88,7 @@ class TestUmlUtils(UnitTestBase):
             ]
         )
         expectedClosest: UmlPosition = UmlPosition(100, 250)
-        actualClosest:   UmlPosition = UmlUtils.closestPoint(referencePosition=UmlPosition(600, 250), umlPositions=umlPositions)
+        actualClosest:   UmlPosition = ProximityUtils.closestPoint(referencePosition=UmlPosition(600, 250), umlPositions=umlPositions)
 
         self.assertEqual(expectedClosest, actualClosest, 'Basic computation failed')
 
@@ -99,7 +100,7 @@ class TestUmlUtils(UnitTestBase):
         )
 
         expectedClosest: UmlPosition = UmlPosition(410, 350)
-        actualClosest:   UmlPosition = UmlUtils.closestPoint(referencePosition=UmlPosition(360, 410), umlPositions=umlPositions)
+        actualClosest:   UmlPosition = ProximityUtils.closestPoint(referencePosition=UmlPosition(360, 410), umlPositions=umlPositions)
 
         self.assertEqual(expectedClosest, actualClosest, 'Basic computation failed')
 
@@ -112,7 +113,7 @@ class TestUmlUtils(UnitTestBase):
              ]
         )
         expectedClosest: UmlPosition = UmlPosition(20, 63)
-        actualClosest:   UmlPosition = UmlUtils.closestPoint(referencePosition=UmlPosition(0, 238), umlPositions=umlPositions)
+        actualClosest:   UmlPosition = ProximityUtils.closestPoint(referencePosition=UmlPosition(0, 238), umlPositions=umlPositions)
         self.assertEqual(expectedClosest, actualClosest, 'Numpy computation failed')
 
     def testLineCentumTopFixToMin(self):
@@ -205,7 +206,7 @@ class TestUmlUtils(UnitTestBase):
         y: int = 950
         #
         # This will return us an absolute position on the shape/rectangle
-        absolutePosition: UmlPosition = UmlUtils.getNearestPointOnRectangle(x=x, y=y, rectangle=self._rectangle)
+        absolutePosition: UmlPosition = ProximityUtils.getNearestPointOnRectangle(x=x, y=y, rectangle=self._rectangle)
 
         expectedRelativePosition: UmlPosition = UmlPosition(x=TOP_RELATIVE_POSITION_X, y=TOP_RELATIVE_POSITION_Y)
         relativePosition:         UmlPosition = UmlUtils.convertToRelativeCoordinates(absolutePosition=absolutePosition, rectangle=self._rectangle)
@@ -216,7 +217,7 @@ class TestUmlUtils(UnitTestBase):
         x: int = 800
         y: int = 1300
 
-        absolutePosition:         UmlPosition = UmlUtils.getNearestPointOnRectangle(x=x, y=y, rectangle=self._rectangle)
+        absolutePosition:         UmlPosition = ProximityUtils.getNearestPointOnRectangle(x=x, y=y, rectangle=self._rectangle)
         expectedRelativePosition: UmlPosition = UmlPosition(x=RIGHT_RELATIVE_POSITION_X, y=RIGHT_RELATIVE_POSITION_Y)
         relativePosition:         UmlPosition = UmlUtils.convertToRelativeCoordinates(absolutePosition=absolutePosition, rectangle=self._rectangle)
 
@@ -227,7 +228,7 @@ class TestUmlUtils(UnitTestBase):
         y: int = 950
 
         expectedPoint: UmlPosition = UmlPosition(600, 1000)
-        actualPoint:   UmlPosition = UmlUtils.getNearestPointOnRectangle(x=x, y=y, rectangle=self._rectangle)
+        actualPoint:   UmlPosition = ProximityUtils.getNearestPointOnRectangle(x=x, y=y, rectangle=self._rectangle)
 
         self.logger.debug(f'{actualPoint=}')
 
@@ -239,7 +240,7 @@ class TestUmlUtils(UnitTestBase):
         y: int = 1100
 
         expectedPoint: UmlPosition = UmlPosition(500, 1100)
-        actualPoint:   UmlPosition = UmlUtils.getNearestPointOnRectangle(x=x, y=y, rectangle=self._rectangle)
+        actualPoint:   UmlPosition = ProximityUtils.getNearestPointOnRectangle(x=x, y=y, rectangle=self._rectangle)
 
         self.assertEqual(expectedPoint, actualPoint, 'Calculation for left outside is wrong')
 
@@ -249,7 +250,7 @@ class TestUmlUtils(UnitTestBase):
         y: int = 1100
 
         expectedPoint: UmlPosition = UmlPosition(700, 1100)
-        actualPoint:   UmlPosition = UmlUtils.getNearestPointOnRectangle(x=x, y=y, rectangle=self._rectangle)
+        actualPoint:   UmlPosition = ProximityUtils.getNearestPointOnRectangle(x=x, y=y, rectangle=self._rectangle)
 
         self.assertEqual(expectedPoint, actualPoint, 'Calculation for left outside is wrong')
 

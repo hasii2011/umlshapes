@@ -33,9 +33,13 @@ from umlshapes.types.UmlFontFamily import UmlFontFamily
 
 
 class ResourceUtils:
+    """
+    The class variables are NOT meant to be used directly.  They
+    are a cache for the class methods.
 
-    clsLogger: Logger = getLogger(__name__)
-
+    TODO:   Perhaps introduce an initialize method to get them set
+    and make the class methods private.
+    """
     BLACK_SOLID_PEN:  Pen  = cast(Pen, None)        # noqa
     RED_SOLID_PEN:    Pen  = cast(Pen, None)        # noqa
     RED_DASHED_PEN:   Pen  = cast(Pen, None)        # noqa
@@ -44,6 +48,8 @@ class ResourceUtils:
     DEFAULT_FONT:     Font = cast(Font, None)       # noqa
 
     DEFAULT_BACKGROUND_BRUSH: Brush = cast(Brush, None) # noqa
+
+    clsLogger: Logger = getLogger(__name__)
 
     @classmethod
     def blackSolidPen(cls) -> Pen:
