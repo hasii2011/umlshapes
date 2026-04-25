@@ -26,8 +26,8 @@ from wx import MemoryDC
 
 from umlmodel.Link import Link
 
-from umlshapes.utils.ShapeAnalysis import LeftTopRectangleIndicator
-from umlshapes.utils.ShapeAnalysis import RelativeRectangleResult
+from umlshapes.utils.ShapeAnalysisUtils import LeftTopRectangleIndicator
+from umlshapes.utils.ShapeAnalysisUtils import RelativeRectangleResult
 from umlshapes.utils.UmlUtils import UmlUtils
 
 from umlshapes.links.UmlLink import UmlLink

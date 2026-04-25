@@ -1,6 +1,5 @@
 
 from typing import List
-from typing import Tuple
 
 from math import atan2
 from math import degrees
@@ -16,9 +15,9 @@ from umlshapes.types.Common import LollipopCoordinates
 
 from umlshapes.types.UmlPosition import UmlPosition
 
-from umlshapes.utils.ShapeAnalysis import RelativeRectangleResult
-from umlshapes.utils.ShapeAnalysis import Degrees
-from umlshapes.utils.ShapeAnalysis import ShapeAnalysis
+from umlshapes.utils.ShapeAnalysisUtils import RelativeRectangleResult
+from umlshapes.utils.ShapeAnalysisUtils import Degrees
+from umlshapes.utils.ShapeAnalysisUtils import ShapeAnalysisUtils
 
 
 class UmlUtils:
@@ -109,31 +108,6 @@ class UmlUtils:
         return distance
 
     @classmethod
-    def convertToAbsoluteCoordinates(cls, relativePosition: UmlPosition, rectangle: Rectangle) -> UmlPosition:
-
-        left: int = rectangle.left      # x
-        top: int = rectangle.top        # y
-
-        absoluteX: int = relativePosition.x + left
-        absoluteY: int = relativePosition.y + top
-
-        absoluteCoordinates: UmlPosition = UmlPosition(x=absoluteX, y=absoluteY)
-
-        return absoluteCoordinates
-
-    @classmethod
-    def convertToRelativeCoordinates(cls, absolutePosition: UmlPosition, rectangle: Rectangle) -> UmlPosition:
-
-        left: int = rectangle.left      # x
-        top: int = rectangle.top        # y
-
-        relativeX: int = absolutePosition.x - left
-        relativeY: int = absolutePosition.y - top
-
-        relativeCoordinates: UmlPosition = UmlPosition(x=relativeX, y=relativeY)
-        return relativeCoordinates
-
-    @classmethod
     def computeRelativeRectanglePosition(cls, rectangle1: Rectangle, rectangle2: Rectangle) -> RelativeRectangleResult:
         """
         Computes the relative position and direction between two LTRB rectangles.
@@ -148,7 +122,7 @@ class UmlUtils:
         Returns:
                 A RectangleRelativeResult dataclass
         """
-        leftTopRectangle, otherRectangle, leftTopIndicator = ShapeAnalysis.identifyLeftMostTopMostRectangle(rectangle1=rectangle1, rectangle2=rectangle2)
+        leftTopRectangle, otherRectangle, leftTopIndicator = ShapeAnalysisUtils.identifyLeftMostTopMostRectangle(rectangle1=rectangle1, rectangle2=rectangle2)
 
         # Relative positioning: Is otherRectangle to the right/bottom of primary?
         # Based on simple coordinate comparison
@@ -180,17 +154,6 @@ class UmlUtils:
         result.directionToOther = direction
 
         return result
-
-    @staticmethod
-    def snapCoordinatesToGrid(x: int, y: int, gridInterval: int) -> Tuple[int, int]:
-
-        xDiff: float = x % gridInterval
-        yDiff: float = y % gridInterval
-
-        snappedX: int = round(x - xDiff)
-        snappedY: int = round(y - yDiff)
-
-        return snappedX, snappedY
 
     @classmethod
     def lineSplitter(cls, text: str, dc: DC, textWidth: int) -> List[str]:

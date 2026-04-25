@@ -29,7 +29,7 @@ class RelativeRectangleResult:
     directionToOther: Degrees = Degrees(0.0)
 
 
-class ShapeAnalysis:
+class ShapeAnalysisUtils:
     clsLogger: Logger = getLogger(__name__)
 
     @classmethod
@@ -71,8 +71,8 @@ class ShapeAnalysis:
 
             [Reference]: https://mathbitsnotebook.com/Geometry/CoordinateGeometry/CGmidpoint.html
         """
-        if ShapeAnalysis.clsLogger.isEnabledFor(DEBUG):
-            ShapeAnalysis.clsLogger.debug(f'{srcPosition=}  {dstPosition=}')
+        if ShapeAnalysisUtils.clsLogger.isEnabledFor(DEBUG):
+            ShapeAnalysisUtils.clsLogger.debug(f'{srcPosition=}  {dstPosition=}')
         x1 = srcPosition.x
         y1 = srcPosition.y
         x2 = dstPosition.x
