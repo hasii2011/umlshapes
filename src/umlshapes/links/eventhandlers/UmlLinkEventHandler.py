@@ -26,7 +26,7 @@ from umlmodel.enumerations.LinkType import LinkType
 
 from umlshapes.lib.ogl import ShapeEvtHandler
 
-from umlshapes.UmlUtils import UmlUtils
+from umlshapes.utils.UmlUtils import UmlUtils
 from umlshapes.utils.ProximityUtils import ProximityUtils
 from umlshapes.dialogs.DlgEditLink import DlgEditLink
 from umlshapes.pubsubengine.UmlMessageType import UmlMessageType

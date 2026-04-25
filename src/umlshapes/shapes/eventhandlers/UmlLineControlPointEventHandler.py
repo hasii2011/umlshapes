@@ -10,7 +10,7 @@ from wx import Cursor
 
 from umlshapes.lib.ogl import ShapeEvtHandler
 
-from umlshapes.UmlUtils import UmlUtils
+from umlshapes.utils.UmlUtils import UmlUtils
 from umlshapes.utils.ProximityUtils import ProximityUtils
 
 from umlshapes.frames.DiagramFrame import DiagramFrame

@@ -15,7 +15,7 @@ from umlshapes.pubsubengine.UmlMessageType import UmlMessageType
 from umlshapes.frames.UmlClassCtxMenuHandler import UmlClassCtxMenuHandler
 from umlshapes.frames.UmlFrame import UmlFrame
 
-from umlshapes.UmlUtils import UmlUtils
+from umlshapes.utils.UmlUtils import UmlUtils
 from umlshapes.utils.ProximityUtils import ProximityUtils
 
 from umlshapes.shapes.UmlClass import UmlClass

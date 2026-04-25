@@ -20,7 +20,7 @@ from umlmodel.Interface import Interface
 from umlshapes.utils.ResourceUtils import ResourceUtils
 from umlshapes.lib.ogl import Shape
 
-from umlshapes.UmlUtils import UmlUtils
+from umlshapes.utils.UmlUtils import UmlUtils
 from umlshapes.mixins.IDMixin import IDMixin
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
