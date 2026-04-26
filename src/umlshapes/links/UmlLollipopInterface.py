@@ -20,8 +20,6 @@ from umlmodel.Interface import Interface
 from umlshapes.utils.ResourceUtils import ResourceUtils
 from umlshapes.lib.ogl import Shape
 
-from umlshapes.utils.UmlUtils import UmlUtils
-from umlshapes.utils.ShapeRelationshipUtils import ShapeRelationshipUtils
 from umlshapes.mixins.IDMixin import IDMixin
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
@@ -30,6 +28,8 @@ from umlshapes.mixins.TopLeftMixin import Rectangle
 from umlshapes.types.Common import AttachmentSide
 from umlshapes.types.Common import LollipopCoordinates
 from umlshapes.types.UmlPosition import UmlPosition
+
+from umlshapes.utils.ShapeRelationshipUtils import ShapeRelationshipUtils
 
 if TYPE_CHECKING:
     from umlshapes.shapes.UmlClass import UmlClass
@@ -159,7 +159,7 @@ class UmlLollipopInterface(Shape, IDMixin):
         rectangle: Rectangle = self._attachedTo.rectangle
         lollipopCoordinates: LollipopCoordinates = self._computeLollipopCoordinates(rectangle)
 
-        lollipopWasAbused: bool = UmlUtils.lollipopHitTest(x=x, y=y, attachmentSide=self.attachmentSide, lollipopCoordinates=lollipopCoordinates)
+        lollipopWasAbused: bool = ShapeRelationshipUtils.lollipopHitTest(x=x, y=y, attachmentSide=self.attachmentSide, lollipopCoordinates=lollipopCoordinates)
 
         if lollipopWasAbused:
             return 0, self

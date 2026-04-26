@@ -28,6 +28,7 @@ from umlmodel.Link import Link
 
 from umlshapes.utils.ShapeAnalysisUtils import LeftTopRectangleIndicator
 from umlshapes.utils.ShapeAnalysisUtils import RelativeRectangleResult
+from umlshapes.utils.ShapeAnalysisUtils import ShapeAnalysisUtils
 from umlshapes.utils.UmlUtils import UmlUtils
 
 from umlshapes.links.UmlLink import UmlLink
@@ -132,7 +133,7 @@ class UmlAssociation(UmlLink):
         rectangle1: Rectangle = sourceShape.rectangle
         rectangle2: Rectangle = destinationShape.rectangle
 
-        result: RelativeRectangleResult = UmlUtils.computeRelativeRectanglePosition(rectangle1=rectangle1, rectangle2=rectangle2)
+        result: RelativeRectangleResult = ShapeAnalysisUtils.computeRelativeRectanglePosition(rectangle1=rectangle1, rectangle2=rectangle2)
 
         if result.leftMostTopMostShape == LeftTopRectangleIndicator.RECTANGLE_1 and result.isOtherToBottom is True:
             self._repositionUmlLinkLabel(umlLinkLabel=self.destinationCardinality)

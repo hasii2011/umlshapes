@@ -6,6 +6,7 @@ from codeallybasic.UnitTestBase import UnitTestBase
 
 from umlshapes.utils.ShapeAnalysisUtils import LeftTopRectangleIndicator
 from umlshapes.utils.ShapeAnalysisUtils import RelativeRectangleResult
+from umlshapes.utils.ShapeAnalysisUtils import ShapeAnalysisUtils
 from umlshapes.utils.UmlUtils import UmlUtils
 from umlshapes.utils.ProximityUtils import ProximityUtils
 from umlshapes.utils.TransformationUtils import TransformationUtils
@@ -273,7 +274,7 @@ class TestUmlUtils(UnitTestBase):
         r1: Rectangle = Rectangle(0, 0, 10, 10)
         r2: Rectangle = Rectangle(20, 20, 30, 30)
 
-        result: RelativeRectangleResult = UmlUtils.computeRelativeRectanglePosition(rectangle1=r1, rectangle2=r2)
+        result: RelativeRectangleResult = ShapeAnalysisUtils.computeRelativeRectanglePosition(rectangle1=r1, rectangle2=r2)
 
         self.assertEqual(result.leftMostTopMostShape, LeftTopRectangleIndicator.RECTANGLE_1, 'Incorrect left most shape')
         self.assertTrue(result.isOtherToRight, 'It is to the right!')
@@ -284,7 +285,7 @@ class TestUmlUtils(UnitTestBase):
         r1: Rectangle = Rectangle(20, 20, 30, 30)
         r2: Rectangle = Rectangle(0, 0, 10, 10)
 
-        result: RelativeRectangleResult = UmlUtils.computeRelativeRectanglePosition(rectangle1=r1, rectangle2=r2)
+        result: RelativeRectangleResult = ShapeAnalysisUtils.computeRelativeRectanglePosition(rectangle1=r1, rectangle2=r2)
 
         self.assertEqual(result.leftMostTopMostShape, LeftTopRectangleIndicator.RECTANGLE_2, 'Incorrect left most shape')
         self.assertTrue(result.isOtherToRight, 'It is to the right!')
@@ -295,7 +296,7 @@ class TestUmlUtils(UnitTestBase):
 
         r1: Rectangle = Rectangle(0, 20, 10, 30)
         r2: Rectangle = Rectangle(0, 0, 10, 10)
-        result: RelativeRectangleResult = UmlUtils.computeRelativeRectanglePosition(r1, r2)
+        result: RelativeRectangleResult = ShapeAnalysisUtils.computeRelativeRectanglePosition(r1, r2)
 
         self.assertEqual(result.leftMostTopMostShape, LeftTopRectangleIndicator.RECTANGLE_2, 'Incorrect left most shape')
         self.assertFalse(result.isOtherToRight, 'It is NOT to the right!')
@@ -306,7 +307,7 @@ class TestUmlUtils(UnitTestBase):
         r1 = Rectangle(0, 0, 10, 10)
         r2 = Rectangle(20, -20, 30, -10)
 
-        result = UmlUtils.computeRelativeRectanglePosition(r1, r2)
+        result = ShapeAnalysisUtils.computeRelativeRectanglePosition(r1, r2)
 
         self.assertEqual(result.leftMostTopMostShape, LeftTopRectangleIndicator.RECTANGLE_1, 'Incorrect left most shape')
         self.assertTrue(result.isOtherToRight, 'It is to the right!')
