@@ -7,7 +7,6 @@ from codeallybasic.UnitTestBase import UnitTestBase
 from umlshapes.utils.ShapeAnalysisUtils import LeftTopRectangleIndicator
 from umlshapes.utils.ShapeAnalysisUtils import RelativeRectangleResult
 from umlshapes.utils.ShapeAnalysisUtils import ShapeAnalysisUtils
-from umlshapes.utils.UmlUtils import UmlUtils
 from umlshapes.utils.ProximityUtils import ProximityUtils
 from umlshapes.utils.TransformationUtils import TransformationUtils
 from umlshapes.utils.ShapeRelationshipUtils import ShapeRelationshipUtils

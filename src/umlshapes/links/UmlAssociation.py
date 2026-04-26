@@ -29,7 +29,6 @@ from umlmodel.Link import Link
 from umlshapes.utils.ShapeAnalysisUtils import LeftTopRectangleIndicator
 from umlshapes.utils.ShapeAnalysisUtils import RelativeRectangleResult
 from umlshapes.utils.ShapeAnalysisUtils import ShapeAnalysisUtils
-from umlshapes.utils.UmlUtils import UmlUtils
 
 from umlshapes.links.UmlLink import UmlLink
 from umlshapes.links.LabelType import LabelType

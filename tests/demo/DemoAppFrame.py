@@ -41,7 +41,6 @@ from umlmodel.ModelTypes import ClassName
 from umlmodel.SDInstance import SDInstance
 
 from tests.demo.LinkCreator import SmartPlacement
-from umlshapes.utils.UmlUtils import UmlUtils
 from umlshapes.utils.ShapeRelationshipUtils import ShapeRelationshipUtils
 from umlshapes.ShapeTypes import UmlShapeGenre
 from umlshapes.UmlDiagram import UmlDiagram

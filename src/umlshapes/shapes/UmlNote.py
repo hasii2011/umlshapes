@@ -14,7 +14,6 @@ from umlshapes.lib.ogl import RectangleShape
 
 from umlmodel.Note import Note
 
-from umlshapes.utils.UmlUtils import UmlUtils
 from umlshapes.utils.DrawingUtils import DrawingUtils
 from umlshapes.utils.ResourceUtils import ResourceUtils
 
@@ -140,7 +139,7 @@ class UmlNote(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin):
 
         try:
             noteContent = self.modelNote.content
-            lines = UmlUtils.lineSplitter(noteContent, dc, w - 2 * UmlNote.MARGIN)
+            lines = DrawingUtils.lineSplitter(noteContent, dc, w - 2 * UmlNote.MARGIN)
         except (ValueError, Exception) as e:
             self.logger.error(f"Unable to display note - {e}")
             return
