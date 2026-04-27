@@ -27,7 +27,7 @@ VERIFICATION_IMAGE_PATH: Path = Path(f'/tmp/{LINKS_IMAGE_FILENAME}')
 def selectShapesToMove():
     click(40, 115)
     # Select the shapes and link
-    dragTo(445, 515, duration=DRAG_DURATION, button=LEFT)
+    dragTo(500, 600, duration=DRAG_DURATION, button=LEFT)
 
 def testInterface():
     pullDownViewMenu()
@@ -96,9 +96,7 @@ if __name__ == '__main__':
     pyautogui.PAUSE = 0.5
     pyautogui.FAILSAFE = True
 
-    if isAppRunning() is False:
-        alert(text='The demo app is not running', title='Hey, bonehead', button='OK')
-    else:
+    if isAppRunning():
         makeAppActive()
         testInterface()
         testAggregation()
@@ -124,3 +122,5 @@ if __name__ == '__main__':
             assert False, 'Developer error'
 
         alert(text=message, title=title, button='OK')
+    else:
+        alert(text='The demo app is not running', title='Hey, bonehead', button='OK')

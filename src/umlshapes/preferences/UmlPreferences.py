@@ -2,9 +2,13 @@
 from logging import Logger
 from logging import getLogger
 
+from codeallybasic.Position import Position
+from codeallybasic.Dimensions import Dimensions
 from codeallybasic.SingletonV3 import SingletonV3
 from codeallybasic.SecureConversions import SecureConversions
 
+from tests.demo.DemoCommon import FRAME_HEIGHT
+from tests.demo.DemoCommon import FRAME_WIDTH
 from umlshapes.types.DeltaXY import DeltaXY
 from umlshapes.types.UmlColor import UmlColor
 from umlshapes.types.UmlPenStyle import UmlPenStyle
@@ -47,6 +51,10 @@ DEFAULT_ASSOCIATION_LABEL_FORMAT: str = (
     f'{UmlAssociationLabelFormat.FORMAT_CENTER_HORIZONTAL.value},'
     f'{UmlAssociationLabelFormat.FORMAT_CENTER_VERTICAL.value}'
 )
+
+TEST_POSITION: str = Position(20, 40).__str__()
+TEST_SIZE:     str = str(Dimensions(width=FRAME_WIDTH + 200, height=FRAME_HEIGHT + 100))
+
 
 PASTE_PREFERENCES: ValueDescriptions = ValueDescriptions(
     {
@@ -154,6 +162,9 @@ DEBUG_PREFERENCES: ValueDescriptions = ValueDescriptions(
         KeyName('trackMouseInterval'):      ValueDescription(defaultValue='10',    deserializer=SecureConversions.secureInteger),
         KeyName('drawLabelMarker'):         ValueDescription(defaultValue='False', deserializer=SecureConversions.secureBoolean),
         KeyName('debugSDInstance'):         ValueDescription(defaultValue='True',  deserializer=SecureConversions.secureBoolean),
+        KeyName('inTestMode'):              ValueDescription(defaultValue='False', deserializer=SecureConversions.secureBoolean),
+        KeyName('testPosition'):            ValueDescription(defaultValue=TEST_POSITION, deserializer=Position.deSerialize),
+        KeyName('testSize'):                ValueDescription(defaultValue=TEST_SIZE,     deserializer=Dimensions.deSerialize),
     }
 )
 

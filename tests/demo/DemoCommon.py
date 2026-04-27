@@ -12,6 +12,10 @@ INITIAL_Y:   int = 100
 INCREMENT_X: int = 25
 INCREMENT_Y: int = 25
 
+FRAME_WIDTH:  int = 1024
+FRAME_HEIGHT: int = 720
+
+
 
 class Identifiers:
     ID_DEMO_SHAPE_BOUNDARIES: ID_REFERENCE = wxNewIdRef()

@@ -59,7 +59,7 @@ LinkEventHandler = Union[UmlAssociationEventHandler, UmlLinkEventHandler]
 
 @dataclass
 class AssociationDescription:
-    associationClass: type[UmlAssociation] = cast(type[UmlAssociation], None)
+    associationClass: type[UmlAssociation] = cast(type[UmlAssociation], None)       # noqa
     linkType:         LinkType             = LinkType.ASSOCIATION
 
 
@@ -146,7 +146,7 @@ class LinkCreator:
         associationDescription: AssociationDescription = self._associations[idReference]
 
         sourceUmlClass, destinationUmlClass = self._createClassPair(diagramFrame=diagramFrame, destinationPosition=UmlPosition(200, y=400))
-        self.logger.info(f'{sourceUmlClass.id=} {destinationUmlClass.id=}')
+        self.logger.debug(f'{sourceUmlClass.id=} {destinationUmlClass.id=}')
 
         createLinkCommand: CreateLinkCommand = CreateLinkCommand(
             partialName=f'{associationDescription.linkType}',
@@ -305,7 +305,7 @@ class LinkCreator:
 
         eventHandler: UmlClassEventHandler = UmlClassEventHandler(previousEventHandler=umlClass.GetEventHandler())
 
-        # Don't change the order. The umlPubSubEngine property assumes the shape was assiged
+        # Don't change the order. The umlPubSubEngine property assumes the shape was assigned
         eventHandler.SetShape(umlClass)
         eventHandler.umlPubSubEngine = self._umlPubSubEngine
 

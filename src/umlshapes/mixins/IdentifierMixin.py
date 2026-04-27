@@ -9,7 +9,7 @@ class InvalidOperationError(Exception):
 class IdentifierMixin:
     """
     This is a replacement ID from Shape.  Developers should use the
-    properties to get human readable IDs.
+    properties to get human-readable IDs.
 
     Today, I will stash strings into a protected variable
 
@@ -54,3 +54,6 @@ class IdentifierMixin:
     @moveMaster.setter
     def moveMaster(self, newValue: bool):
         self._moveMaster = newValue
+
+    def _isSameId(self, other) -> bool:
+        return self.id == other.id

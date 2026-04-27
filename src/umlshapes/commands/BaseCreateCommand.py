@@ -63,7 +63,7 @@ ATTRIBUTE_NAME_MAP: Dict[type[UmlShapeGenre], str] = {
 # noinspection PyAbstractClass
 class BaseCreateCommand(Command, metaclass=MyMetaCommand):
     """
-    Used no-inspection because Pycharm seems to think this class is not abstract
+    Used no-inspection because PyCharm seems to think this class is not abstract
     """
     def __init__(self, canUndo: bool, name: str, umlPubSubEngine: IUmlPubSubEngine, umlFrame: UmlFrame, umlPosition: UmlPosition):
 
@@ -136,7 +136,7 @@ class BaseCreateCommand(Command, metaclass=MyMetaCommand):
 
         umlFrame.refresh()
 
-        self.logger.info(f'Created {type(self._shape)=}')
+        self.logger.debug(f'Created {type(self._shape)=}')
 
     def _removeLinkedUmlShapeFromFrame(self, umlFrame: UmlFrame, umlShape: UmlShapeGenre, modelClass: LinkedObject | None = None):
 

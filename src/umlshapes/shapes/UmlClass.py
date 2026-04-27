@@ -87,7 +87,7 @@ class UmlClass(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
         umlTextColor:       UmlColor = self._preferences.classTextColor
         self._textColor:    Colour   = Colour(UmlColor.toWxColor(umlTextColor))
         self._defaultFont:  Font     = ResourceUtils.defaultFont()
-        self._textHeight:   int      = cast(int, None)
+        self._textHeight:   int      = cast(int, None)                      # noqa
         self._margin:       int      = self._preferences.classTextMargin
 
         self.SetDraggable(drag=True)
@@ -140,7 +140,7 @@ class UmlClass(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
 
     def OnDraw(self, dc: MemoryDC):
 
-        if self.selected is True:
+        if self.selected:
             self.SetPen(ResourceUtils.redDashedPen())
         else:
             self.SetPen(ResourceUtils.blackSolidPen())
@@ -162,18 +162,18 @@ class UmlClass(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
 
         # drawing is restricted in the specified region of the device
         self._startClipping(dc=dc, leftX=x, leftY=y)
-        drawingYOffset = self._drawClassHeader(dc=dc, leftX=x, leftY=y, shapeWidth=w)
+        drawingYOffset = self._drawClassHeader(dc=dc, xLeft=x, yLeft=y, shapeWidth=w)
 
         # noinspection PySimplifyBooleanCheck
         if self.modelClass.showFields is True:
             dc.DrawLine(x, y + drawingYOffset, x + w, y + drawingYOffset)
-            drawingYOffset = self._drawClassFields(dc, leftX=x, leftY=y, startYOffset=drawingYOffset)
+            drawingYOffset = self._drawClassFields(dc, xLeft=x, yLeft=y, startYOffset=drawingYOffset)
 
         dc.DrawLine(x, y + drawingYOffset, x + w, y + drawingYOffset)
 
         # noinspection PySimplifyBooleanCheck
         if self.modelClass.showMethods is True:
-            self._drawClassMethods(dc=dc, leftX=x, leftY=y, startYOffset=drawingYOffset)
+            self._drawClassMethods(dc=dc, xLeft=x, yLeft=y, startYOffset=drawingYOffset)
 
         self._endClipping(dc=dc)
 
@@ -270,20 +270,20 @@ class UmlClass(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
 
         return size.width
 
-    def _drawClassHeader(self, dc: MemoryDC | ClientDC, leftX: int, leftY: int, shapeWidth: int) -> int:
+    def _drawClassHeader(self, dc: MemoryDC | ClientDC, xLeft: int, yLeft: int, shapeWidth: int) -> int:
         """
         Draw the class name and the stereotype name if necessary
 
         Args:
             dc:
-            leftX
-            leftY
+            xLeft
+            yLeft
             shapeWidth:
 
         Returns:  The updated y drawing position
         """
-        x: int = leftX
-        y: int = leftY
+        x: int = xLeft
+        y: int = yLeft
 
         headerMargin:   int = self._textHeight
         drawingYOffset: int = headerMargin
@@ -291,8 +291,8 @@ class UmlClass(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
         self._drawClassName(dc, drawingYOffset, shapeWidth, x, y)
         drawingYOffset += self._textHeight
 
-        drawingYOffset = self._drawStereotypeValue(dc=dc, leftX=leftX,
-                                                   leftY=leftY,
+        drawingYOffset = self._drawStereotypeValue(dc=dc, xLeft=xLeft,
+                                                   yLeft=yLeft,
                                                    shapeWidth=shapeWidth,
                                                    headerMargin=headerMargin,
                                                    drawingYOffset=drawingYOffset
@@ -319,22 +319,22 @@ class UmlClass(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
 
         dc.DrawText(className, nameX, nameY)
 
-    def _drawStereotypeValue(self, dc: MemoryDC | ClientDC, leftX: int, leftY: int, shapeWidth: int, headerMargin: int, drawingYOffset: int) -> int:
+    def _drawStereotypeValue(self, dc: MemoryDC | ClientDC, xLeft: int, yLeft: int, shapeWidth: int, headerMargin: int, drawingYOffset: int) -> int:
         """
         Draw the stereotype value;  If class has no stereotype, just leave a blank space
 
         Args:
             dc:
-            leftX
-            leftY
+            xLeft
+            yLeft
             shapeWidth:
             headerMargin:
             drawingYOffset:
 
         Returns:    Updated Y offset
         """
-        x: int = leftX
-        y: int = leftY
+        x: int = xLeft
+        y: int = yLeft
 
         stereoTypeValue:      str = self._getStereoTypeValue()
         stereoTypeValueWidth: int = self.textWidth(dc, stereoTypeValue)
@@ -348,19 +348,19 @@ class UmlClass(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
 
         return updatedYOffset
 
-    def _drawClassFields(self, dc: MemoryDC, leftX: int, leftY: int, startYOffset: int):
+    def _drawClassFields(self, dc: MemoryDC, xLeft: int, yLeft: int, startYOffset: int):
         """
 
         Args:
             dc:
-            leftX
-            leftY
+            xLeft
+            yLeft
             startYOffset:  Where to start drawing
 
         Returns:  The updated y drawing position
         """
-        x:       int = leftX
-        y:       int = leftY
+        x:       int = xLeft
+        y:       int = yLeft
         yOffset: int = startYOffset
 
         textHeight: int   = self._textHeight
@@ -386,14 +386,14 @@ class UmlClass(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
 
         return yOffset
 
-    def _drawClassMethods(self, dc: MemoryDC, leftX: int, leftY: int, startYOffset: int):
+    def _drawClassMethods(self, dc: MemoryDC, xLeft: int, yLeft: int, startYOffset: int):
         """
         Display methods
 
         Args:
             dc:
-            leftX
-            leftY
+            xLeft
+            yLeft
             startYOffset:
         """
         yOffset:    int = startYOffset
@@ -410,11 +410,11 @@ class UmlClass(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
             if self._eligibleToDraw(modelClass=modelClass, method=method) is True:
 
                 displayParameters: DisplayParameters = modelClass.displayParameters
-                self._drawMethod(dc, method, displayParameters, leftX=leftX, leftY=leftY, startYOffset=yOffset)
+                self._drawMethod(dc, method, displayParameters, xLeft=xLeft, yLeft=yLeft, startYOffset=yOffset)
 
                 yOffset += textHeight
 
-    def _drawMethod(self, dc: MemoryDC, method: Method, displayParameters: DisplayParameters, leftX: int, leftY: int, startYOffset: int):
+    def _drawMethod(self, dc: MemoryDC, method: Method, displayParameters: DisplayParameters, xLeft: int, yLeft: int, startYOffset: int):
         """
         If the preference is not set at the individual class level, then defer to global preference; Otherwise,
         respect the class level preference
@@ -423,12 +423,12 @@ class UmlClass(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
             dc:
             method:
             displayParameters:
-            leftX
-            leftY
+            xLeft
+            yLeft
             startYOffset:
         """
-        x: int = leftX
-        y: int = leftY
+        x: int = xLeft
+        y: int = yLeft
 
         methodStr: str = self._getMethodRepresentation(method, displayParameters)
 
@@ -497,21 +497,7 @@ class UmlClass(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
         return ans
 
     def _isSameName(self, other) -> bool:
-
-        ans: bool = False
-        selfModelClass:   Class = self.modelClass
-        otherModelClass: Class = other.modelClass
-
-        if selfModelClass.name == otherModelClass.name:
-            ans = True
-        return ans
-
-    def _isSameId(self, other):
-
-        ans: bool = False
-        if self.id == other.id:
-            ans = True
-        return ans
+        return self.modelClass.name == other.modelClass.name
 
     def _startClipping(self, dc: DC, leftX: int, leftY: int):
         """
@@ -570,9 +556,7 @@ class UmlClass(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
         """
         Account for
             Margin above class name
-            Class Name
-            Margin above Stereotype
-            Stereotype Name or place holder
+            Margin above Stereotype Name or placeholder
             Margin below Stereotype name
 
         Returns: The highest based on the font set in the DC
@@ -722,15 +706,10 @@ class UmlClass(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
     def __eq__(self, other) -> bool:
 
         if isinstance(other, UmlClass):
-            if self._isSameName(other) is True and self._isSameId(other) is True:
-                return True
-            else:
-                return False
+            return self._isSameName(other) and self._isSameId(other)
         else:
             return False
 
     def __hash__(self):
 
-        selfModelClass: Class = self.modelClass
-
-        return hash(selfModelClass.name) + hash(self.id)
+        return hash((self.modelClass.name, self.id))

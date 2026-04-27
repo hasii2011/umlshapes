@@ -31,16 +31,19 @@ from wx import CommandEvent
 from wx import BookCtrlEvent
 from wx import MenuItem
 from wx import MessageDialog
+from wx import Point
 
 from wx.lib.sized_controls import SizedFrame
 from wx.lib.sized_controls import SizedPanel
+
+from codeallybasic.Dimensions import Dimensions
+from codeallybasic.Position import Position
 
 from umlmodel.Interface import Interface
 from umlmodel.Interface import Interfaces
 from umlmodel.ModelTypes import ClassName
 from umlmodel.SDInstance import SDInstance
 
-from tests.demo.LinkCreator import SmartPlacement
 from umlshapes.utils.ShapeRelationshipUtils import ShapeRelationshipUtils
 from umlshapes.ShapeTypes import UmlShapeGenre
 from umlshapes.UmlDiagram import UmlDiagram
@@ -71,16 +74,18 @@ from umlshapes.types.Common import AttachmentSide
 from umlshapes.types.UmlPosition import UmlPosition
 
 from tests.demo.DemoCommon import Identifiers
+from tests.demo.DemoCommon import FRAME_WIDTH
+from tests.demo.DemoCommon import FRAME_HEIGHT
+
 from tests.demo.LinkCreator import LinkCreator
+from tests.demo.LinkCreator import SmartPlacement
+
 from tests.demo.ShapeCreator import ShapeCreator
 from tests.demo.DemoClassDiagramFrame import DemoClassDiagramFrame
 
 from tests.demo.DlgUmlShapesPreferences import DlgUmlShapesPreferences
 
 DEMO_RUNNING_INDICATOR: str = '/tmp/DemoRunning.txt'
-
-FRAME_WIDTH:  int = 1024
-FRAME_HEIGHT: int = 720
 
 DemoFrame = DemoClassDiagramFrame | SequenceDiagramFrame
 
@@ -94,9 +99,9 @@ class DemoAppFrame(SizedFrame):
         sizedPanel.SetSizerProps(expand=True, proportion=1)
 
         self._umlPubSubEngine: UmlPubSubEngine = UmlPubSubEngine()
-        self._editMenu:        Menu            = cast(Menu, None)
-        self._shapeItem:       MenuItem        = cast(MenuItem, None)
-        self._messageItem:     MenuItem        = cast(MenuItem, None)
+        self._editMenu:        Menu            = cast(Menu, None)           # noqa
+        self._shapeItem:       MenuItem        = cast(MenuItem, None)       # noqa
+        self._messageItem:     MenuItem        = cast(MenuItem, None)       # noqa
 
         self._noteBook: Notebook = Notebook(parent=sizedPanel)
         self._noteBook.SetSizerProps(expand=True, proportion=1)
@@ -136,7 +141,10 @@ class DemoAppFrame(SizedFrame):
 
         self._shapeCreator:     ShapeCreator     = ShapeCreator(umlPubSubEngine=self._umlPubSubEngine)
         self._linkCreator:      LinkCreator      = LinkCreator(umlPubSubEngine=self._umlPubSubEngine)
-        self._sdMessageHandler: SDMessageCreationHandler = SDMessageCreationHandler(umlPubSubEngine=self._umlPubSubEngine, sequenceDiagramFrame=self._currentFrame)
+        self._sdMessageHandler: SDMessageCreationHandler = SDMessageCreationHandler(
+            umlPubSubEngine=self._umlPubSubEngine,
+            sequenceDiagramFrame=cast(SequenceDiagramFrame, self._currentFrame)
+        )
 
         self._preferences:  UmlPreferences = UmlPreferences()
 
@@ -149,8 +157,7 @@ class DemoAppFrame(SizedFrame):
         self.Bind(EVT_NOTEBOOK_PAGE_CHANGED, self._onFrameDisplayedChanged)
         self.Bind(EVT_CLOSE,    self.Close)
 
-        iAmRunningPath: Path = Path(DEMO_RUNNING_INDICATOR)
-        iAmRunningPath.touch()
+        self._setTestItems()
 
     def Close(self, force: bool = False) -> bool:
         iAmRunningPath: Path = Path(DEMO_RUNNING_INDICATOR)
@@ -265,8 +272,8 @@ class DemoAppFrame(SizedFrame):
 
         from umlshapes.ShapeTypes import UmlShapes
 
-        if event.IsChecked() is True:
-            frame: ClassDiagramFrame = self._currentFrame
+        if event.IsChecked():
+            frame: ClassDiagramFrame = cast(ClassDiagramFrame, self._currentFrame)
 
             umlShapes:  UmlShapes = frame.umlShapes
             if len(umlShapes) == 0:     # noqa
@@ -294,9 +301,9 @@ class DemoAppFrame(SizedFrame):
 
     def _onDemoSDMessageCreation(self, event: CommandEvent):
 
-        if event.IsChecked() is True:
-            diagramFrame: SequenceDiagramFrame = self._currentFrame
-            if isinstance(diagramFrame, SequenceDiagramFrame) is True:
+        if event.IsChecked():
+            diagramFrame: SequenceDiagramFrame = cast(SequenceDiagramFrame, self._currentFrame)
+            if isinstance(diagramFrame, SequenceDiagramFrame):
                 self._sdMessageHandler.enableMessageCreation = True
             else:
                 msgDlg: MessageDialog = MessageDialog(
@@ -374,7 +381,7 @@ class DemoAppFrame(SizedFrame):
             diagramFrame:
 
         """
-        if isinstance(diagramFrame, SequenceDiagramFrame) is True:
+        if isinstance(diagramFrame, SequenceDiagramFrame):
 
             self._createSDInstance(diagramFrame=diagramFrame, instanceName='instance1', xCoordinate=100)
             self._createSDInstance(diagramFrame=diagramFrame, instanceName='instance2', xCoordinate=300)
@@ -443,10 +450,6 @@ class DemoAppFrame(SizedFrame):
         umlLollipopInterface.Show(show=True)
         self.logger.info(f'UmlInterface added: {umlLollipopInterface}')
 
-        # eventHandler: UmlLollipopInterfaceEventHandler = UmlLollipopInterfaceEventHandler(lollipopInterface=umlLollipopInterface)
-        # eventHandler.SetPreviousHandler(umlLollipopInterface.GetEventHandler())
-        # umlLollipopInterface.SetEventHandler(eventHandler)
-        # Looks weired but don't need the result
         UmlLollipopInterfaceEventHandler(lollipopInterface=umlLollipopInterface)
 
         pubsubEngine: IUmlPubSubEngine  = requestingFrame.umlPubSubEngine
@@ -488,7 +491,7 @@ class DemoAppFrame(SizedFrame):
         #
         # Toggle the menu item based on the current frame value
         #
-        if isinstance(self._currentFrame, DemoClassDiagramFrame) is True:
+        if isinstance(self._currentFrame, DemoClassDiagramFrame):
             self._shapeItem.Check(check=self._currentFrame.drawShapeBoundary)
 
     def _subscribeFrameToRelevantFrameTopics(self, frameId: FrameId):
@@ -550,3 +553,23 @@ class DemoAppFrame(SizedFrame):
         diagramFrame.refresh()
 
         return umlSDInstance
+
+    def _setTestItems(self):
+        """
+        Set inTestMode to True in the Debug section of the Uml Shapes preferences
+        in order to guarantee these tests run correctly
+
+        * Override user application positioning
+        * Set the running indicator file
+
+        """
+        from pathlib import Path
+        if self._preferences.inTestMode is True:
+            testPosition: Position   = self._preferences.testPosition
+            testSize:     Dimensions = self._preferences.testSize
+
+            self.SetPosition(pt=Point(x=testPosition.x, y=testPosition.y))
+            self.SetSize(width=testSize.width, height=testSize.height)
+
+            iAmRunningPath: Path = Path(DEMO_RUNNING_INDICATOR)
+            iAmRunningPath.touch()

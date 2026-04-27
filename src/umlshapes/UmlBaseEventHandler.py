@@ -4,7 +4,7 @@ from typing import List
 from typing import NewType
 from typing import TYPE_CHECKING
 
-from logging import INFO
+from logging import DEBUG
 from logging import Logger
 from logging import getLogger
 
@@ -39,7 +39,7 @@ class UmlBaseEventHandler(ShapeEvtHandler):
 
         super().__init__(shape=shape, prev=previousEventHandler)
 
-        self._umlPubSubEngine:  IUmlPubSubEngine = cast(IUmlPubSubEngine, None)
+        self._umlPubSubEngine:  IUmlPubSubEngine = cast(IUmlPubSubEngine, None)     # noqa
         self._previousPosition: UmlPosition      = NO_POSITION
 
         self._initialPositions:  InitialPositions = InitialPositions({})
@@ -83,6 +83,13 @@ class UmlBaseEventHandler(ShapeEvtHandler):
             self._saveSelectedShapesInitialPositions()
 
             umlFrame.markShapeAsMoved(umlShape=umlShape)
+            #
+            # Save the master shape position, in case he is not selected
+            #
+            self._initialPositions[ShapeId(umlShape.id)] = umlShape.position
+
+            self._baseLogger.info(f'Initial Position Count: {len(self._initialPositions)}')
+
             self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.FRAME_MODIFIED, frameId=umlShape.umlFrame.id, modifiedFrameId=umlShape.umlFrame.id)
         else:
             if not isinstance(umlShape, UmlLinkLabel) and not isinstance(umlShape, UmlLink):
@@ -108,12 +115,14 @@ class UmlBaseEventHandler(ShapeEvtHandler):
 
         """
         from umlshapes.frames.UmlFrame import UmlFrame
+        from umlshapes.frames.ShapeMoveInfo import InitialPositions
+
         from umlshapes.ShapeTypes import UmlShapeGenre
         from umlshapes.commands.ShapesMovedCommand import ShapesMovedCommand
 
         self._previousPosition = NO_POSITION
         umlShape: UmlShapeGenre = cast(UmlShapeGenre, self.GetShape())
-        self._baseLogger.info(f'{umlShape.id} - {umlShape.moveMaster}')
+        self._baseLogger.debug(f'{umlShape.id} - {umlShape.moveMaster}')
         umlShape.moveMaster = False
 
         umlFrame: UmlFrame = umlShape.umlFrame
@@ -123,11 +132,13 @@ class UmlBaseEventHandler(ShapeEvtHandler):
             initialPositions=self._initialPositions
         )
         umlFrame.commandProcessor.Submit(command=shapesMovedCommand, storeIt=True)
-        self._baseLogger.info(f'Pre clear {umlFrame.shapesMoving=}')
+        self._baseLogger.debug(f'Pre clear {umlFrame.shapesMoving=}')
 
         self._debugDumpMovedShapes(umlFrame)
         umlFrame.clearMovedShapes()
-        self._baseLogger.info(f'Post clear {umlFrame.shapesMoving=}')
+        self._initialPositions = InitialPositions({})
+
+        self._baseLogger.debug(f'Post clear {umlFrame.shapesMoving=}')
 
         super().OnEndDragLeft(x, y, keys, attachment)
 
@@ -248,12 +259,12 @@ class UmlBaseEventHandler(ShapeEvtHandler):
         """
         from os import linesep
 
-        if self._baseLogger.isEnabledFor(INFO):
-            self._baseLogger.info(f'----------- Start -----------')
-            self._baseLogger.info(f'Pre clear {umlFrame.shapesMoving=}')
+        if self._baseLogger.isEnabledFor(DEBUG):
+            self._baseLogger.debug(f'----------- Start -----------')
+            self._baseLogger.debug(f'Pre clear {umlFrame.shapesMoving=}')
             debugLines: str = ''
             for umlId, shapeMovedInfo in umlFrame.movedShapes.items():
                 debugLines = f'{debugLines}{linesep}{shapeMovedInfo=}'
 
-            self._baseLogger.info(debugLines)
-            self._baseLogger.info(f'----------- End -----------')
+            self._baseLogger.debug(debugLines)
+            self._baseLogger.debug(f'----------- End -----------')

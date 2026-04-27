@@ -313,6 +313,9 @@ class UmlActor(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
 
         dc.DrawText(self.modelActor.name, round(x - 0.5 * textWidth), y)
 
+    def _isSameName(self, other) -> bool:
+        return self.modelActor.name == other.modelActor.name
+
     def __str__(self) -> str:
         return self.modelActor.name
 
@@ -320,3 +323,14 @@ class UmlActor(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
 
         strMe: str = f"[UmlActor - umlId: `{self.id} `modelId: '{self.modelActor.id}']"
         return strMe
+
+    def __eq__(self, other) -> bool:
+
+        if isinstance(other, UmlActor):
+            return self._isSameName(other) and self._isSameId(other)
+        else:
+            return False
+
+    def __hash__(self):
+
+        return hash((self.modelActor.name, self.id))

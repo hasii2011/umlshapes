@@ -1,5 +1,9 @@
 
 from typing import TYPE_CHECKING
+
+from logging import Logger
+from logging import getLogger
+
 from datetime import datetime
 
 from wx import ClientDC
@@ -27,7 +31,8 @@ class ShapesMovedCommand(Command):
                          (which contains the shape and its original position).
         """
         from umlshapes.frames.ShapeMoveInfo import MovedShapes
-        from umlshapes.frames.ShapeMoveInfo import ShapeId
+
+        self.logger: Logger = getLogger(__name__)
 
         self._umlFrame:          UmlFrame         = umlFrame
         self._movedShapes:       MovedShapes      = movedShapes
@@ -37,7 +42,7 @@ class ShapesMovedCommand(Command):
 
         # Naming logic similar to BaseCommand
         dt: datetime = datetime.now()
-        self._name = f'Move-{dt.microsecond}'
+        self._name = f'ShapeMove-{dt.microsecond}'
 
         #
         # Command is not created until shapes are completely moved
@@ -56,8 +61,9 @@ class ShapesMovedCommand(Command):
         This method is called when the command is submitted.
         However, Undo followed by redo will call this method again
         """
-        if self._initialDoComplete is False:
+        if not self._initialDoComplete:
             self._initialDoComplete = True
+            self.logger.info(f'Do - {self._name}')
         else:
             self.Redo()
 
@@ -67,6 +73,8 @@ class ShapesMovedCommand(Command):
         """
         Restore shapes to their original positions.
         """
+        self.logger.info(f'Undo - {self._name}')
+
         dc: ClientDC = ClientDC(self._umlFrame)
         self._umlFrame.PrepareDC(dc)
 
@@ -79,13 +87,15 @@ class ShapesMovedCommand(Command):
             umlShape.position = umlPosition
             umlShape.MoveLinks(dc)
             
-        self._umlFrame.Refresh()
+        self._umlFrame.refresh()
         return True
 
     def Redo(self) -> bool:
         """
         Move shapes back to their final positions.
         """
+        self.logger.info(f'Redo - {self._name}')
+
         dc: ClientDC = ClientDC(self._umlFrame)
         self._umlFrame.PrepareDC(dc)
 
@@ -96,5 +106,5 @@ class ShapesMovedCommand(Command):
             umlShape.position = finalPos
             umlShape.MoveLinks(dc)
 
-        self._umlFrame.Refresh()
+        self._umlFrame.refresh()
         return True

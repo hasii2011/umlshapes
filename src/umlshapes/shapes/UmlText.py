@@ -94,7 +94,7 @@ class UmlText(ControlPointMixin, IdentifierMixin, TextShape, TopLeftMixin):
         self.AddText(self._modelText.content)
 
         self._initializeTextFont()
-        self._menu: Menu = cast(Menu, None)
+        self._menu: Menu = cast(Menu, None)     # noqa
 
         umlBackgroundColor: UmlColor = self._preferences.textBackGroundColor
         backgroundColor:    Colour   = Colour(UmlColor.toWxColor(umlBackgroundColor))
@@ -208,7 +208,7 @@ class UmlText(ControlPointMixin, IdentifierMixin, TextShape, TopLeftMixin):
 
     def addChild(self, shape: Shape):
         """
-        The event handler for UML Control Points wants to know who its` parent is
+        The event handler for UML Control Points wants to know who its parent is
         Args:
             shape:
         """
@@ -222,12 +222,12 @@ class UmlText(ControlPointMixin, IdentifierMixin, TextShape, TopLeftMixin):
 
         self._textFont.SetPointSize(self.textSize)
 
-        if self.isBold is True:
+        if self.isBold:
             self._textFont.SetWeight(FONTWEIGHT_BOLD)
-        if self.isItalicized is True:
+        if self.isItalicized:
             self._textFont.SetWeight(FONTWEIGHT_NORMAL)
 
-        if self.isItalicized is True:
+        if self.isItalicized:
             self._textFont.SetStyle(FONTSTYLE_ITALIC)
         else:
             self._textFont.SetStyle(FONTSTYLE_NORMAL)
@@ -237,6 +237,9 @@ class UmlText(ControlPointMixin, IdentifierMixin, TextShape, TopLeftMixin):
 
         self.SetFont(self._textFont)
 
+    def _isSameName(self, other) -> bool:
+        return self.modelText.name == other.modelText.name
+
     def __str__(self) -> str:
         return self.modelText.content
 
@@ -244,3 +247,14 @@ class UmlText(ControlPointMixin, IdentifierMixin, TextShape, TopLeftMixin):
 
         strMe: str = f"[UmlText - umlId: `{self.id} `modelId: '{self.modelText.id}']"
         return strMe
+
+    def __eq__(self, other) -> bool:
+
+        if isinstance(other, UmlText):
+            return self._isSameName(other) and self._isSameId(other)
+        else:
+            return False
+
+    def __hash__(self):
+
+        return hash((self.modelText.name, self.id))

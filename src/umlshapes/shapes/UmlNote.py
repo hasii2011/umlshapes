@@ -39,7 +39,7 @@ if TYPE_CHECKING:
 
 class UmlNote(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin):
     """
-    This is an UML object that represents a UML note in diagrams.
+    This is a UML object that represents a UML note in diagrams.
     A note may be linked only with a basic link
 
     Notice that the IdentifierMixin is placed before any Shape mixin.
@@ -165,6 +165,9 @@ class UmlNote(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin):
         # self.logger.info(f'Position: ({baseX},{baseY})  {w=} {x1=} {y1=} {x2=} {y2=}')
         dc.DrawLine(x1, y1, x2, y2)
 
+    def _isSameName(self, other) -> bool:
+        return self.modelNote.name == other.modelNote.name
+
     def __str__(self) -> str:
         modelNote: Note = self._modelNote
         if modelNote is None:
@@ -175,3 +178,14 @@ class UmlNote(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin):
     def __repr__(self):
 
         return f'UmlNote - umlId: `{self.id}` modelId: {self.modelNote.id}'
+
+    def __eq__(self, other) -> bool:
+
+        if isinstance(other, UmlNote):
+            return self._isSameName(other) and self._isSameId(other)
+        else:
+            return False
+
+    def __hash__(self):
+
+        return hash((self.modelNote.name, self.id))

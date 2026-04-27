@@ -6,7 +6,7 @@ import pyautogui
 from pyautogui import click
 from pyautogui import dragTo
 
-# Hmm why is this coming from here
+# Hmm? why is this coming from here
 from pymsgbox import alert
 
 from codeallybasic.UnitTestBase import UnitTestBase
@@ -73,7 +73,8 @@ def testClass():
     pullDownViewMenu()
     # Show Class
     click(235, 200, button=LEFT)
-    # Select Class  Does not pop edit up dialog
+    # Click Ok
+    click(984, 681, button=LEFT)
     click(200, 230, button=LEFT)
     dragTo(645, 550, duration=DRAG_DURATION, button=LEFT)
 
@@ -87,11 +88,16 @@ def wasTestSuccessful() -> VerifyStatus:
 
 
 if __name__ == '__main__':
+    #
+    #  To run successfully make sure the demo App is close to the
+    #
 
     pyautogui.PAUSE = 0.5
+    pyautogui.FAILSAFE = True
+
     DRAG_DURATION: float = 0.5
 
-    if isAppRunning() is False:
+    if not isAppRunning():
         alert(text='The demo app is not running', title='Hey, bonehead', button='OK')
     else:
         makeAppActive()

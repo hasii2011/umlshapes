@@ -354,7 +354,7 @@ class UmlFrame(DiagramFrame):
         from umlshapes.frames.ShapeMoveInfo import ShapeId
 
         shapeId: ShapeId  = ShapeId(umlShape.id)
-        self.ufLogger.info(f'{shapeId=}')
+        self.ufLogger.debug(f'{shapeId=}')
         if shapeId not in self._movedShapes:
             self._movedShapes[shapeId] = ShapeMoveInfo(
                 umlShape=umlShape,

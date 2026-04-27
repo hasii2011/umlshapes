@@ -151,8 +151,23 @@ class UmlUseCase(ControlPointMixin,  IdentifierMixin, EllipseShape, TopLeftMixin
         self._controlPoints[3]._xoffset = left
         self._controlPoints[3]._yoffset = 0
 
+    def _isSameName(self, other) -> bool:
+        return self.modelUseCase.name == other.modelUseCase.name
+
     def __str__(self) -> str:
         return self.modelUseCase.name
 
     def __repr__(self) -> str:
         return f"[UmlUseCase - umlId: `{self.id} `modelId: '{self.modelUseCase.id}']"
+
+    def __eq__(self, other) -> bool:
+
+        if isinstance(other, UmlUseCase):
+            return self._isSameName(other) and self._isSameId(other)
+        else:
+            return False
+
+    def __hash__(self):
+
+        return hash((self.modelUseCase.name, self.id))
+
