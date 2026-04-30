@@ -44,11 +44,15 @@ from umlmodel.Interface import Interfaces
 from umlmodel.ModelTypes import ClassName
 from umlmodel.SDInstance import SDInstance
 
+from umlshapes.preferences.UmlPreferences import FRAME_WIDTH
+from umlshapes.preferences.UmlPreferences import UmlPreferences
+
 from umlshapes.utils.ShapeRelationshipUtils import ShapeRelationshipUtils
 from umlshapes.ShapeTypes import UmlShapeGenre
 from umlshapes.UmlDiagram import UmlDiagram
 
 from umlshapes.dialogs.DlgEditInterface import DlgEditInterface
+
 from umlshapes.frames.SequenceDiagramFrame import SequenceDiagramFrame
 from umlshapes.frames.UseCaseDiagramFrame import UseCaseDiagramFrame
 
@@ -63,7 +67,6 @@ from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
 from umlshapes.links.UmlLollipopInterface import UmlLollipopInterface
 from umlshapes.links.eventhandlers.UmlLollipopInterfaceEventHandler import UmlLollipopInterfaceEventHandler
 
-from umlshapes.preferences.UmlPreferences import UmlPreferences
 from umlshapes.sd.SDMessageCreationHandler import SDMessageCreationHandler
 
 from umlshapes.shapes.UmlClass import UmlClass
@@ -74,8 +77,6 @@ from umlshapes.types.Common import AttachmentSide
 from umlshapes.types.UmlPosition import UmlPosition
 
 from tests.demo.DemoCommon import Identifiers
-from tests.demo.DemoCommon import FRAME_WIDTH
-from tests.demo.DemoCommon import FRAME_HEIGHT
 
 from tests.demo.LinkCreator import LinkCreator
 from tests.demo.LinkCreator import SmartPlacement
@@ -93,6 +94,7 @@ class DemoAppFrame(SizedFrame):
     def __init__(self):
         self.logger: Logger = getLogger(__name__)
 
+        from umlshapes.preferences.UmlPreferences import FRAME_HEIGHT
         super().__init__(parent=None, title='Test UML Shapes', size=(FRAME_WIDTH, FRAME_HEIGHT), style=DEFAULT_FRAME_STYLE | FRAME_FLOAT_ON_PARENT)
 
         sizedPanel: SizedPanel = self.GetContentsPane()

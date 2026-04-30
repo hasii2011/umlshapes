@@ -2,7 +2,7 @@
 from typing import Union
 from typing import cast
 
-from enum import Enum
+from enum import StrEnum
 
 from dataclasses import dataclass
 
@@ -19,11 +19,11 @@ from umlshapes.types.UmlPosition import UmlPosition
 ModelObject = Union[Text, Note, Actor, Class, UseCase, Link, Interface]
 
 
-NOT_SET_INT: int = cast(int, None)
+NOT_SET_INT: int = cast(int, None)      # noqa
 TAB:         str = '\t'
 
 
-class AttachmentSide(Enum):
+class AttachmentSide(StrEnum):
     """
     Cardinal points, taken to correspond to the attachment points of any shape
     in a Cartesian coordinate system.
