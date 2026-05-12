@@ -48,7 +48,7 @@ class UmlColor(Enum):
         cdb.AddColour(UmlColor.AF_BLUE.value, Colour(0, 48, 143))
 
         c: Colour = cdb.Find(colorEnum.value)
-        if c.IsOk() is False:
+        if not c.IsOk():
             c = cdb.Find(UmlColor.BLACK.value)
             print('Cannot find color use default')
 

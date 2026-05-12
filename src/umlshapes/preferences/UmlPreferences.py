@@ -75,7 +75,6 @@ UML_SHAPE_PREFERENCES: ValueDescriptions = ValueDescriptions(
         KeyName('textFontFamily'):       ValueDescription(defaultValue='Swiss',                     deserializer=UmlFontFamily.deSerialize),
         KeyName('textFontSize'):         ValueDescription(defaultValue='14',                        deserializer=SecureConversions.secureInteger),
         KeyName('textBackGroundColor'):  ValueDescription(defaultValue=DEFAULT_TEXT_BACKGROUND_COLOR, enumUseValue=True, deserializer=UmlColor),
-        KeyName('textBackGroundColor'):  ValueDescription(defaultValue=DEFAULT_TEXT_BACKGROUND_COLOR, enumUseValue=True, deserializer=UmlColor),
 
         KeyName('displayConstructor'):   ValueDescription(defaultValue='True',                      deserializer=SecureConversions.secureBoolean),
         KeyName('displayDunderMethods'): ValueDescription(defaultValue='True',                      deserializer=SecureConversions.secureBoolean),

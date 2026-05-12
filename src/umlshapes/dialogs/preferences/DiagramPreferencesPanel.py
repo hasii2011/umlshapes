@@ -102,20 +102,20 @@ class DiagramPreferencesPanel(BasePreferencesPanel):
         super().__init__(parent)
         self.SetSizerType('vertical')
 
-        self._enableBackgroundGrid: CheckBox = cast(CheckBox, None)
-        self._snapToGrid:           CheckBox = cast(CheckBox, None)
-        self._centerDiagramView:    CheckBox = cast(CheckBox, None)
-        self._showParameters:       CheckBox = cast(CheckBox, None)
+        self._enableBackgroundGrid: CheckBox = cast(CheckBox, None)         # noqa
+        self._snapToGrid:           CheckBox = cast(CheckBox, None)         # noqa
+        self._centerDiagramView:    CheckBox = cast(CheckBox, None)         # noqa
+        self._showParameters:       CheckBox = cast(CheckBox, None)         # noqa
 
-        self._virtualWindowWidth:   NamedSpinCtrl = cast(NamedSpinCtrl, None)
+        self._virtualWindowWidth:   NamedSpinCtrl = cast(NamedSpinCtrl, None)   # noqa
 
-        self._gridInterval:         SpinCtrl = cast(SpinCtrl, None)
-        self._gridLineColor:        ComboBox = cast(ComboBox, None)
-        self._gridStyleChoice:      Choice   = cast(Choice, None)
+        self._gridInterval:         SpinCtrl = cast(SpinCtrl, None)     # noqa
+        self._gridLineColor:        ComboBox = cast(ComboBox, None)     # noqa
+        self._gridStyleChoice:      Choice   = cast(Choice, None)       # noqa
 
-        self._normalBackgroundColor:   ComboBox = cast(ComboBox, None)
-        self._darkModeBackgroundColor: ComboBox = cast(ComboBox, None)
-        self._darkModeGridLineColor:   ComboBox = cast(ComboBox, None)
+        self._normalBackgroundColor:   ComboBox = cast(ComboBox, None)  # noqa
+        self._darkModeBackgroundColor: ComboBox = cast(ComboBox, None)  # noqa
+        self._darkModeGridLineColor:   ComboBox = cast(ComboBox, None)  # noqa
 
         self._layoutControls(self)
         self._setControlValues()

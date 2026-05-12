@@ -1,6 +1,5 @@
 
 from typing import List
-from typing import cast
 from typing import Callable
 
 from logging import Logger
@@ -76,14 +75,14 @@ class ClassPreferencesPanel(BasePreferencesPanel):
 
         super().__init__(parent)
 
-        self._className:            TextCtrl        = cast(TextCtrl, None)
-        self._classDimensions:      ClassDimensions = cast(ClassDimensions, None)
-        self._classTextMargin:      SpinCtrl        = cast(SpinCtrl, None)
-        self._classBackgroundColor: Choice          = cast(Choice, None)
-        self._classTextColor:       Choice          = cast(Choice, None)
+        self._className:            TextCtrl
+        self._classDimensions:      ClassDimensions
+        self._classTextMargin:      SpinCtrl
+        self._classBackgroundColor: Choice
+        self._classTextColor:       Choice
 
-        self._displayDunderMethods: CheckBox      = cast(CheckBox, None)
-        self._displayConstructor:   CheckBox      = cast(CheckBox, None)
+        self._displayDunderMethods: CheckBox
+        self._displayConstructor:   CheckBox
 
         self.SetSizerType('vertical')
         self._layoutControls(self)
