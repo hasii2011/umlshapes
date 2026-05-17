@@ -27,21 +27,21 @@
     },
     "loggers": {
         "umlshapes": {
-            "level": "INFO",
+            "level": "WARNING",
             "handlers": ["consoleHandler"],
             "propagate": false
         },
         "tests": {
-            "level": "INFO",
+            "level": "WARNING",
             "propagate": false
         },
         "tests.demo": {
-            "level": "INFO",
+            "level": "WARNING",
             "handlers": ["consoleHandler"],
             "propagate": false
         },
         "codeallybasic.UnitTestBase": {
-            "level": "INFO",
+            "level": "WARNING",
             "handlers": ["consoleHandler"],
             "propagate": false
         }

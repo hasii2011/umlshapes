@@ -13,14 +13,13 @@ from wx.lib.embeddedimage import PyEmbeddedImage
 
 from wx.lib.sized_controls import SizedPanel
 
-from codeallyadvanced.resources.images.DefaultPreferences import embeddedImage as DefaultPreferences
-
-from codeallyadvanced.resources.images.icons.embedded16.ImgToolboxNote import embeddedImage as ImgToolboxNote
-from codeallyadvanced.resources.images.icons.embedded16.ImgToolboxText import embeddedImage as ImgToolboxText
-from codeallyadvanced.resources.images.icons.embedded16.ImgToolboxClass import embeddedImage as ImgToolboxClass
-from codeallyadvanced.resources.images.icons.embedded16.ImgToolboxSequenceDiagramInstance import embeddedImage as ImgToolboxSequenceDiagramInstance
-from codeallyadvanced.resources.images.icons.embedded16.ImgToolboxRelationshipComposition import embeddedImage as ImgToolboxRelationshipComposition
-from codeallyadvanced.resources.images.icons.embedded16.UmlLollipop import embeddedImage as UmlLollipop
+from codeallyadvanced.resources.minimalistglyph.Embedded32 import DefaultPreferences
+from codeallyadvanced.resources.minimalistglyph.Embedded32 import Note as ImgToolboxNote
+from codeallyadvanced.resources.minimalistglyph.Embedded32 import Text as ImgToolboxText
+from codeallyadvanced.resources.minimalistglyph.Embedded32 import Class as  ImgToolboxClass
+from codeallyadvanced.resources.minimalistglyph.Embedded32 import SequenceDiagramInstance as  ImgToolboxSequenceDiagramInstance
+from codeallyadvanced.resources.minimalistglyph.Embedded32 import Composition as ImgToolboxRelationshipComposition
+from codeallyadvanced.resources.minimalistglyph.Embedded32 import Lollipop as UmlLollipop
 
 from umlshapes.dialogs.preferences.BasePreferencesPanel import BasePreferencesPanel
 from umlshapes.dialogs.preferences.valuepanels.AssociationPreferencesPanel import AssociationPreferencesPanel
@@ -68,7 +67,7 @@ class DefaultValuesPanel(BasePreferencesPanel):
             ImgToolboxRelationshipComposition,
             UmlLollipop,
         ]
-        imageList:      ImageList             = ImageList(width=16, height=16)
+        imageList:      ImageList             = ImageList(width=32, height=32)
 
         for embeddedImage in embeddedImages:
             bmp: Bitmap = embeddedImage.GetBitmap()
