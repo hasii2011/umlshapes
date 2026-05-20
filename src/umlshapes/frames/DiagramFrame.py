@@ -1,6 +1,7 @@
 
 from typing import cast
 from typing import NewType
+from typing import Optional
 from typing import TYPE_CHECKING
 
 from logging import Logger
@@ -102,7 +103,7 @@ class DiagramFrame(ShapeCanvas):
         # The ShapeCanvas ID is an integer;  use our own
         self._id: FrameId = FrameId(IDUtil.getID())
 
-        self._selector: ShapeSelector = cast(ShapeSelector, None)
+        self._selector: Optional[ShapeSelector] = None
 
     @property
     def umlDiagram(self) -> 'UmlDiagram':
@@ -196,7 +197,7 @@ class DiagramFrame(ShapeCanvas):
 
     def OnMouseEvent(self, mouseEvent: MouseEvent):
         """
-        Add additional behaviour to add wheel mouse scrolling
+        Add additional behavior to add wheel mouse scrolling
 
         Args:
             mouseEvent:

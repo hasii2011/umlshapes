@@ -2,6 +2,7 @@
 from typing import cast
 from typing import List
 from typing import NewType
+from typing import Optional
 from typing import TYPE_CHECKING
 
 from logging import DEBUG
@@ -32,7 +33,7 @@ ShapeList = NewType('ShapeList', List[Shape])
 
 class UmlBaseEventHandler(ShapeEvtHandler):
 
-    def __init__(self, previousEventHandler: ShapeEvtHandler, shape: Shape = None):
+    def __init__(self, previousEventHandler: ShapeEvtHandler, shape: Optional[Shape] = None):
         from umlshapes.frames.ShapeMoveInfo import InitialPositions
 
         self._baseLogger: Logger = getLogger(__name__)

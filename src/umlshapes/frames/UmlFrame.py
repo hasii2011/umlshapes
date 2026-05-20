@@ -259,21 +259,21 @@ class UmlFrame(DiagramFrame):
         self.umlDiagram.RemoveShape(self._selector)
 
         for s in self.umlDiagram.shapes:
-            if self._ignoreShape(shapeToCheck=s) is False:
+            if self._ignoreShape(shapeToCheck=s) is False:      # noqa
                 if isinstance(s, UmlLink) or isinstance(s, UmlSDMessage):
                     umlLink: UmlLink | UmlSDMessage = s
                     x1, y1, x2, y2 = umlLink.GetEnds()
                     umlLine: UmlLine = UmlLine(start=UmlPoint(x=x1, y=y1), end=UmlPoint(x=x2, y=y2))
-                    if CoordinateUtils.isLineWhollyContainedByRectangle(boundingRectangle=self._selector.rectangle, umlLine=umlLine) is True:
+                    if CoordinateUtils.isLineWhollyContainedByRectangle(boundingRectangle=self._selector.rectangle, umlLine=umlLine):   # type: ignore
                         umlLink.selected = True
                 else:
                     from umlshapes.ShapeTypes import UmlShapeGenre
                     shape: UmlShapeGenre = cast(UmlShapeGenre, s)
-                    if CoordinateUtils.isShapeInRectangle(boundingRectangle=self._selector.rectangle, shapeRectangle=shape.rectangle) is True:
+                    if CoordinateUtils.isShapeInRectangle(boundingRectangle=self._selector.rectangle, shapeRectangle=shape.rectangle):  # type: ignore
                         shape.selected = True
 
         self.refresh()
-        self._selector = cast(ShapeSelector, None)
+        self._selector = cast(ShapeSelector, None)  # noqa
 
         return True
 
@@ -317,7 +317,7 @@ class UmlFrame(DiagramFrame):
         self.ufLogger.debug(f'{deltaXY=}')
         shapes = self.selectedShapes
 
-        if self._shapesMoving is False:
+        if self._shapesMoving is False:         # noqa
             from umlshapes.links.UmlLink import UmlLink
             from umlshapes.links.UmlLinkLabel import UmlLinkLabel
 
@@ -330,7 +330,7 @@ class UmlFrame(DiagramFrame):
             umlShape: UmlShapeGenre = cast(UmlShapeGenre, s)
             if not isinstance(umlShape, UmlLink) and not isinstance(umlShape, UmlLinkLabel):
                 # move master moves himself
-                if umlShape.moveMaster is False:
+                if umlShape.moveMaster is False:    # noqa
                     #
                     # But we change the positions visa the move delta
                     # to get smooth scrolling

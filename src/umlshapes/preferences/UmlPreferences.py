@@ -43,7 +43,7 @@ DEFAULT_TEXT_BACKGROUND_COLOR:  str = UmlColor.WHITE.value
 
 DEFAULT_USE_CASE_SIZE:            str = str(UmlDimensions(width=100, height=60))
 DEFAULT_ACTOR_SIZE:               str = str(UmlDimensions(width=80, height=100))
-DEFAULT_ASSOCIATION_LABEL_SIZE:   str = str(UmlDimensions(width=20, height=14))
+DEFAULT_ASSOCIATION_LABEL_SIZE:   str = str(UmlDimensions(width=75, height=24))
 
 DEFAULT_ASSOCIATION_LABEL_FORMAT: str = (
     f'{UmlAssociationLabelFormat.FORMAT_CENTER_HORIZONTAL.value},'

@@ -2,7 +2,7 @@
 from typing import List
 from typing import NewType
 from typing import Tuple
-from typing import cast
+from typing import Optional
 
 from dataclasses import dataclass
 
@@ -47,8 +47,8 @@ class UmlRect(UmlSize):
     def __repr__(self):
         return self.__str__()
 
-
+# noinspection SpellCheckingInspection
 UmlRects = NewType('UmlRects', List[UmlRect])
 
 
-NO_RECT: UmlRect = cast(UmlRect, None)
+NO_RECT: Optional[UmlRect] = None

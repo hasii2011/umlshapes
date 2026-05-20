@@ -1,5 +1,6 @@
 
 from typing import cast
+from typing import Optional
 from typing import TYPE_CHECKING
 
 from logging import Logger
@@ -23,6 +24,7 @@ from umlshapes.preferences.UmlPreferences import UmlPreferences
 
 from umlshapes.mixins.PubSubMixin import PubSubMixin
 from umlshapes.mixins.TopLeftMixin import TopLeftMixin
+from umlshapes.mixins.IdentifierMixin import IdentifierMixin
 from umlshapes.mixins.ControlPointMixin import ControlPointMixin
 
 from umlshapes.types.UmlDimensions import UmlDimensions
@@ -31,9 +33,9 @@ if TYPE_CHECKING:
     from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
 
 
-class UmlLinkLabel(ControlPointMixin, TextShape, TopLeftMixin, PubSubMixin):
+class UmlLinkLabel(ControlPointMixin, TextShape, TopLeftMixin, PubSubMixin, IdentifierMixin):
 
-    def __init__(self, label: str = '', size: UmlDimensions = None, labelType: LabelType = LabelType.NOT_SET):
+    def __init__(self, label: str = '', size: Optional[UmlDimensions] = None, labelType: LabelType = LabelType.NOT_SET):
         """
 
         Args:
@@ -53,6 +55,7 @@ class UmlLinkLabel(ControlPointMixin, TextShape, TopLeftMixin, PubSubMixin):
         TextShape.__init__(self, width=labelSize.width, height=labelSize.height)
         TopLeftMixin.__init__(self, umlShape=self, width=labelSize.width, height=labelSize.height)
         PubSubMixin.__init__(self)
+        IdentifierMixin.__init__(self)
 
         formatMode: int = self._preferences.associationLabelFormat
         self.SetFormatMode(mode=formatMode)
