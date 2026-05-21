@@ -1,1 +1,1 @@
-setuptools==setuptools<81
+setuptools==82.0.1
