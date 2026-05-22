@@ -20,7 +20,7 @@ classifiers = [
 ]
 
 dependencies = [
-    'wxPython==4.2.4',
+    'wxPython==4.2.5',
     'codeallybasic>=1.30.1',
     'codeallyadvanced>=2.5.4',
     'umlmodel>=3.4.1',
