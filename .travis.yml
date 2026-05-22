@@ -34,8 +34,7 @@ install:
   - pyenv global ${PY_VERSION}
   - pip install --upgrade pip
   - pip install wheel
-  - pip install "setuptools<81"
-  - pip install setuptools==75.8.0
+  - pip install "setuptools<75"
   - pip install twine==6.0.1
   - pip install build==1.2.2.post1
   - pip install html-testRunner~=1.2.1
