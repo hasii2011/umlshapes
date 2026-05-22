@@ -35,6 +35,7 @@ jobs:
             sudo apt-get install -y  libsdl2-dev
             echo "***************************************************"
             pip install --upgrade pip
+            pip install setuptools<81
             pip install wheel
             pip install setuptools
             pip install html-testRunner==1.2.1
