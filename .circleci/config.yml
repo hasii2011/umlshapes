@@ -13,7 +13,7 @@ workflows:
 jobs:
   build:
     macos:
-      xcode: 16.0.0
+      xcode: "latest"
     resource_class: m2pro.medium
     steps:
       - checkout:
