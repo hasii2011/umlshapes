@@ -73,27 +73,28 @@ class UmlBaseEventHandler(ShapeEvtHandler):
 
         umlShape: UmlShapeGenre = cast(UmlShapeGenre, self.GetShape())
         umlFrame: UmlFrame      = self._extractFrame()
-        #
-        # Only the move master moves himself
-        # The first time through we have no way of calculating the delta
-        # The other selected shapes get moved by the frame operations listener (indirectly)
-        #
-        if self._previousPosition is NO_POSITION:
-            self._previousPosition = UmlPosition(x=x, y=y)
-            umlShape.moveMaster = True
-            self._saveSelectedShapesInitialPositions()
 
-            umlFrame.markShapeAsMoved(umlShape=umlShape)
+        if not isinstance(umlShape, UmlLinkLabel) and not isinstance(umlShape, UmlLink):
             #
-            # Save the master shape position, in case he is not selected
+            # Only the move master moves himself
+            # The first time through we have no way of calculating the delta
+            # The other selected shapes get moved by the frame operations listener (indirectly)
             #
-            self._initialPositions[ShapeId(umlShape.id)] = umlShape.position
+            if self._previousPosition is NO_POSITION:
+                self._previousPosition = UmlPosition(x=x, y=y)
+                umlShape.moveMaster = True
+                self._saveSelectedShapesInitialPositions()
 
-            self._baseLogger.info(f'Initial Position Count: {len(self._initialPositions)}')
+                umlFrame.markShapeAsMoved(umlShape=umlShape)
+                #
+                # Save the master shape position, in case he is not selected
+                #
+                self._initialPositions[ShapeId(umlShape.id)] = umlShape.position
 
-            self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.FRAME_MODIFIED, frameId=umlShape.umlFrame.id, modifiedFrameId=umlShape.umlFrame.id)
-        else:
-            if not isinstance(umlShape, UmlLinkLabel) and not isinstance(umlShape, UmlLink):
+                self._baseLogger.info(f'Initial Position Count: {len(self._initialPositions)}')
+
+                self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.FRAME_MODIFIED, frameId=umlShape.umlFrame.id, modifiedFrameId=umlShape.umlFrame.id)
+            else:
 
                 deltaXY: DeltaXY = DeltaXY(
                     deltaX=x - self._previousPosition.x,
