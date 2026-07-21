@@ -39,6 +39,7 @@ class UmlNoteEventHandler(UmlBaseEventHandler):
         with DlgEditNote(parent=umlFrame, note=modelNote, ) as dlg:
             if dlg.ShowModal() == OK:
                 umlFrame.refresh()
+                umlFrame.frameModified = True
 
         umlNote.selected = False
 

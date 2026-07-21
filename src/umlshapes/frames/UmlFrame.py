@@ -127,6 +127,7 @@ class UmlFrame(DiagramFrame):
 
     @frameModified.setter
     def frameModified(self, newValue: bool):
+        self._umlPubSubEngine.sendMessage(UmlMessageType.FRAME_MODIFIED, frameId=self.id, modifiedFrameId=self.id)
         self._frameModified = newValue
 
     @property

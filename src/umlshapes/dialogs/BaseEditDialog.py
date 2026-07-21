@@ -33,7 +33,7 @@ from wx.lib.sized_controls import SizedPanel
 @dataclass
 class CustomDialogButton:
     label:    str = ''
-    callback: Callable = cast(Callable, None)
+    callback: Callable = cast(Callable, None)   # noqa
 
 
 CustomDialogButtons = NewType('CustomDialogButtons', List[CustomDialogButton])

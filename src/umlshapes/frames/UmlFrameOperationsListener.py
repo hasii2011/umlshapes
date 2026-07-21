@@ -56,9 +56,8 @@ if TYPE_CHECKING:
 
 ModelObjects = NewType('ModelObjects', List[UmlModelBase])
 
-# noinspection PyUnusedLocal
 @singledispatch
-def createCutCommand(umlShape: 'UmlShapeGenre') -> BaseCutCommand:
+def createCutCommand(_umlShape: 'UmlShapeGenre') -> BaseCutCommand:
     raise NotImplementedError("Unsupported type")
 
 
@@ -162,7 +161,7 @@ class UmlFrameOperationsListener:
 
             umlModelBase: UmlModelBase = clipboardObject
 
-            if isinstance(umlModelBase, Class) is True:
+            if isinstance(umlModelBase, Class):
                 classPasteCommand: ClassPasteCommand = ClassPasteCommand(umlModelBase=umlModelBase,
                                                                          umlPosition=UmlPosition(x=x, y=y),
                                                                          umlFrame=self._umlFrame,
@@ -263,7 +262,7 @@ class UmlFrameOperationsListener:
         umlFrame = self._umlFrame
 
         with DlgEditNote(umlFrame, note=modelNote) as dlg:
-            if dlg.ShowModal() == ID_OK:
+            if dlg.ShowModal() == OK:
                 umlFrame.refresh()
                 umlFrame.frameModified = True
 
@@ -280,7 +279,7 @@ class UmlFrameOperationsListener:
         umlFrame = self._umlFrame
 
         with DlgEditText(umlFrame, text=modelText) as dlg:
-            if dlg.ShowModal() == ID_OK:
+            if dlg.ShowModal() == OK:
                 umlFrame.refresh()
                 umlFrame.frameModified = True
 
@@ -401,7 +400,7 @@ class UmlFrameOperationsListener:
 
         # put a copy of the model instances in the clipboard
         for umlShape in selectedShapes:
-            linkedObject: LinkedObject = cast(LinkedObject, None)
+            linkedObject: LinkedObject = cast(LinkedObject, None)   # noqa
 
             if isinstance(umlShape, UmlClass):
                 linkedObject = deepcopy(umlShape.modelClass)

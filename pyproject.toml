@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name        = 'umlshapes'
-dynamic     = ["version"]
+dynamic     = ['version']
 description = 'UML Shapes for the UML Diagrammer'
 readme      = "README.md"
 authors     = [{name = 'Humberto A. Sanchez II', email = 'Humberto.A.Sanchez.II@gmail.com'}]
@@ -31,17 +31,17 @@ dependencies = [
 
 [project.optional-dependencies]
 test = [
-    'mypy==2.1.0',
+    'mypy==2.3.0',
     'mypy-extensions==1.1.0',
     'types-Deprecated==1.3.1.20260520',
     'html-testRunner~=1.2.1',
     'pyautogui==0.9.54',
-    'pillow==12.2.0',
+    'pillow==12.3.0',
 ]
 
 deploy = [
     "wheel==0.47.0",
-    "setuptools==82.0.1",
+    "setuptools==83.0.0",
     "twine==6.2.0",
     "build==1.5.0",
     'pkginfo==1.12.1.2'

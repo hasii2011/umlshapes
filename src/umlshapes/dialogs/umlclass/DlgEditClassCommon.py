@@ -27,7 +27,6 @@ from umlshapes.dialogs.umlclass.DlgEditStereotype import DlgEditStereotype
 from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
 
 from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
-from umlshapes.pubsubengine.UmlMessageType import UmlMessageType
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
@@ -87,7 +86,7 @@ class DlgEditClassCommon(BaseEditDialog):
         sizedPanel: SizedPanel = self.GetContentsPane()
         sizedPanel.SetSizerType('vertical')
 
-        self._methods: EnhancedListBox = cast(EnhancedListBox, None)
+        self._methods: EnhancedListBox = cast(EnhancedListBox, None)    # noqa
 
         self._customDialogButtons: CustomDialogButtons = CustomDialogButtons([])
 
@@ -142,12 +141,11 @@ class DlgEditClassCommon(BaseEditDialog):
     def _onNameChange(self, event):
         self._modeInterfaceCopy.name = event.GetString()
 
-    # noinspection PyUnusedLocal
-    def _onDescription(self, event: CommandEvent):
+    def _onDescription(self, _event: CommandEvent):
         """
         Called when the class description button is pressed.
         Args:
-            event:
+            _event:
         """
         with DlgEditDescription(self, model=self._modeInterfaceCopy) as dlg:
             if dlg.ShowModal() == OK:
@@ -169,7 +167,7 @@ class DlgEditClassCommon(BaseEditDialog):
         """
         method: Method     = Method(name=UmlPreferences().defaultNameMethod)
         answer: CallbackAnswer = self._editMethod(method=method)
-        if answer.valid is True:
+        if answer.valid:
             self._modeInterfaceCopy.methods.append(method)
 
         return answer
@@ -231,11 +229,10 @@ class DlgEditClassCommon(BaseEditDialog):
 
         return downCallbackData
 
-    # noinspection PyUnusedLocal
-    def _onStereotype(self, event: CommandEvent):
+    def _onStereotype(self, _event: CommandEvent):
         """
         Args:
-            event:
+            _event:
         """
         stereotype: Stereotype = cast(Class, self._modeInterfaceCopy).stereotype
 
@@ -247,4 +244,3 @@ class DlgEditClassCommon(BaseEditDialog):
         """
         """
         self._umlFrame.frameModified = True
-        self._umlPubSubEngine.sendMessage(UmlMessageType.FRAME_MODIFIED, frameId=self._umlFrame.id, modifiedFrameId=self._umlFrame.id)

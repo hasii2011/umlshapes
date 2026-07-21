@@ -286,10 +286,9 @@ class DemoAppFrame(SizedFrame):
         else:
             self._currentFrame.drawShapeBoundary = False
         self._currentFrame.refresh()
-        self.logger.info(f'Drawing Shapes Boundary=`{self._currentFrame.drawShapeBoundary}` frame=`{self._currentFrame.id}`')
+        self.logger.info(f'Drawing Shapes Boundary=`{cast(DemoClassDiagramFrame, self._currentFrame).drawShapeBoundary}` frame=`{self._currentFrame.id}`')
 
-    # noinspection PyUnusedLocal
-    def _onWiggleShapes(self, event: CommandEvent):
+    def _onWiggleShapes(self, _event: CommandEvent):
 
         frame: UmlFrame = self._currentFrame
 
@@ -467,7 +466,7 @@ class DemoAppFrame(SizedFrame):
 
     def _frameModifiedListener(self, modifiedFrameId: str):
 
-        self.logger.debug(f'Frame Modified - {modifiedFrameId=}')
+        self.logger.info(f'Frame Modified - {modifiedFrameId=}')
 
     def _frameLeftClickListener(self, frame: UmlFrame, umlPosition: UmlPosition):
         self.logger.debug(f'Frame {frame.id}, clicked at {umlPosition=}')
@@ -475,15 +474,13 @@ class DemoAppFrame(SizedFrame):
     def _umlShapeListener(self, umlShape: UmlShapeGenre):
         self.logger.debug(f'Shape was selected: {umlShape}')
 
-    # noinspection PyUnusedLocal
-    def _onUmlShapePreferences(self, event: CommandEvent):
+    def _onUmlShapePreferences(self, _event: CommandEvent):
 
         with DlgUmlShapesPreferences(parent=self) as dlg:
             if dlg.ShowModal() == OK:
                 self.logger.info(f'Pressed Ok')
 
-    # noinspection PyUnusedLocal
-    def _onFrameDisplayedChanged(self, event: BookCtrlEvent):
+    def _onFrameDisplayedChanged(self, _event: BookCtrlEvent):
 
         self._currentFrame = cast(DemoFrame, self._noteBook.GetCurrentPage())
 

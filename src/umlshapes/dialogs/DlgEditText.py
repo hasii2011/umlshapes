@@ -24,7 +24,7 @@ class DlgEditText(BaseEditDialog):
             if dlg.ShowModal() == OK:
                 return f'Retrieved data: {text.content=}'
             else:
-                return f'Cancelled'
+                return f'Canceled'
 
     """
     def __init__(self, parent: Window, text: Text):
