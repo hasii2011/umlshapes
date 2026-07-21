@@ -15,6 +15,7 @@ from dataclasses import dataclass
 from deprecated import deprecated
 
 from wx import DC
+from wx import WXK_BACK
 from wx import WXK_UP
 from wx import EVT_CHAR
 from wx import EVT_MOTION
@@ -78,6 +79,7 @@ class Ltrb:
 class UmlFrame(DiagramFrame):
 
     KEY_CODE_DELETE: int = WXK_DELETE
+    KEY_CODE_BACK:   int = WXK_BACK
     KEY_CODE_UP:     int = WXK_UP
     KEY_CODE_DOWN:   int = WXK_DOWN
 
@@ -293,7 +295,7 @@ class UmlFrame(DiagramFrame):
 
     # noinspection PyUnusedLocal
     @deprecated(version='2.0.0', reason='Use the .redrawShapes')
-    def wiggleShape(self, shape):
+    def wiggleShape(self, _shape):
         self.redrawShapes()
 
     def redrawShapes(self):
@@ -381,10 +383,7 @@ class UmlFrame(DiagramFrame):
         """
         c: int = event.GetKeyCode()
         match c:
-            case UmlFrame.KEY_CODE_DELETE:
-                #
-                # Hmm.  Or I could send a message
-                # self._umlFrameOperationsListener.cutShapes(selectedShapes=self.selectedShapes)
+            case UmlFrame.KEY_CODE_BACK | UmlFrame.KEY_CODE_DELETE:
                 self._umlPubSubEngine.sendMessage(UmlMessageType.CUT_SHAPES, frameId=self.id)
             case UmlFrame.KEY_CODE_UP:
                 self._changeTheSelectedShapesZOrder(callback=self._moveShapeToFront)
