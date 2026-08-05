@@ -10,13 +10,13 @@
 
 This is version 2 of the [Pyut](https://github.com/hasii2011/pyut) [Ogl Module](https://github.com/hasii2011/ogl).  
 
-This version removes the internal miniogl code and relies on wxPython's wx.lib.ogl package.
+This version removes the internal miniogl code and relies on wxPython's [wx.lib.ogl](https://docs.wxpython.org/wx.lib.ogl.html) package.
 
 
 
 This is the external graphical shapes module for the UML Diagrammer that allows for development of extensions for the UML Diagrammer
 
-This project depends on umlmodel and wxPython
+This project depends on [umlmodel](https://github.com/hasii2011/umlmodel) and [wxPython](https://wxpython.org)
 
 ```bash
 pip install umlshapes
@@ -24,33 +24,12 @@ pip install umlshapes
 
 ___
 
-Written by Humberto A. Sanchez II <mailto@Humberto.A.Sanchez.II@gmail.com>, (C) 2025
-
-
-## Note
-For all kind of problems, requests, enhancements, bug reports, etc., please drop me an e-mail.
-
-
-------
-
-
-![Humberto's Modified Logo](https://raw.githubusercontent.com/wiki/hasii2011/gittodoistclone/images/SillyGitHub.png)
-
-I am concerned about the GitHub Copilot project
-
-I urge you to read about the [Give up GitHub](https://GiveUpGitHub.org) campaign from [the Software Freedom Conservancy](https://sfconservancy.org).
-
-While I do not advocate for all the issues listed there, I do not like that a company like Microsoft may profit from open source projects.
-
-I continue to use GitHub because it offers the services I need for free.  But I continue to monitor their terms of service.
-
-Any use of this project's code by GitHub Copilot, past or present, is done without my permission.  I do not consent to GitHub's use of this project's code in Copilot.
 Written by <a href="mailto:humberto.a.sanchez.ii@gmail.com?subject=Hello Humberto">Humberto A. Sanchez II</a>  ©2026
 
----
 
 ## Note
 For all kind of problems, requests, enhancements, bug reports, etc., please drop me an e-mail.
 
+------
 
 [Copilot Statement](https://github.com/hasii2011/code-ally-basic/wiki/GitHub-Copilot).
