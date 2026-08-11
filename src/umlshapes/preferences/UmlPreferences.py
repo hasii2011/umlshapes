@@ -7,6 +7,11 @@ from codeallybasic.Dimensions import Dimensions
 from codeallybasic.SingletonV3 import SingletonV3
 from codeallybasic.SecureConversions import SecureConversions
 
+from umlshapes.preferences.Defaults import DEFAULT_ASSOCIATION_LABEL_FORMAT
+from umlshapes.preferences.Defaults import DEFAULT_ASSOCIATION_LABEL_SIZE
+from umlshapes.preferences.Defaults import FRAME_HEIGHT
+from umlshapes.preferences.Defaults import FRAME_WIDTH
+
 from umlshapes.types.DeltaXY import DeltaXY
 from umlshapes.types.UmlColor import UmlColor
 from umlshapes.types.UmlPenStyle import UmlPenStyle
@@ -43,15 +48,6 @@ DEFAULT_TEXT_BACKGROUND_COLOR:  str = UmlColor.WHITE.value
 
 DEFAULT_USE_CASE_SIZE:            str = str(UmlDimensions(width=100, height=60))
 DEFAULT_ACTOR_SIZE:               str = str(UmlDimensions(width=80, height=100))
-DEFAULT_ASSOCIATION_LABEL_SIZE:   str = str(UmlDimensions(width=75, height=24))
-
-DEFAULT_ASSOCIATION_LABEL_FORMAT: str = (
-    f'{UmlAssociationLabelFormat.FORMAT_CENTER_HORIZONTAL.value},'
-    f'{UmlAssociationLabelFormat.FORMAT_CENTER_VERTICAL.value}'
-)
-
-FRAME_WIDTH:  int = 1024
-FRAME_HEIGHT: int = 720
 
 TEST_POSITION: str = Position(20, 40).__str__()
 TEST_SIZE:     str = str(Dimensions(width=FRAME_WIDTH + 200, height=FRAME_HEIGHT + 100))
@@ -165,6 +161,8 @@ DEBUG_PREFERENCES: ValueDescriptions = ValueDescriptions(
         KeyName('inTestMode'):              ValueDescription(defaultValue='False', deserializer=SecureConversions.secureBoolean),
         KeyName('testPosition'):            ValueDescription(defaultValue=TEST_POSITION, deserializer=Position.deSerialize),
         KeyName('testSize'):                ValueDescription(defaultValue=TEST_SIZE,     deserializer=Dimensions.deSerialize),
+        KeyName('genericClassName'):        ValueDescription(defaultValue='False', deserializer=SecureConversions.secureBoolean),
+
     }
 )
 

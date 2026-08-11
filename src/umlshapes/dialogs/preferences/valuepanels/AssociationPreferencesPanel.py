@@ -43,14 +43,14 @@ class AssociationPreferencesPanel(BasePreferencesPanel):
         super().__init__(parent)
         self.SetSizerType('vertical')
 
-        self._textFontSize: ComboBox = cast(ComboBox, None)
-        self._diamondSize: ComboBox = cast(ComboBox, None)
-        self._associationLabelSize: DimensionsControl = cast(DimensionsControl, None)
+        self._textFontSize: ComboBox = cast(ComboBox, None)                             # noqa
+        self._diamondSize: ComboBox = cast(ComboBox, None)                              # noqa
+        self._associationLabelSize: DimensionsControl = cast(DimensionsControl, None)   # noqa
 
-        self._formatNone: CheckBox = cast(CheckBox, None)
-        self._formatCenterHorizontal: CheckBox = cast(CheckBox, None)
-        self._formatCenterVertical: CheckBox = cast(CheckBox, None)
-        self._formatSizeToContents: CheckBox = cast(CheckBox, None)
+        self._formatNone: CheckBox = cast(CheckBox, None)                               # noqa
+        self._formatCenterHorizontal: CheckBox = cast(CheckBox, None)                   # noqa
+        self._formatCenterVertical: CheckBox = cast(CheckBox, None)                     # noqa
+        self._formatSizeToContents: CheckBox = cast(CheckBox, None)                     # noqa
 
         self._layoutControls(parentPanel=self)
         self._setControlValues()
@@ -125,25 +125,25 @@ class AssociationPreferencesPanel(BasePreferencesPanel):
     def _onAssociationLabelDimensionsChanged(self, newValue: UmlDimensions):
         self._preferences.associationLabelSize = newValue
 
-    # noinspection PyUnusedLocal
-    def _onFormatNoneChange(self, event: CommandEvent):
-        if self._formatNone.GetValue() is True:
+    def _onFormatNoneChange(self, _event: CommandEvent):
+        if self._formatNone.GetValue():
             self._clearFormatControls()
             self._disableFormatControls()
-            self._preferences.associationLabelFormat = UmlAssociationLabelFormat.FORMAT_NONE.value
+            # TODO: Fix this
+            self._preferences.associationLabelFormat = UmlAssociationLabelFormat.FORMAT_NONE.value      # type: ignore
         else:
             self._enableFormatControl()
 
     # noinspection PyUnusedLocal
-    def _onFormatCenterHorizontalChange(self, event: CommandEvent):
+    def _onFormatCenterHorizontalChange(self, _event: CommandEvent):
         self._updatePreference(control=self._formatCenterHorizontal, wxMode=FORMAT_CENTRE_HORIZ)
 
     # noinspection PyUnusedLocal
-    def _onFormatCenterVerticalChange(self, event: CommandEvent):
+    def _onFormatCenterVerticalChange(self, _event: CommandEvent):
         self._updatePreference(control=self._formatCenterVertical, wxMode=FORMAT_CENTRE_VERT)
 
     # noinspection PyUnusedLocal
-    def _onFormatSizeToContentsChange(self, event: CommandEvent):
+    def _onFormatSizeToContentsChange(self, _event: CommandEvent):
         self._updatePreference(control=self._formatSizeToContents, wxMode=FORMAT_SIZE_TO_CONTENTS)
 
     def _disableFormatControls(self):
@@ -167,7 +167,8 @@ class AssociationPreferencesPanel(BasePreferencesPanel):
         # noinspection PyTypeChecker
         currentValue: int = self._preferences.associationLabelFormat
         updatedValue: int = self._getUpdatedValue(control=control, wxMode=wxMode, currentValue=currentValue)
-        self._preferences.associationLabelFormat = UmlAssociationLabelFormat.toDelimitedString(updatedValue)
+        # TODO: Fix this
+        self._preferences.associationLabelFormat = UmlAssociationLabelFormat.toDelimitedString(updatedValue)    # type: ignore
 
     def _getUpdatedValue(self, control: CheckBox, wxMode: int, currentValue: int) -> int:
         """
@@ -181,7 +182,7 @@ class AssociationPreferencesPanel(BasePreferencesPanel):
         Returns:  The updated value either set or cleared
 
         """
-        if control.GetValue() is True:
+        if control.GetValue():
             updatedValue: int = UmlAssociationLabelFormat.setMode(wxMode=wxMode, wxValue=currentValue)
         else:
             updatedValue = UmlAssociationLabelFormat.clearMode(wxMode=wxMode, wxValue=currentValue)

@@ -23,10 +23,10 @@ from umlshapes.preferences.UmlPreferences import UmlPreferences
 
 @dataclass
 class NameData:
-    textCtrl:     TextCtrl = cast(TextCtrl, None)
+    textCtrl:     TextCtrl = cast(TextCtrl, None)       # noqa
     label:        str      = ''
     initialValue: str = ''
-    callback:     Callable = cast(Callable, None)
+    callback:     Callable = cast(Callable, None)       # noqa
 
 
 class DefaultNamesPanel(SizedPanel):
@@ -64,27 +64,27 @@ class DefaultNamesPanel(SizedPanel):
 
     def _onInterfaceNameChanged(self, event: CommandEvent):
         newValue: str = event.GetString()
-        self._preferences.interfaceName = newValue
+        self._preferences.defaultNameInterface = newValue
 
     def _onUseCaseNameChanged(self, event: CommandEvent):
         newValue: str = event.GetString()
-        self._preferences.useCaseName = newValue
+        self._preferences.defaultNameUsecase = newValue
 
     def _onActorNameChanged(self, event: CommandEvent):
         newValue: str = event.GetString()
-        self._preferences.actorName = newValue
+        self._preferences.defaultNameActor = newValue
 
     def _onMethodNameChanged(self, event: CommandEvent):
         newValue: str = event.GetString()
-        self._preferences.methodName = newValue
+        self._preferences.defaultNameMethod = newValue
 
     def _onFieldNameChanged(self, event: CommandEvent):
         newValue: str = event.GetString()
-        self._preferences.fieldName = newValue
+        self._preferences.defaultNameField = newValue
 
     def _onParameterNameChanged(self, event: CommandEvent):
         newValue: str = event.GetString()
-        self._preferences.parameterName = newValue
+        self._preferences.defaultNameParameter = newValue
 
     def _onAssociationNameChanged(self, event: CommandEvent):
         newValue: str = event.GetString()

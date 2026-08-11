@@ -12,11 +12,11 @@ from umlshapes.lib.ogl import FORMAT_SIZE_TO_CONTENTS
 class UmlAssociationLabelFormat(Enum):
     # noinspection SpellCheckingInspection
     """
-    Types of formatting: can be combined in a bit list
+    Types of formatting: can be combined in a bit map
 
         FORMAT_NONE = 0               # Left justification
-        FORMAT_CENTRE_HORIZ = 1       # Centre horizontally
-        FORMAT_CENTRE_VERT = 2        # Centre vertically
+        FORMAT_CENTRE_HORIZ = 1       # Center horizontally
+        FORMAT_CENTRE_VERT = 2        # Center vertically
         FORMAT_SIZE_TO_CONTENTS = 4   # Resize shape to contents
     """
     FORMAT_NONE              = 'No Format'

@@ -23,10 +23,12 @@ from wx import CommandEvent
 from wx.lib.sized_controls import SizedPanel
 from wx.lib.sized_controls import SizedStaticBox
 
+
 from umlshapes.dialogs.preferences.NamedSpinCtrl import NSCValueType
 from umlshapes.dialogs.preferences.NamedSpinCtrl import NSC_CALLBACK_PARAMETER_TYPE
 from umlshapes.dialogs.preferences.NamedSpinCtrl import NamedSpinControlDescription
 from umlshapes.dialogs.preferences.NamedSpinCtrl import NamedSpinCtrl
+
 from umlshapes.dialogs.preferences.BasePreferencesPanel import BasePreferencesPanel
 
 from umlshapes.types.UmlColor import UmlColor
@@ -44,7 +46,8 @@ MAX_VIRTUAL_WINDOW_WIDTH: int = 50000
 
 
 def virtualWindowWidthChanged(newValue: NSC_CALLBACK_PARAMETER_TYPE):
-    UmlPreferences().virtualWindowWidth = newValue
+
+    UmlPreferences().virtualWindowWidth = cast(int, newValue)
 
 
 virtualWindowLengthDescription: NamedSpinControlDescription = NamedSpinControlDescription(
@@ -306,7 +309,7 @@ class DiagramPreferencesPanel(BasePreferencesPanel):
         Make the UI consistent when the background grid is used or not
         If no background grid there is nothing to snap to
         """
-        if self._preferences.backGroundGridEnabled is True:
+        if self._preferences.backGroundGridEnabled:
             self._snapToGrid.Enabled = True
         else:
             self._snapToGrid.SetValue(False)

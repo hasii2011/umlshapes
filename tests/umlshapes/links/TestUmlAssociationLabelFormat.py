@@ -10,7 +10,8 @@ from umlshapes.lib.ogl import FORMAT_NONE
 from umlshapes.lib.ogl import FORMAT_SIZE_TO_CONTENTS
 
 from umlshapes.links.UmlAssociationLabelFormat import UmlAssociationLabelFormat
-from umlshapes.preferences.UmlPreferences import DEFAULT_ASSOCIATION_LABEL_FORMAT
+
+from umlshapes.preferences.Defaults import DEFAULT_ASSOCIATION_LABEL_FORMAT
 
 
 class TestUmlAssociationLabelFormat(UnitTestBase):

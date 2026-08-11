@@ -78,7 +78,7 @@ class DlgEditClass(DlgEditClassCommon):
         sizedPanel: SizedPanel = self.GetContentsPane()
         sizedPanel.SetSizerProps(expand=True, proportion=1)
 
-        self._enhancedListBox: EnhancedListBox = cast(EnhancedListBox, None)
+        self._enhancedListBox: EnhancedListBox = cast(EnhancedListBox, None)        # noqa
 
         self._layoutNameControls(parent=sizedPanel)
 
@@ -240,7 +240,7 @@ class DlgEditClass(DlgEditClassCommon):
 
         prefs: UmlPreferences = UmlPreferences()
 
-        if prefs.autoResizeShapesOnEdit is True:
+        if prefs.autoResizeShapesOnEdit:
             umlClass: 'UmlClass' = self._getAssociatedUmlClass(self._modelClass)
 
             umlClass.autoSize()

@@ -44,7 +44,9 @@ from umlmodel.Interface import Interfaces
 from umlmodel.ModelTypes import ClassName
 from umlmodel.SDInstance import SDInstance
 
-from umlshapes.preferences.UmlPreferences import FRAME_WIDTH
+from umlshapes.preferences.Defaults import FRAME_HEIGHT
+from umlshapes.preferences.Defaults import FRAME_WIDTH
+
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
 from umlshapes.utils.ShapeRelationshipUtils import ShapeRelationshipUtils
@@ -94,7 +96,6 @@ class DemoAppFrame(SizedFrame):
     def __init__(self):
         self.logger: Logger = getLogger(__name__)
 
-        from umlshapes.preferences.UmlPreferences import FRAME_HEIGHT
         super().__init__(parent=None, title='Test UML Shapes', size=(FRAME_WIDTH, FRAME_HEIGHT), style=DEFAULT_FRAME_STYLE | FRAME_FLOAT_ON_PARENT)
 
         sizedPanel: SizedPanel = self.GetContentsPane()
@@ -563,7 +564,7 @@ class DemoAppFrame(SizedFrame):
 
         """
         from pathlib import Path
-        if self._preferences.inTestMode is True:
+        if self._preferences.inTestMode:
             testPosition: Position   = self._preferences.testPosition
             testSize:     Dimensions = self._preferences.testSize
 

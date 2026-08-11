@@ -26,7 +26,7 @@ from umlshapes.preferences.UmlPreferences import UmlPreferences
 
 from umlshapes.dialogs.preferences.BasePreferencesPanel import BasePreferencesPanel
 
-NO_SPIN_CTRL: NamedSpinCtrl = cast(NamedSpinCtrl, None)
+NO_SPIN_CTRL: NamedSpinCtrl = cast(NamedSpinCtrl, None) # noqa
 
 MIN_LOLLIPOP_LENGTH: int = 50
 MAX_LOLLIPOP_LENGTH: int = 150
@@ -47,16 +47,17 @@ DEFAULT_SPIN_CTRL_SIZE: Size = Size(width=100, height=20)
 
 
 def onLollipopLengthChanged(newValue: NSC_CALLBACK_PARAMETER_TYPE):
-    LollipopPreferencesPanel.clsUmlPreferences.lollipopLineLength = newValue
+
+    LollipopPreferencesPanel.clsUmlPreferences.lollipopLineLength = cast(int, newValue)
 
 def onLollipopCircleRadiusChanged(newValue: NSC_CALLBACK_PARAMETER_TYPE):
-    LollipopPreferencesPanel.clsUmlPreferences.lollipopCircleRadius = newValue
+    LollipopPreferencesPanel.clsUmlPreferences.lollipopCircleRadius = cast(int, newValue)
 
 def onLollipopInterfaceNameIndentChanged(newValue: NSC_CALLBACK_PARAMETER_TYPE):
-    LollipopPreferencesPanel.clsUmlPreferences.interfaceNameIndent = newValue
+    LollipopPreferencesPanel.clsUmlPreferences.interfaceNameIndent = cast(int, newValue)
 
-def onHitAreaInflationRationChanged(newValue: NSC_CALLBACK_PARAMETER_TYPE):
-    LollipopPreferencesPanel.clsUmlPreferences.hitAreaInflationRate = newValue
+def onHitAreaInflationRatioChanged(newValue: NSC_CALLBACK_PARAMETER_TYPE):
+    LollipopPreferencesPanel.clsUmlPreferences.hitAreaInflationRate = cast(int, newValue)
 
 
 LollipopLineLength: NamedSpinControlDescription = NamedSpinControlDescription(
@@ -92,7 +93,7 @@ HitAreaInflationRate:  NamedSpinControlDescription = NamedSpinControlDescription
     minValue=MIN_HIT_AREA_INFLATION_RATE,
     maxValue=MAX_HIT_AREA_INFLATION_RATE,
     valueType=NSCValueType.INT,
-    valueChangedCallback=onHitAreaInflationRationChanged
+    valueChangedCallback=onHitAreaInflationRatioChanged
 )
 
 
@@ -112,7 +113,7 @@ class LollipopPreferencesPanel(BasePreferencesPanel):
         self._interfaceNameIndent:  NamedSpinCtrl = NO_SPIN_CTRL
         self._hitAreaInflationRate: NamedSpinCtrl = NO_SPIN_CTRL
 
-        self._horizontalOffset: SpinCtrlDouble = cast(SpinCtrlDouble, None)
+        self._horizontalOffset: SpinCtrlDouble = cast(SpinCtrlDouble, None)     # noqa
 
         super().__init__(parent)
 

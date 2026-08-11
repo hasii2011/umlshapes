@@ -22,7 +22,7 @@ class CreateUmlClassCommand(BaseCreateCommand):
     Command that creates a new UML Class on the UML frame
     """
 
-    def __init__(self, umlFrame: UmlFrame, umlPosition: UmlPosition, umlPubSubEngine: IUmlPubSubEngine, modelClass: Class = None):
+    def __init__(self, umlFrame: UmlFrame, umlPosition: UmlPosition, umlPubSubEngine: IUmlPubSubEngine, modelClass: Class | None = None):
         """
         If the caller provides a ready-made class this command uses it and does not
         invoke the class editor
@@ -32,7 +32,7 @@ class CreateUmlClassCommand(BaseCreateCommand):
             umlPosition:
             umlPubSubEngine:
         """
-        self._uniqueId:   float          = self.timeStamp
+        self._uniqueId:   float        = self.timeStamp
         self._modelClass: Class | None = modelClass     # Must be here before super().__init__()
 
         name: str = f'Create Class-{self._uniqueId}'
@@ -58,7 +58,11 @@ class CreateUmlClassCommand(BaseCreateCommand):
         Returns:    The newly created class
         """
         if self._modelClass is None:
-            className:  str   = f'{self._umlPreferences.defaultClassName}{self._uniqueId}'
+            className:  str   = f'{self._umlPreferences.defaultClassName}'
+            if self._umlPreferences.genericClassName:
+                pass
+            else:
+                className = f'{className}{self._uniqueId}'
             modelClass: Class = Class(name=className)
         else:
             modelClass = self._modelClass
