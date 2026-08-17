@@ -76,28 +76,28 @@ class BaseLinkCommand(Command):
         """
         The engine used for messaging and event coordination. 
         """
-        self._umlLink:         UmlLinkGenre     = cast('UmlLinkGenre', None)
+        self._umlLink:         UmlLinkGenre     = cast('UmlLinkGenre', None)    # noqa
         """
         The UI representation of the link. This is transient and re-created during Undo/Redo
         Only use this for deletion;  Will be re-created on Undo and create link
         """
-        self._modelLink: Link     = cast(Link, None)
+        self._modelLink: Link     = cast(Link, None)                            # noqa
         """
         The persistent model data representing the link.
         So we can recreate the Link;  Set by subclass   
         """
-        self._linkType:  LinkType = cast(LinkType, None)
+        self._linkType:  LinkType = cast(LinkType, None)                        # noqa
 
-        self._sourceUmlShape:      UmlShapeGenre = cast('UmlShapeGenre', None)
+        self._sourceUmlShape:      UmlShapeGenre = cast('UmlShapeGenre', None)  # noqa
         """
         The starting shape of the link. 
         Save the ends for Undo
         """
-        self._destinationUmlShape: UmlShapeGenre = cast('UmlShapeGenre', None)
+        self._destinationUmlShape: UmlShapeGenre = cast('UmlShapeGenre', None)  # noqa
         """
         The ending shape of the link.
         """
-        self._umlFrame:            UmlFrame      = cast(UmlFrame, None)
+        self._umlFrame:            UmlFrame      = cast(UmlFrame, None)         # noqa
         """
         The canvas/frame where the link resides. 
         """
@@ -191,7 +191,7 @@ class BaseLinkCommand(Command):
             self._umlLink = umlInterface
         elif self._modelLink.linkType == LinkType.NOTELINK:
 
-            umlNote: UmlNote = cast(UmlNote, sourceUmlShape)
+            umlNote: UmlNote = cast(UmlNote, self._sourceUmlShape)
 
             umlNoteLink: UmlNoteLink = self._createNoteLink(umlClass=destinationUmlShape, umlNote=umlNote)
 
@@ -314,7 +314,7 @@ class BaseLinkCommand(Command):
 
     def _addCustomEndPoints(self):
         """
-        Add specific end positions if the were specified by the link creator
+        Add specific end positions if they were specified by the link creator
         """
         if self._linkSourcePosition is not NO_POSITION and self._linkDestinationPosition is not NO_POSITION:
             self._umlLink.endPositions = EndPositions(fromPosition=self._linkSourcePosition, toPosition=self._linkDestinationPosition)

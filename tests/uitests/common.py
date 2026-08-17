@@ -18,7 +18,7 @@ DRAG_DURATION: float = 0.5
 def isAppRunning() -> bool:
     answer: bool = False
 
-    if DEMO_RUNNING_INDICATOR.exists() is True:
+    if DEMO_RUNNING_INDICATOR.exists():
         answer = True
 
     return answer
@@ -36,10 +36,10 @@ def takeCompletionScreenShot(imagePath: Path):
 
     imagePath.unlink(missing_ok=True)
 
-    left:   int = 18
-    top:    int = 39
-    right:  int = 1030
-    bottom: int = 730
+    left:   int = 20
+    top:    int = 40
+    right:  int = 1342
+    bottom: int = 1052
 
     bbox = (left, top, right, bottom)
 

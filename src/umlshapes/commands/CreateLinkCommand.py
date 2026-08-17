@@ -2,13 +2,19 @@
 from typing import TYPE_CHECKING
 from typing import cast
 
+from umlmodel.Class import Class
 from umlmodel.Link import Link
+from umlmodel.Note import Note
 from umlmodel.enumerations.LinkType import LinkType
 
 from umlshapes.commands.BaseLinkCommand import BaseLinkCommand
+from umlshapes.frames.UmlFrame import UmlFrame
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
+
+from umlshapes.shapes.UmlNote import UmlNote
 from umlshapes.shapes.UmlClass import UmlClass
+
 from umlshapes.types.UmlPosition import NO_POSITION
 from umlshapes.types.UmlPosition import NO_POSITIONS
 from umlshapes.types.UmlPosition import UmlPosition
@@ -24,6 +30,7 @@ class CreateLinkCommand(BaseLinkCommand):
     LinkCounter: int = 0
 
     def __init__(self,
+                 umlFrame: UmlFrame,
                  partialName: str,
                  sourceShape: 'UmlShapeGenre',
                  destinationShape: 'UmlShapeGenre',
@@ -57,6 +64,9 @@ class CreateLinkCommand(BaseLinkCommand):
         self._sourceUmlShape      = sourceShape
         self._destinationUmlShape = destinationShape
 
+        self._linkType = linkType
+        self._umlFrame = umlFrame
+
         if linkType == LinkType.ASSOCIATION or linkType == LinkType.AGGREGATION or linkType == LinkType.COMPOSITION:
             self._modelLink = self._createAssociationModelLink(linkType=linkType)
         elif linkType == LinkType.INHERITANCE:
@@ -65,14 +75,20 @@ class CreateLinkCommand(BaseLinkCommand):
                 subUmlClass=cast(UmlClass, self._sourceUmlShape)
             )
         elif linkType == LinkType.INTERFACE:
-            self._modelLink = self._createInterfaceModelLink()
+            self._modelLink = self._createInterfaceModelLink(
+                implementor=cast(UmlClass, sourceShape).modelClass,
+                interface=cast(UmlClass, destinationShape).modelClass
+            )
         elif linkType == LinkType.NOTELINK:
-            self._modelLink = Link(linkType=LinkType.NOTELINK)
+
+            self._modelLink = self._createNoteModelLink(
+                modelNote=cast(UmlNote, self._sourceUmlShape).modelNote,
+                modelClass=cast(UmlClass, self._destinationUmlShape).modelClass
+            )
+
         else:
             assert False, f'Unhandled link type: {linkType}'
 
-        self._linkType            = linkType
-        self._umlFrame            = sourceShape.umlFrame
 
     @property
     def umlLink(self) -> 'UmlLinkGenre':
@@ -125,9 +141,29 @@ class CreateLinkCommand(BaseLinkCommand):
         CreateLinkCommand.LinkCounter += 1
         return modelInheritance
 
-    def _createInterfaceModelLink(self):
+    def _createInterfaceModelLink(self, implementor: Class, interface: Class) -> Link:
 
         name: str = f'implements'
-        modelInterface: Link = Link(name=name, linkType=LinkType.INTERFACE)
+        modelInterfaceInterface: Link = Link(name=name, linkType=LinkType.INTERFACE)
+        modelInterfaceInterface.source      = implementor
+        modelInterfaceInterface.destination = interface
 
-        return modelInterface
+        return modelInterfaceInterface
+
+    def _createNoteModelLink(self, modelNote: Note, modelClass: Class) -> Link:
+        """
+
+        Args:
+            modelNote:   The Model Note
+            modelClass:  The Model Class
+
+        Returns:  A Model Link
+        """
+        assert isinstance(modelNote, Note), 'Not a model note'
+        assert isinstance(modelClass, Class), 'Not a model class'
+
+        modelNoteLink: Link = Link(name='', linkType=LinkType.NOTELINK)
+        modelNoteLink.source      = modelNote
+        modelNoteLink.destination = modelClass
+
+        return modelNoteLink

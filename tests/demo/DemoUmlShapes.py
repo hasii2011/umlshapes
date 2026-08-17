@@ -24,8 +24,8 @@ class DemoUmlShapes(App):
 
         self.logger: Logger = getLogger(__name__)
 
-        self._preferences:     UmlPreferences = cast(UmlPreferences, None)
-        self._wxFrame:         DemoAppFrame   = cast(DemoAppFrame, None)
+        self._preferences:     UmlPreferences = cast(UmlPreferences, None)      # noqa
+        self._wxFrame:         DemoAppFrame   = cast(DemoAppFrame, None)        # noqa
 
         # self._demoEventEngine = DemoEventEngine(listeningWindow=self._frame)    # Our app event engine
 

@@ -21,7 +21,7 @@ from umlshapes.shapes.UmlClass import UmlClass
 
 from umlshapes.types.UmlPosition import UmlPosition
 
-NO_CLASS: UmlClass = cast(UmlClass, None)
+NO_CLASS: UmlClass = cast(UmlClass, None)       # noqa
 
 class ClassDiagramFrame(UmlFrame):
 
@@ -36,7 +36,7 @@ class ClassDiagramFrame(UmlFrame):
 
         self.ucdLogger: Logger = getLogger(__name__)
 
-        self._menuHandler:  UmlClassCtxMenuHandler = cast(UmlClassCtxMenuHandler, None)
+        self._menuHandler:  UmlClassCtxMenuHandler = cast(UmlClassCtxMenuHandler, None)     # noqa
 
         self._requestingLollipopLocation: bool     = False
         self._requestingUmlClass:         UmlClass = NO_CLASS
@@ -160,7 +160,7 @@ class ClassDiagramFrame(UmlFrame):
     def _areWeOverAShape(self, x: int, y: int) -> bool:
         answer:         bool  = True
         shape, n = self.FindShape(x=x, y=y)
-        # Don't popup over a shape
+        # Do not pop up over a shape
         if shape is None:
             answer = False
 

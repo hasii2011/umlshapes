@@ -38,7 +38,7 @@ def testInterface():
     # Click on left most shape
     click(195, 240)
     # Move out of way
-    dragTo(905, 485, duration=DRAG_DURATION, button=LEFT)
+    dragTo(905, 700, duration=DRAG_DURATION, button=LEFT)
 
 def testAggregation():
     pullDownViewMenu()
@@ -48,7 +48,7 @@ def testAggregation():
     # Click on left most shape
     click(170, 240)
     # Move out of way
-    dragTo(885, 160, duration=DRAG_DURATION, button=LEFT)
+    dragTo(950, 160, duration=DRAG_DURATION, button=LEFT)
 
 def testComposition():
     pullDownViewMenu()
@@ -59,7 +59,7 @@ def testComposition():
     # Click on left most shape
     click(170, 240)
     # Move out of way
-    dragTo(640, 142, duration=DRAG_DURATION, button=LEFT)
+    dragTo(1175, 170, duration=DRAG_DURATION, button=LEFT)
 
 def testInheritance():
     pullDownViewMenu()
@@ -68,7 +68,7 @@ def testInheritance():
     selectShapesToMove()
     click(170, 240)
     # Move out of way
-    dragTo(665, 485, duration=DRAG_DURATION, button=LEFT)
+    dragTo(1200, 600, duration=DRAG_DURATION, button=LEFT)
 
 def testAssociation():
     pullDownViewMenu()
@@ -116,7 +116,7 @@ if __name__ == '__main__':
             title   = 'Failure'
             message = 'You have failed as a programmer'
         elif success == VerifyStatus.CANNOT_VERIFY:
-            title   = 'Cannot verify tooling is messing'
+            title   = 'Cannot verify'
             message = f'{EXIFTOOL} must be missing'
         else:
             assert False, 'Developer error'

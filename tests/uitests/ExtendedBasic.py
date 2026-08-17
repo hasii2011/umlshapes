@@ -35,7 +35,7 @@ class ExtendedBasic:
     def verifySameImage(cls, goldenImage: Path, generatedImage: Path) -> VerifyStatus:
         status: VerifyStatus = VerifyStatus.CANNOT_VERIFY
 
-        if ExtendedBasic.cliExists(EXIFTOOL) is True:
+        if ExtendedBasic.cliExists(EXIFTOOL):
             goldenMeta:    JsonDict = ExtendedBasic.generatedVerificationMetaData(imagePath=goldenImage)
             generatedMeta: JsonDict = ExtendedBasic.generatedVerificationMetaData(imagePath=generatedImage)
             if goldenMeta[META_IMAGE_SIZE] == generatedMeta[META_IMAGE_SIZE] and goldenMeta[META_MEGA_PIXELS] == generatedMeta[META_MEGA_PIXELS]:
@@ -64,6 +64,7 @@ class ExtendedBasic:
 
     @classmethod
     def generatedVerificationMetaData(cls, imagePath: Path) -> JsonDict:
+        # noinspection SpellCheckingInspection
         """
         exiftool -ImageSize -Megapixels -json goldenImages/testShapes.png
         """

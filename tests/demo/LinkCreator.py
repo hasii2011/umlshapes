@@ -133,6 +133,7 @@ class LinkCreator:
         sourceUmlClass, destinationUmlClass = self._createClassPair(diagramFrame=diagramFrame, sourcePosition=sourcePosition, destinationPosition=destinationPosition)
 
         createLinkCommand: CreateLinkCommand = CreateLinkCommand(
+            umlFrame=diagramFrame,
             partialName=f'{LinkType.AGGREGATION}',
             sourceShape=sourceUmlClass,
             destinationShape=destinationUmlClass,
@@ -149,6 +150,7 @@ class LinkCreator:
         self.logger.debug(f'{sourceUmlClass.id=} {destinationUmlClass.id=}')
 
         createLinkCommand: CreateLinkCommand = CreateLinkCommand(
+            umlFrame=diagramFrame,
             partialName=f'{associationDescription.linkType}',
             sourceShape=sourceUmlClass,
             destinationShape=destinationUmlClass,
@@ -165,6 +167,7 @@ class LinkCreator:
         subUmlClass.modelClass.name  = 'SubClass'
 
         createLinkCommand: CreateLinkCommand = CreateLinkCommand(
+            umlFrame=diagramFrame,
             partialName=f'{LinkType.INHERITANCE}',
             sourceShape=subUmlClass,
             destinationShape=baseUmlClass,
@@ -183,6 +186,7 @@ class LinkCreator:
         self._classCounter += 1
 
         createLinkCommand: CreateLinkCommand = CreateLinkCommand(
+            umlFrame=diagramFrame,
             partialName=f'{LinkType.INTERFACE}',
             sourceShape=implementingClass,
             destinationShape=interfaceClass,
@@ -206,6 +210,7 @@ class LinkCreator:
         self._displayUmlClass(umlClass=umlClass, umlPosition=classPosition, diagramFrame=diagramFrame)
 
         createLinkCommand: CreateLinkCommand = CreateLinkCommand(
+            umlFrame=diagramFrame,
             partialName=f'{LinkType.NOTELINK}',
             sourceShape=umlNote,
             destinationShape=umlClass,
@@ -231,6 +236,7 @@ class LinkCreator:
         self._associateClassEventHandler(umlClass=subClassUmlClass)
 
         createLinkCommand: CreateLinkCommand = CreateLinkCommand(
+            umlFrame=diagramFrame,
             partialName=f'{LinkType.INHERITANCE}',
             sourceShape=subClassUmlClass,
             destinationShape=baseUmlClass,

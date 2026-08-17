@@ -50,7 +50,7 @@ DEFAULT_USE_CASE_SIZE:            str = str(UmlDimensions(width=100, height=60))
 DEFAULT_ACTOR_SIZE:               str = str(UmlDimensions(width=80, height=100))
 
 TEST_POSITION: str = Position(20, 40).__str__()
-TEST_SIZE:     str = str(Dimensions(width=FRAME_WIDTH + 200, height=FRAME_HEIGHT + 100))
+TEST_SIZE:     str = str(Dimensions(width=FRAME_WIDTH + 300, height=FRAME_HEIGHT + 300))
 
 
 PASTE_PREFERENCES: ValueDescriptions = ValueDescriptions(
