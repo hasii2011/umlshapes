@@ -46,7 +46,7 @@ jobs:
           PY_TAG="cp${PY_VER_COMPACT//./}"
           gh release download wxPython-4.3.1 \
             --repo wxWidgets/Phoenix \
-            --pattern "*${PY_TAG}*ubuntu-22.04*.whl" \
+            --pattern "*ubuntu2204*${PY_TAG}*.whl" \
             --dir ./wxwheels
 
       - name: Install dependencies and umlshapes with test and deploy extras
