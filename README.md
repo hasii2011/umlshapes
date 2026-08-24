@@ -1,5 +1,6 @@
 ![](https://github.com/hasii2011/code-ally-basic/blob/master/developer/agpl-license-web-badge-version-2-256x48.png "AGPL")
 
+[![CI](https://github.com/hasii2011/umlshapes/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/hasii2011/umlshapes/actions/workflows/ci.yml)
 [![PyPI version](https://badge.fury.io/py/umlshapes.svg)](https://badge.fury.io/py/umlshapes)
 [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://GitHub.com/Naereen/StrapDown.js/graphs/commit-activity)
 
