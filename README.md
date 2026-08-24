@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/hasii2011/umlshapes/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/hasii2011/umlshapes/actions/workflows/ci.yml)
 [![PyPI version](https://badge.fury.io/py/umlshapes.svg)](https://badge.fury.io/py/umlshapes)
-[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://GitHub.com/Naereen/StrapDown.js/graphs/commit-activity)
+[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/hasii2011/umlshapes/graphs/commit-activity)
 
 [![forthebadge made-with-python](http://ForTheBadge.com/images/badges/made-with-python.svg)](https://www.python.org/)
 
