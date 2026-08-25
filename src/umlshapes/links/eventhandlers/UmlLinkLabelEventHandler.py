@@ -38,21 +38,21 @@ class UmlLinkLabelEventHandler(UmlBaseEventHandler):
 
         self._currentDebugCount: int = REPORT_INTERVAL
 
-    def OnMovePost(self, dc, x: int, y: int, oldX: int, oldY: int, display: bool = True):
+    def OnMovePost(self, dc, x: int, y: int, old_x: int, old_y: int, display: bool = True):
         """
         Positions are reported from the center of the label
         Args:
             dc:
             x:
             y:
-            oldX:
-            oldY:
+            old_x:
+            old_y:
             display:
 
         Returns:
 
         """
-        super().OnMovePost(dc, x, y, oldX, oldY, display)
+        super().OnMovePost(dc, x, y, old_x, old_y, display)
 
         umlLinkLabel: UmlLinkLabel     = cast(UmlLinkLabel, self.GetShape())
         umlLink:      PositionReporter = umlLinkLabel.parent
@@ -75,6 +75,8 @@ class UmlLinkLabelEventHandler(UmlBaseEventHandler):
         leftCoordinate: LeftCoordinate = self._convertToTopLeft(x=x, y=y, umlAssociationLabel=umlLinkLabel)
         deltaXY:        DeltaXY        = self._calculateDelta(labelPosition, leftCoordinate, linkLabelX, linkLabelY)
         umlLinkLabel.linkDelta = deltaXY
+
+        self._indicateFrameModified()
 
     def _calculateDelta(self, labelPosition: UmlPosition, leftCoordinate: LeftCoordinate, linkLabelX, linkLabelY) -> DeltaXY:
         """

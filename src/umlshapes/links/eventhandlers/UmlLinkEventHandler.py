@@ -28,8 +28,6 @@ from umlshapes.lib.ogl import ShapeEvtHandler
 
 from umlshapes.utils.ProximityUtils import ProximityUtils
 from umlshapes.dialogs.DlgEditLink import DlgEditLink
-from umlshapes.pubsubengine.UmlMessageType import UmlMessageType
-
 from umlshapes.frames.UmlFrame import UmlFrame
 
 from umlshapes.links.LabelType import LabelType
@@ -284,18 +282,6 @@ class UmlLinkEventHandler(UmlBaseEventHandler):
         frame: UmlFrame = self._getFrame()
         frame.Refresh()
         self._indicateFrameModified()
-
-    def _indicateFrameModified(self):
-        frame: UmlFrame = self._getFrame()
-        assert self._umlPubSubEngine is not None, 'Developer error;  Remember to inject the UML PubSub Engine'
-        self._umlPubSubEngine.sendMessage(UmlMessageType.FRAME_MODIFIED, frameId=frame.id, modifiedFrameId=frame.id)
-
-    def _getFrame(self) -> UmlFrame:
-
-        umlLink:  UmlLink  = self.GetShape()
-        umlFrame: UmlFrame = umlLink.GetCanvas()
-
-        return umlFrame
 
     def _toUmlPositions(self, wxPoints: List[Point]) -> UmlPositions:
 

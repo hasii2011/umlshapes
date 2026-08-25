@@ -65,8 +65,8 @@ class UmlLink(IdentifierMixin, LineShape, PubSubMixin):
         self.linkLogger:   Logger         = getLogger(__name__)
         self._preferences: UmlPreferences = UmlPreferences()
 
-        self._link:     Link                = link
-        self._linkName: UmlLinkLabel = cast(UmlLinkLabel, None)
+        self._link:     Link         = link
+        self._linkName: UmlLinkLabel = cast(UmlLinkLabel, None)     # noqa
 
         self.SetFormatMode(mode=FORMAT_SIZE_TO_CONTENTS)
         self.SetDraggable(True, recursive=True)
@@ -181,8 +181,8 @@ class UmlLink(IdentifierMixin, LineShape, PubSubMixin):
         """
         Adjust the link ends
         Args:
-            fromPosition:   The from position
-            toPosition:     The to position
+            fromPosition:   The 'from' position
+            toPosition:     The 'to' position
         """
         self.SetEnds(
             x1=fromPosition.x,
@@ -203,7 +203,7 @@ class UmlLink(IdentifierMixin, LineShape, PubSubMixin):
 
     def optimizeLink(self):
         """
-            Optimize the link, so as to minimize the link length
+            Optimize the link, to minimize the link length
         """
         dc = self.umlFrame.createDC()
         self.OnMoveLink(dc=dc, moveControlPoints=True)
@@ -216,6 +216,7 @@ class UmlLink(IdentifierMixin, LineShape, PubSubMixin):
         )
 
     def OnDraw(self, dc: MemoryDC):
+
         if self._linkName is None:
             self._linkName = self._createLinkName()
             self._setupLinkText(umlAssociationLabel=self._linkName)
@@ -247,7 +248,7 @@ class UmlLink(IdentifierMixin, LineShape, PubSubMixin):
         Line is not draggable.
 
         :note: This is really to distinguish between lines and other images.
-         For lines we want to pass drag to canvas, since lines tend to prevent
+         For lines, we want to pass drag to canvas, since lines tend to prevent
          dragging on a canvas (they get in the way.)
 
         """

@@ -34,22 +34,31 @@ ShapeList = NewType('ShapeList', List[Shape])
 class UmlBaseEventHandler(ShapeEvtHandler):
 
     def __init__(self, previousEventHandler: ShapeEvtHandler, shape: Optional[Shape] = None):
+        """
+
+        Args:
+            previousEventHandler:
+            shape:
+        """
         from umlshapes.frames.ShapeMoveInfo import InitialPositions
 
         self._baseLogger: Logger = getLogger(__name__)
 
         super().__init__(shape=shape, prev=previousEventHandler)
 
-        self._umlPubSubEngine:  IUmlPubSubEngine = cast(IUmlPubSubEngine, None)     # noqa
-        self._previousPosition: UmlPosition      = NO_POSITION
+        self._umlPubSubEngine:  Optional[IUmlPubSubEngine] = None
+        self._previousPosition: UmlPosition                = NO_POSITION
 
         self._initialPositions:  InitialPositions = InitialPositions({})
 
-    def _setUmlPubSubEngine(self, umlPubSubEngine: IUmlPubSubEngine):
-        self._umlPubSubEngine = umlPubSubEngine
+    @property
+    def umlPubSubEngine(self) -> IUmlPubSubEngine:
+        assert self._umlPubSubEngine is not None, 'Developer error: pub sub engine not set'
+        return self._umlPubSubEngine
 
-    # noinspection PyTypeChecker
-    umlPubSubEngine = property(fget=None, fset=_setUmlPubSubEngine)
+    @umlPubSubEngine.setter
+    def umlPubSubEngine(self, umlPubSubEngine: IUmlPubSubEngine):
+        self._umlPubSubEngine = umlPubSubEngine
 
     def OnDragLeft(self, draw, x, y, keys=0, attachment=0):
         """
@@ -93,7 +102,7 @@ class UmlBaseEventHandler(ShapeEvtHandler):
 
                 self._baseLogger.info(f'Initial Position Count: {len(self._initialPositions)}')
 
-                self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.FRAME_MODIFIED, frameId=umlShape.umlFrame.id, modifiedFrameId=umlShape.umlFrame.id)
+                self.umlPubSubEngine.sendMessage(messageType=UmlMessageType.FRAME_MODIFIED, frameId=umlShape.umlFrame.id, modifiedFrameId=umlShape.umlFrame.id)
             else:
 
                 deltaXY: DeltaXY = DeltaXY(
@@ -102,7 +111,7 @@ class UmlBaseEventHandler(ShapeEvtHandler):
                 )
                 self._previousPosition = UmlPosition(x=x, y=y)
 
-                self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.SHAPE_MOVING, frameId=umlShape.umlFrame.id, deltaXY=deltaXY)
+                self.umlPubSubEngine.sendMessage(messageType=UmlMessageType.SHAPE_MOVING, frameId=umlShape.umlFrame.id, deltaXY=deltaXY)
 
         super().OnDragLeft(draw, x, y, keys, attachment)
 
@@ -253,6 +262,19 @@ class UmlBaseEventHandler(ShapeEvtHandler):
         umlShape: UmlShapeGenre = cast(UmlShapeGenre, self.GetShape())
 
         return umlShape.umlFrame
+
+    def _indicateFrameModified(self):
+
+        frame: UmlFrame = self._getFrame()
+
+        self.umlPubSubEngine.sendMessage(UmlMessageType.FRAME_MODIFIED, frameId=frame.id, modifiedFrameId=frame.id)
+
+    def _getFrame(self) -> 'UmlFrame':
+
+        shape:    Shape      = self.GetShape()
+        umlFrame: 'UmlFrame' = shape.GetCanvas()
+
+        return umlFrame
 
     def _debugDumpMovedShapes(self, umlFrame):
         """
