@@ -74,7 +74,7 @@ class BaseLinkCommand(Command):
         """
         self._umlPubSubEngine: IUmlPubSubEngine = umlPubSubEngine
         """
-        The engine used for messaging and event coordination. 
+        The engine used for messaging and event coordination.
         """
         self._umlLink:         UmlLinkGenre     = cast('UmlLinkGenre', None)    # noqa
         """
@@ -84,13 +84,13 @@ class BaseLinkCommand(Command):
         self._modelLink: Link     = cast(Link, None)                            # noqa
         """
         The persistent model data representing the link.
-        So we can recreate the Link;  Set by subclass   
+        So we can recreate the Link;  Set by subclass
         """
         self._linkType:  LinkType = cast(LinkType, None)                        # noqa
 
         self._sourceUmlShape:      UmlShapeGenre = cast('UmlShapeGenre', None)  # noqa
         """
-        The starting shape of the link. 
+        The starting shape of the link.
         Save the ends for Undo
         """
         self._destinationUmlShape: UmlShapeGenre = cast('UmlShapeGenre', None)  # noqa
@@ -99,15 +99,15 @@ class BaseLinkCommand(Command):
         """
         self._umlFrame:            UmlFrame      = cast(UmlFrame, None)         # noqa
         """
-        The canvas/frame where the link resides. 
+        The canvas/frame where the link resides.
         """
         self._linkSourcePosition:      UmlPosition  = linkSourcePosition
         """
-        The starting position of the link.         
+        The starting position of the link.
         """
         self._linkDestinationPosition: UmlPosition = linkDestinationPosition
         """
-        The ending position of the link.  
+        The ending position of the link.
         """
         self._linkControlPositions: UmlPositions = linkControlPositions
 

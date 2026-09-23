@@ -27,7 +27,7 @@ class ShapesMovedCommand(Command):
         """
         Args:
             umlFrame: The diagram frame where shapes are being moved.
-            movedShapes: A dictionary mapping shape IDs to ShapeMovedInfo 
+            movedShapes: A dictionary mapping shape IDs to ShapeMovedInfo
                          (which contains the shape and its original position).
         """
         from umlshapes.frames.ShapeMoveInfo import MovedShapes
@@ -86,7 +86,7 @@ class ShapesMovedCommand(Command):
             umlShape: UmlShapeGenre = shapeMoveInfo.umlShape
             umlShape.position = umlPosition
             umlShape.MoveLinks(dc)
-            
+
         self._umlFrame.refresh()
         return True
 

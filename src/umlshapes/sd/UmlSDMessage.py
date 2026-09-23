@@ -165,7 +165,7 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
     def GetBackgroundBrush(self) -> Brush:
         """
         Override default behavior;  So we can see 'through' the message text
-        
+
         Returns:  our precomputed transparent brush
         """
         return self._messageBackGroundBrush

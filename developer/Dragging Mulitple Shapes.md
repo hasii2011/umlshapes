@@ -3,9 +3,9 @@ Dragging Multiple Shapes
 
 ## Problem Statement
 
-Each individual shape type currently takes responsibility for dragging itself across the diagram via the `BaseEventHandler`.  
+Each individual shape type currently takes responsibility for dragging itself across the diagram via the `BaseEventHandler`.
 
-Actually, the base wxPtyhon event handler does the dragging and positioning.  However, it does not provide enough feedback.  The developer does not see the shape dragged.  The user drags the shape and stops.  The *dragged* shape magically appears at the new positions.  The effect is quite disturbing.  
+Actually, the base wxPtyhon event handler does the dragging and positioning.  However, it does not provide enough feedback.  The developer does not see the shape dragged.  The user drags the shape and stops.  The *dragged* shape magically appears at the new positions.  The effect is quite disturbing.
 
 Since each shape *drags* itself, when the user selects multiple shapes only the latest selected shape drags.
 
@@ -37,4 +37,4 @@ The master shape is issuing *SHAPE_MOVING* messages.  Someone has to be listenin
 
 ## Conclusion
 
-That is a masterful implementation. 
+That is a masterful implementation.

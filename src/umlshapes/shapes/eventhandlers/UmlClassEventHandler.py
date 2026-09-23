@@ -49,9 +49,9 @@ class UmlClassEventHandler(UmlBaseEventHandler):
 
         I really don't like accessing the UML Frame is this manner because
         now we are tightly coupled; The alternative is sending a message
-        That seems complicated in that now the UML Frame must have 2 ways to 
+        That seems complicated in that now the UML Frame must have 2 ways to
         get the lollipop location
-        
+
         TODO:  May revisit this later
 
         Pass it to the frame Handler

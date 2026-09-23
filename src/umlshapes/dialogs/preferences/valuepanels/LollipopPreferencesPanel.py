@@ -101,7 +101,7 @@ class LollipopPreferencesPanel(BasePreferencesPanel):
 
     clsUmlPreferences: UmlPreferences = UmlPreferences()
     """
-    I have a class version of the preferences for the class callbacks that need 
+    I have a class version of the preferences for the class callbacks that need
     them.  This is cheap since the preferences class is a Singleton
     """
 
