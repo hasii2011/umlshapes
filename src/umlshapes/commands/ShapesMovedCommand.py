@@ -17,18 +17,28 @@ if TYPE_CHECKING:
     from umlshapes.frames.UmlFrame import UmlFrame
     from umlshapes.frames.ShapeMoveInfo import MovedShapes
 
+DEFAULT_NAME_PREFIX: str = 'ShapeMove'
+
 
 class ShapesMovedCommand(Command):
     """
     A command to undo/redo the movement of one or more shapes.
     """
 
-    def __init__(self, umlFrame: 'UmlFrame', movedShapes: 'MovedShapes', initialPositions: InitialPositions):
+    def __init__(self,
+                 umlFrame:         'UmlFrame',
+                 movedShapes:      'MovedShapes',
+                 initialPositions: InitialPositions,
+                 name:             str = DEFAULT_NAME_PREFIX
+                 ):
         """
+
         Args:
-            umlFrame: The diagram frame where shapes are being moved.
-            movedShapes: A dictionary mapping shape IDs to ShapeMovedInfo
-                         (which contains the shape and its original position).
+            umlFrame:          The diagram frame where shapes are being moved.
+            movedShapes:       A dictionary mapping shape IDs to ShapeMovedInfo
+                              (which contains the shape and its original position).
+            initialPositions: A dictionary mapping shape IDs to their starting positions.
+            name:             An alternate name for the command to override default
         """
         from umlshapes.frames.ShapeMoveInfo import MovedShapes
 
@@ -41,8 +51,8 @@ class ShapesMovedCommand(Command):
         self._initialDoComplete: bool             = False
 
         # Naming logic similar to BaseCommand
-        dt: datetime = datetime.now()
-        self._name = f'ShapeMove-{dt.microsecond}'
+        dt:         datetime = datetime.now()
+        self._name: str   = f'{name}-{dt.microsecond}'
 
         #
         # Command is not created until shapes are completely moved
@@ -52,12 +62,26 @@ class ShapesMovedCommand(Command):
 
         super().__init__(canUndo=True, name=self._name)
 
+    @property
+    def commandName(self) -> str:
+        return self._name
+
+    @commandName.setter
+    def commandName(self, commandName: str):
+        self._name = commandName
+
     def GetName(self) -> str:
+        """
+        Override to make sure to use MY NAME
+
+        Returns:
+
+        """
         return self._name
 
     def Do(self) -> bool:
         """
-        The shapes have already been moved by the mouse interaction.
+        The shapes have already been moved by mouse or programmatic interaction.
         This method is called when the command is submitted.
         However, Undo followed by redo will call this method again
         """
