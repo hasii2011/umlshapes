@@ -1,3 +1,4 @@
+
 from typing import List
 from typing import cast
 
@@ -5,6 +6,7 @@ from logging import Logger
 from logging import getLogger
 
 from codeallyadvanced.ui.widgets.DimensionsControl import DimensionsControl
+from codeallyadvanced.ui.widgets.DimensionsControl import DimensionsParameters
 from wx import CB_READONLY
 from wx import CheckBox
 from wx import CommandEvent
@@ -77,13 +79,12 @@ class AssociationPreferencesPanel(BasePreferencesPanel):
         StaticText(formPanel, ID_ANY, 'Diamond Size')
         self._diamondSize = ComboBox(formPanel, choices=DIAMOND_SIZES, style=CB_READONLY)
 
-        # This not in the form
-        self._associationsLabelDimensions = DimensionsControl(sizedPanel=parentPanel,
-                                                              displayText='Association Label Width/Height',
-                                                              valueChangedCallback=self._onAssociationLabelDimensionsChanged,
-                                                              minValue=ASSOCIATION_LABEL_MIN_SIZE,
-                                                              setControlsSize=False
-                                                              )
+        dimensionsParameters: DimensionsParameters = DimensionsParameters(
+            caption='Association Label Width/Height',
+            valueChangedCallback=self._onAssociationLabelDimensionsChanged,
+            minValue=ASSOCIATION_LABEL_MIN_SIZE
+        )
+        self._associationsLabelDimensions = DimensionsControl(parent=parentPanel, parameters=dimensionsParameters)
         self._layoutFormatMode(parentPanel=parentPanel)
 
     def _layoutFormatMode(self, parentPanel: SizedPanel):

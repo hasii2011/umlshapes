@@ -17,6 +17,7 @@ from wx.lib.sized_controls import SizedPanel
 from codeallybasic.Dimensions import Dimensions
 
 from codeallyadvanced.ui.widgets.DimensionsControl import DimensionsControl
+from codeallyadvanced.ui.widgets.DimensionsControl import DimensionsParameters
 
 from umlshapes.dialogs.preferences.BasePreferencesPanel import BasePreferencesPanel
 from umlshapes.types.UmlDimensions import UmlDimensions
@@ -39,9 +40,11 @@ class NotePreferencesPanel(BasePreferencesPanel):
 
         parent.Bind(EVT_TEXT, self._onNoteTextChanged, noteText)
 
-        self._noteDimensions: DimensionsControl = DimensionsControl(sizedPanel=self, displayText='Note Width/Height',
-                                                                    valueChangedCallback=self._noteDimensionsChanged,
-                                                                    setControlsSize=False)
+        dimensionsParameters: DimensionsParameters = DimensionsParameters(
+            caption='Note Width/Height',
+            valueChangedCallback=self._noteDimensionsChanged
+        )
+        self._noteDimensions: DimensionsControl = DimensionsControl(parent=self, parameters=dimensionsParameters)
 
         self._noteDimensions.SetSizerProps(expand=True, proportion=1)
         self._noteDimensions.dimensions = self._preferences.noteDimensions

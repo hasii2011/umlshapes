@@ -73,7 +73,7 @@ class DualSpinners(SizedPanel):
         self._wxSpinner0Id: int = wxNewIdRef()
         self._wxSpinner1Id: int = wxNewIdRef()
 
-        if setControlsSize is True:
+        if setControlsSize:
             self._spinner0: SpinCtrl = SpinCtrl(self, self._wxSpinner0Id, "", size=Size(SPINNER_WIDTH, SPINNER_HEIGHT))
             self._spinner1: SpinCtrl = SpinCtrl(self, self._wxSpinner1Id, "", size=Size(SPINNER_WIDTH, SPINNER_HEIGHT))
         else:
@@ -100,17 +100,18 @@ class DualSpinners(SizedPanel):
         self._spinner1.SetValue(spinnerValues.value1)
         self.logger.info(f'range: {self._spinner0.GetRange()} - {self._spinner0.GetValue()=} {self._spinner1.GetValue()=}')
 
+    # noinspection PyPropertyDefinition
     # noinspection PyTypeChecker
-    spinnerValues = property(fset=_setSpinnerValues, doc='Write only property to initialize spinner values')
+    spinnerValues = property(fget=None, fset=_setSpinnerValues, fdel=None, doc='Write only property to initialize spinner values')
 
-    def enableControls(self, value: bool):
+    def enableControls(self, enable: bool):
         """
         Enable or disable the spinner controls
 
         Args:
-            value: `True` to enable, else `False`
+            enable: `True` to enable, else `False`
         """
-        if value is True:
+        if enable:
             self._spinner0.Enable()
             self._spinner1.Enable()
         else:

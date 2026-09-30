@@ -52,8 +52,9 @@ class ClassDimensions(DualSpinners):
         self._dimensions = newValue
         self.spinnerValues = SpinnerValues(value0=newValue.width, value1=newValue.height)
 
+    # noinspection PyPropertyDefinition
     # noinspection PyTypeChecker
-    dimensions = property(fset=_setDimensions, doc='Write only property to set dimensions on control')
+    dimensions = property(fget=None, fset=_setDimensions, fdel=None, doc='Write only property to set dimensions on control')
 
     def _onSpinValueChangedCallback(self, spinnerValues: SpinnerValues):
         self.logger.info(f'{spinnerValues}')

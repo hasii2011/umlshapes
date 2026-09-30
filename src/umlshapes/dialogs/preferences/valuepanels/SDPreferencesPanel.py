@@ -16,6 +16,7 @@ from wx.lib.sized_controls import SizedStaticBox
 from codeallybasic.Dimensions import Dimensions
 
 from codeallyadvanced.ui.widgets.DimensionsControl import DimensionsControl
+from codeallyadvanced.ui.widgets.DimensionsControl import DimensionsParameters
 
 from umlshapes.dialogs.preferences.BasePreferencesPanel import BasePreferencesPanel
 from umlshapes.types.UmlDimensions import UmlDimensions
@@ -29,8 +30,8 @@ class SDPreferencesPanel(BasePreferencesPanel):
         super().__init__(parent)
         self.SetSizerType('horizontal')
 
-        self._instancePosition:   SpinCtrl          = cast(SpinCtrl, None)
-        self._instanceDimensions: DimensionsControl = cast(DimensionsControl, None)
+        self._instancePosition:   SpinCtrl          = cast(SpinCtrl, None)              # noqa
+        self._instanceDimensions: DimensionsControl = cast(DimensionsControl, None)     # noqa
 
         self._layoutControls(parentSizedPanel=self)
         self._setControlValues()
@@ -38,10 +39,13 @@ class SDPreferencesPanel(BasePreferencesPanel):
     def _layoutControls(self, parentSizedPanel: SizedPanel):
         self._layoutInstancePositionControl(parentSizedPanel=parentSizedPanel)
 
-        self._instanceDimensions = DimensionsControl(sizedPanel=parentSizedPanel, displayText='Instance Width/Height',
-                                                     minValue=100, maxValue=1000,
-                                                     valueChangedCallback=self._noteDimensionsChanged,
-                                                     setControlsSize=False)
+        dimensionsParameters: DimensionsParameters = DimensionsParameters(
+            caption='Instance Width/Height',
+            minValue=100,
+            maxValue=1000,
+            valueChangedCallback=self._noteDimensionsChanged
+        )
+        self._instanceDimensions = DimensionsControl(parent=parentSizedPanel, parameters=dimensionsParameters)
 
     def _setControlValues(self):
         """

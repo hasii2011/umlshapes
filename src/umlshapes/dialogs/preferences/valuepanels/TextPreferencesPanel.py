@@ -20,6 +20,7 @@ from wx.lib.sized_controls import SizedPanel
 from wx.lib.sized_controls import SizedStaticBox
 
 from codeallyadvanced.ui.widgets.DimensionsControl import DimensionsControl
+from codeallyadvanced.ui.widgets.DimensionsControl import DimensionsParameters
 
 from umlshapes.dialogs.preferences.BasePreferencesPanel import BasePreferencesPanel
 
@@ -39,11 +40,11 @@ class TextPreferencesPanel(BasePreferencesPanel):
 
         self._textDefaultText: TextCtrl = self._createDefaultTextPanel(self)
 
-        self._textDimensions: DimensionsControl = DimensionsControl(sizedPanel=self,
-                                                                    displayText='Text Width/Height',
-                                                                    valueChangedCallback=self._onTextDimensionsChanged,
-                                                                    setControlsSize=False
-                                                                    )
+        dimensionsParameters: DimensionsParameters = DimensionsParameters(
+            caption='Text Width/Height',
+            valueChangedCallback=self._onTextDimensionsChanged
+        )
+        self._textDimensions: DimensionsControl = DimensionsControl(parent=self, parameters=dimensionsParameters)
         self._boldText:            CheckBox = cast(CheckBox, None)
         self._italicizeText:       CheckBox = cast(CheckBox, None)
         self._fontSelector:        ComboBox = cast(ComboBox, None)
