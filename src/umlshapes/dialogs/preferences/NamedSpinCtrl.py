@@ -15,9 +15,9 @@ from wx import SP_ARROW_KEYS
 from wx import Size
 from wx import SpinCtrl
 from wx import SpinEvent
+from wx import StaticText
 
 from wx.lib.sized_controls import SizedPanel
-from wx.lib.sized_controls import SizedStaticBox
 
 NSC_CALLBACK_PARAMETER_TYPE = str | int
 
@@ -36,7 +36,7 @@ class NamedSpinControlDescription:
     valueType:   NSCValueType
     valueChangedCallback: NSCValueChangedCallback
 
-class NamedSpinCtrl(SizedStaticBox):
+class NamedSpinCtrl(SizedPanel):
     """
     TODO: Move to code-ally-advanced
 
@@ -54,11 +54,11 @@ class NamedSpinCtrl(SizedStaticBox):
         """
         self.logger: Logger = getLogger(__name__)
 
-        super().__init__(parent=parent, label=description.label)
+        super().__init__(parent=parent)
 
-        self.SetSizerType('horizontal')
-        # noinspection PyUnresolvedReferences
-        self.SetSizerProps(proportion=1)
+        self.SetSizerType('vertical')
+
+        self._staticText: StaticText = StaticText(self, ID_ANY, description.label)
 
         spinCtrl: SpinCtrl = SpinCtrl(self, id=ID_ANY, size=description.controlSize, style=SP_ARROW_KEYS)
         spinCtrl.SetRange(description.minValue, description.maxValue)
@@ -69,6 +69,13 @@ class NamedSpinCtrl(SizedStaticBox):
         self._valueChangedCallback: NSCValueChangedCallback = description.valueChangedCallback
 
         parent.Bind(EVT_SPINCTRL, self._onValueChanged, self._spinCtrl)
+
+    def _setToolTip(self, tip: str):
+        self._spinCtrl.SetToolTip(tip)
+
+    # noinspection PyPropertyDefinition
+    # noinspection PyTypeChecker
+    toolTip = property(fget=None, fset=_setToolTip, fdel=None, doc='Write only property to set tooltip on spin control')
 
     @property
     def value(self):

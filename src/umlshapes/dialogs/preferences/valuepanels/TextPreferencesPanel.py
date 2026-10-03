@@ -13,6 +13,7 @@ from wx import EVT_TEXT
 from wx import CheckBox
 from wx import ComboBox
 from wx import CommandEvent
+from wx import Size
 from wx import TextCtrl
 from wx import Window
 
@@ -28,6 +29,22 @@ from umlshapes.types.UmlColor import UmlColor
 from umlshapes.types.UmlDimensions import UmlDimensions
 from umlshapes.types.UmlFontFamily import UmlFontFamily
 
+DEFAULT_COMBOBOX_HEIGHT:   int = -1    # In wxWidgets, passing -1 for height uses the native platform control height
+DEFAULT_STATIC_BOX_HEIGHT: int = 58    # On macOS, single-row static boxes require 58px to prevent vertical squashing
+DEFAULT_STYLE_BOX_HEIGHT:  int = 75    # Accommodates nested static box and vertically stacked checkboxes
+
+FONT_FAMILY_PANEL_WIDTH: int = 254    # Aligns with DimensionsControl (254px) and hugs the font selectors
+FONT_PANEL_SIZE:        Size = Size(width=FONT_FAMILY_PANEL_WIDTH, height=DEFAULT_STATIC_BOX_HEIGHT)
+
+TEXT_STYLE_PANEL_WIDTH: int = 285    # Hugs the background color static box and checkboxes with appropriate margin
+TEXT_STYLE_PANEL_SIZE:  Size = Size(width=TEXT_STYLE_PANEL_WIDTH, height=DEFAULT_STYLE_BOX_HEIGHT)
+
+FONT_FAMILY_SELECTOR_SIZE:           Size = Size(width=140, height=DEFAULT_COMBOBOX_HEIGHT)
+FONT_SIZE_SELECTOR_SIZE:             Size = Size(width=70,  height=DEFAULT_COMBOBOX_HEIGHT)
+TEXT_BACKGROUND_COLOR_SELECTOR_SIZE: Size = Size(width=110, height=DEFAULT_COMBOBOX_HEIGHT)
+
+FONT_SIZES: List[str] = ['8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20']
+
 
 class TextPreferencesPanel(BasePreferencesPanel):
 
@@ -42,14 +59,16 @@ class TextPreferencesPanel(BasePreferencesPanel):
 
         dimensionsParameters: DimensionsParameters = DimensionsParameters(
             caption='Text Width/Height',
-            valueChangedCallback=self._onTextDimensionsChanged
+            valueChangedCallback=self._onTextDimensionsChanged,
+            expand=False
         )
         self._textDimensions: DimensionsControl = DimensionsControl(parent=self, parameters=dimensionsParameters)
-        self._boldText:            CheckBox = cast(CheckBox, None)
-        self._italicizeText:       CheckBox = cast(CheckBox, None)
-        self._fontSelector:        ComboBox = cast(ComboBox, None)
-        self._fontSizeSelector:    ComboBox = cast(ComboBox, None)
-        self._textBackGroundColor: ComboBox = cast(ComboBox, None)
+        self._textDimensions.SetSizerProps(expand=False)
+        self._boldText:            CheckBox = cast(CheckBox, None)  # noqa
+        self._italicizeText:       CheckBox = cast(CheckBox, None)  # noqa
+        self._fontSelector:        ComboBox = cast(ComboBox, None)  # noqa
+        self._fontSizeSelector:    ComboBox = cast(ComboBox, None)  # noqa
+        self._textBackGroundColor: ComboBox = cast(ComboBox, None)  # noqa
 
         self._createFontAttributesPanel(self)
         self._createTextStylePanel(self)
@@ -79,10 +98,11 @@ class TextPreferencesPanel(BasePreferencesPanel):
         directoryPanel: SizedStaticBox = SizedStaticBox(parent, label='Default Text')
 
         directoryPanel.SetSizerType('horizontal')
-        directoryPanel.SetSizerProps(expand=True, proportion=1)
+        directoryPanel.SetSizerProps(expand=True)
+        directoryPanel.SetMinSize(Size(-1, DEFAULT_STATIC_BOX_HEIGHT))
 
         textCtrl: TextCtrl = TextCtrl(directoryPanel)
-        textCtrl.SetSizerProps(expand=True, proportion=5)
+        textCtrl.SetSizerProps(expand=True, proportion=1)
 
         return textCtrl
 
@@ -91,18 +111,25 @@ class TextPreferencesPanel(BasePreferencesPanel):
         stylePanel: SizedStaticBox = SizedStaticBox(parent, label='Text Style')
 
         stylePanel.SetSizerType('horizontal')
-        stylePanel.SetSizerProps(expand=True, proportion=2)
+        stylePanel.SetSizerProps(expand=False)
+        stylePanel.SetMinSize(TEXT_STYLE_PANEL_SIZE)
 
         textBackGroundColorSSB: SizedStaticBox = SizedStaticBox(stylePanel, label='Text Background Color')
-        textBackGroundColorSSB.SetSizerProps(expand=True, proportion=1)
+        textBackGroundColorSSB.SetSizerProps(expand=False, proportion=0)
+        textBackGroundColorSSB.SetMinSize(Size(-1, DEFAULT_STATIC_BOX_HEIGHT))
 
         colorChoices = []
         for cc in UmlColor:
             colorChoices.append(cc.value)
-        self._textBackGroundColor = ComboBox(textBackGroundColorSSB, choices=colorChoices, style=CB_READONLY)
+        self._textBackGroundColor = ComboBox(textBackGroundColorSSB, choices=colorChoices, size=TEXT_BACKGROUND_COLOR_SELECTOR_SIZE, style=CB_READONLY)
+        self._textBackGroundColor.SetSizerProps(expand=False, halign='left')
 
-        self._boldText      = CheckBox(parent=stylePanel, label='Bold Text')
-        self._italicizeText = CheckBox(parent=stylePanel, label='Italicize Text')
+        checkBoxPanel: SizedPanel = SizedPanel(stylePanel)
+        checkBoxPanel.SetSizerType('vertical')
+        checkBoxPanel.SetSizerProps(expand=False, valign='center')
+
+        self._boldText      = CheckBox(parent=checkBoxPanel, label='Bold Text')
+        self._italicizeText = CheckBox(parent=checkBoxPanel, label='Italicize Text')
 
     def _createFontAttributesPanel(self, parent: SizedPanel):
 
@@ -112,17 +139,17 @@ class TextPreferencesPanel(BasePreferencesPanel):
 
         fontPanel: SizedStaticBox = SizedStaticBox(parent, label='Font Family and Size')
         fontPanel.SetSizerType('horizontal')
-        fontPanel.SetSizerProps(expand=True, proportion=1)
+        fontPanel.SetSizerProps(expand=False)
+        fontPanel.SetMinSize(FONT_PANEL_SIZE)
 
-        self._fontSelector = ComboBox(fontPanel, choices=fontChoices, style=CB_READONLY)
-        self._fontSelector.SetSizerProps(expand=True, proportion=1)
+        self._fontSelector = ComboBox(fontPanel, choices=fontChoices, size=FONT_FAMILY_SELECTOR_SIZE, style=CB_READONLY)
+        self._fontSelector.SetSizerProps(expand=False, proportion=0)
 
-        fontSizes: List[str] = ['8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20']
-        self._fontSizeSelector = ComboBox(fontPanel, choices=fontSizes, style=CB_READONLY)
-        self._fontSizeSelector.SetSizerProps(expand=True, proportion=1)
+        self._fontSizeSelector = ComboBox(fontPanel, choices=FONT_SIZES, size=FONT_SIZE_SELECTOR_SIZE, style=CB_READONLY)
+        self._fontSizeSelector.SetSizerProps(expand=False, proportion=0)
 
     # noinspection PyUnusedLocal
-    def _onDefaultTextValueChanged(self, event: CommandEvent):
+    def _onDefaultTextValueChanged(self, _event: CommandEvent):
         self._preferences.textValue = self._textDefaultText.GetValue()
 
     def _onTextDimensionsChanged(self, newValue: UmlDimensions):

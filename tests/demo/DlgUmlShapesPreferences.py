@@ -46,8 +46,8 @@ class DlgUmlShapesPreferences(SizedDialog):
         diagramPreferencesPanel:      DiagramPreferencesPanel = DiagramPreferencesPanel(parent=book)
         defaultValuesPreferencesPage: DefaultValuesPanel      = DefaultValuesPanel(parent=book)
 
-        book.AddPage(diagramPreferencesPanel,      text=diagramPreferencesPanel.name,      select=False)
-        book.AddPage(defaultValuesPreferencesPage, text=defaultValuesPreferencesPage.name, select=True)
+        book.AddPage(diagramPreferencesPanel,      text=diagramPreferencesPanel.name,      select=True)
+        book.AddPage(defaultValuesPreferencesPage, text=defaultValuesPreferencesPage.name, select=False)
 
         self._layoutStandardOkCancelButtonSizer()
         # self.Fit()
@@ -66,13 +66,13 @@ class DlgUmlShapesPreferences(SizedDialog):
         self.Bind(EVT_CLOSE,  self._onClose)
 
     # noinspection PyUnusedLocal
-    def _onOk(self, event: CommandEvent):
+    def _onOk(self, _event: CommandEvent):
         """
         """
         self.EndModal(OK)
 
     # noinspection PyUnusedLocal
-    def _onClose(self, event: CommandEvent):
+    def _onClose(self, _event: CommandEvent):
         """
         """
         self.EndModal(CANCEL)

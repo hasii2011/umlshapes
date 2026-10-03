@@ -37,9 +37,12 @@ from umlshapes.types.UmlPenStyle import UmlPenStyle
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
 SPINNER_WIDTH:  int = 60
-SPINNER_HEIGHT: int = 35
+SPINNER_HEIGHT: int = -1    # In wxWidgets, passing -1 for height uses native platform control height
 
 DEFAULT_SPIN_CTRL_SIZE: Size = Size(width=75, height=SPINNER_HEIGHT)
+
+DEFAULT_GRID_OPTIONS_HEIGHT: int  = 80
+DEFAULT_GRID_OPTIONS_SIZE:   Size = Size(width=-1, height=DEFAULT_GRID_OPTIONS_HEIGHT)
 
 MIN_VIRTUAL_WINDOW_WIDTH: int = 0
 MAX_VIRTUAL_WINDOW_WIDTH: int = 50000
@@ -129,7 +132,7 @@ class DiagramPreferencesPanel(BasePreferencesPanel):
         horizontalPanel: SizedPanel = SizedPanel(parentSizedPanel)
         verticalPanel:   SizedPanel = SizedPanel(horizontalPanel)
         horizontalPanel.SetSizerType('horizontal')
-        horizontalPanel.SetSizerProps(expand=True, proportion=3)
+        horizontalPanel.SetSizerProps(expand=True)
         verticalPanel.SetSizerType('vertical')
 
         self._layoutDiagramPreferences(verticalPanel=verticalPanel)
@@ -186,14 +189,12 @@ class DiagramPreferencesPanel(BasePreferencesPanel):
         self._showParameters       = CheckBox(verticalPanel, label='Show Method Parameters')
 
         self._virtualWindowWidth = NamedSpinCtrl(parent=verticalPanel, description=virtualWindowLengthDescription)
-        # noinspection PyUnresolvedReferences
-        # self._virtualWindowWidth.SetSizerProps(proportion=4)
 
         self._enableBackgroundGrid.SetToolTip('Turn on a diagram grid in the UML Frame')
         self._snapToGrid.SetToolTip('Snap class diagram shapes to the closest grid corner')
         self._centerDiagramView.SetToolTip('Center the view in the virtual frame')
         self._showParameters.SetToolTip('Global value to display method parameters;  Unless overridden by the class')
-        self._virtualWindowWidth.SetToolTip('Determines the virtual window width and height of the UML Frame')
+        self._virtualWindowWidth.toolTip = 'Determines the virtual window width and height of the UML Frame'
 
         self._fixPanelSize(verticalPanel)
 
@@ -232,11 +233,12 @@ class DiagramPreferencesPanel(BasePreferencesPanel):
     def _layoutGridOptions(self, panel: SizedPanel):
 
         staticBox: SizedStaticBox = SizedStaticBox(panel, label='Grid Options')
-        staticBox.SetSizerProps(expand=True, proportion=2)
+        staticBox.SetSizerProps(expand=True)
+        staticBox.SetMinSize(DEFAULT_GRID_OPTIONS_SIZE)
 
         gridPanel: SizedPanel = SizedPanel(staticBox)
         gridPanel.SetSizerType('horizontal')
-        gridPanel.SetSizerProps(expand=True, proportion=2)
+        gridPanel.SetSizerProps(expand=True, proportion=1)
 
         self._layoutGridIntervalControl(sizedPanel=gridPanel)
         self._layoutGridLineColorControl(panel=gridPanel)

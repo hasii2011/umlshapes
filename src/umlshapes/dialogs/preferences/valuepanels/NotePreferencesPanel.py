@@ -42,11 +42,12 @@ class NotePreferencesPanel(BasePreferencesPanel):
 
         dimensionsParameters: DimensionsParameters = DimensionsParameters(
             caption='Note Width/Height',
-            valueChangedCallback=self._noteDimensionsChanged
+            valueChangedCallback=self._noteDimensionsChanged,
+            expand=False
         )
         self._noteDimensions: DimensionsControl = DimensionsControl(parent=self, parameters=dimensionsParameters)
 
-        self._noteDimensions.SetSizerProps(expand=True, proportion=1)
+        self._noteDimensions.SetSizerProps(expand=False)
         self._noteDimensions.dimensions = self._preferences.noteDimensions
 
     def _onNoteTextChanged(self, event: CommandEvent):
