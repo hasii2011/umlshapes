@@ -5,8 +5,6 @@ from typing import cast
 from logging import Logger
 from logging import getLogger
 
-from codeallyadvanced.ui.widgets.DimensionsControl import DimensionsControl
-from codeallyadvanced.ui.widgets.DimensionsControl import DimensionsParameters
 from wx import CB_READONLY
 from wx import CheckBox
 from wx import CommandEvent
@@ -19,13 +17,18 @@ from wx import StaticText
 from wx import Window
 
 from wx.lib.sized_controls import SizedPanel
-from wx.lib.sized_controls import SizedStaticBox
+
+from codeallyadvanced.ui.widgets.TitledPanel import TitledPanel
+from codeallyadvanced.ui.widgets.DimensionsControl import DimensionsControl
+from codeallyadvanced.ui.widgets.DimensionsControl import DimensionsParameters
 
 from umlshapes.dialogs.preferences.BasePreferencesPanel import BasePreferencesPanel
+
 from umlshapes.lib.ogl import FORMAT_CENTRE_HORIZ
 from umlshapes.lib.ogl import FORMAT_CENTRE_VERT
 from umlshapes.lib.ogl import FORMAT_SIZE_TO_CONTENTS
 from umlshapes.links.UmlAssociationLabelFormat import UmlAssociationLabelFormat
+
 from umlshapes.types.UmlDimensions import UmlDimensions
 
 ASSOCIATION_LABEL_MIN_SIZE: int = 20
@@ -82,15 +85,16 @@ class AssociationPreferencesPanel(BasePreferencesPanel):
         dimensionsParameters: DimensionsParameters = DimensionsParameters(
             caption='Association Label Width/Height',
             valueChangedCallback=self._onAssociationLabelDimensionsChanged,
-            minValue=ASSOCIATION_LABEL_MIN_SIZE
+            minValue=ASSOCIATION_LABEL_MIN_SIZE,
+            expand=False
         )
         self._associationsLabelDimensions = DimensionsControl(parent=parentPanel, parameters=dimensionsParameters)
+        self._associationsLabelDimensions.SetSizerProps(expand=False)
         self._layoutFormatMode(parentPanel=parentPanel)
 
     def _layoutFormatMode(self, parentPanel: SizedPanel):
 
-        formatContainer: SizedStaticBox = SizedStaticBox(parent=parentPanel, label='Association Label Format')
-        formatContainer.SetSizerProps(expand=True, proportion=3)
+        formatContainer: TitledPanel = TitledPanel(parent=parentPanel, titleLabel='Association Label Format')
 
         self._formatNone             = CheckBox(formatContainer, ID_ANY, UmlAssociationLabelFormat.FORMAT_NONE.value)
         self._formatCenterHorizontal = CheckBox(formatContainer, ID_ANY, UmlAssociationLabelFormat.FORMAT_CENTER_HORIZONTAL.value)

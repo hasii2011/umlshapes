@@ -1,6 +1,5 @@
 
 from typing import List
-from typing import Callable
 
 from logging import Logger
 from logging import getLogger
@@ -28,25 +27,24 @@ from codeallybasic.Dimensions import Dimensions
 
 from umlshapes.dialogs.preferences.BasePreferencesPanel import BasePreferencesPanel
 
-from umlshapes.dialogs.preferences.valuepanels.DualSpinners import DualSpinners
-from umlshapes.dialogs.preferences.valuepanels.DualSpinners import SpinnerValues
+from codeallyadvanced.ui.widgets.DualSpinnerControl import DualSpinnerControl
+from codeallyadvanced.ui.widgets.DualSpinnerControl import DualSpinnerParameters
+from codeallyadvanced.ui.widgets.DualSpinnerControl import SpinnerValues
+from codeallyadvanced.ui.widgets.DualSpinnerControl import ValueChangeCallback
 
 from umlshapes.types.UmlColor import UmlColor
 from umlshapes.types.UmlDimensions import UmlDimensions
 
-class ClassDimensions(DualSpinners):
+class ClassDimensions(DualSpinnerControl):
     """
     Syntactic sugar around dual spinners
     """
-    def __init__(self, sizedPanel: SizedPanel,
-                 valueChangedCallback: Callable,
-                 minValue: int = DualSpinners.DEFAULT_MIN_VALUE, maxValue: int = DualSpinners.DEFAULT_MAX_VALUE,
-                 setControlsSize: bool = True):
+    def __init__(self, parent: SizedPanel, parameters: DualSpinnerParameters):
 
-        self._dimensionsChangedCallback: Callable   = valueChangedCallback
-        self._dimensions:                Dimensions = Dimensions()
+        self._dimensionsChangedCallback: ValueChangeCallback = parameters.valueChangedCallback
+        self._dimensions:                Dimensions          = Dimensions()
 
-        super().__init__(sizedPanel, valueChangedCallback=self._onSpinValueChangedCallback, minValue=minValue, maxValue=maxValue, setControlsSize=setControlsSize)
+        super().__init__(parent=parent, parameters=parameters)
 
     def _setDimensions(self, newValue: Dimensions):
         self._dimensions = newValue
@@ -56,13 +54,14 @@ class ClassDimensions(DualSpinners):
     # noinspection PyTypeChecker
     dimensions = property(fget=None, fset=_setDimensions, fdel=None, doc='Write only property to set dimensions on control')
 
-    def _onSpinValueChangedCallback(self, spinnerValues: SpinnerValues):
-        self.logger.info(f'{spinnerValues}')
+    def _notifyValueChanged(self, spinnerValues: SpinnerValues):
+        self.dscLogger.info(f'{spinnerValues}')
 
-        self._dimensions.width = spinnerValues.value0
+        self._dimensions.width  = spinnerValues.value0
         self._dimensions.height = spinnerValues.value1
 
-        self._dimensionsChangedCallback(self._dimensions)
+        if self._dimensionsChangedCallback is not None:
+            self._dimensionsChangedCallback(self._dimensions)
 
 
 class ClassPreferencesPanel(BasePreferencesPanel):
@@ -122,9 +121,11 @@ class ClassPreferencesPanel(BasePreferencesPanel):
 
         self._layoutClassAttributesForm(parentPanel)
 
+        self._layoutClassDimensions(parentPanel)
+
         self._layoutMethodDisplayControls(parentPanel)
 
-    def _layoutClassAttributesForm(self, parentPanel):
+    def _layoutClassAttributesForm(self, parentPanel: SizedPanel):
         """
 
         Args:
@@ -154,11 +155,15 @@ class ClassPreferencesPanel(BasePreferencesPanel):
         self._classTextMargin = SpinCtrl(nameFormPanel, id=ID_ANY, size=Size(width=100, height=-1), style=SP_ARROW_KEYS)
         self._classTextMargin .SetRange(1, 100)
 
-        StaticText(nameFormPanel, ID_ANY, 'Class Width/Height')
-        self._classDimensions = ClassDimensions(sizedPanel=nameFormPanel,
-                                                valueChangedCallback=self._onClassDimensionsChanged,
-                                                setControlsSize=False
-                                                )
+    def _layoutClassDimensions(self, parentPanel: SizedPanel):
+
+        dualSpinnerParameters: DualSpinnerParameters = DualSpinnerParameters(
+            caption='Class Width/Height',
+            valueChangedCallback=self._onClassDimensionsChanged,
+            expand=False
+        )
+        self._classDimensions = ClassDimensions(parent=parentPanel, parameters=dualSpinnerParameters)
+        self._classDimensions.SetSizerProps(expand=False)
 
     def _layoutMethodDisplayControls(self, parentPanel: SizedPanel):
 
