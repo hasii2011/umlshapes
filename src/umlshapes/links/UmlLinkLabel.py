@@ -6,6 +6,8 @@ from typing import cast
 from logging import Logger
 from logging import getLogger
 
+from umlshapes.lib.ogl import Shape
+
 from umlshapes.links.LabelType import LabelType
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 from umlshapes.shapes.UmlBaseLabel import UmlBaseLabel
@@ -54,7 +56,7 @@ class UmlLinkLabel(UmlBaseLabel):
         return self.GetParent()
 
     @parent.setter
-    def parent(self, parent: 'UmlLink'):
+    def parent(self, parent: Shape):
         self.SetParent(parent)
 
     @property
