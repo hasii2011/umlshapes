@@ -1,4 +1,3 @@
-
 from logging import Logger
 from logging import getLogger
 
@@ -59,3 +58,9 @@ class SDInstanceConstrainer(RectangleShape, TopLeftMixin):
         self.SetPen(pen)
 
         super().OnDraw(dc)
+
+    def HitTest(self, x: float, y: float) -> tuple[int, float] | bool:
+        """
+        Pass-through hit test so background constraining shape does not intercept mouse clicks.
+        """
+        return False

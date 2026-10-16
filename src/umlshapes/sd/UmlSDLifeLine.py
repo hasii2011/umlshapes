@@ -1,4 +1,3 @@
-
 from typing import cast
 
 from logging import Logger
@@ -21,6 +20,8 @@ from umlshapes.sd.SDInstanceConstrainer import SDInstanceConstrainer
 from umlshapes.sd.UmlInstanceName import UmlInstanceName
 from umlshapes.sd.UmlSDMessage import UmlSDMessage
 from umlshapes.sd.UmlSDMessage import UmlSDMessages
+
+HIT_TEST_TOLERANCE: int = 15
 
 
 class UmlSDLifeLine(IdentifierMixin, RectangleShape, TopLeftMixin):
@@ -89,9 +90,29 @@ class UmlSDLifeLine(IdentifierMixin, RectangleShape, TopLeftMixin):
 
         self.AddLine(line=umlSDMessage, other=destinationLifeLine)
 
+    def HitTest(self, x: float, y: float) -> tuple[int, float] | bool:
+        """
+        Hit test for lifeline providing a comfortable click band (+/- 15px).
+        """
+        centerX: float = self.GetX()
+        centerY: float = self.GetY()
+        halfHeight: float = self.GetHeight() / 2.0
+
+        top: float = centerY - halfHeight
+        bottom: float = centerY + halfHeight
+
+        if (abs(x - centerX) <= HIT_TEST_TOLERANCE) and (top <= y <= bottom):
+            return 0, abs(x - centerX)
+        return False
+
     def OnDraw(self, dc: MemoryDC):
-        self.SetPen(ResourceUtils.blackSolidPen())
-        super().OnDraw(dc=dc)
+        lineX: int = round(self.GetX())
+        halfHeight: float = self.GetHeight() / 2.0
+        topY: int = round(self.GetY() - halfHeight)
+        bottomY: int = round(self.GetY() + halfHeight)
+
+        dc.SetPen(ResourceUtils.blackDashedPen())
+        dc.DrawLine(lineX, topY, lineX, bottomY)
 
     def __str__(self) -> str:
         return f'UmlSDLifeLine: {self.id}'

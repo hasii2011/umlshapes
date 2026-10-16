@@ -1,4 +1,3 @@
-
 from typing import cast
 
 from logging import Logger
@@ -14,9 +13,11 @@ from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 from umlshapes.sd.eventhandlers.UmlSDLifeLineEventHandler import LifeLineClickDetails
 from umlshapes.sd.eventhandlers.UmlSDMessageEventHandler import UmlSDMessageEventHandler
 
+from umlshapes.sd.SDLayoutEngine import SDLayoutEngine
+from umlshapes.sd.UmlSDLifeLine import UmlSDLifeLine
 from umlshapes.sd.UmlSDMessage import UmlSDMessage
 
-NO_START_DETAILS = cast(LifeLineClickDetails, None)
+NO_START_DETAILS: LifeLineClickDetails = cast(LifeLineClickDetails, None)
 
 
 class SDMessageCreationHandler:
@@ -32,6 +33,7 @@ class SDMessageCreationHandler:
 
         self._sequenceDiagramFrame: SequenceDiagramFrame = sequenceDiagramFrame
         self._umlPubSubEngine:      IUmlPubSubEngine     = umlPubSubEngine
+        self._layoutEngine:         SDLayoutEngine       = SDLayoutEngine()
 
         self._umlPubSubEngine.subscribe(
             UmlMessageType.SD_LIFELINE_CLICKED,
@@ -110,28 +112,38 @@ class SDMessageCreationHandler:
         """
         self.logger.info(f'\n{endDetails=}')
 
-        modelMessage: SDMessage    = SDMessage(
+        startLifeLine: UmlSDLifeLine = self._startDetails.lifeLine
+        destLifeLine:  UmlSDLifeLine = endDetails.lifeLine
+
+        headerBottomY: int = startLifeLine.rectangle.top
+        clickedY:      int = self._startDetails.clickPosition.y
+        snappedY:      int = self._layoutEngine.computeNearestSlotY(headerBottomY=headerBottomY, targetY=clickedY)
+
+        startX: float = startLifeLine.GetX()
+        endX:   float = destLifeLine.GetX()
+
+        modelMessage: SDMessage = SDMessage(
             message=f'demoMessage-{self._messageCount:04d}',
-            src=self._startDetails.lifeLine.umlInstanceName.sdInstance,
-            sourceY=self._startDetails.clickPosition.y,
-            dst=endDetails.lifeLine.umlInstanceName.sdInstance,
-            destinationY=endDetails.clickPosition.y,
+            src=startLifeLine.umlInstanceName.sdInstance,
+            sourceY=snappedY,
+            dst=destLifeLine.umlInstanceName.sdInstance,
+            destinationY=snappedY,
         )
         self._messageCount += 1
         umlSDMessage: UmlSDMessage = UmlSDMessage(sdMessage=modelMessage, umlPubSubEngine=self._umlPubSubEngine)
         umlSDMessage.umlFrame = self._sequenceDiagramFrame
         self.logger.info(f'Created message: {umlSDMessage.sdMessage.message}')
 
-        self._startDetails.lifeLine.addMessage(umlSDMessage=umlSDMessage, destinationLifeLine=endDetails.lifeLine)
+        startLifeLine.addMessage(umlSDMessage=umlSDMessage, destinationLifeLine=destLifeLine)
 
+        umlSDMessage.fromY = snappedY
+        umlSDMessage.toY   = snappedY
         umlSDMessage.SetEnds(
-            x1=self._startDetails.clickPosition.x,
-            y1=self._startDetails.clickPosition.y,
-            x2=endDetails.clickPosition.x,
-            y2=endDetails.clickPosition.y
+            x1=startX,
+            y1=snappedY,
+            x2=endX,
+            y2=snappedY
         )
-        umlSDMessage.fromY = self._startDetails.clickPosition.y
-        umlSDMessage.toY   = endDetails.clickPosition.y
 
         umlSDMessage.Show(True)
         self._sequenceDiagramFrame.umlDiagram.AddShape(umlSDMessage)

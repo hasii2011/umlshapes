@@ -1,16 +1,15 @@
-
 from typing import TYPE_CHECKING
 
 from logging import Logger
 from logging import getLogger
-
-from wx import CallAfter as wxCallAfter
 
 from umlmodel.SDInstance import SDInstance
 
 from umlshapes.lib.ogl import CompositeShape
 from umlshapes.lib.ogl import Constraint
 from umlshapes.lib.ogl import CONSTRAINT_ALIGNED_TOP
+from umlshapes.lib.ogl import CONSTRAINT_BELOW
+from umlshapes.lib.ogl import CONSTRAINT_CENTRED_HORIZONTALLY
 
 from umlshapes.utils.ResourceUtils import ResourceUtils
 
@@ -28,11 +27,11 @@ from umlshapes.sd.SDInstanceConstrainer import SDInstanceConstrainer
 from umlshapes.sd.UmlInstanceName import UmlInstanceName
 from umlshapes.sd.UmlSDLifeLine import UmlSDLifeLine
 
-
 if TYPE_CHECKING:
     from umlshapes.frames.SequenceDiagramFrame import SequenceDiagramFrame
 
 OP_NONE: int = 0    # None of OP_CLICK_LEFT, OP_CLICK_RIGHT, OP_DRAG_LEFT, OP_DRAG_RIGHT
+
 
 class UmlSDInstance(ControlPointMixin, IdentifierMixin, CompositeShape, TopLeftMixin):
 
@@ -69,8 +68,15 @@ class UmlSDInstance(ControlPointMixin, IdentifierMixin, CompositeShape, TopLeftM
         self.AddChild(instanceName)
         self.AddChild(sdLifeLine)
 
-        constraint: Constraint = Constraint(CONSTRAINT_ALIGNED_TOP, constrainingShape, [instanceName, sdLifeLine])
-        self.AddConstraint(constraint)
+        topConstraint:            Constraint = Constraint(CONSTRAINT_ALIGNED_TOP, constrainingShape, [instanceName])
+        centerNameConstraint:     Constraint = Constraint(CONSTRAINT_CENTRED_HORIZONTALLY, constrainingShape, [instanceName])
+        centerLifeLineConstraint: Constraint = Constraint(CONSTRAINT_CENTRED_HORIZONTALLY, constrainingShape, [sdLifeLine])
+        belowConstraint:          Constraint = Constraint(CONSTRAINT_BELOW, instanceName, [sdLifeLine])
+
+        self.AddConstraint(topConstraint)
+        self.AddConstraint(centerNameConstraint)
+        self.AddConstraint(centerLifeLineConstraint)
+        self.AddConstraint(belowConstraint)
         self.Recompute()
 
         # If we don't do this, the shapes will be able to move on their
@@ -82,8 +88,6 @@ class UmlSDInstance(ControlPointMixin, IdentifierMixin, CompositeShape, TopLeftM
         # If we don't do this the shape will take all left-clicks for itself
         constrainingShape.SetSensitivityFilter(OP_NONE)
         self.SetCentreResize(False)
-
-        wxCallAfter(sdLifeLine.adjustLifeLineTopPosition)
 
         self._setEventHandlers(umlSDLifeLine=sdLifeLine)
         self._umlSDLifeLine: UmlSDLifeLine = sdLifeLine

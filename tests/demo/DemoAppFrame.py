@@ -109,21 +109,21 @@ class DemoAppFrame(SizedFrame):
         self._noteBook: Notebook = Notebook(parent=sizedPanel)
         self._noteBook.SetSizerProps(expand=True, proportion=1)
 
-        self._diagramFrame1 = DemoClassDiagramFrame(
+        self._diagramFrame1: DemoClassDiagramFrame = DemoClassDiagramFrame(
             parent=self._noteBook,
             umlPubSubEngine=self._umlPubSubEngine,
         )
-        self._diagramFrame2 = SequenceDiagramFrame(
+        self._sequenceDiagramFrame: SequenceDiagramFrame = SequenceDiagramFrame(
             parent=self._noteBook,
             umlPubSubEngine=self._umlPubSubEngine,
         )
-        self._diagramFrame3 = UseCaseDiagramFrame(
+        self._diagramFrame3: UseCaseDiagramFrame = UseCaseDiagramFrame(
             parent=self._noteBook,
             umlPubSubEngine=self._umlPubSubEngine
         )
 
         self._noteBook.AddPage(page=self._diagramFrame1, text='Class Diagram',    select=True)
-        self._noteBook.AddPage(page=self._diagramFrame2, text='Sequence Diagram', select=False)
+        self._noteBook.AddPage(page=self._sequenceDiagramFrame, text='Sequence Diagram', select=False)
         self._noteBook.AddPage(page=self._diagramFrame3, text='Use Case Diagram', select=False)
         self._noteBook.SetSelection(0)      # Hard code while working on 2.1.0
 
@@ -131,7 +131,7 @@ class DemoAppFrame(SizedFrame):
 
         self._createApplicationMenuBar()
         self._diagramFrame1.commandProcessor.SetEditMenu(menu=self._editMenu)
-        self._diagramFrame2.commandProcessor.SetEditMenu(menu=self._editMenu)
+        self._sequenceDiagramFrame.commandProcessor.SetEditMenu(menu=self._editMenu)
         self._diagramFrame3.commandProcessor.SetEditMenu(menu=self._editMenu)
 
         self.CreateStatusBar()  # should always do this when there's a resize border
@@ -146,7 +146,7 @@ class DemoAppFrame(SizedFrame):
         self._linkCreator:      LinkCreator      = LinkCreator(umlPubSubEngine=self._umlPubSubEngine)
         self._sdMessageHandler: SDMessageCreationHandler = SDMessageCreationHandler(
             umlPubSubEngine=self._umlPubSubEngine,
-            sequenceDiagramFrame=cast(SequenceDiagramFrame, self._currentFrame)
+            sequenceDiagramFrame=self._sequenceDiagramFrame
         )
 
         self._preferences:  UmlPreferences = UmlPreferences()
@@ -154,7 +154,7 @@ class DemoAppFrame(SizedFrame):
         self._interfaceCount: int = 0
 
         self._subscribeFrameToRelevantFrameTopics(frameId=self._diagramFrame1.id)
-        self._subscribeFrameToRelevantFrameTopics(frameId=self._diagramFrame2.id)
+        self._subscribeFrameToRelevantFrameTopics(frameId=self._sequenceDiagramFrame.id)
         self._subscribeFrameToRelevantFrameTopics(frameId=self._diagramFrame3.id)
 
         self.Bind(EVT_NOTEBOOK_PAGE_CHANGED, self._onFrameDisplayedChanged)
