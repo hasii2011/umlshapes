@@ -1,4 +1,5 @@
 
+from typing import Optional
 from typing import cast
 from typing import List
 from typing import NewType
@@ -27,8 +28,6 @@ from umlshapes.utils.ResourceUtils import ResourceUtils
 
 from umlshapes.UmlDiagram import UmlDiagram
 from umlshapes.frames.UmlFrame import UmlFrame
-
-from umlshapes.links.LabelType import LabelType
 
 from umlshapes.mixins.PubSubMixin import PubSubMixin
 from umlshapes.mixins.IdentifierMixin import IdentifierMixin
@@ -72,7 +71,7 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
 
         self.SetFont(ResourceUtils.defaultFont())
 
-        self._messageLabel: UmlSDMessageLabel = cast(UmlSDMessageLabel, None)
+        self._messageLabel: Optional[UmlSDMessageLabel] = None
 
         #
         # TODO:  Support different message type that require different arrow heads and lines
@@ -110,6 +109,10 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
     @selected.setter
     def selected(self, select: bool):
         self.Select(select=select)
+
+    @property
+    def messageLabel(self) -> Optional[UmlSDMessageLabel]:
+        return self._messageLabel
 
     @property
     def fromY(self) -> int:
@@ -160,7 +163,8 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
         """
         Update the message
         """
-        self._messageLabel.label = self._sdMessage.message
+        if self._messageLabel is not None:
+            self._messageLabel.label = self._sdMessage.message
 
     def GetBackgroundBrush(self) -> Brush:
         """
@@ -211,16 +215,21 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
         endX, endY, otherEndX, otherEndY = self.FindLineEndPoints()
         self.SetEnds(endX, fromY, otherEndX, toY)
 
+        if self._messageLabel is not None:
+            labelX, labelY = self.GetLabelPosition(position=NAME_IDX)
+            self._messageLabel.Move(dc, labelX, labelY)
+            self._messageLabel.position = UmlPosition(x=labelX, y=labelY)
+
     def _createLinkName(self) -> UmlSDMessageLabel:
 
         labelX, labelY = self.GetLabelPosition(position=NAME_IDX)
-        return self._createMessageLabel(x=labelX, y=labelY, text=self.sdMessage.message, labelType=LabelType.ASSOCIATION_NAME)
+        return self._createMessageLabel(x=labelX, y=labelY, text=self.sdMessage.message)
 
-    def _createMessageLabel(self, x: int, y: int, text: str, labelType: LabelType) -> UmlSDMessageLabel:
+    def _createMessageLabel(self, x: int, y: int, text: str) -> UmlSDMessageLabel:
 
         assert text is not None, 'Developer error'
 
-        umlSDMessageLabel: UmlSDMessageLabel = UmlSDMessageLabel(label=text, labelType=labelType)
+        umlSDMessageLabel: UmlSDMessageLabel = UmlSDMessageLabel(label=text)
 
         umlSDMessageLabel.position = UmlPosition(x=x, y=y)
         #
@@ -231,7 +240,7 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
 
         return umlSDMessageLabel
 
-    def _setupMessageLabel(self, umlSDMessageLabel):
+    def _setupMessageLabel(self, umlSDMessageLabel: UmlSDMessageLabel):
         """
 
         Args:

@@ -1,8 +1,18 @@
 
-from umlshapes.links.eventhandlers.UmlLinkLabelEventHandler import UmlLinkLabelEventHandler
+from logging import Logger
+from logging import getLogger
 
-class UmlSDMessageLabelEventHandler(UmlLinkLabelEventHandler):
+from umlshapes.lib.ogl import ShapeEvtHandler
+
+from umlshapes.UmlBaseEventHandler import UmlBaseEventHandler
+
+
+class UmlSDMessageLabelEventHandler(UmlBaseEventHandler):
     """
-    Syntactic sugar
+    Event handler for Sequence Diagram Message Labels.
     """
-    pass
+
+    def __init__(self, previousEventHandler: ShapeEvtHandler):
+        self.logger: Logger = getLogger(__name__)
+        super().__init__(previousEventHandler=previousEventHandler)
+

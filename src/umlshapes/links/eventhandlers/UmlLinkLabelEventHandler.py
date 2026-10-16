@@ -59,7 +59,7 @@ class UmlLinkLabelEventHandler(UmlBaseEventHandler):
 
         self._debugPrint(f'label type: {umlLinkLabel.labelType} xy=({x},{y})')
 
-        if umlLinkLabel.labelType == LabelType.ASSOCIATION_NAME or umlLinkLabel.labelType == LabelType.SD_MESSAGE_NAME:
+        if umlLinkLabel.labelType == LabelType.ASSOCIATION_NAME:
             linkLabelX, linkLabelY = umlLink.GetLabelPosition(NAME_IDX)
         elif umlLinkLabel.labelType == LabelType.SOURCE_CARDINALITY:
             linkLabelX, linkLabelY = umlLink.GetLabelPosition(SOURCE_CARDINALITY_IDX)
@@ -78,7 +78,7 @@ class UmlLinkLabelEventHandler(UmlBaseEventHandler):
 
         self._indicateFrameModified()
 
-    def _calculateDelta(self, labelPosition: UmlPosition, leftCoordinate: LeftCoordinate, linkLabelX, linkLabelY) -> DeltaXY:
+    def _calculateDelta(self, labelPosition: UmlPosition, leftCoordinate: LeftCoordinate, linkLabelX: int, linkLabelY: int) -> DeltaXY:
         """
 
         Args:
