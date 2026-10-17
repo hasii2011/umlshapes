@@ -27,7 +27,6 @@ from umlmodel.SDMessage import SDMessage
 from umlshapes.utils.ResourceUtils import ResourceUtils
 
 from umlshapes.UmlDiagram import UmlDiagram
-from umlshapes.frames.UmlFrame import UmlFrame
 
 from umlshapes.mixins.PubSubMixin import PubSubMixin
 from umlshapes.mixins.IdentifierMixin import IdentifierMixin
@@ -36,6 +35,7 @@ from umlshapes.mixins.ControlPointMixin import ControlPointMixin
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 
+from umlshapes.sd.SDMessageLabelPlacement import SDMessageLabelPlacement
 from umlshapes.sd.UmlSDMessageLabel import UmlSDMessageLabel
 from umlshapes.sd.eventhandlers.UmlSDMessageLabelEventHandler import UmlSDMessageLabelEventHandler
 
@@ -43,8 +43,9 @@ from umlshapes.types.Common import NAME_IDX
 from umlshapes.types.UmlPosition import UmlPosition
 
 if TYPE_CHECKING:
-    from umlshapes.sd.UmlSDLifeLine import UmlSDLifeLine
     from umlshapes.frames.SequenceDiagramFrame import SequenceDiagramFrame
+    from umlshapes.frames.UmlFrame import UmlFrame
+    from umlshapes.sd.UmlSDLifeLine import UmlSDLifeLine
 
 
 class SD_MESSAGE_TYPE(Enum):
@@ -216,9 +217,41 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
         self.SetEnds(endX, fromY, otherEndX, toY)
 
         if self._messageLabel is not None:
-            labelX, labelY = self.GetLabelPosition(position=NAME_IDX)
-            self._messageLabel.Move(dc, labelX, labelY)
-            self._messageLabel.position = UmlPosition(x=labelX, y=labelY)
+            self._updateMessageLabelPosition(dc=dc)
+
+    def _updateMessageLabelPosition(self, dc: ClientDC):
+        """
+        Position the message label according to the user's placement preference mode.
+
+        Args:
+            dc: The device context
+        """
+        if self._messageLabel is None or len(self._lineControlPoints) < 2:
+            return
+
+        startX: int = round(self._lineControlPoints[0][0])
+        endX:   int = round(self._lineControlPoints[-1][0])
+        lineY:  int = round(self._lineControlPoints[0][1])
+
+        placementMode: SDMessageLabelPlacement = self._preferences.messageLabelPlacement
+
+        targetX: int
+        match placementMode:
+            case SDMessageLabelPlacement.CENTERED:
+                targetX = (startX + endX) // 2
+            case SDMessageLabelPlacement.PROPORTIONAL:
+                targetX = round(startX + (self._messageLabel.proportionalOffset * (endX - startX)))
+            case SDMessageLabelPlacement.FIXED:
+                targetX = self._messageLabel.fixedX
+            case _:
+                targetX = (startX + endX) // 2
+
+        targetY: int = lineY + self._messageLabel.verticalOffset
+
+        self._messageLabel.Move(dc, targetX, targetY)
+        topLeftX: int = targetX - (self._messageLabel.size.width // 2)
+        topLeftY: int = targetY - (self._messageLabel.size.height // 2)
+        self._messageLabel.position = UmlPosition(x=topLeftX, y=topLeftY)
 
     def _createLinkName(self) -> UmlSDMessageLabel:
 
@@ -230,8 +263,13 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
         assert text is not None, 'Developer error'
 
         umlSDMessageLabel: UmlSDMessageLabel = UmlSDMessageLabel(label=text)
+        umlSDMessageLabel.proportionalOffset = 0.5
+        umlSDMessageLabel.fixedX = x
+        umlSDMessageLabel.verticalOffset = 0
 
-        umlSDMessageLabel.position = UmlPosition(x=x, y=y)
+        topLeftX: int = x - (umlSDMessageLabel.size.width // 2)
+        topLeftY: int = y - (umlSDMessageLabel.size.height // 2)
+        umlSDMessageLabel.position = UmlPosition(x=topLeftX, y=topLeftY)
         #
         # Maybe not necessary, but let's be consistent
         #
@@ -246,6 +284,8 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
         Args:
             umlSDMessageLabel:
         """
+        from umlshapes.frames.UmlFrame import UmlFrame
+
         umlFrame: UmlFrame = self.GetCanvas()
         umlSDMessageLabel.SetCanvas(umlFrame)
         umlSDMessageLabel.parent = self

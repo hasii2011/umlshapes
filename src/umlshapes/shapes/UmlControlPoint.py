@@ -1,4 +1,6 @@
 
+from typing import TYPE_CHECKING
+
 from logging import Logger
 from logging import getLogger
 
@@ -9,7 +11,8 @@ from umlshapes.lib.ogl import Shape
 
 from umlshapes.utils.ResourceUtils import ResourceUtils
 
-from umlshapes.frames.UmlFrame import UmlFrame
+if TYPE_CHECKING:
+    from umlshapes.frames.UmlFrame import UmlFrame
 
 
 class UmlControlPoint(ControlPoint):
@@ -18,7 +21,7 @@ class UmlControlPoint(ControlPoint):
         * Change the control point color and size
         * Implement resizing of its parent.
     """
-    def __init__(self, umlFrame: UmlFrame, shape: Shape, size: int, xOffSet: float, yOffSet: float, controlPointType: int):
+    def __init__(self, umlFrame: 'UmlFrame', shape: Shape, size: int, xOffSet: float, yOffSet: float, controlPointType: int):
         """
 
         Args:

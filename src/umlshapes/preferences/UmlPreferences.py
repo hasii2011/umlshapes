@@ -7,8 +7,19 @@ from codeallybasic.Dimensions import Dimensions
 from codeallybasic.SingletonV3 import SingletonV3
 from codeallybasic.SecureConversions import SecureConversions
 
+from umlshapes.preferences.Defaults import DEFAULT_ACTOR_SIZE
 from umlshapes.preferences.Defaults import DEFAULT_ASSOCIATION_LABEL_FORMAT
 from umlshapes.preferences.Defaults import DEFAULT_ASSOCIATION_LABEL_SIZE
+from umlshapes.preferences.Defaults import DEFAULT_BACKGROUND_COLOR
+from umlshapes.preferences.Defaults import DEFAULT_CLASS_BACKGROUND_COLOR
+from umlshapes.preferences.Defaults import DEFAULT_CLASS_TEXT_COLOR
+from umlshapes.preferences.Defaults import DEFAULT_DARK_MODE_BACKGROUND_COLOR
+from umlshapes.preferences.Defaults import DEFAULT_DARK_MODE_GRID_LINE_COLOR
+from umlshapes.preferences.Defaults import DEFAULT_GRID_LINE_COLOR
+from umlshapes.preferences.Defaults import DEFAULT_GRID_LINE_STYLE
+from umlshapes.preferences.Defaults import DEFAULT_MESSAGE_LABEL_PLACEMENT
+from umlshapes.preferences.Defaults import DEFAULT_TEXT_BACKGROUND_COLOR
+from umlshapes.preferences.Defaults import DEFAULT_USE_CASE_SIZE
 from umlshapes.preferences.Defaults import FRAME_HEIGHT
 from umlshapes.preferences.Defaults import FRAME_WIDTH
 
@@ -21,6 +32,7 @@ from umlshapes.types.UmlDimensions import UmlDimensions
 from umlshapes.types.UmlFontFamily import UmlFontFamily
 
 from umlshapes.links.UmlAssociationLabelFormat import UmlAssociationLabelFormat
+from umlshapes.sd.SDMessageLabelPlacement import SDMessageLabelPlacement
 
 from codeallybasic.DynamicConfiguration import DynamicConfiguration
 from codeallybasic.DynamicConfiguration import KeyName
@@ -32,22 +44,6 @@ from codeallybasic.DynamicConfiguration import ValueDescriptions
 
 MODULE_NAME:           str = 'umlshapes'
 PREFERENCES_FILE_NAME: str = f'{MODULE_NAME}.ini'
-
-DEFAULT_BACKGROUND_COLOR:           str = UmlColor.WHITE.value
-DEFAULT_DARK_MODE_BACKGROUND_COLOR: str = UmlColor.DIM_GREY.value
-
-DEFAULT_GRID_LINE_COLOR:           str = UmlColor.AF_BLUE.value
-DEFAULT_DARK_MODE_GRID_LINE_COLOR: str = UmlColor.WHITE.value
-
-DEFAULT_CLASS_BACKGROUND_COLOR: str = UmlColor.MINT_CREAM.value
-DEFAULT_CLASS_TEXT_COLOR:       str = UmlColor.BLACK.value
-DEFAULT_GRID_LINE_STYLE:        str = UmlPenStyle.DOT.value
-
-# When the text value is selected
-DEFAULT_TEXT_BACKGROUND_COLOR:  str = UmlColor.WHITE.value
-
-DEFAULT_USE_CASE_SIZE:            str = str(UmlDimensions(width=100, height=60))
-DEFAULT_ACTOR_SIZE:               str = str(UmlDimensions(width=80, height=100))
 
 TEST_POSITION: str = Position(20, 40).__str__()
 TEST_SIZE:     str = str(Dimensions(width=FRAME_WIDTH + 300, height=FRAME_HEIGHT + 300))
@@ -128,6 +124,7 @@ SEQUENCE_DIAGRAM_PREFERENCES: ValueDescriptions = ValueDescriptions(
         KeyName('enableCompositeShapeLiveDragging'): ValueDescription(defaultValue='True', deserializer=SecureConversions.secureBoolean),
         KeyName('initialLifeLineLength'):            ValueDescription(defaultValue='360',  deserializer=SecureConversions.secureInteger),
         KeyName('messageArrowHeadSize'):             ValueDescription(defaultValue='10.0', deserializer=SecureConversions.secureFloat),
+        KeyName('messageLabelPlacement'):            ValueDescription(defaultValue=DEFAULT_MESSAGE_LABEL_PLACEMENT, enumUseValue=True, deserializer=SDMessageLabelPlacement),
     }
 )
 ASSOCIATION_PREFERENCES: ValueDescriptions = ValueDescriptions(

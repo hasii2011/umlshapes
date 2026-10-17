@@ -315,23 +315,23 @@ class UmlFrame(DiagramFrame):
         """
         from umlshapes.links.UmlLink import UmlLink
         from umlshapes.ShapeTypes import UmlShapeGenre
-        from umlshapes.links.UmlLinkLabel import UmlLinkLabel
+        from umlshapes.shapes.UmlBaseLabel import UmlBaseLabel
 
         self.ufLogger.debug(f'{deltaXY=}')
         shapes = self.selectedShapes
 
         if self._shapesMoving is False:         # noqa
             from umlshapes.links.UmlLink import UmlLink
-            from umlshapes.links.UmlLinkLabel import UmlLinkLabel
+            from umlshapes.shapes.UmlBaseLabel import UmlBaseLabel
 
             for s in shapes:
-                if not isinstance(s, (UmlLink, UmlLinkLabel)):
+                if not isinstance(s, (UmlLink, UmlBaseLabel)):
                     self.markShapeAsMoved(umlShape=s)
             self._shapesMoving = True
 
         for s in shapes:
             umlShape: UmlShapeGenre = cast(UmlShapeGenre, s)
-            if not isinstance(umlShape, UmlLink) and not isinstance(umlShape, UmlLinkLabel):
+            if not isinstance(umlShape, UmlLink) and not isinstance(umlShape, UmlBaseLabel):
                 # move master moves himself
                 if umlShape.moveMaster is False:    # noqa
                     #
@@ -473,14 +473,14 @@ class UmlFrame(DiagramFrame):
         Returns: True if the shape is one of our ignore shapes
         """
         from umlshapes.shapes.UmlControlPoint import UmlControlPoint
-        from umlshapes.links.UmlLinkLabel import UmlLinkLabel
+        from umlshapes.shapes.UmlBaseLabel import UmlBaseLabel
         from umlshapes.links.UmlLollipopInterface import UmlLollipopInterface
         from umlshapes.shapes.UmlLineControlPoint import UmlLineControlPoint
 
         ignore: bool = False
 
         if (isinstance(shapeToCheck, UmlControlPoint) or
-                isinstance(shapeToCheck, UmlLinkLabel) or
+                isinstance(shapeToCheck, UmlBaseLabel) or
                 isinstance(shapeToCheck, UmlLollipopInterface) or
                 isinstance(shapeToCheck, UmlLineControlPoint)):
             ignore = True

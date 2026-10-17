@@ -215,9 +215,10 @@ class UmlFrameOperationsListener:
 
         from umlshapes.ShapeTypes import UmlShapeGenre
         from umlshapes.ShapeTypes import UmlLinkGenre
+        from umlshapes.sd.UmlSDMessage import UmlSDMessage
 
         for shape in self._umlFrame.umlDiagram.shapes:
-            if isinstance(shape, UmlShapeGenre) is True or isinstance(shape, UmlLinkGenre) is True:
+            if isinstance(shape, UmlShapeGenre) is True or isinstance(shape, UmlLinkGenre) is True or isinstance(shape, UmlSDMessage) is True:
                 shape.selected = True
 
         self._umlFrame.refresh()
@@ -365,12 +366,31 @@ class UmlFrameOperationsListener:
 
         self._copyToInternalClipboard(selectedShapes=selectedShapes)  # In case we want to paste them back
 
+        from umlshapes.commands.DeleteSDMessageCommand import DeleteSDMessageCommand
+        from umlshapes.sd.UmlSDMessage import UmlSDMessage
+        from umlshapes.sd.UmlSDMessageLabel import UmlSDMessageLabel
+
         for shape in selectedShapes:
             if isinstance(shape, UmlShapeGenre):
                 self._umlFrame.commandProcessor.Submit(createCutCommand(shape))
             elif isinstance(shape, UmlLinkGenre):
                 deleteLinkCommand: DeleteLinkCommand = DeleteLinkCommand(partialName='Delete-', umlLink=shape, umlPubSubEngine=self._umlPubSubEngine)
                 self._umlFrame.commandProcessor.Submit(deleteLinkCommand)
+            elif isinstance(shape, UmlSDMessage):
+                deleteSDMessageCommand: DeleteSDMessageCommand = DeleteSDMessageCommand(
+                    partialName='Delete-',
+                    umlSDMessage=shape,
+                    umlPubSubEngine=self._umlPubSubEngine
+                )
+                self._umlFrame.commandProcessor.Submit(deleteSDMessageCommand)
+            elif isinstance(shape, UmlSDMessageLabel):
+                if shape.parent is not None and isinstance(shape.parent, UmlSDMessage):
+                    deleteSDMessageCommand = DeleteSDMessageCommand(
+                        partialName='Delete-',
+                        umlSDMessage=shape.parent,
+                        umlPubSubEngine=self._umlPubSubEngine
+                    )
+                    self._umlFrame.commandProcessor.Submit(deleteSDMessageCommand)
             else:
                 assert False, f'Now do I delete this: {shape=}'
         self._umlFrame.frameModified = True
@@ -390,11 +410,13 @@ class UmlFrameOperationsListener:
             selectedShapes:   The selected shapes
 
         """
+        from umlmodel.SDMessage import SDMessage
         from umlshapes.shapes.UmlClass import UmlClass
         from umlshapes.shapes.UmlNote import UmlNote
         from umlshapes.shapes.UmlActor import UmlActor
         from umlshapes.shapes.UmlUseCase import UmlUseCase
         from umlshapes.shapes.UmlText import UmlText
+        from umlshapes.sd.UmlSDMessage import UmlSDMessage
 
         self._clipboard = ModelObjects([])
 
@@ -414,6 +436,9 @@ class UmlFrameOperationsListener:
                 umlText: UmlText = umlShape
                 text:    Text    = deepcopy(umlText.modelText)
                 self._clipboard.append(text)
+            elif isinstance(umlShape, UmlSDMessage):
+                sdMessage: SDMessage = deepcopy(umlShape.sdMessage)
+                self._clipboard.append(sdMessage)
             else:
                 self.logger.warning(f'Unhandled copy of shape {type(umlShape)}')
 

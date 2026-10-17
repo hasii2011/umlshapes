@@ -9,6 +9,7 @@ from umlshapes.types.UmlFontFamily import UmlFontFamily
 from umlshapes.types.UmlPenStyle import UmlPenStyle
 from umlshapes.types.UmlPosition import UmlPosition
 from umlshapes.types.WiggleFactor import WiggleFactor
+from umlshapes.sd.SDMessageLabelPlacement import SDMessageLabelPlacement
 
 
 class UmlPreferences:
@@ -63,6 +64,7 @@ class UmlPreferences:
     enableCompositeShapeLiveDragging: bool
     initialLifeLineLength: int
     messageArrowHeadSize: float
+    messageLabelPlacement: SDMessageLabelPlacement
     associationTextFontSize: int
     diamondSize: int
     associationLabelSize: UmlDimensions
