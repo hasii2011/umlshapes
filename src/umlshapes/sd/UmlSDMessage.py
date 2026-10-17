@@ -1,26 +1,32 @@
 
-from typing import Optional
-from typing import cast
 from typing import List
 from typing import NewType
+from typing import Optional
 from typing import TYPE_CHECKING
 
 from logging import Logger
 from logging import getLogger
 
-from enum import Enum
+from math import sqrt
 
 from wx import Brush
 from wx import ClientDC
 from wx import MemoryDC
+from wx import Point
 from wx import WHITE
 from wx import BLACK_BRUSH
+from wx import RED_BRUSH
 from wx import BRUSHSTYLE_TRANSPARENT
 
 from umlshapes.lib.ogl import OP_ALL
-from umlshapes.lib.ogl import LineShape
+from umlshapes.lib.ogl import ArrowHead
 from umlshapes.lib.ogl import ARROW_ARROW
 from umlshapes.lib.ogl import ARROW_POSITION_END
+from umlshapes.lib.ogl import ARROW_POSITION_START
+
+from umlshapes.lib.ogl import LineShape
+from umlshapes.lib.ogl import GetArrowPoints
+from umlshapes.lib.ogl import GetPointOnLine
 
 from umlmodel.SDMessage import SDMessage
 
@@ -36,6 +42,7 @@ from umlshapes.preferences.UmlPreferences import UmlPreferences
 from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 
 from umlshapes.sd.SDMessageLabelPlacement import SDMessageLabelPlacement
+from umlshapes.sd.SDMessageType import SDMessageType
 from umlshapes.sd.UmlSDMessageLabel import UmlSDMessageLabel
 from umlshapes.sd.eventhandlers.UmlSDMessageLabelEventHandler import UmlSDMessageLabelEventHandler
 
@@ -48,13 +55,9 @@ if TYPE_CHECKING:
     from umlshapes.sd.UmlSDLifeLine import UmlSDLifeLine
 
 
-class SD_MESSAGE_TYPE(Enum):
-    SYNCHRONOUS_MESSAGE = 'Synchronous Message'
-
-
 class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
 
-    def __init__(self, sdMessage: SDMessage, umlPubSubEngine: IUmlPubSubEngine, messageType: SD_MESSAGE_TYPE = SD_MESSAGE_TYPE.SYNCHRONOUS_MESSAGE):
+    def __init__(self, sdMessage: SDMessage, umlPubSubEngine: IUmlPubSubEngine, messageType: SDMessageType = SDMessageType.SYNCHRONOUS):
 
         self.logger: Logger = getLogger(__name__)
         super().__init__(shape=self)
@@ -63,8 +66,8 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
         LineShape.__init__(self)
         PubSubMixin.__init__(self)
 
-        self._sdMessage:   SDMessage       = sdMessage
-        self._messageType: SD_MESSAGE_TYPE = messageType
+        self._sdMessage:   SDMessage     = sdMessage
+        self._messageType: SDMessageType = messageType
         self._preferences: UmlPreferences  = UmlPreferences()
 
         self._umlPubSubEngine = umlPubSubEngine
@@ -110,6 +113,14 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
     @selected.setter
     def selected(self, select: bool):
         self.Select(select=select)
+
+    @property
+    def messageType(self) -> SDMessageType:
+        return self._messageType
+
+    @messageType.setter
+    def messageType(self, messageType: SDMessageType):
+        self._messageType = messageType
 
     @property
     def messageLabel(self) -> Optional[UmlSDMessageLabel]:
@@ -178,14 +189,78 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
     def OnDraw(self, dc: MemoryDC):
         if self._messageLabel is None:
             self._messageLabel = self._createLinkName()
-            self._setupMessageLabel(umlSDMessageLabel=self._messageLabel)
 
         if self.Selected() is True:
-            self.SetPen(ResourceUtils.redSolidPen())
+            if self._messageType == SDMessageType.RETURN:
+                self.SetPen(ResourceUtils.redDashedPen())
+            else:
+                self.SetPen(ResourceUtils.redSolidPen())
+            self.SetBrush(RED_BRUSH)
         else:
-            self.SetPen(ResourceUtils.blackSolidPen())
+            if self._messageType == SDMessageType.RETURN:
+                self.SetPen(ResourceUtils.blackDashedPen())
+            else:
+                self.SetPen(ResourceUtils.blackSolidPen())
+            self.SetBrush(BLACK_BRUSH)
 
         super().OnDraw(dc=dc)
+
+    def DrawArrow(self, dc: MemoryDC, arrow: ArrowHead, XOffset: float = 0.0, proportionalOffset: bool = False):
+        if self._messageType == SDMessageType.SYNCHRONOUS:
+            super().DrawArrow(dc, arrow, XOffset, proportionalOffset)
+            return
+
+        lineControlPoints: Optional[List[Point]] = self._lineControlPoints
+        if not lineControlPoints or len(lineControlPoints) < 2:
+            return
+
+        firstLinePoint:      Point = lineControlPoints[0]
+        secondLinePoint:     Point = lineControlPoints[1]
+        lastLinePoint:       Point = lineControlPoints[-1]
+        secondLastLinePoint: Point = lineControlPoints[-2]
+
+        startPositionX:  int
+        startPositionY:  int
+        positionOnLineX: float
+        positionOnLineY: float
+
+        arrowPosition: int = arrow.GetPosition()
+        if arrowPosition == ARROW_POSITION_START:
+            realOffset: float = XOffset
+            if proportionalOffset:
+                totalLength: float = sqrt((secondLinePoint.x - firstLinePoint.x) ** 2 + (secondLinePoint.y - firstLinePoint.y) ** 2)
+                realOffset = XOffset * totalLength
+            positionOnLineX, positionOnLineY = GetPointOnLine(secondLinePoint.x, secondLinePoint.y, firstLinePoint.x, firstLinePoint.y, realOffset)
+            startPositionX = secondLinePoint.x
+            startPositionY = secondLinePoint.y
+        elif arrowPosition == ARROW_POSITION_END:
+            realOffset = XOffset
+            if proportionalOffset:
+                totalLength = sqrt((secondLastLinePoint.x - lastLinePoint.x) ** 2 + (secondLastLinePoint.y - lastLinePoint.y) ** 2)
+                realOffset = XOffset * totalLength
+            positionOnLineX, positionOnLineY = GetPointOnLine(secondLastLinePoint.x, secondLastLinePoint.y, lastLinePoint.x, lastLinePoint.y, realOffset)
+            startPositionX = secondLastLinePoint.x
+            startPositionY = secondLastLinePoint.y
+        else:
+            super().DrawArrow(dc, arrow, XOffset, proportionalOffset)
+            return
+
+        arrowLength: float = arrow.GetSize()
+        arrowWidth:  float = arrowLength / 3.0
+
+        tipX:   int
+        tipY:   int
+        side1X: int
+        side1Y: int
+        side2X: int
+        side2Y: int
+        tipX, tipY, side1X, side1Y, side2X, side2Y = GetArrowPoints(
+            startPositionX, startPositionY, positionOnLineX, positionOnLineY, arrowLength, arrowWidth
+        )
+
+        dc.SetPen(ResourceUtils.redSolidPen() if self.Selected() is True else ResourceUtils.blackSolidPen())
+        dc.DrawLine(side1X, side1Y, tipX, tipY)
+        dc.DrawLine(side2X, side2Y, tipX, tipY)
 
     def OnMoveLink(self, dc: ClientDC, moveControlPoints: bool = True):
         """
@@ -209,7 +284,8 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
         toY:   int = self._computeAbsoluteY(umlSDLifeLine=self.GetTo(), relativeY=self._relativeToY)
         self.SetEnds(endX, fromY, otherEndX, toY)
 
-        if len(self._lineControlPoints) > 2:    # noqa
+        lineControlPoints: Optional[List[Point]] = self._lineControlPoints
+        if lineControlPoints is not None and len(lineControlPoints) > 2:
             self.Initialise()
 
         # Do a second time, because one may depend on the other
@@ -226,12 +302,13 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
         Args:
             dc: The device context
         """
-        if self._messageLabel is None or len(self._lineControlPoints) < 2:
+        lineControlPoints: Optional[List[Point]] = self._lineControlPoints
+        if self._messageLabel is None or not lineControlPoints or len(lineControlPoints) < 2:
             return
 
-        startX: int = round(self._lineControlPoints[0][0])
-        endX:   int = round(self._lineControlPoints[-1][0])
-        lineY:  int = round(self._lineControlPoints[0][1])
+        startX: int = lineControlPoints[0].x
+        endX:   int = lineControlPoints[-1].x
+        lineY:  int = lineControlPoints[0].y
 
         placementMode: SDMessageLabelPlacement = self._preferences.messageLabelPlacement
 

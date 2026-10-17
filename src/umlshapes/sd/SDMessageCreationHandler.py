@@ -14,10 +14,11 @@ from umlshapes.sd.eventhandlers.UmlSDLifeLineEventHandler import LifeLineClickDe
 from umlshapes.sd.eventhandlers.UmlSDMessageEventHandler import UmlSDMessageEventHandler
 
 from umlshapes.sd.SDLayoutEngine import SDLayoutEngine
+from umlshapes.sd.SDMessageType import SDMessageType
 from umlshapes.sd.UmlSDLifeLine import UmlSDLifeLine
 from umlshapes.sd.UmlSDMessage import UmlSDMessage
 
-NO_START_DETAILS: LifeLineClickDetails = cast(LifeLineClickDetails, None)
+NO_START_DETAILS: LifeLineClickDetails = cast(LifeLineClickDetails, None)   # noqa
 
 
 class SDMessageCreationHandler:
@@ -43,10 +44,19 @@ class SDMessageCreationHandler:
 
         self._startDetails: LifeLineClickDetails = NO_START_DETAILS
 
-        self._messageCreationInProgress: bool = False
-        self._enableMessageCreation:     bool = False
+        self._messageCreationInProgress: bool          = False
+        self._enableMessageCreation:     bool          = False
+        self._messageType:               SDMessageType = SDMessageType.SYNCHRONOUS
 
         self._messageCount: int = 0     # temp until I get possible message names in
+
+    @property
+    def messageType(self) -> SDMessageType:
+        return self._messageType
+
+    @messageType.setter
+    def messageType(self, messageType: SDMessageType):
+        self._messageType = messageType
 
     @property
     def sequenceDiagramFrame(self) -> SequenceDiagramFrame:
@@ -68,13 +78,13 @@ class SDMessageCreationHandler:
     @enableMessageCreation.setter
     def enableMessageCreation(self, enable: bool):
         """
-        Set to False to stop the message creation workflow
+        Set to False, in order to stop the message creation workflow
         Args:
-            enable: If True the 2 step message creation workflow is enabled
+            enable: If True the 2-step message creation workflow is enabled
 
         """
         self._enableMessageCreation = enable
-        if enable is True:
+        if enable:
             self._umlPubSubEngine.sendMessage(
                 UmlMessageType.UPDATE_APPLICATION_STATUS,
                 frameId=self._sequenceDiagramFrame.id,
@@ -89,8 +99,8 @@ class SDMessageCreationHandler:
         Args:
             clickDetails:
         """
-        if self._enableMessageCreation is True:
-            if self._messageCreationInProgress is True:
+        if self._enableMessageCreation:
+            if self._messageCreationInProgress:
                 self._hookThemUp(endDetails=clickDetails)
                 self._messageCreationInProgress = False
             else:
@@ -130,7 +140,11 @@ class SDMessageCreationHandler:
             destinationY=snappedY,
         )
         self._messageCount += 1
-        umlSDMessage: UmlSDMessage = UmlSDMessage(sdMessage=modelMessage, umlPubSubEngine=self._umlPubSubEngine)
+        umlSDMessage: UmlSDMessage = UmlSDMessage(
+            sdMessage=modelMessage,
+            umlPubSubEngine=self._umlPubSubEngine,
+            messageType=self._messageType
+        )
         umlSDMessage.umlFrame = self._sequenceDiagramFrame
         self.logger.info(f'Created message: {umlSDMessage.sdMessage.message}')
 
@@ -158,7 +172,7 @@ class SDMessageCreationHandler:
         )
         umlSDMessage.SetEventHandler(eventHandler)
 
-        self._sequenceDiagramFrame._moveShapeToFront(umlSDMessage)
+        self._sequenceDiagramFrame.moveShapeToFront(umlSDMessage)
 
     def _reset(self):
         self._startDetails = NO_START_DETAILS

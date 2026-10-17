@@ -187,6 +187,13 @@ class DemoAppFrame(SizedFrame):
         fileMenu.Append(ID_PREFERENCES, "P&references", "Uml preferences")
 
         self._messageItem = actionMenu.AppendCheckItem(Identifiers.ID_CREATE_SD_MESSAGE, item='Create SD Message', help='Demo SD Message')
+        actionMenu.AppendSeparator()
+
+        msgTypeMenu: Menu = Menu()
+        msgTypeMenu.AppendRadioItem(Identifiers.ID_SD_MSG_SYNC, 'Synchronous', 'Create synchronous messages (solid arrowhead)')
+        msgTypeMenu.AppendRadioItem(Identifiers.ID_SD_MSG_ASYNC, 'Asynchronous', 'Create asynchronous messages (open stick arrowhead)')
+        msgTypeMenu.AppendRadioItem(Identifiers.ID_SD_MSG_RETURN, 'Return', 'Create return messages (dashed line, open stick arrowhead)')
+        actionMenu.AppendSubMenu(msgTypeMenu, 'Message Type')
 
         #
         # Use all the stock properties
@@ -269,6 +276,9 @@ class DemoAppFrame(SizedFrame):
         self.Bind(EVT_MENU, self._onEditMenu, id=ID_SELECTALL)
 
         self.Bind(EVT_MENU, self._onDemoSDMessageCreation, id=Identifiers.ID_CREATE_SD_MESSAGE)
+        self.Bind(EVT_MENU, self._onSDMessageTypeSelected, id=Identifiers.ID_SD_MSG_SYNC)
+        self.Bind(EVT_MENU, self._onSDMessageTypeSelected, id=Identifiers.ID_SD_MSG_ASYNC)
+        self.Bind(EVT_MENU, self._onSDMessageTypeSelected, id=Identifiers.ID_SD_MSG_RETURN)
 
     # noinspection PyUnusedLocal
     def _onDemoShapeBoundaries(self, event: CommandEvent):
@@ -318,6 +328,22 @@ class DemoAppFrame(SizedFrame):
 
         else:
             self._sdMessageHandler.enableMessageCreation = False
+
+    def _onSDMessageTypeSelected(self, event: CommandEvent):
+
+        from umlshapes.sd.SDMessageType import SDMessageType
+
+        menuId: int = event.GetId()
+        match menuId:
+            case Identifiers.ID_SD_MSG_ASYNC:
+                self._sdMessageHandler.messageType = SDMessageType.ASYNCHRONOUS
+                self.SetStatusText('Selected Asynchronous Message')
+            case Identifiers.ID_SD_MSG_RETURN:
+                self._sdMessageHandler.messageType = SDMessageType.RETURN
+                self.SetStatusText('Selected Return Message')
+            case _:
+                self._sdMessageHandler.messageType = SDMessageType.SYNCHRONOUS
+                self.SetStatusText('Selected Synchronous Message')
 
     def _onDisplayElement(self, event: CommandEvent):
 

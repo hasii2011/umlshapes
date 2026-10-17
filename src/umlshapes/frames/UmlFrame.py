@@ -239,7 +239,7 @@ class UmlFrame(DiagramFrame):
         """
         super().OnMouseEvent(mouseEvent)
 
-        if self._preferences.trackMouse is True:
+        if self._preferences.trackMouse:
             if self._currentReportInterval == 0:
                 x, y = self.CalcUnscrolledPosition(mouseEvent.GetPosition())
                 self.ufLogger.info(f'({x},{y})')
@@ -374,6 +374,21 @@ class UmlFrame(DiagramFrame):
         self._movedShapes  = MovedShapes({})
         self._shapesMoving = False
 
+    def moveShapeToFront(self, shape: Shape):
+        """
+        Move the given shape to the top of the Z order
+
+        Args:
+            shape: The shape to move
+        """
+        shapesToMove = [shape] + shape.GetChildren()
+        currentShapes = list(self.umlDiagram.shapes)
+
+        for s in shapesToMove:
+            currentShapes.remove(s)
+
+        self.umlDiagram.shapes = currentShapes + shapesToMove
+
     def _onProcessKeystrokes(self, event: KeyEvent):
         """
 
@@ -386,7 +401,7 @@ class UmlFrame(DiagramFrame):
             case UmlFrame.KEY_CODE_BACK | UmlFrame.KEY_CODE_DELETE:
                 self._umlPubSubEngine.sendMessage(UmlMessageType.CUT_SHAPES, frameId=self.id)
             case UmlFrame.KEY_CODE_UP:
-                self._changeTheSelectedShapesZOrder(callback=self._moveShapeToFront)
+                self._changeTheSelectedShapesZOrder(callback=self.moveShapeToFront)
                 event.Skip(skip=True)
             case UmlFrame.KEY_CODE_DOWN:
                 self._changeTheSelectedShapesZOrder(callback=self._moveShapeToBack)
@@ -513,21 +528,6 @@ class UmlFrame(DiagramFrame):
                 if isinstance(shape, UmlShapeGenre):
                     callback(shape)
         self.refresh()
-
-    def _moveShapeToFront(self, shape: Shape):
-        """
-        Move the given shape to the top of the Z order
-
-        Args:
-            shape: The shape to move
-        """
-        shapesToMove = [shape] + shape.GetChildren()
-        currentShapes = list(self.umlDiagram.shapes)
-
-        for s in shapesToMove:
-            currentShapes.remove(s)
-
-        self.umlDiagram.shapes = currentShapes + shapesToMove
 
     def _moveShapeToBack(self, shape: Shape):
         """

@@ -33,6 +33,9 @@ class Identifiers:
     ID_DISPLAY_ORTHOGONAL_LINK:  ID_REFERENCE = wxNewIdRef()
     ID_DISPLAY_SEQUENCE_DIAGRAM: ID_REFERENCE = wxNewIdRef()
     ID_CREATE_SD_MESSAGE:        ID_REFERENCE = wxNewIdRef()
+    ID_SD_MSG_SYNC:              ID_REFERENCE = wxNewIdRef()
+    ID_SD_MSG_ASYNC:             ID_REFERENCE = wxNewIdRef()
+    ID_SD_MSG_RETURN:            ID_REFERENCE = wxNewIdRef()
 
     ID_SOURCE_TOP:    ID_REFERENCE = wxNewIdRef()
     ID_SOURCE_BOTTOM: ID_REFERENCE = wxNewIdRef()
