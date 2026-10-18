@@ -19,11 +19,10 @@ class UmlSDMessageLabel(UmlBaseLabel):
             size:  Optional dimensions
         """
         preferences: UmlPreferences = UmlPreferences()
-        labelSize: UmlDimensions = size if size is not None else preferences.associationLabelSize
 
         super().__init__(
             label=label,
-            size=labelSize,
+            size=size,
             fontSize=preferences.associationTextFontSize,
             formatMode=preferences.associationLabelFormat
         )

@@ -8,6 +8,7 @@ from logging import getLogger
 
 from wx import ClientDC
 
+from umlshapes.lib.ogl import ControlPoint
 from umlshapes.lib.ogl import ShapeEvtHandler
 
 from umlshapes.UmlBaseEventHandler import UmlBaseEventHandler
@@ -116,6 +117,14 @@ class UmlSDMessageLabelEventHandler(UmlBaseEventHandler):
             label.fixedX = newCenterX
             label.verticalOffset = newCenterY - lineY
 
+        self._indicateFrameModified()
+        canvas.refresh()
+
+    def OnSizingEndDragLeft(self, pt: ControlPoint, x: int, y: int, keys: int = 0, attachment: int = 0):
+        super().OnSizingEndDragLeft(pt, x, y, keys, attachment)
+        label: UmlSDMessageLabel = cast(UmlSDMessageLabel, self.GetShape())
+        label.fitToText()
+        canvas: UmlFrame = label.umlFrame
         self._indicateFrameModified()
         canvas.refresh()
 
