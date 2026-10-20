@@ -10,14 +10,21 @@ from umlshapes.sd.SDLayoutParameters import SDLayoutParameters
 
 class SDLayoutEngine:
     """
-    Computes coordinates for Sequence Diagram participants and message time slots.
+    Computes coordinates for Sequence Diagram participants and message timeSteps.
     Provides deterministic layout for interactive diagrams and auto-generation.
+
+    Initialization:
+        Always instantiates with default layout parameters (SDLayoutParameters).
+        If a caller requires a customized parameter set, they should:
+          1. Retrieve a copy of the current parameters via the `parameters` getter,
+             modify the desired fields, and reassign it via the setter; OR
+          2. Construct a new SDLayoutParameters instance and assign it via the `parameters` setter.
     """
 
-    def __init__(self, parameters: SDLayoutParameters | None = None):
+    def __init__(self):
         self.logger: Logger = getLogger(__name__)
 
-        self._parameters:  SDLayoutParameters = replace(parameters) if parameters is not None else SDLayoutParameters()
+        self._parameters:  SDLayoutParameters = SDLayoutParameters()
         self._preferences: UmlPreferences     = UmlPreferences()
 
     @property

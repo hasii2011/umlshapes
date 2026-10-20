@@ -1,3 +1,5 @@
+from typing import Optional
+from typing import TYPE_CHECKING
 from typing import cast
 
 from logging import Logger
@@ -21,6 +23,9 @@ from umlshapes.sd.UmlInstanceName import UmlInstanceName
 from umlshapes.sd.UmlSDMessage import UmlSDMessage
 from umlshapes.sd.UmlSDMessage import UmlSDMessages
 
+if TYPE_CHECKING:
+    from umlshapes.sd.UmlSDInstance import UmlSDInstance
+
 HIT_TEST_TOLERANCE: int = 15
 
 
@@ -39,8 +44,9 @@ class UmlSDLifeLine(IdentifierMixin, RectangleShape, TopLeftMixin):
         TopLeftMixin.__init__(self, umlShape=self, width=width, height=height)
 
         self.SetCanvas(sequenceDiagramFrame)
-        self._umlInstanceName:     UmlInstanceName       = instanceName
-        self._instanceConstrainer: SDInstanceConstrainer = instanceConstrainer
+        self._umlInstanceName:     UmlInstanceName               = instanceName
+        self._instanceConstrainer: SDInstanceConstrainer         = instanceConstrainer
+        self._umlSDInstance:       Optional['UmlSDInstance']     = None
 
     @property
     def umlFrame(self) -> SequenceDiagramFrame:
@@ -53,6 +59,14 @@ class UmlSDLifeLine(IdentifierMixin, RectangleShape, TopLeftMixin):
     @property
     def instanceConstrainer(self) -> SDInstanceConstrainer:
         return self._instanceConstrainer
+
+    @property
+    def umlSDInstance(self) -> Optional['UmlSDInstance']:
+        return self._umlSDInstance
+
+    @umlSDInstance.setter
+    def umlSDInstance(self, instance: 'UmlSDInstance'):
+        self._umlSDInstance = instance
 
     @property
     def messages(self) -> UmlSDMessages:
@@ -81,13 +95,10 @@ class UmlSDLifeLine(IdentifierMixin, RectangleShape, TopLeftMixin):
         """
 
         Args:
-            umlSDMessage:           The message between us and the 'other' life line
+            umlSDMessage:           The message between us and the 'other' lifeline
             destinationLifeLine:    The 'other'
 
-        Returns:
-
         """
-
         self.AddLine(line=umlSDMessage, other=destinationLifeLine)
 
     def HitTest(self, x: float, y: float) -> tuple[int, float] | bool:

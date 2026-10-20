@@ -120,7 +120,8 @@ class TestSDLayoutEngine(UnitTestBase):
             startX=CUSTOM_START_X,
             startY=CUSTOM_START_Y
         )
-        customEngine: SDLayoutEngine = SDLayoutEngine(parameters=customParams)
+        customEngine: SDLayoutEngine = SDLayoutEngine()
+        customEngine.parameters = customParams
 
         self.assertEqual(EXPECTED_CUSTOM_COL_0_X, customEngine.computeColumnX(columnIndex=COLUMN_0_INDEX))
         self.assertEqual(EXPECTED_CUSTOM_COL_1_X, customEngine.computeColumnX(columnIndex=COLUMN_1_INDEX))

@@ -10,6 +10,7 @@ from codeallybasic.SecureConversions import SecureConversions
 from umlshapes.preferences.Defaults import DEFAULT_ACTOR_SIZE
 from umlshapes.preferences.Defaults import DEFAULT_ASSOCIATION_LABEL_FORMAT
 from umlshapes.preferences.Defaults import DEFAULT_ASSOCIATION_LABEL_SIZE
+from umlshapes.preferences.Defaults import DEFAULT_AUTO_GROW_LIFELINES
 from umlshapes.preferences.Defaults import DEFAULT_BACKGROUND_COLOR
 from umlshapes.preferences.Defaults import DEFAULT_CLASS_BACKGROUND_COLOR
 from umlshapes.preferences.Defaults import DEFAULT_CLASS_TEXT_COLOR
@@ -18,7 +19,9 @@ from umlshapes.preferences.Defaults import DEFAULT_DARK_MODE_GRID_LINE_COLOR
 from umlshapes.preferences.Defaults import DEFAULT_GRID_LINE_COLOR
 from umlshapes.preferences.Defaults import DEFAULT_GRID_LINE_STYLE
 from umlshapes.preferences.Defaults import DEFAULT_MESSAGE_LABEL_PLACEMENT
+from umlshapes.preferences.Defaults import DEFAULT_SD_INSTANCE_DIMENSIONS
 from umlshapes.preferences.Defaults import DEFAULT_TEXT_BACKGROUND_COLOR
+from umlshapes.preferences.Defaults import DEFAULT_UNIFORM_LIFELINE_LENGTH
 from umlshapes.preferences.Defaults import DEFAULT_USE_CASE_SIZE
 from umlshapes.preferences.Defaults import FRAME_HEIGHT
 from umlshapes.preferences.Defaults import FRAME_WIDTH
@@ -41,6 +44,9 @@ from codeallybasic.DynamicConfiguration import Sections
 from codeallybasic.DynamicConfiguration import ValueDescription
 from codeallybasic.DynamicConfiguration import ValueDescriptions
 
+DEFAULT_NAME_RELATIVE_HEIGHT: str = '0.10'
+DEFAULT_LIFE_LINE_LENGTH:     str = '360'
+DEFAULT_INSTANCE_Y:           str = '50'
 
 MODULE_NAME:           str = 'umlshapes'
 PREFERENCES_FILE_NAME: str = f'{MODULE_NAME}.ini'
@@ -118,13 +124,14 @@ NAME_PREFERENCES: ValueDescriptions = ValueDescriptions(
 )
 SEQUENCE_DIAGRAM_PREFERENCES: ValueDescriptions = ValueDescriptions(
     {
-        KeyName('instanceDimensions'):               ValueDescription(defaultValue=str(UmlDimensions(100, 400)), deserializer=UmlDimensions.deSerialize),
-        KeyName('instanceYPosition'):                ValueDescription(defaultValue='50',   deserializer=SecureConversions.secureInteger),
-        KeyName('instanceNameRelativeHeight'):       ValueDescription(defaultValue='0.10', deserializer=SecureConversions.secureFloat),
-        KeyName('enableCompositeShapeLiveDragging'): ValueDescription(defaultValue='True', deserializer=SecureConversions.secureBoolean),
-        KeyName('initialLifeLineLength'):            ValueDescription(defaultValue='360',  deserializer=SecureConversions.secureInteger),
+        KeyName('instanceDimensions'):               ValueDescription(defaultValue=DEFAULT_SD_INSTANCE_DIMENSIONS, deserializer=UmlDimensions.deSerialize),
+        KeyName('instanceYPosition'):                ValueDescription(defaultValue=DEFAULT_INSTANCE_Y,             deserializer=SecureConversions.secureInteger),
+        KeyName('instanceNameRelativeHeight'):       ValueDescription(defaultValue=DEFAULT_NAME_RELATIVE_HEIGHT,   deserializer=SecureConversions.secureFloat),
+        KeyName('initialLifeLineLength'):            ValueDescription(defaultValue=DEFAULT_LIFE_LINE_LENGTH, deserializer=SecureConversions.secureInteger),
         KeyName('messageArrowHeadSize'):             ValueDescription(defaultValue='10.0', deserializer=SecureConversions.secureFloat),
         KeyName('messageLabelPlacement'):            ValueDescription(defaultValue=DEFAULT_MESSAGE_LABEL_PLACEMENT, enumUseValue=True, deserializer=SDMessageLabelPlacement),
+        KeyName('autoGrowLifeLines'):                ValueDescription(defaultValue=str(DEFAULT_AUTO_GROW_LIFELINES),     deserializer=SecureConversions.secureBoolean),
+        KeyName('uniformLifeLineLength'):            ValueDescription(defaultValue=str(DEFAULT_UNIFORM_LIFELINE_LENGTH), deserializer=SecureConversions.secureBoolean),
     }
 )
 ASSOCIATION_PREFERENCES: ValueDescriptions = ValueDescriptions(
@@ -159,7 +166,7 @@ DEBUG_PREFERENCES: ValueDescriptions = ValueDescriptions(
         KeyName('testPosition'):            ValueDescription(defaultValue=TEST_POSITION, deserializer=Position.deSerialize),
         KeyName('testSize'):                ValueDescription(defaultValue=TEST_SIZE,     deserializer=Dimensions.deSerialize),
         KeyName('genericClassName'):        ValueDescription(defaultValue='False', deserializer=SecureConversions.secureBoolean),
-
+        KeyName('enableCompositeShapeLiveDragging'): ValueDescription(defaultValue='True', deserializer=SecureConversions.secureBoolean),
     }
 )
 

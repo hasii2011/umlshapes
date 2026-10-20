@@ -1,3 +1,4 @@
+
 from typing import cast
 
 from logging import Logger
@@ -7,6 +8,7 @@ from umlmodel.SDMessage import SDMessage
 
 from umlshapes.frames.SequenceDiagramFrame import SequenceDiagramFrame
 
+from umlshapes.preferences.UmlPreferences import UmlPreferences
 from umlshapes.pubsubengine.UmlMessageType import UmlMessageType
 from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 
@@ -15,6 +17,7 @@ from umlshapes.sd.eventhandlers.UmlSDMessageEventHandler import UmlSDMessageEven
 
 from umlshapes.sd.SDLayoutEngine import SDLayoutEngine
 from umlshapes.sd.SDMessageType import SDMessageType
+from umlshapes.sd.UmlSDInstance import UmlSDInstance
 from umlshapes.sd.UmlSDLifeLine import UmlSDLifeLine
 from umlshapes.sd.UmlSDMessage import UmlSDMessage
 
@@ -35,6 +38,7 @@ class SDMessageCreationHandler:
         self._sequenceDiagramFrame: SequenceDiagramFrame = sequenceDiagramFrame
         self._umlPubSubEngine:      IUmlPubSubEngine     = umlPubSubEngine
         self._layoutEngine:         SDLayoutEngine       = SDLayoutEngine()
+        self._preferences:          UmlPreferences       = UmlPreferences()
 
         self._umlPubSubEngine.subscribe(
             UmlMessageType.SD_LIFELINE_CLICKED,
@@ -73,15 +77,32 @@ class SDMessageCreationHandler:
 
     @property
     def enableMessageCreation(self) -> bool:
+        """
+        Controls the interactive two-step message creation workflow for sequence diagrams.
+
+        When enabled (True):
+            Activates interactive message creation mode and prompts the user to select
+            the source lifeline, followed by the destination lifeline, creating a message
+            between them.
+
+        When disabled (False):
+            Cancels any in-progress creation workflow and ignores subsequent lifeline clicks.
+
+        Returns:
+            True if interactive message creation mode is active, False otherwise.
+        """
         return self._enableMessageCreation
 
     @enableMessageCreation.setter
     def enableMessageCreation(self, enable: bool):
         """
-        Set to False, in order to stop the message creation workflow
-        Args:
-            enable: If True the 2-step message creation workflow is enabled
+        Enable or disable interactive message creation mode.
 
+        Setting to True prompts the user to click the source lifeline.
+        Setting to False stops and resets any in-progress message creation workflow.
+
+        Args:
+            enable: If True, activates the 2-step message creation workflow; if False, cancels it.
         """
         self._enableMessageCreation = enable
         if enable:
@@ -127,7 +148,39 @@ class SDMessageCreationHandler:
 
         headerBottomY: int = startLifeLine.rectangle.top
         clickedY:      int = self._startDetails.clickPosition.y
-        snappedY:      int = self._layoutEngine.computeNearestSlotY(headerBottomY=headerBottomY, targetY=clickedY)
+
+        rawSlotIndex: int = self._layoutEngine.computeNearestSlotIndex(headerBottomY=headerBottomY, targetY=clickedY)
+
+        slotIndex: int
+        snappedY:  int
+        if self._preferences.autoGrowLifeLines:
+
+            slotIndex = max(0, rawSlotIndex)
+            snappedY  = self._layoutEngine.computeSlotY(headerBottomY=headerBottomY, slotIndex=slotIndex)
+
+            neededLifelineHeight: int = (snappedY - headerBottomY) + self._layoutEngine.parameters.bottomPadding
+            currentStartHeight:   int = startLifeLine.size.height
+            currentDestHeight:    int = destLifeLine.size.height
+
+            if (neededLifelineHeight > currentStartHeight) or (neededLifelineHeight > currentDestHeight):
+                if self._preferences.uniformLifeLineLength:
+                    self._sequenceDiagramFrame.setAllLifeLinesLength(neededLifelineHeight)
+                else:
+                    startSDInstance: UmlSDInstance | None = startLifeLine.umlSDInstance
+                    if startSDInstance is not None:
+                        startSDInstance.setLifeLineLength(neededLifelineHeight)
+
+                    destSDInstance: UmlSDInstance | None = destLifeLine.umlSDInstance
+                    if destSDInstance is not None:
+                        destSDInstance.setLifeLineLength(neededLifelineHeight)
+        else:
+            maxSlotIndex: int = max(
+                0,
+                (startLifeLine.size.height - self._layoutEngine.parameters.topPadding - self._layoutEngine.parameters.bottomPadding)
+                // self._layoutEngine.parameters.slotHeight
+            )
+            slotIndex = max(0, min(rawSlotIndex, maxSlotIndex))
+            snappedY = self._layoutEngine.computeSlotY(headerBottomY=headerBottomY, slotIndex=slotIndex)
 
         startX: float = startLifeLine.GetX()
         endX:   float = destLifeLine.GetX()

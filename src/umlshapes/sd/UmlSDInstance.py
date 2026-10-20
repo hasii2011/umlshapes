@@ -1,3 +1,4 @@
+
 from typing import TYPE_CHECKING
 
 from logging import Logger
@@ -7,9 +8,11 @@ from umlmodel.SDInstance import SDInstance
 
 from umlshapes.lib.ogl import CompositeShape
 from umlshapes.lib.ogl import Constraint
+from umlshapes.lib.ogl import ControlPoint
 from umlshapes.lib.ogl import CONSTRAINT_ALIGNED_TOP
 from umlshapes.lib.ogl import CONSTRAINT_BELOW
 from umlshapes.lib.ogl import CONSTRAINT_CENTRED_HORIZONTALLY
+from umlshapes.lib.ogl import CONTROL_POINT_VERTICAL
 
 from umlshapes.utils.ResourceUtils import ResourceUtils
 
@@ -20,6 +23,7 @@ from umlshapes.mixins.TopLeftMixin import TopLeftMixin
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 from umlshapes.sd.eventhandlers.UmlSDLifeLineEventHandler import UmlSDLifeLineEventHandler
+from umlshapes.shapes.UmlControlPoint import UmlControlPoint
 
 from umlshapes.types.UmlDimensions import UmlDimensions
 
@@ -29,8 +33,10 @@ from umlshapes.sd.UmlSDLifeLine import UmlSDLifeLine
 
 if TYPE_CHECKING:
     from umlshapes.frames.SequenceDiagramFrame import SequenceDiagramFrame
+    from umlshapes.frames.UmlFrame import UmlFrame
 
-OP_NONE: int = 0    # None of OP_CLICK_LEFT, OP_CLICK_RIGHT, OP_DRAG_LEFT, OP_DRAG_RIGHT
+OP_NONE:             int = 0    # None of OP_CLICK_LEFT, OP_CLICK_RIGHT, OP_DRAG_LEFT, OP_DRAG_RIGHT
+MIN_LIFELINE_LENGTH: int = 80
 
 
 class UmlSDInstance(ControlPointMixin, IdentifierMixin, CompositeShape, TopLeftMixin):
@@ -90,7 +96,11 @@ class UmlSDInstance(ControlPointMixin, IdentifierMixin, CompositeShape, TopLeftM
         self.SetCentreResize(False)
 
         self._setEventHandlers(umlSDLifeLine=sdLifeLine)
-        self._umlSDLifeLine: UmlSDLifeLine = sdLifeLine
+        self._constrainingShape: SDInstanceConstrainer = constrainingShape
+        self._instanceName:      UmlInstanceName       = instanceName
+        self._umlSDLifeLine:     UmlSDLifeLine         = sdLifeLine
+
+        sdLifeLine.umlSDInstance = self
 
     @property
     def umlFrame(self) -> 'SequenceDiagramFrame':
@@ -103,6 +113,105 @@ class UmlSDInstance(ControlPointMixin, IdentifierMixin, CompositeShape, TopLeftM
     @property
     def umlSDLifeLine(self) -> UmlSDLifeLine:
         return self._umlSDLifeLine
+
+    @property
+    def constrainingShape(self) -> SDInstanceConstrainer:
+        return self._constrainingShape
+
+    @property
+    def instanceName(self) -> UmlInstanceName:
+        return self._instanceName
+
+    @property
+    def controlPoints(self) -> list[ControlPoint]:
+        return self._controlPoints
+
+    def getLifeLineLength(self) -> int:
+        return round(self._umlSDLifeLine.GetHeight())
+
+    def setLifeLineLength(self, newLength: int):
+        targetLength: int
+        if newLength < MIN_LIFELINE_LENGTH:
+            targetLength = MIN_LIFELINE_LENGTH
+        else:
+            targetLength = newLength
+
+        instanceNameHeight: int = round(self._instanceName.GetHeight())
+        newTotalHeight: int = instanceNameHeight + targetLength
+
+        instanceTopY: float = self._instanceName.GetY() - (instanceNameHeight / 2.0)
+
+        self._umlSDLifeLine.SetSize(1, targetLength)
+        self._umlSDLifeLine.size = UmlDimensions(width=1, height=targetLength)
+
+        constrainingWidth: float = self._constrainingShape.GetWidth()
+        self._constrainingShape.SetSize(constrainingWidth, newTotalHeight)
+        self._constrainingShape.size = UmlDimensions(width=round(constrainingWidth), height=newTotalHeight)
+        self._constrainingShape.SetY(instanceTopY + (newTotalHeight / 2.0))
+
+        self.Recompute()
+        self.ResetControlPoints()
+
+    def CalculateSize(self):
+        maxX: float = -999999.9
+        maxY: float = -999999.9
+        minX: float = 999999.9
+        minY: float = 999999.9
+
+        for child in self._children:
+            if isinstance(child, ControlPoint):
+                continue
+            if isinstance(child, CompositeShape):
+                child.CalculateSize()
+
+            w, h = child.GetBoundingBoxMax()
+            childX: float = child.GetX()
+            childY: float = child.GetY()
+            if childX + w / 2.0 > maxX:
+                maxX = childX + w / 2.0
+            if childX - w / 2.0 < minX:
+                minX = childX - w / 2.0
+            if childY + h / 2.0 > maxY:
+                maxY = childY + h / 2.0
+            if childY - h / 2.0 < minY:
+                minY = childY - h / 2.0
+
+        self._width = maxX - minX
+        self._height = maxY - minY
+        self._xpos = self._width / 2.0 + minX
+        self._ypos = self._height / 2.0 + minY
+
+    def MakeControlPoints(self):
+        from umlshapes.frames.UmlFrame import UmlFrame
+
+        canvas: UmlFrame = self.GetCanvas()
+        umlControlPointSize: int = self._preferences.controlPointSize
+
+        yOffset: float = self._umlSDLifeLine.GetY() + (self._umlSDLifeLine.GetHeight() / 2.0) - self.GetY()
+        control: UmlControlPoint = UmlControlPoint(
+            umlFrame=canvas,
+            shape=self,
+            size=umlControlPointSize,
+            xOffSet=0.0,
+            yOffSet=yOffset,
+            controlPointType=CONTROL_POINT_VERTICAL
+        )
+        control.SetParent(self)
+        self.GetChildren().append(control)
+        self.GetCanvas().AddShape(control)
+        self._controlPoints.append(control)
+        self._addEventHandler(umlControlPoint=control)
+
+    def ResetControlPoints(self):
+        self.ResetMandatoryControlPoints()
+        if len(self._controlPoints) == 0:
+            return
+        yOffset: float = self._umlSDLifeLine.GetY() + (self._umlSDLifeLine.GetHeight() / 2.0) - self.GetY()
+        self._controlPoints[0]._xoffset = 0.0
+        self._controlPoints[0]._yoffset = yOffset
+
+    def DeleteControlPoints(self, dc = None):
+        super().DeleteControlPoints(dc)
 
     def _setEventHandlers(self, umlSDLifeLine: UmlSDLifeLine):
         """

@@ -18,6 +18,9 @@ DEFAULT_ASSOCIATION_LABEL_FORMAT: str = (
 
 DEFAULT_MESSAGE_LABEL_PLACEMENT: str = SDMessageLabelPlacement.PROPORTIONAL.value
 
+DEFAULT_AUTO_GROW_LIFELINES:     bool = True
+DEFAULT_UNIFORM_LIFELINE_LENGTH: bool = True
+
 DEFAULT_BACKGROUND_COLOR:           str = UmlColor.WHITE.value
 DEFAULT_DARK_MODE_BACKGROUND_COLOR: str = UmlColor.DIM_GREY.value
 
@@ -33,3 +36,8 @@ DEFAULT_TEXT_BACKGROUND_COLOR:  str = UmlColor.WHITE.value
 
 DEFAULT_USE_CASE_SIZE: str = str(UmlDimensions(width=100, height=60))
 DEFAULT_ACTOR_SIZE:    str = str(UmlDimensions(width=80, height=100))
+
+DEFAULT_SD_INSTANCE_DIMENSIONS: str = str(UmlDimensions(100, 400))
+DEFAULT_NAME_RELATIVE_HEIGHT:   float = 0.10
+DEFAULT_LIFE_LINE_LENGTH:       int   = 360
+DEFAULT_INSTANCE_Y:             int   = 50

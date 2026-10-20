@@ -61,10 +61,11 @@ class UmlPreferences:
     instanceDimensions: UmlDimensions
     instanceYPosition: int
     instanceNameRelativeHeight: float
-    enableCompositeShapeLiveDragging: bool
     initialLifeLineLength: int
     messageArrowHeadSize: float
     messageLabelPlacement: SDMessageLabelPlacement
+    autoGrowLifeLines: bool
+    uniformLifeLineLength: bool
     associationTextFontSize: int
     diamondSize: int
     associationLabelSize: UmlDimensions
@@ -86,3 +87,4 @@ class UmlPreferences:
     testPosition: Position
     testSize: Dimensions
     genericClassName: bool
+    enableCompositeShapeLiveDragging: bool

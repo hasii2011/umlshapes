@@ -1,4 +1,3 @@
-
 from typing import Optional
 from typing import cast
 
@@ -21,9 +20,11 @@ from umlshapes.dialogs.DlgEditSDMessage import DlgEditSDMessage
 
 from umlshapes.frames.UmlFrame import UmlFrame
 
+from umlshapes.preferences.UmlPreferences import UmlPreferences
 from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 
 from umlshapes.sd.SDLayoutEngine import SDLayoutEngine
+from umlshapes.sd.UmlSDInstance import UmlSDInstance
 from umlshapes.sd.UmlSDLifeLine import UmlSDLifeLine
 from umlshapes.sd.UmlSDMessage import UmlSDMessage
 
@@ -44,6 +45,7 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
         self._umlSDMessage:    UmlSDMessage     = umlSDMessage
         self._umlPubSubEngine: IUmlPubSubEngine = umlPubSubEngine
         self._layoutEngine:    SDLayoutEngine   = SDLayoutEngine()
+        self._preferences:     UmlPreferences   = UmlPreferences()
         self._initialFromY:    Optional[int]    = None
         self._initialToY:      Optional[int]    = None
 
@@ -145,18 +147,42 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
 
         headerBottomY: int = startLifeLine.rectangle.top
         rawSlotIndex: int = self._layoutEngine.computeNearestSlotIndex(headerBottomY=headerBottomY, targetY=targetY)
-        maxSlotIndex: int = max(
-            0,
-            (startLifeLine.size.height - self._layoutEngine.parameters.topPadding - self._layoutEngine.parameters.bottomPadding)
-            // self._layoutEngine.parameters.slotHeight
-        )
-        clampedSlotIndex: int = max(0, min(rawSlotIndex, maxSlotIndex))
-        snappedY: int = self._layoutEngine.computeSlotY(headerBottomY=headerBottomY, slotIndex=clampedSlotIndex)
+        slotIndex: int
+        snappedY: int
+        canvas: UmlFrame = self._umlSDMessage.umlFrame
+        if self._preferences.autoGrowLifeLines:
+            slotIndex = max(0, rawSlotIndex)
+            snappedY = self._layoutEngine.computeSlotY(headerBottomY=headerBottomY, slotIndex=slotIndex)
+            neededHeight: int = (snappedY - headerBottomY) + self._layoutEngine.parameters.bottomPadding
+            destLifeLine: Optional[UmlSDLifeLine] = cast(Optional[UmlSDLifeLine], self._umlSDMessage.GetTo())
+            currentStartHeight: int = startLifeLine.size.height
+            currentDestHeight: int = 0
+            if destLifeLine is not None:
+                currentDestHeight = destLifeLine.size.height
+            if (neededHeight > currentStartHeight) or (neededHeight > currentDestHeight):
+                if self._preferences.uniformLifeLineLength:
+                    if hasattr(canvas, 'setAllLifeLinesLength'):
+                        canvas.setAllLifeLinesLength(neededHeight)
+                else:
+                    startSDInstance: UmlSDInstance | None = startLifeLine.umlSDInstance
+                    if startSDInstance is not None:
+                        startSDInstance.setLifeLineLength(neededHeight)
+                    if destLifeLine is not None:
+                        destSDInstance: UmlSDInstance | None = destLifeLine.umlSDInstance
+                        if destSDInstance is not None:
+                            destSDInstance.setLifeLineLength(neededHeight)
+        else:
+            maxSlotIndex: int = max(
+                0,
+                (startLifeLine.size.height - self._layoutEngine.parameters.topPadding - self._layoutEngine.parameters.bottomPadding)
+                // self._layoutEngine.parameters.slotHeight
+            )
+            slotIndex = max(0, min(rawSlotIndex, maxSlotIndex))
+            snappedY = self._layoutEngine.computeSlotY(headerBottomY=headerBottomY, slotIndex=slotIndex)
 
         if snappedY != self._umlSDMessage.fromY or snappedY != self._umlSDMessage.toY:
             self._umlSDMessage.fromY = snappedY
             self._umlSDMessage.toY = snappedY
-            canvas: UmlFrame = self._umlSDMessage.umlFrame
             dc: ClientDC = ClientDC(canvas)
             canvas.PrepareDC(dc)
             self._umlSDMessage.OnMoveLink(dc=dc)

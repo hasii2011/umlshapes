@@ -1,4 +1,6 @@
 
+from typing import TYPE_CHECKING
+
 from logging import Logger
 from logging import getLogger
 
@@ -9,6 +11,9 @@ from umlshapes.pubsubengine.UmlMessageType import UmlMessageType
 
 from umlshapes.types.DeltaXY import DeltaXY
 from umlshapes.frames.UmlFrame import UmlFrame
+
+if TYPE_CHECKING:
+    from umlshapes.sd.UmlSDInstance import UmlSDInstance
 
 
 class SequenceDiagramFrame(UmlFrame):
@@ -27,3 +32,29 @@ class SequenceDiagramFrame(UmlFrame):
 
     def _shapeMovingListener(self, deltaXY: DeltaXY):
         self.logger.debug(f'{deltaXY=}')
+
+    def getSDInstances(self) -> list['UmlSDInstance']:
+        """
+        Retrieve all UmlSDInstance shapes currently on this diagram frame.
+        """
+        from umlshapes.sd.UmlSDInstance import UmlSDInstance
+
+        instances: list[UmlSDInstance] = []
+        for shape in self.umlShapes:
+            if isinstance(shape, UmlSDInstance):
+                instances.append(shape)
+        return instances
+
+    def setAllLifeLinesLength(self, length: int):
+        """
+        Resize all lifelines on this diagram frame to maintain uniform length.
+
+        Args:
+            length: The new lifeline length in pixels.
+        """
+        from umlshapes.sd.UmlSDInstance import UmlSDInstance
+
+        for shape in self.umlShapes:
+            if isinstance(shape, UmlSDInstance):
+                shape.setLifeLineLength(newLength=length)
+        self.refresh()
