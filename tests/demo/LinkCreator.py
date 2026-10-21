@@ -22,7 +22,7 @@ from umlshapes.commands.CreateLinkCommand import CreateLinkCommand
 
 from umlshapes.pubsubengine.UmlPubSubEngine import UmlPubSubEngine
 
-from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
+from umlshapes.frames.UmlFrame import UmlFrame
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
@@ -110,7 +110,7 @@ class LinkCreator:
             }
         )
 
-    def displaySmartPlacement(self, diagramFrame: ClassDiagramFrame, placement: SmartPlacement):
+    def displaySmartPlacement(self, diagramFrame: UmlFrame, placement: SmartPlacement):
         #
         # default to source left
         #
@@ -142,7 +142,7 @@ class LinkCreator:
         )
         diagramFrame.commandProcessor.Submit(command=createLinkCommand, storeIt=True)
 
-    def displayAssociation(self, idReference: ID_REFERENCE, diagramFrame: ClassDiagramFrame):
+    def displayAssociation(self, idReference: ID_REFERENCE, diagramFrame: UmlFrame):
 
         associationDescription: AssociationDescription = self._associations[idReference]
 
@@ -159,7 +159,7 @@ class LinkCreator:
         )
         diagramFrame.commandProcessor.Submit(command=createLinkCommand, storeIt=True)
 
-    def displayUmlInheritance(self, diagramFrame: ClassDiagramFrame):
+    def displayUmlInheritance(self, diagramFrame: UmlFrame):
         """
         """
         baseUmlClass, subUmlClass = self._createClassPair(diagramFrame=diagramFrame)
@@ -176,7 +176,7 @@ class LinkCreator:
         )
         diagramFrame.commandProcessor.Submit(command=createLinkCommand, storeIt=True)
 
-    def displayUmlInterface(self, diagramFrame: ClassDiagramFrame):
+    def displayUmlInterface(self, diagramFrame: UmlFrame):
 
         interfaceClass, implementingClass = self._createClassPair(diagramFrame=diagramFrame)
 
@@ -195,7 +195,7 @@ class LinkCreator:
         )
         diagramFrame.commandProcessor.Submit(command=createLinkCommand, storeIt=True)
 
-    def displayNoteLink(self, diagramFrame: ClassDiagramFrame):
+    def displayNoteLink(self, diagramFrame: UmlFrame):
         classPosition: UmlPosition = UmlPosition(x=450, y=100)
 
         umlNote: UmlNote = self._createUmlNote()
@@ -219,7 +219,7 @@ class LinkCreator:
         )
         diagramFrame.commandProcessor.Submit(command=createLinkCommand, storeIt=True)
 
-    def displayOrthogonalLink(self, diagramFrame: ClassDiagramFrame):
+    def displayOrthogonalLink(self, diagramFrame: UmlFrame):
         baseClassPosition: UmlPosition = UmlPosition(x=180, y=205)
         subClassPosition:  UmlPosition = UmlPosition(x=550, y=480)
 
@@ -249,7 +249,7 @@ class LinkCreator:
         diagramFrame.commandProcessor.Submit(command=createLinkCommand, storeIt=True)
 
     def _createClassPair(self,
-                         diagramFrame:        ClassDiagramFrame,
+                         diagramFrame:        UmlFrame,
                          sourcePosition:      UmlPosition = UmlPosition(x=100, y=100),
                          destinationPosition: UmlPosition = UmlPosition(x=200, y=300),
                          ) -> Tuple[UmlClass, UmlClass]:
@@ -342,7 +342,7 @@ class LinkCreator:
 
         return umlNote
 
-    def _displayUmlClass(self, umlClass: UmlClass, umlPosition: UmlPosition, diagramFrame: ClassDiagramFrame):
+    def _displayUmlClass(self, umlClass: UmlClass, umlPosition: UmlPosition, diagramFrame: UmlFrame):
 
         diagram: UmlDiagram = diagramFrame.umlDiagram
 

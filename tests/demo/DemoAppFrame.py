@@ -127,7 +127,7 @@ class DemoAppFrame(SizedFrame):
         self._noteBook.AddPage(page=self._diagramFrame3, text='Use Case Diagram', select=False)
         self._noteBook.SetSelection(0)      # Hard code while working on 2.1.0
 
-        self._currentFrame: DemoClassDiagramFrame | SequenceDiagramFrame | UseCaseDiagramFrame = cast(DemoFrame, self._noteBook.GetCurrentPage())
+        self._currentFrame: UmlFrame = cast(UmlFrame, self._noteBook.GetCurrentPage())
 
         self._createApplicationMenuBar()
         self._diagramFrame1.commandProcessor.SetEditMenu(menu=self._editMenu)
@@ -285,19 +285,23 @@ class DemoAppFrame(SizedFrame):
 
         from umlshapes.ShapeTypes import UmlShapes
 
-        if event.IsChecked():
-            frame: ClassDiagramFrame = cast(ClassDiagramFrame, self._currentFrame)
-
-            umlShapes:  UmlShapes = frame.umlShapes
-            if len(umlShapes) == 0:     # noqa
-                with MessageDialog(parent=None, message='There are no shapes on the current frame', caption='You messed up!', style=OK | ICON_ERROR) as dlg:
-                    dlg.ShowModal()
+        if isinstance(self._currentFrame, DemoClassDiagramFrame):
+            demoFrame: DemoClassDiagramFrame = self._currentFrame
+            if event.IsChecked():
+                umlShapes: UmlShapes = demoFrame.umlShapes
+                if len(umlShapes) == 0:     # noqa
+                    with MessageDialog(parent=None, message='There are no shapes on the current frame', caption='You messed up!', style=OK | ICON_ERROR) as dlg:
+                        dlg.ShowModal()
+                else:
+                    demoFrame.drawShapeBoundary = True
             else:
-                self._currentFrame.drawShapeBoundary = True
+                demoFrame.drawShapeBoundary = False
+            demoFrame.refresh()
+            self.logger.info(f'Drawing Shapes Boundary=`{demoFrame.drawShapeBoundary}` frame=`{demoFrame.id}`')
         else:
-            self._currentFrame.drawShapeBoundary = False
-        self._currentFrame.refresh()
-        self.logger.info(f'Drawing Shapes Boundary=`{cast(DemoClassDiagramFrame, self._currentFrame).drawShapeBoundary}` frame=`{self._currentFrame.id}`')
+            self._shapeItem.Check(check=False)
+            with MessageDialog(parent=None, message='Shape boundaries can only be shown on a Class Diagram frame', caption='Bad News', style=OK | ICON_ERROR) as dlg:
+                dlg.ShowModal()
 
     def _onWiggleShapes(self, _event: CommandEvent):
 
@@ -402,7 +406,7 @@ class DemoAppFrame(SizedFrame):
             case _:
                 self.logger.error(f'WTH!  I am not handling that menu item')
 
-    def _displaySequenceDiagram(self, diagramFrame: SequenceDiagramFrame):
+    def _displaySequenceDiagram(self, diagramFrame: UmlFrame):
         """
 
         Args:
@@ -509,7 +513,7 @@ class DemoAppFrame(SizedFrame):
 
     def _onFrameDisplayedChanged(self, _event: BookCtrlEvent):
 
-        self._currentFrame = cast(DemoFrame, self._noteBook.GetCurrentPage())
+        self._currentFrame = cast(UmlFrame, self._noteBook.GetCurrentPage())
 
         self._currentFrame.commandProcessor.SetMenuStrings()
 

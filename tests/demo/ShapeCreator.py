@@ -8,10 +8,8 @@ from umlshapes.commands.CreateUmlNoteCommand import CreateUmlNoteCommand
 from umlshapes.commands.CreateUmlTextCommand import CreateUmlTextCommand
 from umlshapes.commands.CreateUmlUseCaseCommand import CreateUmlUseCaseCommand
 
-from umlshapes.frames.UseCaseDiagramFrame import UseCaseDiagramFrame
-
 from umlshapes.pubsubengine.UmlPubSubEngine import UmlPubSubEngine
-from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
+from umlshapes.frames.UmlFrame import UmlFrame
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
 from umlshapes.types.UmlPosition import UmlPosition
@@ -30,7 +28,7 @@ class ShapeCreator:
         self._preferences:     UmlPreferences  = UmlPreferences()
         self._currentPosition: UmlPosition     = UmlPosition(x=INITIAL_X, y=INITIAL_Y)
 
-    def displayUndoableUmlClass(self, diagramFrame: ClassDiagramFrame):
+    def displayUndoableUmlClass(self, diagramFrame: UmlFrame):
 
         umlPosition: UmlPosition = self._computePosition()
 
@@ -42,7 +40,7 @@ class ShapeCreator:
         submitStatus: bool = diagramFrame.commandProcessor.Submit(command=cmd, storeIt=True)
         self.logger.debug(f'Create class submission status: {submitStatus}')
 
-    def displayUndoableUmlNote(self, diagramFrame: ClassDiagramFrame):
+    def displayUndoableUmlNote(self, diagramFrame: UmlFrame):
 
         umlPosition: UmlPosition = self._computePosition()
 
@@ -55,7 +53,7 @@ class ShapeCreator:
         submitStatus: bool = diagramFrame.commandProcessor.Submit(command=cmd, storeIt=True)
         self.logger.debug(f'Create note submission status: {submitStatus}')
 
-    def displayUndoableUmlText(self, diagramFrame: ClassDiagramFrame):
+    def displayUndoableUmlText(self, diagramFrame: UmlFrame):
 
         umlPosition: UmlPosition = self._computePosition()
 
@@ -68,7 +66,7 @@ class ShapeCreator:
         submitStatus: bool = diagramFrame.commandProcessor.Submit(command=cmd, storeIt=True)
         self.logger.debug(f'Create text submission status: {submitStatus}')
 
-    def displayUndoableUmlActor(self, diagramFrame: UseCaseDiagramFrame):
+    def displayUndoableUmlActor(self, diagramFrame: UmlFrame):
         umlPosition: UmlPosition = self._computePosition()
 
         cmd: CreateUmlActorCommand = CreateUmlActorCommand(
@@ -80,7 +78,7 @@ class ShapeCreator:
         submitStatus: bool = diagramFrame.commandProcessor.Submit(command=cmd, storeIt=True)
         self.logger.debug(f'Create actor submission status: {submitStatus}')
 
-    def displayUndoableUmlUseCase(self, diagramFrame: UseCaseDiagramFrame):
+    def displayUndoableUmlUseCase(self, diagramFrame: UmlFrame):
         umlPosition: UmlPosition = self._computePosition()
 
         cmd: CreateUmlUseCaseCommand = CreateUmlUseCaseCommand(
