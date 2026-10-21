@@ -44,7 +44,6 @@ class EnhancedListBox(SizedPanel):
     def __init__(self, parent: SizedPanel, title: str, callbacks: AdvancedListCallbacks):
         super().__init__(parent)
         self.SetSizerType('vertical')
-        # noinspection PyUnresolvedReferences
         self.SetSizerProps(expand=True, proportion=2)   # SizeProps is a mixin
 
         self._callbacks: AdvancedListCallbacks = callbacks

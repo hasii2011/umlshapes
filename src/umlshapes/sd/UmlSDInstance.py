@@ -1,4 +1,5 @@
 
+from typing import cast
 from typing import TYPE_CHECKING
 
 from logging import Logger
@@ -187,7 +188,9 @@ class UmlSDInstance(ControlPointMixin, IdentifierMixin, CompositeShape, TopLeftM
         canvas: UmlFrame = self.GetCanvas()
         umlControlPointSize: int = self._preferences.controlPointSize
 
-        yOffset: float = self._umlSDLifeLine.GetY() + (self._umlSDLifeLine.GetHeight() / 2.0) - self.GetY()
+        lifelineBottomY:  float = self._umlSDLifeLine.GetY() + (self._umlSDLifeLine.GetHeight() / 2.0)
+        compositeCenterY: float = self.GetY()
+        yOffset:          float = lifelineBottomY - compositeCenterY
         control: UmlControlPoint = UmlControlPoint(
             umlFrame=canvas,
             shape=self,
@@ -203,12 +206,22 @@ class UmlSDInstance(ControlPointMixin, IdentifierMixin, CompositeShape, TopLeftM
         self._addEventHandler(umlControlPoint=control)
 
     def ResetControlPoints(self):
+
         self.ResetMandatoryControlPoints()
         if len(self._controlPoints) == 0:
             return
-        yOffset: float = self._umlSDLifeLine.GetY() + (self._umlSDLifeLine.GetHeight() / 2.0) - self.GetY()
-        self._controlPoints[0]._xoffset = 0.0
-        self._controlPoints[0]._yoffset = yOffset
+
+        # In OGL, control point positions are drawn relative to the parent shape's center:
+        # controlPoint.Y = self.GetY() + yOffset. To place the resize handle at the
+        # bottom of the lifeline, compute the lifeline's bottom Y and subtract the
+        # composite shape's vertical center.
+        lifelineBottomY:  float = self._umlSDLifeLine.GetY() + (self._umlSDLifeLine.GetHeight() / 2.0)
+        compositeCenterY: float = self.GetY()
+        yOffset:          float = lifelineBottomY - compositeCenterY
+
+        controlPoint: UmlControlPoint = cast(UmlControlPoint, self._controlPoints[0])
+        controlPoint.xOffset = 0.0
+        controlPoint.yOffset = yOffset
 
     def DeleteControlPoints(self, dc = None):
         super().DeleteControlPoints(dc)

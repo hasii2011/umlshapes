@@ -47,3 +47,19 @@ class UmlControlPoint(ControlPoint):
         # Override parent class
         self.SetPen(ResourceUtils.redSolidPen())
         self.SetBrush(WHITE_BRUSH)
+
+    @property
+    def xOffset(self) -> float:
+        return self._xoffset
+
+    @xOffset.setter
+    def xOffset(self, newXOffset: float):
+        self._xoffset = newXOffset
+
+    @property
+    def yOffset(self) -> float:
+        return self._yoffset
+
+    @yOffset.setter
+    def yOffset(self, newYOffset: float):
+        self._yoffset = newYOffset

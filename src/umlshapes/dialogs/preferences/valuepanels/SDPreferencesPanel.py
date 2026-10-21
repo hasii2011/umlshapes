@@ -17,6 +17,7 @@ from wx import Size
 from wx import SpinCtrl
 from wx import SpinCtrlDouble
 from wx import SpinDoubleEvent
+from wx import ToolTip
 from wx import Window
 
 from wx.lib.sized_controls import SizedPanel
@@ -95,7 +96,7 @@ class SDPreferencesPanel(BasePreferencesPanel):
             valueChangedCallback=self._noteDimensionsChanged
         )
         self._instanceDimensions = TitledDimensionsControl(parent=instanceRow, parameters=dimensionsParameters)
-        self._instanceDimensions.SetToolTip(INSTANCE_DIMENSIONS_TOOLTIP)
+        self._instanceDimensions.SetToolTip(ToolTip(INSTANCE_DIMENSIONS_TOOLTIP))
 
         instanceNameRow: SizedPanel = SizedPanel(parentSizedPanel)
         instanceNameRow.SetSizerType('horizontal')

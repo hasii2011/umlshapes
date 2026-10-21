@@ -372,7 +372,6 @@ class OglApp(App):
         sizedPanel.SetSizerProps(expand=True, proportion=1)
 
         self._diagramFrame = TestWindow(parent=sizedPanel, frame=self._frame, log=self.logger)
-        # noinspection PyUnresolvedReferences
         self._diagramFrame.SetSizerProps(expand=True, proportion=1)
 
         self.SetTopWindow(self._frame)

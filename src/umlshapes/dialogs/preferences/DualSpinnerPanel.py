@@ -12,6 +12,7 @@ from wx import ID_ANY
 from wx import Size
 from wx import SpinCtrl
 from wx import StaticText
+from wx import ToolTip
 
 from wx.lib.sized_controls import SizedPanel
 
@@ -102,16 +103,17 @@ class DualSpinnerPanel(SizedPanel):
         self._spinner0.SetValue(values[0])
         self._spinner1.SetValue(values[1])
 
-    def SetToolTip(self, tip: str):
+    def SetToolTip(self, tip: ToolTip):
         """
         Set tooltip description on the container and both child spin controls.
 
         Args:
-            tip: The tooltip text string.
+            tip: The tooltip instance.
         """
         super().SetToolTip(tip)
-        self._spinner0.SetToolTip(tip)
-        self._spinner1.SetToolTip(tip)
+        tipString: str = tip.GetTip()
+        self._spinner0.SetToolTip(ToolTip(tipString))
+        self._spinner1.SetToolTip(ToolTip(tipString))
 
     def _onSpinnerChanged(self, _event: CommandEvent):
         """

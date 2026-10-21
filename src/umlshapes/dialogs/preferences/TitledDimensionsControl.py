@@ -5,6 +5,8 @@ from typing import Callable
 from logging import Logger
 from logging import getLogger
 
+from wx import ToolTip
+
 from wx.lib.sized_controls import SizedPanel
 
 from codeallybasic.Dimensions import Dimensions
@@ -92,12 +94,12 @@ class TitledDimensionsControl(TitledPanel):
         """
         self._dualSpinnerPanel.values = (dimensions.width, dimensions.height)
 
-    def SetToolTip(self, tip: str):
+    def SetToolTip(self, tip: ToolTip):
         """
         Set tooltip description across the titled container and embedded spinners.
 
         Args:
-            tip: The tooltip text string.
+            tip: The tooltip instance.
         """
         super().SetToolTip(tip)
         self._dualSpinnerPanel.SetToolTip(tip)
