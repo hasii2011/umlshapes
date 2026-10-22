@@ -1,3 +1,5 @@
+from typing import Optional
+from typing import TYPE_CHECKING
 
 from logging import Logger
 from logging import getLogger
@@ -14,6 +16,9 @@ from umlshapes.pubsubengine.UmlMessageType import UmlMessageType
 from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 
 from umlshapes.sd.UmlSDLifeLine import UmlSDLifeLine
+
+if TYPE_CHECKING:
+    from umlshapes.sd.UmlSDInstance import UmlSDInstance
 
 
 @dataclass
@@ -40,10 +45,11 @@ class UmlSDLifeLineEventHandler(ShapeEvtHandler):
         self._umlSDLifeLine:   UmlSDLifeLine    = umlSDLifeLine
         self._umlPubSubEngine: IUmlPubSubEngine = umlPubSubEngine
 
-    def OnLeftClick(self, x: int, y: int, keys: int, attachment: int):
+    def OnLeftClick(self, x: int, y: int, keys: int = 0, attachment: int = 0):
         """
         We want to capture this in order to inform any subscribers that the
-        life has been left-clicked.  We send along relevant click details
+        lifeline has been left-clicked. We send along relevant click details and
+        delegate selection to the parent UmlSDInstance.
 
         Args:
             x:              The x-coordinate we will pass along
@@ -65,3 +71,62 @@ class UmlSDLifeLineEventHandler(ShapeEvtHandler):
                 lifeLine=sdLifeLine
             )
         )
+
+        parentInstance: Optional['UmlSDInstance'] = sdLifeLine.umlSDInstance
+        if parentInstance is not None:
+            parentHandler: ShapeEvtHandler = parentInstance.GetEventHandler()
+            if parentHandler is not None:
+                parentHandler.OnLeftClick(x, y, keys, attachment)
+
+    def OnBeginDragLeft(self, x: int, y: int, keys: int = 0, attachment: int = 0):
+        """
+        Delegate the start of a left drag to the parent UmlSDInstance so dragging
+        the lifeline moves the entire participant horizontally.
+
+        Args:
+            x:
+            y:
+            keys:
+            attachment:
+        """
+        sdLifeLine: UmlSDLifeLine = self.GetShape()
+        parentInstance: Optional['UmlSDInstance'] = sdLifeLine.umlSDInstance
+        if parentInstance is not None:
+            parentHandler: ShapeEvtHandler = parentInstance.GetEventHandler()
+            if parentHandler is not None:
+                parentHandler.OnBeginDragLeft(x, y, keys, attachment)
+
+    def OnDragLeft(self, draw: bool, x: int, y: int, keys: int = 0, attachment: int = 0):
+        """
+        Delegate left drag motion to the parent UmlSDInstance.
+
+        Args:
+            draw:
+            x:
+            y:
+            keys:
+            attachment:
+        """
+        sdLifeLine: UmlSDLifeLine = self.GetShape()
+        parentInstance: Optional['UmlSDInstance'] = sdLifeLine.umlSDInstance
+        if parentInstance is not None:
+            parentHandler: ShapeEvtHandler = parentInstance.GetEventHandler()
+            if parentHandler is not None:
+                parentHandler.OnDragLeft(draw, x, y, keys, attachment)
+
+    def OnEndDragLeft(self, x: int, y: int, keys: int = 0, attachment: int = 0):
+        """
+        Delegate the end of a left drag to the parent UmlSDInstance.
+
+        Args:
+            x:
+            y:
+            keys:
+            attachment:
+        """
+        sdLifeLine: UmlSDLifeLine = self.GetShape()
+        parentInstance: Optional['UmlSDInstance'] = sdLifeLine.umlSDInstance
+        if parentInstance is not None:
+            parentHandler: ShapeEvtHandler = parentInstance.GetEventHandler()
+            if parentHandler is not None:
+                parentHandler.OnEndDragLeft(x, y, keys, attachment)

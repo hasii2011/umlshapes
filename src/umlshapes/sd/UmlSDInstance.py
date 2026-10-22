@@ -1,4 +1,3 @@
-
 from typing import cast
 from typing import TYPE_CHECKING
 
@@ -96,7 +95,7 @@ class UmlSDInstance(ControlPointMixin, IdentifierMixin, CompositeShape, TopLeftM
         constrainingShape.SetSensitivityFilter(OP_NONE)
         self.SetCentreResize(False)
 
-        self._setEventHandlers(umlSDLifeLine=sdLifeLine)
+        self._setEventHandlers(instanceName=instanceName, umlSDLifeLine=sdLifeLine)
         self._constrainingShape: SDInstanceConstrainer = constrainingShape
         self._instanceName:      UmlInstanceName       = instanceName
         self._umlSDLifeLine:     UmlSDLifeLine         = sdLifeLine
@@ -135,7 +134,7 @@ class UmlSDInstance(ControlPointMixin, IdentifierMixin, CompositeShape, TopLeftM
         if newLength < MIN_LIFELINE_LENGTH:
             targetLength = MIN_LIFELINE_LENGTH
         else:
-            targetLength = newLength
+            targetLength = round(newLength)
 
         instanceNameHeight: int = round(self._instanceName.GetHeight())
         newTotalHeight: int = instanceNameHeight + targetLength
@@ -199,6 +198,8 @@ class UmlSDInstance(ControlPointMixin, IdentifierMixin, CompositeShape, TopLeftM
             yOffSet=yOffset,
             controlPointType=CONTROL_POINT_VERTICAL
         )
+        control.SetX(self.GetX())
+        control.SetY(self.GetY() + yOffset)
         control.SetParent(self)
         self.GetChildren().append(control)
         self.GetCanvas().AddShape(control)
@@ -222,18 +223,29 @@ class UmlSDInstance(ControlPointMixin, IdentifierMixin, CompositeShape, TopLeftM
         controlPoint: UmlControlPoint = cast(UmlControlPoint, self._controlPoints[0])
         controlPoint.xOffset = 0.0
         controlPoint.yOffset = yOffset
+        controlPoint.SetX(self.GetX())
+        controlPoint.SetY(self.GetY() + yOffset)
 
     def DeleteControlPoints(self, dc = None):
         super().DeleteControlPoints(dc)
 
-    def _setEventHandlers(self, umlSDLifeLine: UmlSDLifeLine):
+    def _setEventHandlers(self, instanceName: UmlInstanceName, umlSDLifeLine: UmlSDLifeLine):
         """
         Set the event handlers for the constrained shapes
 
         Args:
+            instanceName:
             umlSDLifeLine:
 
         """
+        from umlshapes.sd.eventhandlers.UmlInstanceNameEventHandler import UmlInstanceNameEventHandler
+
+        nameEventHandler: UmlInstanceNameEventHandler = UmlInstanceNameEventHandler(
+            umlInstanceName=instanceName,
+            umlSDInstance=self,
+            previousEventHandler=instanceName.GetEventHandler()
+        )
+        instanceName.SetEventHandler(nameEventHandler)
 
         eventHandler: UmlSDLifeLineEventHandler = UmlSDLifeLineEventHandler(
             umlSDLifeLine=umlSDLifeLine,

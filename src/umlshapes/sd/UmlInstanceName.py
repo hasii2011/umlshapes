@@ -2,6 +2,8 @@
 from logging import Logger
 from logging import getLogger
 
+from wx import MemoryDC
+
 from umlmodel.SDInstance import SDInstance
 
 from umlshapes.utils.ResourceUtils import ResourceUtils
@@ -47,3 +49,17 @@ class UmlInstanceName(RectangleShape, TopLeftMixin):
         self._sdInstance = sdInstance
         self.ClearText()
         self.AddText(sdInstance.instanceName)
+
+    def OnDraw(self, dc: MemoryDC):
+        """
+        Draw the instance name rectangle, highlighting in red dashed pen when selected.
+
+        Args:
+            dc:
+        """
+        if self.AncestorSelected() is True:
+            self.SetPen(ResourceUtils.redDashedPen())
+        else:
+            self.SetPen(ResourceUtils.blackSolidPen())
+
+        super().OnDraw(dc)

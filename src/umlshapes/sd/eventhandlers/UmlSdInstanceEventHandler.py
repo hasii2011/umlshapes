@@ -11,6 +11,7 @@ from umlshapes.lib.ogl import ShapeEvtHandler
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
+from umlshapes.pubsubengine.UmlMessageType import UmlMessageType
 
 from umlshapes.sd.UmlSDInstance import UmlSDInstance
 
@@ -37,7 +38,8 @@ class UmlSdInstanceEventHandler(UmlBaseEventHandler):
     def OnBeginDragLeft(self, x: int, y: int, keys: int = 0, attachment: int = 0):
         """
         Record the baseline Y position so the instance is constrained strictly
-        to horizontal dragging.
+        to horizontal dragging. Ensure the instance is selected so it is highlighted
+        in red during drag.
 
         Args:
             x:
@@ -50,6 +52,24 @@ class UmlSdInstanceEventHandler(UmlBaseEventHandler):
         umlShape: UmlShapeGenre = cast(UmlShapeGenre, self.GetShape())
         self._fixedY = round(umlShape.GetY())
         self._fixedMouseY = y
+
+        if not umlShape.Selected():
+            from umlshapes.frames.UmlFrame import UmlFrame
+            from umlshapes.lib.ogl import ShapeCanvas
+
+            canvas: ShapeCanvas = umlShape.GetCanvas()
+            dc: ClientDC = ClientDC(canvas)
+            canvas.PrepareDC(dc)
+            self._unSelectAllShapesOnCanvas(umlShape, canvas, dc)
+            umlShape.Select(True, dc)
+            if self._umlPubSubEngine is not None:
+                self._umlPubSubEngine.sendMessage(
+                    messageType=UmlMessageType.UML_SHAPE_SELECTED,
+                    frameId=cast(UmlFrame, canvas).id,
+                    umlShape=umlShape
+                )
+            cast(UmlFrame, canvas).refresh()
+
         super().OnBeginDragLeft(x, y, keys, attachment)
 
     def OnDragLeft(self, draw: bool, x: int, y: int, keys: int = 0, attachment: int = 0):
@@ -121,7 +141,7 @@ class UmlSdInstanceEventHandler(UmlBaseEventHandler):
         """
         umlSDInstance: UmlSDInstance = cast(UmlSDInstance, self.GetShape())
         headerBottomY: int = round(umlSDInstance.umlSDLifeLine.rectangle.top)
-        rawLength: int = y - headerBottomY
+        rawLength: int = round(y - headerBottomY)
 
         minAllowedLength: int = self._computeMinAllowedLifeLineLength(umlSDInstance=umlSDInstance)
         newLength: int
@@ -149,7 +169,7 @@ class UmlSdInstanceEventHandler(UmlBaseEventHandler):
         """
         umlSDInstance: UmlSDInstance = cast(UmlSDInstance, self.GetShape())
         headerBottomY: int = round(umlSDInstance.umlSDLifeLine.rectangle.top)
-        rawLength: int = y - headerBottomY
+        rawLength: int = round(y - headerBottomY)
 
         minAllowedLength: int = self._computeMinAllowedLifeLineLength(umlSDInstance=umlSDInstance)
         newLength: int
@@ -187,13 +207,13 @@ class UmlSdInstanceEventHandler(UmlBaseEventHandler):
             return MIN_BASE_LIFELINE_LENGTH
         return requiredLength
 
-    def OnEndSize(self, x: int, y: int):
+    def OnEndSize(self, w: int, h: int):
         """
         We want to tell the lifeline to stretch or shrink to new size
 
         Args:
-            x:
-            y:
+            w:
+            h:
         """
         from umlshapes.sd.UmlSDLifeLine import UmlSDLifeLine
 
@@ -202,7 +222,7 @@ class UmlSdInstanceEventHandler(UmlBaseEventHandler):
 
         umlSDLifeLine.adjustLifeLineTopPosition()
 
-        super().OnEndSize(x, y)
+        super().OnEndSize(w, h)
 
     def OnDrawOutline(self, dc: ClientDC, x: int, y: int, w: int, h: int):
         """

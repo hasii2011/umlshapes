@@ -122,7 +122,11 @@ class UmlSDLifeLine(IdentifierMixin, RectangleShape, TopLeftMixin):
         topY: int = round(self.GetY() - halfHeight)
         bottomY: int = round(self.GetY() + halfHeight)
 
-        dc.SetPen(ResourceUtils.blackDashedPen())
+        if self.AncestorSelected() is True:
+            dc.SetPen(ResourceUtils.redDashedPen())
+        else:
+            dc.SetPen(ResourceUtils.blackDashedPen())
+
         dc.DrawLine(lineX, topY, lineX, bottomY)
 
     def __str__(self) -> str:

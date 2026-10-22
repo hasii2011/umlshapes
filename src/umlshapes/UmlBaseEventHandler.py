@@ -188,6 +188,8 @@ class UmlBaseEventHandler(ShapeEvtHandler):
                                               frameId=cast(UmlFrame, canvas).id,
                                               umlShape=shape)
 
+        cast(UmlFrame, canvas).refresh()
+
     def OnDrawOutline(self, dc: ClientDC, x: int, y: int, w: int, h: int):
         """
         Called when shape is moving or is resized

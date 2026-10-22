@@ -1,3 +1,4 @@
+
 from unittest import TestSuite
 from unittest import defaultTestLoader
 from unittest import main as unitTestMain
@@ -6,28 +7,41 @@ from wx import ClientDC
 from wx import Point
 
 from codeallyadvanced.ui.UnitTestBaseW import UnitTestBaseW
+
 from umlmodel.SDInstance import SDInstance
 from umlmodel.SDMessage import SDMessage
 
 from umlshapes.commands.DeleteSDMessageCommand import DeleteSDMessageCommand
+
+from umlshapes.lib.ogl import ControlPoint
 from umlshapes.lib.ogl import OGLInitialize
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
+
 from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 from umlshapes.pubsubengine.UmlPubSubEngine import UmlPubSubEngine
 
 from umlshapes.frames.SequenceDiagramFrame import SequenceDiagramFrame
+
 from umlshapes.sd.SDMessageType import SDMessageType
 from umlshapes.sd.UmlSDInstance import UmlSDInstance
 from umlshapes.sd.UmlSDLifeLine import UmlSDLifeLine
 from umlshapes.sd.UmlSDMessage import UmlSDMessage
 from umlshapes.sd.UmlSDMessage import LineControlPoints
+
 from umlshapes.shapes.UmlLineControlPoint import UmlLineControlPoint
+
 from umlshapes.sd.eventhandlers.UmlSDMessageEventHandler import UmlSDMessageEventHandler
 
-INITIAL_FROM_Y: int = 100
-INITIAL_TO_Y:   int = 140
-MOVED_X:        int = 250
+INITIAL_FROM_Y:             int = 100
+INITIAL_TO_Y:               int = 140
+MOVED_X:                    int = 250
+EXPECTED_TIME_STEP_HEIGHT:  int = 40
+RESIZED_LOOP_WIDTH:         int = 120
+INSTANCE_DEFAULT_X:         int = 100
+INSTANCE_DEFAULT_Y:         int = 50
+CORNER_CONTROL_POINT_INDEX: int = 2
+RETURN_CONTROL_POINT_INDEX: int = 3
 
 
 class TestSDReflexiveMessage(UnitTestBaseW):
@@ -54,47 +68,13 @@ class TestSDReflexiveMessage(UnitTestBaseW):
         self._diagramFrame.Destroy()
         super().tearDown()
 
-    def _createTestInstance(self, name: str, x: int = 100, y: int = 50) -> UmlSDInstance:
-        sdInstanceModel: SDInstance = SDInstance()
-        sdInstanceModel.instanceName = name
-
-        umlSDInstance: UmlSDInstance = UmlSDInstance(
-            sdInstance=sdInstanceModel,
-            diagramFrame=self._diagramFrame,
-            umlPubSubEngine=self._umlPubSubEngine
-        )
-        umlSDInstance.SetX(x)
-        umlSDInstance.SetY(y)
-        umlSDInstance.umlSDLifeLine.SetX(x)
-        self._diagramFrame.umlDiagram.AddShape(umlSDInstance)
-        umlSDInstance.Show(True)
-        return umlSDInstance
-
     def testReflexiveMessageCreationAndGeometry(self):
-        umlSDInstance: UmlSDInstance = self._createTestInstance(name='instance1', x=100)
-        lifeLine: UmlSDLifeLine = umlSDInstance.umlSDLifeLine
-        lifeLineX: int = round(lifeLine.GetX())
 
-        modelMessage: SDMessage = SDMessage(
-            message='reflexiveCall',
-            src=lifeLine.umlInstanceName.sdInstance,
-            sourceY=INITIAL_FROM_Y,
-            dst=lifeLine.umlInstanceName.sdInstance,
-            destinationY=INITIAL_TO_Y
-        )
-        umlSDMessage: UmlSDMessage = UmlSDMessage(
-            sdMessage=modelMessage,
-            umlPubSubEngine=self._umlPubSubEngine,
-            messageType=SDMessageType.SYNCHRONOUS
-        )
-        umlSDMessage.umlFrame = self._diagramFrame
-        lifeLine.addMessage(umlSDMessage=umlSDMessage, destinationLifeLine=lifeLine)
-        umlSDMessage.fromY = INITIAL_FROM_Y
-        umlSDMessage.toY   = INITIAL_TO_Y
+        umlSDInstance: UmlSDInstance = self._createTestInstance(name='instance1', x=INSTANCE_DEFAULT_X)
+        lifeLine:      UmlSDLifeLine = umlSDInstance.umlSDLifeLine
+        lifeLineX:     int           = round(lifeLine.GetX())
 
-        umlSDMessage.setReflexiveMessagePoints(lifeLineX=lifeLineX, fromY=INITIAL_FROM_Y, toY=INITIAL_TO_Y)
-        self._diagramFrame.umlDiagram.AddShape(umlSDMessage)
-        umlSDMessage.Show(True)
+        umlSDMessage: UmlSDMessage = self._createReflexiveMessage(lifeLine=lifeLine)
 
         self.assertTrue(umlSDMessage.isReflexiveMessage)
         lineControlPoints: LineControlPoints = umlSDMessage.lineControlPoints
@@ -117,25 +97,11 @@ class TestSDReflexiveMessage(UnitTestBaseW):
         self.assertEqual(point3.y, INITIAL_TO_Y)
 
     def testReflexiveMessageHorizontalParticipantMovement(self):
-        umlSDInstance: UmlSDInstance = self._createTestInstance(name='instance1', x=100)
-        lifeLine: UmlSDLifeLine = umlSDInstance.umlSDLifeLine
 
-        modelMessage: SDMessage = SDMessage(
-            message='reflexiveCall',
-            src=lifeLine.umlInstanceName.sdInstance,
-            sourceY=INITIAL_FROM_Y,
-            dst=lifeLine.umlInstanceName.sdInstance,
-            destinationY=INITIAL_TO_Y
-        )
-        umlSDMessage: UmlSDMessage = UmlSDMessage(
-            sdMessage=modelMessage,
-            umlPubSubEngine=self._umlPubSubEngine,
-            messageType=SDMessageType.SYNCHRONOUS
-        )
-        umlSDMessage.umlFrame = self._diagramFrame
-        lifeLine.addMessage(umlSDMessage=umlSDMessage, destinationLifeLine=lifeLine)
-        umlSDMessage.fromY = INITIAL_FROM_Y
-        umlSDMessage.toY   = INITIAL_TO_Y
+        umlSDInstance: UmlSDInstance = self._createTestInstance(name='instance1', x=INSTANCE_DEFAULT_X)
+        lifeLine:      UmlSDLifeLine = umlSDInstance.umlSDLifeLine
+
+        umlSDMessage: UmlSDMessage = self._createReflexiveMessage(lifeLine=lifeLine, initializePoints=False)
 
         dc: ClientDC = ClientDC(self._diagramFrame)
         self._diagramFrame.PrepareDC(dc)
@@ -159,207 +125,117 @@ class TestSDReflexiveMessage(UnitTestBaseW):
         self.assertEqual(point3.x, MOVED_X)
 
     def testReflexiveMessageVerticalDragSnapping(self):
-        umlSDInstance: UmlSDInstance = self._createTestInstance(name='instance1', x=100)
-        lifeLine: UmlSDLifeLine = umlSDInstance.umlSDLifeLine
 
-        modelMessage: SDMessage = SDMessage(
-            message='reflexiveCall',
-            src=lifeLine.umlInstanceName.sdInstance,
-            sourceY=INITIAL_FROM_Y,
-            dst=lifeLine.umlInstanceName.sdInstance,
-            destinationY=INITIAL_TO_Y
-        )
-        umlSDMessage: UmlSDMessage = UmlSDMessage(
-            sdMessage=modelMessage,
-            umlPubSubEngine=self._umlPubSubEngine,
-            messageType=SDMessageType.SYNCHRONOUS
-        )
-        umlSDMessage.umlFrame = self._diagramFrame
-        lifeLine.addMessage(umlSDMessage=umlSDMessage, destinationLifeLine=lifeLine)
-        umlSDMessage.fromY = INITIAL_FROM_Y
-        umlSDMessage.toY   = INITIAL_TO_Y
+        umlSDInstance: UmlSDInstance = self._createTestInstance(name='instance1', x=INSTANCE_DEFAULT_X)
+        lifeLine:      UmlSDLifeLine = umlSDInstance.umlSDLifeLine
 
-        eventHandler: UmlSDMessageEventHandler = UmlSDMessageEventHandler(
-            umlSDMessage=umlSDMessage,
-            umlPubSubEngine=self._umlPubSubEngine,
-            previousEventHandler=umlSDMessage.GetEventHandler()
-        )
-        umlSDMessage.SetEventHandler(eventHandler)
+        umlSDMessage: UmlSDMessage = self._createReflexiveMessage(lifeLine=lifeLine, initializePoints=False)
+        eventHandler: UmlSDMessageEventHandler = self._attachEventHandler(umlSDMessage=umlSDMessage)
 
-        expectedTimeStepHeight: int = 40
         initialSpan: int = INITIAL_TO_Y - INITIAL_FROM_Y
 
-        eventHandler.OnBeginDragLeft(x=100, y=INITIAL_FROM_Y)
-        targetY: int = INITIAL_FROM_Y + (expectedTimeStepHeight * 2)
-        eventHandler.OnDragLeft(draw=False, x=100, y=targetY)
-        eventHandler.OnEndDragLeft(x=100, y=targetY)
+        eventHandler.OnBeginDragLeft(x=INSTANCE_DEFAULT_X, y=INITIAL_FROM_Y)
+        targetY: int = INITIAL_FROM_Y + (EXPECTED_TIME_STEP_HEIGHT * 2)
+        eventHandler.OnDragLeft(draw=False, x=INSTANCE_DEFAULT_X, y=targetY)
+        eventHandler.OnEndDragLeft(x=INSTANCE_DEFAULT_X, y=targetY)
 
         self.assertEqual(umlSDMessage.toY - umlSDMessage.fromY, initialSpan)
         self.assertTrue(umlSDMessage.fromY > INITIAL_FROM_Y)
 
     def testReturnControlPointDragResizesMessage(self):
-        umlSDInstance: UmlSDInstance = self._createTestInstance(name='instance1', x=100)
-        lifeLine: UmlSDLifeLine = umlSDInstance.umlSDLifeLine
 
-        modelMessage: SDMessage = SDMessage(
-            message='reflexiveCall',
-            src=lifeLine.umlInstanceName.sdInstance,
-            sourceY=INITIAL_FROM_Y,
-            dst=lifeLine.umlInstanceName.sdInstance,
-            destinationY=INITIAL_TO_Y
-        )
-        umlSDMessage: UmlSDMessage = UmlSDMessage(
-            sdMessage=modelMessage,
-            umlPubSubEngine=self._umlPubSubEngine,
-            messageType=SDMessageType.SYNCHRONOUS
-        )
-        umlSDMessage.umlFrame = self._diagramFrame
-        lifeLine.addMessage(umlSDMessage=umlSDMessage, destinationLifeLine=lifeLine)
-        umlSDMessage.fromY = INITIAL_FROM_Y
-        umlSDMessage.toY   = INITIAL_TO_Y
-        umlSDMessage.setReflexiveMessagePoints(lifeLineX=100, fromY=INITIAL_FROM_Y, toY=INITIAL_TO_Y)
-        self._diagramFrame.umlDiagram.AddShape(umlSDMessage)
-        umlSDMessage.Show(True)
+        umlSDInstance: UmlSDInstance = self._createTestInstance(name='instance1', x=INSTANCE_DEFAULT_X)
+        lifeLine:      UmlSDLifeLine = umlSDInstance.umlSDLifeLine
+        umlSDMessage:  UmlSDMessage  = self._createReflexiveMessage(lifeLine=lifeLine)
         umlSDMessage.Select(True)
 
-        eventHandler: UmlSDMessageEventHandler = UmlSDMessageEventHandler(
-            umlSDMessage=umlSDMessage,
-            umlPubSubEngine=self._umlPubSubEngine,
-            previousEventHandler=umlSDMessage.GetEventHandler()
-        )
-        umlSDMessage.SetEventHandler(eventHandler)
+        eventHandler: UmlSDMessageEventHandler = self._attachEventHandler(umlSDMessage=umlSDMessage)
 
-        controlPoints = umlSDMessage.GetControlPoints()
+        controlPoints: list[ControlPoint] = umlSDMessage.GetControlPoints()
         self.assertEqual(len(controlPoints), 4)
-        returnPoint = controlPoints[3]
+        returnPoint: ControlPoint = controlPoints[RETURN_CONTROL_POINT_INDEX]
         self.assertIsInstance(returnPoint, UmlLineControlPoint)
 
-        expectedTimeStepHeight: int = 40
-        newTargetY: int = INITIAL_FROM_Y + (expectedTimeStepHeight * 3)
-
-        eventHandler.OnSizingBeginDragLeft(pt=returnPoint, x=100, y=INITIAL_TO_Y)
-        eventHandler.OnSizingDragLeft(pt=returnPoint, draw=False, x=100, y=newTargetY)
-        eventHandler.OnSizingEndDragLeft(pt=returnPoint, x=100, y=newTargetY)
+        newTargetY: int = INITIAL_FROM_Y + (EXPECTED_TIME_STEP_HEIGHT * 3)
+        self._simulateSizingDrag(
+            eventHandler=eventHandler,
+            point=returnPoint,
+            startX=INSTANCE_DEFAULT_X,
+            startY=INITIAL_TO_Y,
+            targetX=INSTANCE_DEFAULT_X,
+            targetY=newTargetY
+        )
 
         self.assertEqual(umlSDMessage.fromY, INITIAL_FROM_Y)
         self.assertEqual(umlSDMessage.toY, newTargetY)
-        self.assertEqual(umlSDMessage.toY - umlSDMessage.fromY, expectedTimeStepHeight * 3)
+        self.assertEqual(umlSDMessage.toY - umlSDMessage.fromY, EXPECTED_TIME_STEP_HEIGHT * 3)
 
     def testReturnControlPointDragUpRepositionsMessage(self):
-        umlSDInstance: UmlSDInstance = self._createTestInstance(name='instance1', x=100)
-        lifeLine: UmlSDLifeLine = umlSDInstance.umlSDLifeLine
 
-        expectedTimeStepHeight: int = 40
-        startFromY: int = INITIAL_FROM_Y + (expectedTimeStepHeight * 2)
-        startToY:   int = startFromY + expectedTimeStepHeight
+        umlSDInstance: UmlSDInstance = self._createTestInstance(name='instance1', x=INSTANCE_DEFAULT_X)
+        lifeLine:      UmlSDLifeLine = umlSDInstance.umlSDLifeLine
 
-        modelMessage: SDMessage = SDMessage(
-            message='reflexiveCall',
-            src=lifeLine.umlInstanceName.sdInstance,
-            sourceY=startFromY,
-            dst=lifeLine.umlInstanceName.sdInstance,
-            destinationY=startToY
-        )
-        umlSDMessage: UmlSDMessage = UmlSDMessage(
-            sdMessage=modelMessage,
-            umlPubSubEngine=self._umlPubSubEngine,
-            messageType=SDMessageType.SYNCHRONOUS
-        )
-        umlSDMessage.umlFrame = self._diagramFrame
-        lifeLine.addMessage(umlSDMessage=umlSDMessage, destinationLifeLine=lifeLine)
-        umlSDMessage.fromY = startFromY
-        umlSDMessage.toY   = startToY
-        umlSDMessage.setReflexiveMessagePoints(lifeLineX=100, fromY=startFromY, toY=startToY)
-        self._diagramFrame.umlDiagram.AddShape(umlSDMessage)
-        umlSDMessage.Show(True)
+        startFromY: int = INITIAL_FROM_Y + (EXPECTED_TIME_STEP_HEIGHT * 2)
+        startToY:   int = startFromY + EXPECTED_TIME_STEP_HEIGHT
+
+        umlSDMessage: UmlSDMessage = self._createReflexiveMessage(lifeLine=lifeLine, fromY=startFromY, toY=startToY)
         umlSDMessage.Select(True)
 
-        eventHandler: UmlSDMessageEventHandler = UmlSDMessageEventHandler(
-            umlSDMessage=umlSDMessage,
-            umlPubSubEngine=self._umlPubSubEngine,
-            previousEventHandler=umlSDMessage.GetEventHandler()
+        eventHandler: UmlSDMessageEventHandler = self._attachEventHandler(umlSDMessage=umlSDMessage)
+
+        controlPoints: list[ControlPoint] = umlSDMessage.GetControlPoints()
+        returnPoint: ControlPoint = controlPoints[RETURN_CONTROL_POINT_INDEX]
+
+        dragUpTargetY: int = INITIAL_FROM_Y + EXPECTED_TIME_STEP_HEIGHT
+        self._simulateSizingDrag(
+            eventHandler=eventHandler,
+            point=returnPoint,
+            startX=INSTANCE_DEFAULT_X,
+            startY=startToY,
+            targetX=INSTANCE_DEFAULT_X,
+            targetY=dragUpTargetY
         )
-        umlSDMessage.SetEventHandler(eventHandler)
-
-        controlPoints = umlSDMessage.GetControlPoints()
-        returnPoint = controlPoints[3]
-
-        dragUpTargetY: int = INITIAL_FROM_Y + expectedTimeStepHeight
-
-        eventHandler.OnSizingBeginDragLeft(pt=returnPoint, x=100, y=startToY)
-        eventHandler.OnSizingDragLeft(pt=returnPoint, draw=False, x=100, y=dragUpTargetY)
-        eventHandler.OnSizingEndDragLeft(pt=returnPoint, x=100, y=dragUpTargetY)
 
         self.assertEqual(umlSDMessage.toY, dragUpTargetY)
         self.assertEqual(umlSDMessage.fromY, INITIAL_FROM_Y)
-        self.assertEqual(umlSDMessage.toY - umlSDMessage.fromY, expectedTimeStepHeight)
+        self.assertEqual(umlSDMessage.toY - umlSDMessage.fromY, EXPECTED_TIME_STEP_HEIGHT)
 
     def testCornerControlPointHorizontalResize(self):
-        umlSDInstance: UmlSDInstance = self._createTestInstance(name='instance1', x=100)
-        lifeLine: UmlSDLifeLine = umlSDInstance.umlSDLifeLine
 
-        modelMessage: SDMessage = SDMessage(
-            message='reflexiveCall',
-            src=lifeLine.umlInstanceName.sdInstance,
-            sourceY=INITIAL_FROM_Y,
-            dst=lifeLine.umlInstanceName.sdInstance,
-            destinationY=INITIAL_TO_Y
-        )
-        umlSDMessage: UmlSDMessage = UmlSDMessage(
-            sdMessage=modelMessage,
-            umlPubSubEngine=self._umlPubSubEngine,
-            messageType=SDMessageType.SYNCHRONOUS
-        )
-        umlSDMessage.umlFrame = self._diagramFrame
-        lifeLine.addMessage(umlSDMessage=umlSDMessage, destinationLifeLine=lifeLine)
-        umlSDMessage.fromY = INITIAL_FROM_Y
-        umlSDMessage.toY   = INITIAL_TO_Y
-        umlSDMessage.setReflexiveMessagePoints(lifeLineX=100, fromY=INITIAL_FROM_Y, toY=INITIAL_TO_Y)
-        self._diagramFrame.umlDiagram.AddShape(umlSDMessage)
-        umlSDMessage.Show(True)
+        umlSDInstance: UmlSDInstance = self._createTestInstance(name='instance1', x=INSTANCE_DEFAULT_X)
+        lifeLine:      UmlSDLifeLine = umlSDInstance.umlSDLifeLine
+
+        umlSDMessage: UmlSDMessage = self._createReflexiveMessage(lifeLine=lifeLine)
         umlSDMessage.Select(True)
 
-        eventHandler: UmlSDMessageEventHandler = UmlSDMessageEventHandler(
-            umlSDMessage=umlSDMessage,
-            umlPubSubEngine=self._umlPubSubEngine,
-            previousEventHandler=umlSDMessage.GetEventHandler()
+        eventHandler: UmlSDMessageEventHandler = self._attachEventHandler(umlSDMessage=umlSDMessage)
+
+        controlPoints: list[ControlPoint] = umlSDMessage.GetControlPoints()
+        cornerPoint:   ControlPoint       = controlPoints[CORNER_CONTROL_POINT_INDEX]
+
+        self._simulateSizingDrag(
+            eventHandler=eventHandler,
+            point=cornerPoint,
+            startX=150,
+            startY=INITIAL_TO_Y,
+            targetX=220,
+            targetY=INITIAL_TO_Y
         )
-        umlSDMessage.SetEventHandler(eventHandler)
 
-        controlPoints = umlSDMessage.GetControlPoints()
-        cornerPoint = controlPoints[2]
-
-        eventHandler.OnSizingBeginDragLeft(pt=cornerPoint, x=150, y=INITIAL_TO_Y)
-        eventHandler.OnSizingDragLeft(pt=cornerPoint, draw=False, x=220, y=INITIAL_TO_Y)
-        eventHandler.OnSizingEndDragLeft(pt=cornerPoint, x=220, y=INITIAL_TO_Y)
-
-        self.assertEqual(umlSDMessage.loopWidth, 120)
+        self.assertEqual(umlSDMessage.loopWidth, RESIZED_LOOP_WIDTH)
 
         lineControlPoints: LineControlPoints = umlSDMessage.lineControlPoints
         assert lineControlPoints is not None
+
         self.assertEqual(lineControlPoints[1].x, 220)
         self.assertEqual(lineControlPoints[2].x, 220)
 
     def testReflexiveMessageDeleteAndUndo(self):
-        umlSDInstance: UmlSDInstance = self._createTestInstance(name='instance1', x=100)
-        lifeLine: UmlSDLifeLine = umlSDInstance.umlSDLifeLine
 
-        modelMessage: SDMessage = SDMessage(
-            message='reflexiveCall',
-            src=lifeLine.umlInstanceName.sdInstance,
-            sourceY=INITIAL_FROM_Y,
-            dst=lifeLine.umlInstanceName.sdInstance,
-            destinationY=INITIAL_TO_Y
-        )
-        umlSDMessage: UmlSDMessage = UmlSDMessage(
-            sdMessage=modelMessage,
-            umlPubSubEngine=self._umlPubSubEngine,
-            messageType=SDMessageType.SYNCHRONOUS
-        )
-        umlSDMessage.umlFrame = self._diagramFrame
-        lifeLine.addMessage(umlSDMessage=umlSDMessage, destinationLifeLine=lifeLine)
-        umlSDMessage.fromY = INITIAL_FROM_Y
-        umlSDMessage.toY   = INITIAL_TO_Y
+        umlSDInstance: UmlSDInstance = self._createTestInstance(name='instance1', x=INSTANCE_DEFAULT_X)
+        lifeLine:      UmlSDLifeLine = umlSDInstance.umlSDLifeLine
+
+        umlSDMessage: UmlSDMessage = self._createReflexiveMessage(lifeLine=lifeLine, initializePoints=False)
         self._diagramFrame.umlDiagram.AddShape(umlSDMessage)
         umlSDMessage.Show(True)
 
@@ -375,6 +251,76 @@ class TestSDReflexiveMessage(UnitTestBaseW):
         self.assertTrue(deleteCommand.Undo())
         self.assertIn(umlSDMessage, self._diagramFrame.umlDiagram.GetShapeList())
         self.assertIn(umlSDMessage, lifeLine.GetLines())
+
+    def _createTestInstance(self, name: str, x: int = INSTANCE_DEFAULT_X, y: int = INSTANCE_DEFAULT_Y) -> UmlSDInstance:
+        sdInstanceModel: SDInstance = SDInstance()
+        sdInstanceModel.instanceName = name
+
+        umlSDInstance: UmlSDInstance = UmlSDInstance(
+            sdInstance=sdInstanceModel,
+            diagramFrame=self._diagramFrame,
+            umlPubSubEngine=self._umlPubSubEngine
+        )
+        umlSDInstance.SetX(x)
+        umlSDInstance.SetY(y)
+        umlSDInstance.umlSDLifeLine.SetX(x)
+        self._diagramFrame.umlDiagram.AddShape(umlSDInstance)
+        umlSDInstance.Show(True)
+        return umlSDInstance
+
+    def _createReflexiveMessage(
+        self,
+        lifeLine: UmlSDLifeLine,
+        fromY: int = INITIAL_FROM_Y,
+        toY: int = INITIAL_TO_Y,
+        initializePoints: bool = True
+    ) -> UmlSDMessage:
+        modelMessage: SDMessage = SDMessage(
+            message='reflexiveCall',
+            src=lifeLine.umlInstanceName.sdInstance,
+            sourceY=fromY,
+            dst=lifeLine.umlInstanceName.sdInstance,
+            destinationY=toY
+        )
+        umlSDMessage: UmlSDMessage = UmlSDMessage(
+            sdMessage=modelMessage,
+            umlPubSubEngine=self._umlPubSubEngine,
+            messageType=SDMessageType.SYNCHRONOUS
+        )
+        umlSDMessage.umlFrame = self._diagramFrame
+        lifeLine.addMessage(umlSDMessage=umlSDMessage, destinationLifeLine=lifeLine)
+        umlSDMessage.fromY = fromY
+        umlSDMessage.toY   = toY
+
+        if initializePoints:
+            lifeLineX: int = round(lifeLine.GetX())
+            umlSDMessage.setReflexiveMessagePoints(lifeLineX=lifeLineX, fromY=fromY, toY=toY)
+            self._diagramFrame.umlDiagram.AddShape(umlSDMessage)
+            umlSDMessage.Show(True)
+
+        return umlSDMessage
+
+    def _attachEventHandler(self, umlSDMessage: UmlSDMessage) -> UmlSDMessageEventHandler:
+        eventHandler: UmlSDMessageEventHandler = UmlSDMessageEventHandler(
+            umlSDMessage=umlSDMessage,
+            umlPubSubEngine=self._umlPubSubEngine,
+            previousEventHandler=umlSDMessage.GetEventHandler()
+        )
+        umlSDMessage.SetEventHandler(eventHandler)
+        return eventHandler
+
+    def _simulateSizingDrag(
+        self,
+        eventHandler: UmlSDMessageEventHandler,
+        point: ControlPoint,
+        startX: int,
+        startY: int,
+        targetX: int,
+        targetY: int
+    ):
+        eventHandler.OnSizingBeginDragLeft(pt=point, x=startX, y=startY)
+        eventHandler.OnSizingDragLeft(pt=point, draw=False, x=targetX, y=targetY)
+        eventHandler.OnSizingEndDragLeft(pt=point, x=targetX, y=targetY)
 
 
 def suite() -> TestSuite:
