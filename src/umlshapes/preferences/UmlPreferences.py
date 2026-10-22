@@ -20,7 +20,9 @@ from umlshapes.preferences.Defaults import DEFAULT_GRID_LINE_COLOR
 from umlshapes.preferences.Defaults import DEFAULT_GRID_LINE_STYLE
 from umlshapes.preferences.Defaults import DEFAULT_MESSAGE_LABEL_PLACEMENT
 from umlshapes.preferences.Defaults import DEFAULT_SD_INSTANCE_DIMENSIONS
+from umlshapes.preferences.Defaults import DEFAULT_REFLEXIVE_MESSAGE_WIDTH
 from umlshapes.preferences.Defaults import DEFAULT_TEXT_BACKGROUND_COLOR
+from umlshapes.preferences.Defaults import DEFAULT_TIME_STEP_HEIGHT
 from umlshapes.preferences.Defaults import DEFAULT_UNIFORM_LIFELINE_LENGTH
 from umlshapes.preferences.Defaults import DEFAULT_USE_CASE_SIZE
 from umlshapes.preferences.Defaults import FRAME_HEIGHT
@@ -132,6 +134,8 @@ SEQUENCE_DIAGRAM_PREFERENCES: ValueDescriptions = ValueDescriptions(
         KeyName('messageLabelPlacement'):            ValueDescription(defaultValue=DEFAULT_MESSAGE_LABEL_PLACEMENT, enumUseValue=True, deserializer=SDMessageLabelPlacement),
         KeyName('autoGrowLifeLines'):                ValueDescription(defaultValue=str(DEFAULT_AUTO_GROW_LIFELINES),     deserializer=SecureConversions.secureBoolean),
         KeyName('uniformLifeLineLength'):            ValueDescription(defaultValue=str(DEFAULT_UNIFORM_LIFELINE_LENGTH), deserializer=SecureConversions.secureBoolean),
+        KeyName('timeStepHeight'):                   ValueDescription(defaultValue=str(DEFAULT_TIME_STEP_HEIGHT),        deserializer=SecureConversions.secureInteger),
+        KeyName('reflexiveMessageWidth'):            ValueDescription(defaultValue=str(DEFAULT_REFLEXIVE_MESSAGE_WIDTH), deserializer=SecureConversions.secureInteger),
     }
 )
 ASSOCIATION_PREFERENCES: ValueDescriptions = ValueDescriptions(

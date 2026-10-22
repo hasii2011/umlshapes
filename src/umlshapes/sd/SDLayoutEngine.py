@@ -14,7 +14,7 @@ class SDLayoutEngine:
     Provides deterministic layout for interactive diagrams and auto-generation.
 
     Initialization:
-        Always instantiates with default layout parameters (SDLayoutParameters).
+        Always instantiates with layout parameters initialized from preferences.
         If a caller requires a customized parameter set, they should:
           1. Retrieve a copy of the current parameters via the `parameters` getter,
              modify the desired fields, and reassign it via the setter; OR
@@ -24,8 +24,11 @@ class SDLayoutEngine:
     def __init__(self):
         self.logger: Logger = getLogger(__name__)
 
-        self._parameters:  SDLayoutParameters = SDLayoutParameters()
         self._preferences: UmlPreferences     = UmlPreferences()
+        self._parameters:  SDLayoutParameters = SDLayoutParameters(
+            timeStepHeight=self._preferences.timeStepHeight,
+            reflexiveMessageWidth=self._preferences.reflexiveMessageWidth
+        )
 
     @property
     def parameters(self) -> SDLayoutParameters:
@@ -53,33 +56,33 @@ class SDLayoutEngine:
         """
         return self._parameters.startX + (columnIndex * self._parameters.columnSpacing)
 
-    def computeSlotY(self, headerBottomY: int, slotIndex: int) -> int:
+    def computeTimeStepY(self, headerBottomY: int, timeStepIndex: int) -> int:
         """
-        Compute the vertical Y coordinate for a given message slot index.
+        Compute the vertical Y coordinate for a given message timeStep index.
         """
-        return headerBottomY + self._parameters.topPadding + (slotIndex * self._parameters.slotHeight)
+        return headerBottomY + self._parameters.topPadding + (timeStepIndex * self._parameters.timeStepHeight)
 
-    def computeNearestSlotIndex(self, headerBottomY: int, targetY: int) -> int:
+    def computeNearestTimeStepIndex(self, headerBottomY: int, targetY: int) -> int:
         """
-        Compute the nearest slot index for a given raw Y coordinate.
+        Compute the nearest timeStep index for a given raw Y coordinate.
         """
         relativeY: int = targetY - (headerBottomY + self._parameters.topPadding)
         if relativeY < 0:
             return 0
-        slotIndex: int = round(relativeY / self._parameters.slotHeight)
-        return slotIndex
+        timeStepIndex: int = round(relativeY / self._parameters.timeStepHeight)
+        return timeStepIndex
 
-    def computeNearestSlotY(self, headerBottomY: int, targetY: int) -> int:
+    def computeNearestTimeStepY(self, headerBottomY: int, targetY: int) -> int:
         """
-        Snap an arbitrary Y coordinate to the nearest valid slot Y.
+        Snap an arbitrary Y coordinate to the nearest valid timeStep Y.
         """
-        slotIndex: int = self.computeNearestSlotIndex(headerBottomY=headerBottomY, targetY=targetY)
-        return self.computeSlotY(headerBottomY=headerBottomY, slotIndex=slotIndex)
+        timeStepIndex: int = self.computeNearestTimeStepIndex(headerBottomY=headerBottomY, targetY=targetY)
+        return self.computeTimeStepY(headerBottomY=headerBottomY, timeStepIndex=timeStepIndex)
 
-    def computeLifelineHeight(self, totalSlots: int) -> int:
+    def computeLifelineHeight(self, totalTimeSteps: int) -> int:
         """
-        Compute the required lifeline height to accommodate totalSlots message levels.
+        Compute the required lifeline height to accommodate totalTimeSteps message levels.
         """
         initialHeight: int = self._preferences.initialLifeLineLength
-        neededHeight: int = self._parameters.topPadding + ((totalSlots + 1) * self._parameters.slotHeight) + self._parameters.bottomPadding
+        neededHeight: int = self._parameters.topPadding + ((totalTimeSteps + 1) * self._parameters.timeStepHeight) + self._parameters.bottomPadding
         return max(initialHeight, neededHeight)

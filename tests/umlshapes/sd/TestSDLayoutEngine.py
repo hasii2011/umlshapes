@@ -18,35 +18,35 @@ EXPECTED_COL_2_X: int = 540
 
 HEADER_BOTTOM_Y: int = 90
 
-SLOT_0_INDEX: int = 0
-SLOT_1_INDEX: int = 1
-SLOT_2_INDEX: int = 2
+TIME_STEP_0_INDEX: int = 0
+TIME_STEP_1_INDEX: int = 1
+TIME_STEP_2_INDEX: int = 2
 
-EXPECTED_SLOT_0_Y: int = 110
-EXPECTED_SLOT_1_Y: int = 150
-EXPECTED_SLOT_2_Y: int = 190
+EXPECTED_TIME_STEP_0_Y: int = 110
+EXPECTED_TIME_STEP_1_Y: int = 150
+EXPECTED_TIME_STEP_2_Y: int = 190
 
-TARGET_Y_ABOVE_SLOTS: int = 80
-TARGET_Y_NEAR_SLOT_0: int = 115
-TARGET_Y_NEAR_SLOT_1: int = 145
-TARGET_Y_NEAR_SLOT_2: int = 195
+TARGET_Y_ABOVE_TIME_STEPS: int = 80
+TARGET_Y_NEAR_TIME_STEP_0: int = 115
+TARGET_Y_NEAR_TIME_STEP_1: int = 145
+TARGET_Y_NEAR_TIME_STEP_2: int = 195
 
-TOTAL_SLOTS_FEW:  int = 2
-TOTAL_SLOTS_MANY: int = 10
+TOTAL_TIME_STEPS_FEW:  int = 2
+TOTAL_TIME_STEPS_MANY: int = 10
 
-EXPECTED_FEW_SLOTS_HEIGHT:  int = 360
-EXPECTED_MANY_SLOTS_HEIGHT: int = 500
+EXPECTED_FEW_TIME_STEPS_HEIGHT:  int = 360
+EXPECTED_MANY_TIME_STEPS_HEIGHT: int = 500
 
-CUSTOM_COLUMN_SPACING: int = 300
-CUSTOM_SLOT_HEIGHT:    int = 50
-CUSTOM_TOP_PADDING:    int = 30
-CUSTOM_BOTTOM_PADDING: int = 50
-CUSTOM_START_X:        int = 150
-CUSTOM_START_Y:        int = 80
+CUSTOM_COLUMN_SPACING:  int = 300
+CUSTOM_TIME_STEP_HEIGHT: int = 50
+CUSTOM_TOP_PADDING:     int = 30
+CUSTOM_BOTTOM_PADDING:  int = 50
+CUSTOM_START_X:         int = 150
+CUSTOM_START_Y:         int = 80
 
-EXPECTED_CUSTOM_COL_0_X:  int = 150
-EXPECTED_CUSTOM_COL_1_X:  int = 450
-EXPECTED_CUSTOM_SLOT_1_Y: int = 170
+EXPECTED_CUSTOM_COL_0_X:       int = 150
+EXPECTED_CUSTOM_COL_1_X:       int = 450
+EXPECTED_CUSTOM_TIME_STEP_1_Y: int = 170
 
 EXTERNAL_MUTATION_VALUE: int = 999
 NEW_COLUMN_SPACING:      int = 400
@@ -55,7 +55,7 @@ EXPECTED_NEW_COL_1_X:    int = 500
 
 class TestSDLayoutEngine(UnitTestBase):
     """
-    Unit tests for SDLayoutEngine column and slot calculations.
+    Unit tests for SDLayoutEngine column and timeStep calculations.
     """
 
     def setUp(self):
@@ -72,49 +72,49 @@ class TestSDLayoutEngine(UnitTestBase):
         self.assertEqual(EXPECTED_COL_1_X, col1)
         self.assertEqual(EXPECTED_COL_2_X, col2)
 
-    def testComputeSlotY(self):
+    def testComputeTimeStepY(self):
         layoutEngine: SDLayoutEngine = self._layoutEngine
 
-        slot0: int = layoutEngine.computeSlotY(headerBottomY=HEADER_BOTTOM_Y, slotIndex=SLOT_0_INDEX)
-        slot1: int = layoutEngine.computeSlotY(headerBottomY=HEADER_BOTTOM_Y, slotIndex=SLOT_1_INDEX)
-        slot2: int = layoutEngine.computeSlotY(headerBottomY=HEADER_BOTTOM_Y, slotIndex=SLOT_2_INDEX)
+        timeStep0: int = layoutEngine.computeTimeStepY(headerBottomY=HEADER_BOTTOM_Y, timeStepIndex=TIME_STEP_0_INDEX)
+        timeStep1: int = layoutEngine.computeTimeStepY(headerBottomY=HEADER_BOTTOM_Y, timeStepIndex=TIME_STEP_1_INDEX)
+        timeStep2: int = layoutEngine.computeTimeStepY(headerBottomY=HEADER_BOTTOM_Y, timeStepIndex=TIME_STEP_2_INDEX)
 
-        self.assertEqual(EXPECTED_SLOT_0_Y, slot0)
-        self.assertEqual(EXPECTED_SLOT_1_Y, slot1)
-        self.assertEqual(EXPECTED_SLOT_2_Y, slot2)
+        self.assertEqual(EXPECTED_TIME_STEP_0_Y, timeStep0)
+        self.assertEqual(EXPECTED_TIME_STEP_1_Y, timeStep1)
+        self.assertEqual(EXPECTED_TIME_STEP_2_Y, timeStep2)
 
-    def testComputeNearestSlotIndex(self):
+    def testComputeNearestTimeStepIndex(self):
         layoutEngine: SDLayoutEngine = self._layoutEngine
 
-        idxAbove: int = layoutEngine.computeNearestSlotIndex(headerBottomY=HEADER_BOTTOM_Y, targetY=TARGET_Y_ABOVE_SLOTS)
-        idx0:     int = layoutEngine.computeNearestSlotIndex(headerBottomY=HEADER_BOTTOM_Y, targetY=TARGET_Y_NEAR_SLOT_0)
-        idx1:     int = layoutEngine.computeNearestSlotIndex(headerBottomY=HEADER_BOTTOM_Y, targetY=TARGET_Y_NEAR_SLOT_1)
-        idx2:     int = layoutEngine.computeNearestSlotIndex(headerBottomY=HEADER_BOTTOM_Y, targetY=TARGET_Y_NEAR_SLOT_2)
+        idxAbove: int = layoutEngine.computeNearestTimeStepIndex(headerBottomY=HEADER_BOTTOM_Y, targetY=TARGET_Y_ABOVE_TIME_STEPS)
+        idx0:     int = layoutEngine.computeNearestTimeStepIndex(headerBottomY=HEADER_BOTTOM_Y, targetY=TARGET_Y_NEAR_TIME_STEP_0)
+        idx1:     int = layoutEngine.computeNearestTimeStepIndex(headerBottomY=HEADER_BOTTOM_Y, targetY=TARGET_Y_NEAR_TIME_STEP_1)
+        idx2:     int = layoutEngine.computeNearestTimeStepIndex(headerBottomY=HEADER_BOTTOM_Y, targetY=TARGET_Y_NEAR_TIME_STEP_2)
 
-        self.assertEqual(SLOT_0_INDEX, idxAbove)
-        self.assertEqual(SLOT_0_INDEX, idx0)
-        self.assertEqual(SLOT_1_INDEX, idx1)
-        self.assertEqual(SLOT_2_INDEX, idx2)
+        self.assertEqual(TIME_STEP_0_INDEX, idxAbove)
+        self.assertEqual(TIME_STEP_0_INDEX, idx0)
+        self.assertEqual(TIME_STEP_1_INDEX, idx1)
+        self.assertEqual(TIME_STEP_2_INDEX, idx2)
 
-    def testComputeNearestSlotY(self):
+    def testComputeNearestTimeStepY(self):
         layoutEngine: SDLayoutEngine = self._layoutEngine
 
-        snappedY: int = layoutEngine.computeNearestSlotY(headerBottomY=HEADER_BOTTOM_Y, targetY=TARGET_Y_NEAR_SLOT_1)
-        self.assertEqual(EXPECTED_SLOT_1_Y, snappedY)
+        snappedY: int = layoutEngine.computeNearestTimeStepY(headerBottomY=HEADER_BOTTOM_Y, targetY=TARGET_Y_NEAR_TIME_STEP_1)
+        self.assertEqual(EXPECTED_TIME_STEP_1_Y, snappedY)
 
     def testComputeLifelineHeight(self):
         layoutEngine: SDLayoutEngine = self._layoutEngine
 
-        heightFewSlots: int = layoutEngine.computeLifelineHeight(totalSlots=TOTAL_SLOTS_FEW)
-        self.assertEqual(EXPECTED_FEW_SLOTS_HEIGHT, heightFewSlots)
+        heightFewTimeSteps: int = layoutEngine.computeLifelineHeight(totalTimeSteps=TOTAL_TIME_STEPS_FEW)
+        self.assertEqual(EXPECTED_FEW_TIME_STEPS_HEIGHT, heightFewTimeSteps)
 
-        heightManySlots: int = layoutEngine.computeLifelineHeight(totalSlots=TOTAL_SLOTS_MANY)
-        self.assertEqual(EXPECTED_MANY_SLOTS_HEIGHT, heightManySlots)
+        heightManyTimeSteps: int = layoutEngine.computeLifelineHeight(totalTimeSteps=TOTAL_TIME_STEPS_MANY)
+        self.assertEqual(EXPECTED_MANY_TIME_STEPS_HEIGHT, heightManyTimeSteps)
 
     def testCustomParameters(self):
         customParams: SDLayoutParameters = SDLayoutParameters(
             columnSpacing=CUSTOM_COLUMN_SPACING,
-            slotHeight=CUSTOM_SLOT_HEIGHT,
+            timeStepHeight=CUSTOM_TIME_STEP_HEIGHT,
             topPadding=CUSTOM_TOP_PADDING,
             bottomPadding=CUSTOM_BOTTOM_PADDING,
             startX=CUSTOM_START_X,
@@ -125,7 +125,7 @@ class TestSDLayoutEngine(UnitTestBase):
 
         self.assertEqual(EXPECTED_CUSTOM_COL_0_X, customEngine.computeColumnX(columnIndex=COLUMN_0_INDEX))
         self.assertEqual(EXPECTED_CUSTOM_COL_1_X, customEngine.computeColumnX(columnIndex=COLUMN_1_INDEX))
-        self.assertEqual(EXPECTED_CUSTOM_SLOT_1_Y, customEngine.computeSlotY(headerBottomY=HEADER_BOTTOM_Y, slotIndex=SLOT_1_INDEX))
+        self.assertEqual(EXPECTED_CUSTOM_TIME_STEP_1_Y, customEngine.computeTimeStepY(headerBottomY=HEADER_BOTTOM_Y, timeStepIndex=TIME_STEP_1_INDEX))
 
     def testParametersImmutabilityViaCopy(self):
         layoutEngine: SDLayoutEngine = self._layoutEngine

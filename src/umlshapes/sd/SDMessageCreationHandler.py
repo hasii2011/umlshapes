@@ -147,18 +147,30 @@ class SDMessageCreationHandler:
         destLifeLine:  UmlSDLifeLine = endDetails.lifeLine
 
         headerBottomY: int = startLifeLine.rectangle.top
-        clickedY:      int = self._startDetails.clickPosition.y
+        clickedFromY:  int = self._startDetails.clickPosition.y
+        clickedToY:    int = endDetails.clickPosition.y
 
-        rawSlotIndex: int = self._layoutEngine.computeNearestSlotIndex(headerBottomY=headerBottomY, targetY=clickedY)
+        isReflexiveMessage: bool = (startLifeLine == destLifeLine)
+        rawFromTimeStepIndex: int = self._layoutEngine.computeNearestTimeStepIndex(headerBottomY=headerBottomY, targetY=clickedFromY)
 
-        slotIndex: int
-        snappedY:  int
+        fromTimeStepIndex: int = max(0, rawFromTimeStepIndex)
+        toTimeStepIndex:   int
+        if isReflexiveMessage:
+            rawToTimeStepIndex: int = self._layoutEngine.computeNearestTimeStepIndex(headerBottomY=headerBottomY, targetY=clickedToY)
+            if rawToTimeStepIndex <= fromTimeStepIndex:
+                toTimeStepIndex = fromTimeStepIndex + 1
+            else:
+                toTimeStepIndex = rawToTimeStepIndex
+        else:
+            toTimeStepIndex = fromTimeStepIndex
+
+        snappedFromY: int = self._layoutEngine.computeTimeStepY(headerBottomY=headerBottomY, timeStepIndex=fromTimeStepIndex)
+        snappedToY:   int = self._layoutEngine.computeTimeStepY(headerBottomY=headerBottomY, timeStepIndex=toTimeStepIndex)
+
+        maxRequiredY: int = max(snappedFromY, snappedToY)
         if self._preferences.autoGrowLifeLines:
 
-            slotIndex = max(0, rawSlotIndex)
-            snappedY  = self._layoutEngine.computeSlotY(headerBottomY=headerBottomY, slotIndex=slotIndex)
-
-            neededLifelineHeight: int = (snappedY - headerBottomY) + self._layoutEngine.parameters.bottomPadding
+            neededLifelineHeight: int = (maxRequiredY - headerBottomY) + self._layoutEngine.parameters.bottomPadding
             currentStartHeight:   int = startLifeLine.size.height
             currentDestHeight:    int = destLifeLine.size.height
 
@@ -170,17 +182,25 @@ class SDMessageCreationHandler:
                     if startSDInstance is not None:
                         startSDInstance.setLifeLineLength(neededLifelineHeight)
 
-                    destSDInstance: UmlSDInstance | None = destLifeLine.umlSDInstance
-                    if destSDInstance is not None:
-                        destSDInstance.setLifeLineLength(neededLifelineHeight)
+                    if not isReflexiveMessage:
+                        destSDInstance: UmlSDInstance | None = destLifeLine.umlSDInstance
+                        if destSDInstance is not None:
+                            destSDInstance.setLifeLineLength(neededLifelineHeight)
         else:
-            maxSlotIndex: int = max(
+            maxTimeStepIndex: int = max(
                 0,
                 (startLifeLine.size.height - self._layoutEngine.parameters.topPadding - self._layoutEngine.parameters.bottomPadding)
-                // self._layoutEngine.parameters.slotHeight
+                // self._layoutEngine.parameters.timeStepHeight
             )
-            slotIndex = max(0, min(rawSlotIndex, maxSlotIndex))
-            snappedY = self._layoutEngine.computeSlotY(headerBottomY=headerBottomY, slotIndex=slotIndex)
+            if isReflexiveMessage:
+                fromTimeStepIndex = max(0, min(fromTimeStepIndex, max(0, maxTimeStepIndex - 1)))
+                toTimeStepIndex   = max(fromTimeStepIndex + 1, min(toTimeStepIndex, maxTimeStepIndex))
+            else:
+                fromTimeStepIndex = max(0, min(fromTimeStepIndex, maxTimeStepIndex))
+                toTimeStepIndex   = fromTimeStepIndex
+
+            snappedFromY = self._layoutEngine.computeTimeStepY(headerBottomY=headerBottomY, timeStepIndex=fromTimeStepIndex)
+            snappedToY   = self._layoutEngine.computeTimeStepY(headerBottomY=headerBottomY, timeStepIndex=toTimeStepIndex)
 
         startX: float = startLifeLine.GetX()
         endX:   float = destLifeLine.GetX()
@@ -188,9 +208,9 @@ class SDMessageCreationHandler:
         modelMessage: SDMessage = SDMessage(
             message=f'demoMessage-{self._messageCount:04d}',
             src=startLifeLine.umlInstanceName.sdInstance,
-            sourceY=snappedY,
+            sourceY=snappedFromY,
             dst=destLifeLine.umlInstanceName.sdInstance,
-            destinationY=snappedY,
+            destinationY=snappedToY,
         )
         self._messageCount += 1
         umlSDMessage: UmlSDMessage = UmlSDMessage(
@@ -203,14 +223,22 @@ class SDMessageCreationHandler:
 
         startLifeLine.addMessage(umlSDMessage=umlSDMessage, destinationLifeLine=destLifeLine)
 
-        umlSDMessage.fromY = snappedY
-        umlSDMessage.toY   = snappedY
-        umlSDMessage.SetEnds(
-            x1=startX,
-            y1=snappedY,
-            x2=endX,
-            y2=snappedY
-        )
+        umlSDMessage.fromY = snappedFromY
+        umlSDMessage.toY   = snappedToY
+
+        if isReflexiveMessage:
+            umlSDMessage.setReflexiveMessagePoints(
+                lifeLineX=round(startX),
+                fromY=snappedFromY,
+                toY=snappedToY
+            )
+        else:
+            umlSDMessage.SetEnds(
+                x1=startX,
+                y1=snappedFromY,
+                x2=endX,
+                y2=snappedToY
+            )
 
         umlSDMessage.Show(True)
         self._sequenceDiagramFrame.umlDiagram.AddShape(umlSDMessage)

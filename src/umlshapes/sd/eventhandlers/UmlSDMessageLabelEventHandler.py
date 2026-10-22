@@ -105,12 +105,16 @@ class UmlSDMessageLabelEventHandler(UmlBaseEventHandler):
         from umlshapes.sd.UmlSDMessage import UmlSDMessage
 
         parentMessage: Optional[UmlSDMessage] = cast(Optional[UmlSDMessage], label.parent)
-        if parentMessage is not None and len(parentMessage._lineControlPoints) >= 2:
-            startX: int = round(parentMessage._lineControlPoints[0][0])
-            endX: int = round(parentMessage._lineControlPoints[-1][0])
-            lineY: int = round(parentMessage._lineControlPoints[0][1])
+        if parentMessage is not None and parentMessage._lineControlPoints is not None and len(parentMessage._lineControlPoints) >= 2:
+            startX: int = round(parentMessage._lineControlPoints[0].x)
+            lineY:  int = round(parentMessage._lineControlPoints[0].y)
 
-            lineLength: int = endX - startX
+            lineLength: int
+            if parentMessage.isReflexiveMessage:
+                lineLength = round(parentMessage._lineControlPoints[1].x) - startX
+            else:
+                lineLength = round(parentMessage._lineControlPoints[-1].x) - startX
+
             if lineLength != 0:
                 fraction: float = (newCenterX - startX) / lineLength
                 label.proportionalOffset = fraction
@@ -127,4 +131,3 @@ class UmlSDMessageLabelEventHandler(UmlBaseEventHandler):
         canvas: UmlFrame = label.umlFrame
         self._indicateFrameModified()
         canvas.refresh()
-

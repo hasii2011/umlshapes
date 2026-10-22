@@ -70,7 +70,7 @@ class UmlLineControlPointEventHandler(ShapeEvtHandler):
             defaultCursor: Cursor = Cursor(CURSOR_DEFAULT)
             umlLineControlPoint.GetCanvas().SetCursor(defaultCursor)
 
-            umlLink: UmlLink = umlLineControlPoint.attachedTo
+            umlLink: UmlLink = cast(UmlLink, umlLineControlPoint.attachedTo)
             self.logger.debug(f'{umlLineControlPoint=} x,y: ({x},{y})')
 
             if umlLineControlPointType == UmlLineControlPointType.FROM_ENDPOINT:

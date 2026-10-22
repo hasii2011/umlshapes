@@ -66,6 +66,8 @@ class UmlPreferences:
     messageLabelPlacement: SDMessageLabelPlacement
     autoGrowLifeLines: bool
     uniformLifeLineLength: bool
+    timeStepHeight: int
+    reflexiveMessageWidth: int
     associationTextFontSize: int
     diamondSize: int
     associationLabelSize: UmlDimensions

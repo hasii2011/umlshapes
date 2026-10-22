@@ -26,6 +26,7 @@ from umlshapes.types.UmlPosition import UmlPosition
 
 if TYPE_CHECKING:
     from umlshapes.links.UmlLink import UmlLink
+    from umlshapes.sd.UmlSDMessage import UmlSDMessage
 
 
 class UmlLineControlPointType(Enum):
@@ -50,7 +51,7 @@ class UmlLineControlPointType(Enum):
 
 class UmlLineControlPoint(LineControlPoint):
 
-    def __init__(self, umlFrame: UmlFrame, umlLink: 'UmlLink', controlPointType: UmlLineControlPointType, size: int, x: int = 0, y: int = 0):
+    def __init__(self, umlFrame: UmlFrame, umlLink: 'UmlLink | UmlSDMessage', controlPointType: UmlLineControlPointType, size: int, x: int = 0, y: int = 0):
         """
 
         Args:
@@ -65,7 +66,7 @@ class UmlLineControlPoint(LineControlPoint):
         self.logger: Logger = getLogger(__name__)
 
         self._lineControlPointType: UmlLineControlPointType = controlPointType
-        self._attachedTo:           TopLeftMixin            = cast(TopLeftMixin, None)
+        self._attachedTo:           TopLeftMixin            = cast(TopLeftMixin, None)  # noqa
 
         super().__init__(
             theCanvas=umlFrame,
@@ -100,7 +101,7 @@ class UmlLineControlPoint(LineControlPoint):
         return self._lineControlPointType
 
     @property
-    def attachedTo(self) -> 'UmlLink':
+    def attachedTo(self) -> 'UmlLink | UmlSDMessage':
         return self._shape
 
     @property
