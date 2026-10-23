@@ -136,6 +136,24 @@ class DiagramFrame(ShapeCanvas):
 
         client.Blit(0, 0, w, h, dc, x, y)
 
+    def CaptureMouse(self):
+        """
+        Safely capture the mouse if the frame is shown on screen and does not already have capture.
+        """
+        if self.IsShownOnScreen():
+            if not self.HasCapture():
+                super().CaptureMouse()
+
+    def ReleaseMouse(self):
+        """
+        Safely release the mouse if currently captured.
+        """
+        if self.HasCapture():
+            super().ReleaseMouse()
+
+    safeCaptureMouse = CaptureMouse
+    safeReleaseMouse = ReleaseMouse
+
     def RedrawWithBackground(self):
         """
         Redraw the screen using the background.
