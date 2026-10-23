@@ -27,7 +27,9 @@ class SDLayoutEngine:
         self._preferences: UmlPreferences     = UmlPreferences()
         self._parameters:  SDLayoutParameters = SDLayoutParameters(
             timeStepHeight=self._preferences.timeStepHeight,
-            reflexiveMessageWidth=self._preferences.reflexiveMessageWidth
+            reflexiveMessageWidth=self._preferences.reflexiveMessageWidth,
+            executionWidth=self._preferences.executionWidth,
+            executionShiftDelta=self._preferences.executionShiftDelta
         )
 
     @property
@@ -78,6 +80,31 @@ class SDLayoutEngine:
         """
         timeStepIndex: int = self.computeNearestTimeStepIndex(headerBottomY=headerBottomY, targetY=targetY)
         return self.computeTimeStepY(headerBottomY=headerBottomY, timeStepIndex=timeStepIndex)
+
+    def computeExecutionX(self, lifeLineX: int, nestingLevel: int = 0) -> int:
+        """
+        Compute horizontal center X coordinate for an activation bar on a lifeline.
+        Nesting level 0 is centered directly on the lifeline; nested levels are shifted right.
+        """
+        shiftDelta: int = self._parameters.executionShiftDelta
+        return lifeLineX + (nestingLevel * shiftDelta)
+
+    def computeExecutionBounds(
+        self,
+        lifeLineX: int,
+        startY: int,
+        endY: int,
+        nestingLevel: int = 0
+    ) -> tuple[int, int, int, int]:
+        """
+        Compute (centerX, centerY, width, height) for an activation bar.
+        Height is constrained to at least one timeStepHeight.
+        """
+        centerX: int = self.computeExecutionX(lifeLineX=lifeLineX, nestingLevel=nestingLevel)
+        centerY: int = (startY + endY) // 2
+        width: int = self._parameters.executionWidth
+        height: int = max(self._parameters.timeStepHeight, endY - startY)
+        return centerX, centerY, width, height
 
     def computeLifelineHeight(self, totalTimeSteps: int) -> int:
         """

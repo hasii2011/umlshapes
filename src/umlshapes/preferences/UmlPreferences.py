@@ -22,6 +22,9 @@ from umlshapes.preferences.Defaults import DEFAULT_MESSAGE_LABEL_PLACEMENT
 from umlshapes.preferences.Defaults import DEFAULT_SD_INSTANCE_DIMENSIONS
 from umlshapes.preferences.Defaults import DEFAULT_REFLEXIVE_MESSAGE_WIDTH
 from umlshapes.preferences.Defaults import DEFAULT_TEXT_BACKGROUND_COLOR
+from umlshapes.preferences.Defaults import DEFAULT_EXECUTION_SHIFT_DELTA
+from umlshapes.preferences.Defaults import DEFAULT_EXECUTION_WIDTH
+from umlshapes.preferences.Defaults import DEFAULT_AUTO_GENERATE_EXECUTIONS
 from umlshapes.preferences.Defaults import DEFAULT_TIME_STEP_HEIGHT
 from umlshapes.preferences.Defaults import DEFAULT_UNIFORM_LIFELINE_LENGTH
 from umlshapes.preferences.Defaults import DEFAULT_USE_CASE_SIZE
@@ -136,6 +139,9 @@ SEQUENCE_DIAGRAM_PREFERENCES: ValueDescriptions = ValueDescriptions(
         KeyName('uniformLifeLineLength'):            ValueDescription(defaultValue=str(DEFAULT_UNIFORM_LIFELINE_LENGTH), deserializer=SecureConversions.secureBoolean),
         KeyName('timeStepHeight'):                   ValueDescription(defaultValue=str(DEFAULT_TIME_STEP_HEIGHT),        deserializer=SecureConversions.secureInteger),
         KeyName('reflexiveMessageWidth'):            ValueDescription(defaultValue=str(DEFAULT_REFLEXIVE_MESSAGE_WIDTH), deserializer=SecureConversions.secureInteger),
+        KeyName('executionWidth'):                  ValueDescription(defaultValue=str(DEFAULT_EXECUTION_WIDTH),        deserializer=SecureConversions.secureInteger),
+        KeyName('autoGenerateExecutions'):          ValueDescription(defaultValue=str(DEFAULT_AUTO_GENERATE_EXECUTIONS), deserializer=SecureConversions.secureBoolean),
+        KeyName('executionShiftDelta'):             ValueDescription(defaultValue=str(DEFAULT_EXECUTION_SHIFT_DELTA),  deserializer=SecureConversions.secureInteger),
     }
 )
 ASSOCIATION_PREFERENCES: ValueDescriptions = ValueDescriptions(

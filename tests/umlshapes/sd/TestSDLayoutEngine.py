@@ -52,6 +52,23 @@ EXTERNAL_MUTATION_VALUE: int = 999
 NEW_COLUMN_SPACING:      int = 400
 EXPECTED_NEW_COL_1_X:    int = 500
 
+LIFELINE_X:                    int = 200
+START_Y:                       int = 120
+END_Y:                         int = 240
+NESTING_LEVEL_0:               int = 0
+NESTING_LEVEL_1:               int = 1
+NESTING_LEVEL_2:               int = 2
+
+EXPECTED_EXECUTION_X_LEVEL_0: int = 200
+EXPECTED_EXECUTION_X_LEVEL_1: int = 207
+EXPECTED_EXECUTION_X_LEVEL_2: int = 214
+
+EXPECTED_EXECUTION_WIDTH:     int = 14
+EXPECTED_EXECUTION_CENTER_Y:  int = 180
+EXPECTED_EXECUTION_HEIGHT:    int = 120
+EXPECTED_MIN_HEIGHT:           int = 40
+TINY_END_Y:                    int = 130
+
 
 class TestSDLayoutEngine(UnitTestBase):
     """
@@ -141,6 +158,41 @@ class TestSDLayoutEngine(UnitTestBase):
 
         self.assertEqual(NEW_COLUMN_SPACING, layoutEngine.parameters.columnSpacing)
         self.assertEqual(EXPECTED_NEW_COL_1_X, layoutEngine.computeColumnX(columnIndex=COLUMN_1_INDEX))
+
+    def testComputeExecutionX(self):
+        layoutEngine: SDLayoutEngine = self._layoutEngine
+
+        x0: int = layoutEngine.computeExecutionX(lifeLineX=LIFELINE_X, nestingLevel=NESTING_LEVEL_0)
+        x1: int = layoutEngine.computeExecutionX(lifeLineX=LIFELINE_X, nestingLevel=NESTING_LEVEL_1)
+        x2: int = layoutEngine.computeExecutionX(lifeLineX=LIFELINE_X, nestingLevel=NESTING_LEVEL_2)
+
+        self.assertEqual(EXPECTED_EXECUTION_X_LEVEL_0, x0)
+        self.assertEqual(EXPECTED_EXECUTION_X_LEVEL_1, x1)
+        self.assertEqual(EXPECTED_EXECUTION_X_LEVEL_2, x2)
+
+    def testComputeExecutionBounds(self):
+        layoutEngine: SDLayoutEngine = self._layoutEngine
+
+        centerX, centerY, width, height = layoutEngine.computeExecutionBounds(
+            lifeLineX=LIFELINE_X,
+            startY=START_Y,
+            endY=END_Y,
+            nestingLevel=NESTING_LEVEL_1
+        )
+
+        self.assertEqual(EXPECTED_EXECUTION_X_LEVEL_1, centerX)
+        self.assertEqual(EXPECTED_EXECUTION_CENTER_Y, centerY)
+        self.assertEqual(EXPECTED_EXECUTION_WIDTH, width)
+        self.assertEqual(EXPECTED_EXECUTION_HEIGHT, height)
+
+        # Ensure minimum height is at least one timeStepHeight
+        _, _, _, minHeight = layoutEngine.computeExecutionBounds(
+            lifeLineX=LIFELINE_X,
+            startY=START_Y,
+            endY=TINY_END_Y,
+            nestingLevel=NESTING_LEVEL_0
+        )
+        self.assertEqual(EXPECTED_MIN_HEIGHT, minHeight)
 
 
 def suite() -> TestSuite:

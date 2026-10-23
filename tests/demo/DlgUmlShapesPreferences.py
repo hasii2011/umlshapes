@@ -24,13 +24,16 @@ from wx.lib.sized_controls import SizedPanel
 from umlshapes.dialogs.preferences.DefaultValuesPanel import DefaultValuesPanel
 from umlshapes.dialogs.preferences.DiagramPreferencesPanel import DiagramPreferencesPanel
 
+DEFAULT_DIALOG_WIDTH:  int = 460
+DEFAULT_DIALOG_HEIGHT: int = 580
+
 
 class DlgUmlShapesPreferences(SizedDialog):
 
     def __init__(self, parent):
 
         style:   int  = DEFAULT_DIALOG_STYLE | RESIZE_BORDER
-        dlgSize: Size = Size(460, 500)
+        dlgSize: Size = Size(DEFAULT_DIALOG_WIDTH, DEFAULT_DIALOG_HEIGHT)
 
         super().__init__(parent, title='UML Shape Preferences', size=dlgSize, style=style)
 

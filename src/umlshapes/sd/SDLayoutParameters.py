@@ -7,6 +7,8 @@ DEFAULT_BOTTOM_PADDING:          int = 40
 DEFAULT_START_X:                 int = 100
 DEFAULT_START_Y:                 int = 50
 DEFAULT_REFLEXIVE_MESSAGE_WIDTH: int = 50
+DEFAULT_EXECUTION_WIDTH:        int = 14
+DEFAULT_EXECUTION_SHIFT_DELTA:  int = 7
 
 
 @dataclass
@@ -22,3 +24,5 @@ class SDLayoutParameters:
     startX:                int = DEFAULT_START_X
     startY:                int = DEFAULT_START_Y
     reflexiveMessageWidth: int = DEFAULT_REFLEXIVE_MESSAGE_WIDTH
+    executionWidth:       int = DEFAULT_EXECUTION_WIDTH
+    executionShiftDelta:  int = DEFAULT_EXECUTION_SHIFT_DELTA

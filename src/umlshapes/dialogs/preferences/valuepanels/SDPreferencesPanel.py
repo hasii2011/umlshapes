@@ -54,6 +54,9 @@ MAX_REFLEXIVE_MESSAGE_WIDTH:             int = 150
 MIN_TIME_STEP_HEIGHT:                    int = 20
 MAX_TIME_STEP_HEIGHT:                    int = 200
 
+MIN_EXECUTION_WIDTH:                    int = 8
+MAX_EXECUTION_WIDTH:                    int = 40
+
 MIN_INITIAL_LIFELINE_LENGTH:             int = 100
 MAX_INITIAL_LIFELINE_LENGTH:             int = 2000
 
@@ -64,6 +67,8 @@ LABEL_PLACEMENT_TOOLTIP:                 str = 'Determines how message labels ar
 MESSAGE_ARROW_HEAD_SIZE_TOOLTIP:         str = 'Size of arrowheads on sequence diagram message lines'
 REFLEXIVE_MESSAGE_WIDTH_TOOLTIP:         str = 'Width in pixels of sequence diagram reflexive message loops'
 TIME_STEP_HEIGHT_TOOLTIP:                str = 'Vertical spacing in pixels between sequence diagram message time steps'
+EXECUTION_WIDTH_TOOLTIP:                str = 'Width in pixels of sequence diagram execution specification activation bars'
+AUTO_GENERATE_EXECUTIONS_TOOLTIP:       str = 'Automatically generate execution specification activation bars for message call/return spans'
 INITIAL_LIFELINE_LENGTH_TOOLTIP:         str = 'Default starting length in pixels for new instance lifelines'
 AUTO_GROW_LIFELINES_TOOLTIP:             str = 'Automatically extend lifeline length when messages are placed or dragged beyond the current bottom'
 UNIFORM_LIFELINE_LENGTH_TOOLTIP:         str = 'Keep all lifelines at equal length when any lifeline is resized or auto-grown'
@@ -87,6 +92,8 @@ class SDPreferencesPanel(BasePreferencesPanel):
         self._initialLifeLineLength:      SpinCtrl                = cast(SpinCtrl, None)                # noqa
         self._autoGrowLifeLines:          CheckBox                = cast(CheckBox, None)                # noqa
         self._uniformLifeLineLength:      CheckBox                = cast(CheckBox, None)                # noqa
+        self._executionWidth:            SpinCtrl                = cast(SpinCtrl, None)                # noqa
+        self._autoGenerateExecutions:    CheckBox                = cast(CheckBox, None)                # noqa
 
         self._layoutControls(parentSizedPanel=self)
         self._setControlValues()
@@ -129,6 +136,13 @@ class SDPreferencesPanel(BasePreferencesPanel):
 
         self._layoutInitialLifeLineLengthControl(parentSizedPanel=lifelineRow)
         self._layoutLifelinePreferences(parentSizedPanel=lifelineRow)
+
+        executionRow: SizedPanel = SizedPanel(parentSizedPanel)
+        executionRow.SetSizerType('horizontal')
+        executionRow.SetSizerProps(expand=False)
+
+        self._layoutExecutionWidthControl(parentSizedPanel=executionRow)
+        self._layoutExecutionPreferences(parentSizedPanel=executionRow)
 
     def _layoutLabelPlacementControl(self, parentSizedPanel: SizedPanel):
 
@@ -197,6 +211,8 @@ class SDPreferencesPanel(BasePreferencesPanel):
         self._initialLifeLineLength.SetValue(self._preferences.initialLifeLineLength)
         self._autoGrowLifeLines.SetValue(self._preferences.autoGrowLifeLines)
         self._uniformLifeLineLength.SetValue(self._preferences.uniformLifeLineLength)
+        self._executionWidth.SetValue(self._preferences.executionWidth)
+        self._autoGenerateExecutions.SetValue(self._preferences.autoGenerateExecutions)
 
     def _layoutInstanceNameRelativeHeightControl(self, parentSizedPanel: SizedPanel):
 
@@ -332,3 +348,38 @@ class SDPreferencesPanel(BasePreferencesPanel):
 
         newValue: int = self._initialLifeLineLength.GetValue()
         self._preferences.initialLifeLineLength = newValue
+
+    def _layoutExecutionWidthControl(self, parentSizedPanel: SizedPanel):
+
+        executionPanel: TitledPanel = TitledPanel(parent=parentSizedPanel, titleLabel='Execution Width')
+        executionPanel.SetSizerProps(expand=False)
+
+        self._executionWidth = SpinCtrl(
+            parent=executionPanel,
+            min=MIN_EXECUTION_WIDTH,
+            max=MAX_EXECUTION_WIDTH,
+            initial=self._preferences.executionWidth
+        )
+        self._executionWidth.SetToolTip(EXECUTION_WIDTH_TOOLTIP)
+        self.Bind(EVT_SPINCTRL, self._onExecutionWidthChanged, self._executionWidth)
+        self.Bind(EVT_TEXT, self._onExecutionWidthChanged, self._executionWidth)
+
+    def _layoutExecutionPreferences(self, parentSizedPanel: SizedPanel):
+
+        executionPrefPanel: TitledPanel = TitledPanel(parent=parentSizedPanel, titleLabel='Execution Specifications')
+        executionPrefPanel.SetSizerProps(expand=False)
+
+        self._autoGenerateExecutions = CheckBox(parent=executionPrefPanel, label='Auto-generate Executions')
+        self._autoGenerateExecutions.SetToolTip(AUTO_GENERATE_EXECUTIONS_TOOLTIP)
+
+        self.Bind(EVT_CHECKBOX, self._onAutoGenerateExecutionsChanged, self._autoGenerateExecutions)
+
+    def _onExecutionWidthChanged(self, _event: CommandEvent):
+
+        newValue: int = self._executionWidth.GetValue()
+        self._preferences.executionWidth = newValue
+
+    def _onAutoGenerateExecutionsChanged(self, event: CommandEvent):
+
+        newValue: bool = event.IsChecked()
+        self._preferences.autoGenerateExecutions = newValue

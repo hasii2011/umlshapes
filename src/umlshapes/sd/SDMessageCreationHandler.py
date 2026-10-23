@@ -1,4 +1,5 @@
 
+from typing import Optional
 from typing import cast
 
 from logging import Logger
@@ -17,6 +18,7 @@ from umlshapes.sd.eventhandlers.UmlSDMessageEventHandler import UmlSDMessageEven
 
 from umlshapes.sd.SDLayoutEngine import SDLayoutEngine
 from umlshapes.sd.SDMessageType import SDMessageType
+from umlshapes.sd.UmlSDExecution import UmlSDExecution
 from umlshapes.sd.UmlSDInstance import UmlSDInstance
 from umlshapes.sd.UmlSDLifeLine import UmlSDLifeLine
 from umlshapes.sd.UmlSDMessage import UmlSDMessage
@@ -226,13 +228,44 @@ class SDMessageCreationHandler:
         umlSDMessage.fromY = snappedFromY
         umlSDMessage.toY   = snappedToY
 
+        if self._preferences.autoGenerateExecutions:
+            executionDuration: int
+            if isReflexiveMessage:
+                executionDuration = snappedToY - snappedFromY
+            else:
+                executionDuration = self._preferences.timeStepHeight
+
+            execution: UmlSDExecution = UmlSDExecution(
+                lifeLine=destLifeLine,
+                startY=snappedFromY,
+                endY=snappedFromY + executionDuration
+            )
+            destLifeLine.addExecution(execution=execution)
+            umlSDMessage.execution = execution
+
+        fromExecution: Optional[UmlSDExecution] = startLifeLine.getExecutionAtY(y=snappedFromY)
+        toExecution:   Optional[UmlSDExecution] = destLifeLine.getExecutionAtY(y=snappedToY)
+
         if isReflexiveMessage:
+            if fromExecution is not None:
+                startX = fromExecution.GetX() + (fromExecution.GetWidth() / 2.0)
             umlSDMessage.setReflexiveMessagePoints(
                 lifeLineX=round(startX),
                 fromY=snappedFromY,
                 toY=snappedToY
             )
         else:
+            if startLifeLine.GetX() < destLifeLine.GetX():
+                if fromExecution is not None:
+                    startX = fromExecution.GetX() + (fromExecution.GetWidth() / 2.0)
+                if toExecution is not None:
+                    endX = toExecution.GetX() - (toExecution.GetWidth() / 2.0)
+            else:
+                if fromExecution is not None:
+                    startX = fromExecution.GetX() - (fromExecution.GetWidth() / 2.0)
+                if toExecution is not None:
+                    endX = toExecution.GetX() + (toExecution.GetWidth() / 2.0)
+
             umlSDMessage.SetEnds(
                 x1=startX,
                 y1=snappedFromY,

@@ -1,4 +1,5 @@
 
+from typing import cast
 from typing import List
 from typing import NewType
 from typing import Optional
@@ -56,6 +57,7 @@ from umlshapes.types.UmlPosition import UmlPosition
 if TYPE_CHECKING:
     from umlshapes.frames.SequenceDiagramFrame import SequenceDiagramFrame
     from umlshapes.frames.UmlFrame import UmlFrame
+    from umlshapes.sd.UmlSDExecution import UmlSDExecution
     from umlshapes.sd.UmlSDLifeLine import UmlSDLifeLine
 
 
@@ -112,6 +114,7 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
 
         self._initialised: bool = False
         self._lineControlPoints: LineControlPoints = LineControlPoints(self._lineControlPoints)
+        self._execution: Optional['UmlSDExecution'] = None
 
     @property
     def isReflexiveMessage(self) -> bool:
@@ -264,6 +267,21 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
         self._xpos = lifeLineX + (loopWidth // 2)
         self._ypos = (fromY + toY) // 2
 
+    @property
+    def execution(self) -> Optional['UmlSDExecution']:
+        return self._execution
+
+    @execution.setter
+    def execution(self, execution: Optional['UmlSDExecution']):
+        self._execution = execution
+
+    def Draggable(self) -> bool:
+        """
+        Override base LineShape behavior (which hardcodes False) so sequence diagram
+        messages can be dragged vertically to adjust time steps.
+        """
+        return True
+
     def GetBackgroundBrush(self) -> Brush:
         """
         Override default behavior;  So we can see 'through' the message text
@@ -368,28 +386,54 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
         fromY: int = self._computeAbsoluteY(umlSDLifeLine=self.GetFrom(), relativeY=self._relativeFromY)
         toY:   int = self._computeAbsoluteY(umlSDLifeLine=self.GetTo(), relativeY=self._relativeToY)
 
+        from umlshapes.sd.UmlSDLifeLine import UmlSDLifeLine
+
+        fromLifeLine: UmlSDLifeLine = cast(UmlSDLifeLine, self.GetFrom())
+        toLifeLine:   UmlSDLifeLine = cast(UmlSDLifeLine, self.GetTo())
+
+        fromExecution: Optional['UmlSDExecution'] = fromLifeLine.getExecutionAtY(fromY)
+
         if self.isReflexiveMessage:
-            lifeLineX: int = round(self.GetFrom().GetX())
+            startX: int
+            if fromExecution is not None:
+                startX = round(fromExecution.GetX() + (fromExecution.GetWidth() / 2.0))
+            else:
+                startX = round(fromLifeLine.GetX())
+
             loopWidth: int = self.loopWidth
 
             if len(self.lineControlPoints) >= 4:
-                self.lineControlPoints[0] = Point(lifeLineX, fromY)
-                self.lineControlPoints[1] = Point(lifeLineX + loopWidth, fromY)
-                self.lineControlPoints[2] = Point(lifeLineX + loopWidth, toY)
-                self.lineControlPoints[3] = Point(lifeLineX, toY)
+                self.lineControlPoints[0] = Point(startX, fromY)
+                self.lineControlPoints[1] = Point(startX + loopWidth, fromY)
+                self.lineControlPoints[2] = Point(startX + loopWidth, toY)
+                self.lineControlPoints[3] = Point(startX, toY)
                 self._initialised = True
 
-            self._xpos = lifeLineX + (loopWidth // 2)
+            self._xpos = startX + (loopWidth // 2)
             self._ypos = (fromY + toY) // 2
             self.Move(dc, self._xpos, self._ypos)
         else:
-            endX, endY, otherEndX, otherEndY = self.FindLineEndPoints()
+            toExecution: Optional['UmlSDExecution'] = toLifeLine.getExecutionAtY(toY)
+
+            endX:      int = round(fromLifeLine.GetX())
+            otherEndX: int = round(toLifeLine.GetX())
+
+            if fromLifeLine.GetX() < toLifeLine.GetX():
+                if fromExecution is not None:
+                    endX = round(fromExecution.GetX() + (fromExecution.GetWidth() / 2.0))
+                if toExecution is not None:
+                    otherEndX = round(toExecution.GetX() - (toExecution.GetWidth() / 2.0))
+            else:
+                if fromExecution is not None:
+                    endX = round(fromExecution.GetX() - (fromExecution.GetWidth() / 2.0))
+                if toExecution is not None:
+                    otherEndX = round(toExecution.GetX() + (toExecution.GetWidth() / 2.0))
+
             self.SetEnds(endX, fromY, otherEndX, toY)
 
             if len(self.lineControlPoints) > 2:
                 self.Initialise()
 
-            endX, endY, otherEndX, otherEndY = self.FindLineEndPoints()
             self.SetEnds(endX, fromY, otherEndX, toY)
 
         if self._messageLabel is not None:

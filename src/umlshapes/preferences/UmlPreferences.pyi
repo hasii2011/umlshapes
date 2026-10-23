@@ -68,6 +68,9 @@ class UmlPreferences:
     uniformLifeLineLength: bool
     timeStepHeight: int
     reflexiveMessageWidth: int
+    executionWidth: int
+    autoGenerateExecutions: bool
+    executionShiftDelta: int
     associationTextFontSize: int
     diamondSize: int
     associationLabelSize: UmlDimensions

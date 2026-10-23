@@ -151,6 +151,7 @@ class UmlSDInstance(ControlPointMixin, IdentifierMixin, CompositeShape, TopLeftM
 
         self.Recompute()
         self.ResetControlPoints()
+        self._umlSDLifeLine.recomputeExecutionsGeometry()
 
     def CalculateSize(self):
         maxX: float = -999999.9
@@ -225,6 +226,7 @@ class UmlSDInstance(ControlPointMixin, IdentifierMixin, CompositeShape, TopLeftM
         controlPoint.yOffset = yOffset
         controlPoint.SetX(self.GetX())
         controlPoint.SetY(self.GetY() + yOffset)
+        self._umlSDLifeLine.recomputeExecutionsGeometry()
 
     def DeleteControlPoints(self, dc = None):
         super().DeleteControlPoints(dc)

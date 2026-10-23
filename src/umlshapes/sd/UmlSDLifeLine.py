@@ -19,6 +19,7 @@ from umlshapes.mixins.TopLeftMixin import TopLeftMixin
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
 from umlshapes.sd.SDInstanceConstrainer import SDInstanceConstrainer
+from umlshapes.sd.UmlSDExecution import UmlSDExecution
 from umlshapes.sd.UmlInstanceName import UmlInstanceName
 from umlshapes.sd.UmlSDMessage import UmlSDMessage
 from umlshapes.sd.UmlSDMessage import UmlSDMessages
@@ -47,6 +48,7 @@ class UmlSDLifeLine(IdentifierMixin, RectangleShape, TopLeftMixin):
         self._umlInstanceName:     UmlInstanceName               = instanceName
         self._instanceConstrainer: SDInstanceConstrainer         = instanceConstrainer
         self._umlSDInstance:       Optional['UmlSDInstance']     = None
+        self._executions:         list[UmlSDExecution]        = []
 
     @property
     def umlFrame(self) -> SequenceDiagramFrame:
@@ -71,6 +73,90 @@ class UmlSDLifeLine(IdentifierMixin, RectangleShape, TopLeftMixin):
     @property
     def messages(self) -> UmlSDMessages:
         return cast(UmlSDMessages, self._lines)
+
+    @property
+    def executions(self) -> list[UmlSDExecution]:
+        return self._executions
+
+    def addExecution(self, execution: UmlSDExecution):
+        if execution not in self._executions:
+            self._executions.append(execution)
+            self._recalculateNestingLevels()
+            self.recomputeExecutionsGeometry()
+            diagramFrame: Optional[SequenceDiagramFrame] = self.umlFrame
+            if diagramFrame is not None:
+                if hasattr(diagramFrame, 'umlDiagram'):
+                    if execution not in diagramFrame.umlDiagram.GetShapeList():
+                        execution.Show(True)
+                        diagramFrame.umlDiagram.AddShape(execution)
+
+    def removeExecution(self, execution: UmlSDExecution):
+        if execution in self._executions:
+            self._executions.remove(execution)
+            self._recalculateNestingLevels()
+            self.recomputeExecutionsGeometry()
+            diagramFrame: Optional[SequenceDiagramFrame] = self.umlFrame
+            if diagramFrame is not None:
+                if hasattr(diagramFrame, 'umlDiagram'):
+                    if execution in diagramFrame.umlDiagram.GetShapeList():
+                        diagramFrame.umlDiagram.RemoveShape(execution)
+
+    def getExecutionAtY(self, y: int) -> Optional[UmlSDExecution]:
+        """
+        Return the deepest nested execution bar covering the given Y coordinate, if any.
+        """
+        matching: list[UmlSDExecution] = []
+        for execution in self._executions:
+            if execution.startY <= y <= execution.endY:
+                matching.append(execution)
+
+        if len(matching) == 0:
+            return None
+
+        matching.sort(key=lambda a: a.nestingLevel, reverse=True)
+        return matching[0]
+
+    def recalculateNestingLevels(self):
+        """
+        Public method to sort executions by startY and recalculate nesting levels.
+        """
+        self._recalculateNestingLevels()
+
+    def recomputeExecutionsGeometry(self):
+        """
+        Recompute geometry for all execution specification bars attached to this lifeline.
+        """
+        for execution in self._executions:
+            execution.recomputeGeometry()
+            execution.ResetControlPoints()
+
+        canvas = self.GetCanvas()
+        if canvas is not None:
+            from wx import ClientDC
+            dc: ClientDC = ClientDC(canvas)
+            canvas.PrepareDC(dc)
+            self.MoveLinks(dc)
+
+    def _recalculateNestingLevels(self):
+        """
+        Sort executions by startY and recalculate nesting levels for overlapping intervals.
+        """
+        sortedActivations: list[UmlSDExecution] = sorted(self._executions, key=lambda a: a.startY)
+        activeLevels: list[int] = []
+
+        for execution in sortedActivations:
+            placedLevel: Optional[int] = None
+            for levelIdx, endY in enumerate(activeLevels):
+                if endY <= execution.startY:
+                    activeLevels[levelIdx] = execution.endY
+                    placedLevel = levelIdx
+                    break
+
+            if placedLevel is None:
+                placedLevel = len(activeLevels)
+                activeLevels.append(execution.endY)
+
+            execution.nestingLevel = placedLevel
 
     def adjustLifeLineTopPosition(self):
 
@@ -128,6 +214,9 @@ class UmlSDLifeLine(IdentifierMixin, RectangleShape, TopLeftMixin):
             dc.SetPen(ResourceUtils.blackDashedPen())
 
         dc.DrawLine(lineX, topY, lineX, bottomY)
+
+        for execution in self._executions:
+            execution.OnDraw(dc)
 
     def __str__(self) -> str:
         return f'UmlSDLifeLine: {self.id}'

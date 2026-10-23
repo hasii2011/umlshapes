@@ -27,9 +27,9 @@ class SDInstanceConstrainer(RectangleShape, TopLeftMixin):
 
     def __init__(self, diagramFrame: SequenceDiagramFrame):
 
-        self._preferences: UmlPreferences = UmlPreferences()
-
+        self._preferences:  UmlPreferences = UmlPreferences()
         instanceDimensions: UmlDimensions  = self._preferences.instanceDimensions
+
         super().__init__(w=instanceDimensions.width, h=instanceDimensions.height)
         TopLeftMixin.__init__(self, umlShape=self, width=instanceDimensions.width, height=instanceDimensions.height)
 
@@ -50,7 +50,7 @@ class SDInstanceConstrainer(RectangleShape, TopLeftMixin):
 
         pen: Pen = self.GetPen()
 
-        if self._preferences.debugSDInstance is True:
+        if self._preferences.debugSDInstance:
             pen.SetStyle(PENSTYLE_DOT)
         else:
             pen.SetStyle(PENSTYLE_TRANSPARENT)
