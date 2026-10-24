@@ -190,14 +190,16 @@ class SDMessageCreationHandler:
                 )
 
     # noinspection PyUnusedLocal
-    def _frameLeftClicked(self, _frame: SequenceDiagramFrame, umlPosition: UmlPosition):
+    def _frameLeftClicked(self, frame: SequenceDiagramFrame, umlPosition: UmlPosition):
         """
         Handle canvas background clicks during interactive message creation.
 
         Args:
-            _frame:       The sequence diagram frame
+            frame:       The sequence diagram frame
             umlPosition: Clicked canvas coordinates
         """
+        del frame       # just to get rid of PyCharm warning
+
         if not self._enableMessageCreation:
             return
 

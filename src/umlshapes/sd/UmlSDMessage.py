@@ -88,11 +88,6 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
 
         self.SetFont(ResourceUtils.defaultFont())
 
-        self._messageLabel: Optional[UmlSDMessageLabel] = None
-
-        #
-        # TODO:  Support different message type that require different arrow heads and lines
-        #
         self.AddArrow(
             type=ARROW_ARROW,
             end=ARROW_POSITION_END,
@@ -111,7 +106,6 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
         self._fromY: int = 0
         self._toY:   int = 0
 
-        self._loopWidth: Optional[int] = None
 
         self._relativeFromY: int = 0
         self._relativeToY:   int = 0
@@ -120,6 +114,8 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
 
         self._lineControlPoints: LineControlPoints = LineControlPoints(cast(List[Point], self._lineControlPoints))
         self._execution:         UmlSDExecution    = cast(UmlSDExecution, None)     # noqa
+        self._loopWidth:         int               = self._preferences.reflexiveMessageWidth
+        self._messageLabel:      UmlSDMessageLabel = self._initMessageLabel()
 
     @property
     def isLostMessage(self) -> bool:
@@ -153,9 +149,7 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
 
     @property
     def loopWidth(self) -> int:
-        if self._loopWidth is not None:
-            return self._loopWidth
-        return self._preferences.reflexiveMessageWidth
+        return self._loopWidth
 
     @loopWidth.setter
     def loopWidth(self, loopWidth: int):
@@ -177,6 +171,16 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
     def umlFrame(self, frame: 'SequenceDiagramFrame'):
         self.SetCanvas(frame)
 
+    def SetCanvas(self, theCanvas):
+        super().SetCanvas(theCanvas)
+        if theCanvas is not None:
+            from umlshapes.frames.UmlFrame import UmlFrame
+            umlFrame: UmlFrame = cast(UmlFrame, theCanvas)
+            diagram: UmlDiagram = umlFrame.umlDiagram
+            if self._messageLabel not in diagram.GetShapeList():
+                diagram.AddShape(self._messageLabel)
+            self._setMessageLabelEventHandler(self._messageLabel)
+
     @property
     def selected(self) -> bool:
         return self.Selected()
@@ -194,7 +198,7 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
         self._messageType = messageType
 
     @property
-    def messageLabel(self) -> Optional[UmlSDMessageLabel]:
+    def messageLabel(self) -> UmlSDMessageLabel:
         return self._messageLabel
 
     @property
@@ -254,8 +258,7 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
         """
         Update the message
         """
-        if self._messageLabel is not None:
-            self._messageLabel.label = self._sdMessage.message
+        self._messageLabel.label = self._sdMessage.message
 
     def GetControlPoints(self) -> list[ControlPoint]:
         return self._controlPoints
@@ -312,9 +315,6 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
         return self._messageBackGroundBrush
 
     def OnDraw(self, dc: MemoryDC):
-        if self._messageLabel is None:
-            self._messageLabel = self._createLinkName()
-
         if self.Selected() is True:
             if self._messageType == SDMessageType.RETURN:
                 self.SetPen(ResourceUtils.redDashedPen())
@@ -502,8 +502,7 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
 
             self.SetEnds(endX, fromY, otherEndX, toY)
 
-        if self._messageLabel is not None:
-            self.updateMessageLabelPosition(dc=dc)
+        self.updateMessageLabelPosition(dc=dc)
 
     def _moveLostMessageLink(self, dc: ClientDC):
         if not self._from:
@@ -538,8 +537,7 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
             endX = startX + spanX
 
         self.SetEnds(startX, fromY, endX, fromY)
-        if self._messageLabel is not None:
-            self.updateMessageLabelPosition(dc=dc)
+        self.updateMessageLabelPosition(dc=dc)
 
     def _moveFoundMessageLink(self, dc: ClientDC):
         if not self._to:
@@ -574,8 +572,7 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
             startX = endX - spanX
 
         self.SetEnds(startX, toY, endX, toY)
-        if self._messageLabel is not None:
-            self.updateMessageLabelPosition(dc=dc)
+        self.updateMessageLabelPosition(dc=dc)
 
     def updateMessageLabelPosition(self, dc: ClientDC):
         """
@@ -584,7 +581,7 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
         Args:
             dc: The device context
         """
-        if self._messageLabel is None or len(self.lineControlPoints) < 2:
+        if len(self.lineControlPoints) < 2:
             return
 
         startX: int = self.lineControlPoints[0].x
@@ -629,8 +626,6 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
         Returns:
             The calculated center X coordinate
         """
-        assert self._messageLabel is not None, 'Developer error'
-
         targetX: int
         # PyCharm false-positive: PyCharm erroneously marks subsequent Enum case branches
         # as unreachable in match/case statements (PY-52844).
@@ -660,8 +655,6 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
         Returns:
             Tuple of (targetX, targetY)
         """
-        assert self._messageLabel is not None, 'Developer error'
-
         targetX: int = self._computeMessageLabelX(leftX=startX, rightX=loopX, placementMode=placementMode)
         targetY: int = lineY - (self._messageLabel.size.height // 2) - 2 + self._messageLabel.verticalOffset
 
@@ -680,12 +673,19 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
         Returns:
             Tuple of (targetX, targetY)
         """
-        assert self._messageLabel is not None, 'Developer error'
-
         targetX: int = self._computeMessageLabelX(leftX=startX, rightX=endX, placementMode=placementMode)
         targetY: int = lineY - (self._messageLabel.size.height // 2) - 2 + self._messageLabel.verticalOffset
 
         return targetX, targetY
+
+
+    def _initMessageLabel(self) -> UmlSDMessageLabel:
+        label: UmlSDMessageLabel = UmlSDMessageLabel(label=self._sdMessage.message)
+        label.proportionalOffset = 0.5
+        label.verticalOffset = 0
+        label.parent = self
+        self._children.append(label)
+        return label
 
     def _createLinkName(self) -> UmlSDMessageLabel:
 
