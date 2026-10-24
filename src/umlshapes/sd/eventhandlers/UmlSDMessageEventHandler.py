@@ -56,6 +56,7 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
         self._initialMouseX:           Optional[int] = None
         self._initialLoopWidth:        Optional[int] = None
         self._activeControlPointIndex: Optional[int] = None
+        self._isDirectEndpointDrag:    bool          = False
 
     def OnBeginDragLeft(self, x: int, y: int, keys: int = 0, attachment: int = 0):
         """
@@ -70,6 +71,18 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
         self._initialFromY = self._umlSDMessage.fromY
         self._initialToY = self._umlSDMessage.toY
         self._initialMouseY = y
+        self._isDirectEndpointDrag = False
+
+        freeX: int
+        if self._umlSDMessage.isLostMessage is True and len(self._umlSDMessage.lineControlPoints) >= 2:
+            freeX = self._umlSDMessage.lineControlPoints[-1].x
+            if abs(x - freeX) <= 15:
+                self._isDirectEndpointDrag = True
+        elif self._umlSDMessage.isFoundMessage is True and len(self._umlSDMessage.lineControlPoints) >= 2:
+            freeX = self._umlSDMessage.lineControlPoints[0].x
+            if abs(x - freeX) <= 15:
+                self._isDirectEndpointDrag = True
+
         super().OnBeginDragLeft(x, y, keys, attachment)
 
     def OnDragLeft(self, draw: bool, x: int, y: int, keys: int = 0, attachment: int = 0):
@@ -83,6 +96,13 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
             keys:
             attachment:
         """
+        if self._isDirectEndpointDrag:
+            if self._umlSDMessage.isLostMessage:
+                self._resizeLostMessageEndpoint(x=x)
+            elif self._umlSDMessage.isFoundMessage:
+                self._resizeFoundMessageEndpoint(x=x)
+            return
+
         targetY: int
         if self._initialMouseY is not None and self._initialFromY is not None:
             deltaY: int = y - self._initialMouseY
@@ -101,6 +121,19 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
             keys:
             attachment:
         """
+        if self._isDirectEndpointDrag:
+            if self._umlSDMessage.isLostMessage:
+                self._resizeLostMessageEndpoint(x=x)
+            elif self._umlSDMessage.isFoundMessage:
+                self._resizeFoundMessageEndpoint(x=x)
+            self._indicateFrameModified()
+            self._isDirectEndpointDrag = False
+            self._initialFromY = None
+            self._initialToY = None
+            self._initialMouseY = None
+            super().OnEndDragLeft(x, y, keys, attachment)
+            return
+
         targetY: int
         if self._initialMouseY is not None and self._initialFromY is not None:
             deltaY: int = y - self._initialMouseY
@@ -133,7 +166,7 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
         self._initialMouseX = x
         self._initialLoopWidth = self._umlSDMessage.loopWidth
 
-        if self._umlSDMessage.isReflexiveMessage:
+        if self._umlSDMessage.isReflexiveMessage or self._umlSDMessage.isLostMessage or self._umlSDMessage.isFoundMessage:
             controlPoints: list[ControlPoint] = self._umlSDMessage.GetControlPoints()
             if pt in controlPoints:
                 self._activeControlPointIndex = controlPoints.index(pt)
@@ -169,6 +202,10 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
             elif self._activeControlPointIndex == 0 or self._activeControlPointIndex == 1:
                 isCorner = (self._activeControlPointIndex == 1)
                 self._resizeOrRepositionCallMessage(x=x, y=y, isCorner=isCorner)
+        elif self._umlSDMessage.isLostMessage is True and self._activeControlPointIndex == 1:
+            self._resizeLostMessageEndpoint(x=x)
+        elif self._umlSDMessage.isFoundMessage is True and self._activeControlPointIndex == 0:
+            self._resizeFoundMessageEndpoint(x=x)
         else:
             self.OnDragLeft(draw=draw, x=x, y=y, keys=keys, attachment=attachment)
 
@@ -206,6 +243,8 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
 
             if hasChanged:
                 self._indicateFrameModified()
+        elif (self._umlSDMessage.isLostMessage is True and self._activeControlPointIndex == 1) or (self._umlSDMessage.isFoundMessage is True and self._activeControlPointIndex == 0):
+            self._indicateFrameModified()
         else:
             self.OnEndDragLeft(x=x, y=y, keys=keys, attachment=attachment)
 
@@ -221,6 +260,34 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
         if diagramCanvas is not None:
             defaultCursor: Cursor = Cursor(CURSOR_DEFAULT)
             diagramCanvas.SetCursor(defaultCursor)
+
+    def _resizeLostMessageEndpoint(self, x: int):
+        startX: int = self._umlSDMessage.lineControlPoints[0].x
+        newSpanX: int = x - startX
+        if abs(newSpanX) >= 20:
+            y: int = self._umlSDMessage.fromY
+            self._umlSDMessage.SetEnds(startX, y, x, y)
+            canvas: Optional[UmlFrame] = self._umlSDMessage.umlFrame
+            if canvas is not None:
+                dc: ClientDC = ClientDC(canvas)
+                canvas.PrepareDC(dc)
+                self._umlSDMessage.updateMessageLabelPosition(dc=dc)
+                self._umlSDMessage.ResetControlPoints()
+                canvas.refresh()
+
+    def _resizeFoundMessageEndpoint(self, x: int):
+        endX: int = self._umlSDMessage.lineControlPoints[-1].x
+        newSpanX: int = endX - x
+        if abs(newSpanX) >= 20:
+            y: int = self._umlSDMessage.toY
+            self._umlSDMessage.SetEnds(x, y, endX, y)
+            canvas: Optional[UmlFrame] = self._umlSDMessage.umlFrame
+            if canvas is not None:
+                dc: ClientDC = ClientDC(canvas)
+                canvas.PrepareDC(dc)
+                self._umlSDMessage.updateMessageLabelPosition(dc=dc)
+                self._umlSDMessage.ResetControlPoints()
+                canvas.refresh()
 
     def _resizeOrRepositionReturnMessage(self, x: int, y: int, isCorner: bool):
         """
@@ -397,44 +464,48 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
             span = self._umlSDMessage.toY - self._umlSDMessage.fromY
         return span
 
-    def _growLifeLinesIfNeeded(self, startLifeLine: UmlSDLifeLine, neededHeight: int, canvas: UmlFrame):
+    def _growLifeLinesIfNeeded(self, neededHeight: int, canvas: UmlFrame):
         """
         Extend lifeline length for start and destination instances when auto-grow is active.
 
         Args:
-            startLifeLine: Source lifeline shape
-            neededHeight:  Calculated minimum height needed for the lifeline
-            canvas:        The canvas frame
+            referenceLifeLine: Reference lifeline shape
+            neededHeight:      Calculated minimum height needed for the lifeline
+            canvas:            The canvas frame
         """
+        destLifeLine:  Optional[UmlSDLifeLine] = cast(Optional[UmlSDLifeLine], self._umlSDMessage.GetTo())
+        startLifeLine: Optional[UmlSDLifeLine] = cast(Optional[UmlSDLifeLine], self._umlSDMessage.GetFrom())
 
-        destLifeLine: Optional[UmlSDLifeLine] = cast(Optional[UmlSDLifeLine], self._umlSDMessage.GetTo())
+        currentStartHeight: int = 0
+        if startLifeLine is not None:
+            currentStartHeight = startLifeLine.size.height
 
-        currentStartHeight: int = startLifeLine.size.height
-        currentDestHeight:   int = 0
-
+        currentDestHeight: int = 0
         if destLifeLine is not None:
             currentDestHeight = destLifeLine.size.height
+
         if (neededHeight > currentStartHeight) or (neededHeight > currentDestHeight):
 
             if self._preferences.uniformLifeLineLength:
                 if hasattr(canvas, 'setAllLifeLinesLength'):
                     canvas.setAllLifeLinesLength(neededHeight)
             else:
-                startSDInstance: UmlSDInstance | None = startLifeLine.umlSDInstance
+                if startLifeLine is not None:
+                    startSDInstance: UmlSDInstance | None = startLifeLine.umlSDInstance
+                    if startSDInstance is not None:
+                        startSDInstance.setLifeLineLength(neededHeight)
 
-                if startSDInstance is not None:
-                    startSDInstance.setLifeLineLength(neededHeight)
                 if destLifeLine is not None and destLifeLine != startLifeLine:
                     destSDInstance: UmlSDInstance | None = destLifeLine.umlSDInstance
                     if destSDInstance is not None:
                         destSDInstance.setLifeLineLength(neededHeight)
 
-    def _computeAutoGrowEndpoints(self, startLifeLine: UmlSDLifeLine, headerBottomY: int, rawTimeStepIndex: int, span: int, canvas: UmlFrame) -> tuple[int, int]:
+    def _computeAutoGrowEndpoints(self, referenceLifeLine: UmlSDLifeLine, headerBottomY: int, rawTimeStepIndex: int, span: int, canvas: UmlFrame) -> tuple[int, int]:
         """
         Compute snapped message endpoints and expand lifelines if necessary.
 
         Args:
-            startLifeLine:    Source lifeline shape
+            referenceLifeLine: Reference lifeline shape
             headerBottomY:    Bottom Y coordinate of the lifeline header
             rawTimeStepIndex: Unbounded timeStep index based on cursor position
             span:             Vertical span between fromY and toY
@@ -447,15 +518,15 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
         snappedFromY:  int = self._layoutEngine.computeTimeStepY(headerBottomY=headerBottomY, timeStepIndex=timeStepIndex)
         snappedToY:    int = snappedFromY + span
         neededHeight:  int = (snappedToY - headerBottomY) + self._layoutEngine.parameters.bottomPadding
-        self._growLifeLinesIfNeeded(startLifeLine=startLifeLine, neededHeight=neededHeight, canvas=canvas)
+        self._growLifeLinesIfNeeded(neededHeight=neededHeight, canvas=canvas)
         return snappedFromY, snappedToY
 
-    def _computeBoundedEndpoints(self, startLifeLine: UmlSDLifeLine, headerBottomY: int, rawTimeStepIndex: int, span: int) -> tuple[int, int]:
+    def _computeBoundedEndpoints(self, referenceLifeLine: UmlSDLifeLine, headerBottomY: int, rawTimeStepIndex: int, span: int) -> tuple[int, int]:
         """
         Compute snapped message endpoints bounded within current lifeline length.
 
         Args:
-            startLifeLine:    Source lifeline shape
+            referenceLifeLine: Reference lifeline shape
             headerBottomY:    Bottom Y coordinate of the lifeline header
             rawTimeStepIndex: Unbounded timeStep index based on cursor position
             span:             Vertical span between fromY and toY
@@ -465,7 +536,7 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
         """
         maxTimeStepIndex: int = max(
             0,
-            (startLifeLine.size.height - self._layoutEngine.parameters.topPadding - self._layoutEngine.parameters.bottomPadding - span)
+            (referenceLifeLine.size.height - self._layoutEngine.parameters.topPadding - self._layoutEngine.parameters.bottomPadding - span)
             // self._layoutEngine.parameters.timeStepHeight
         )
         timeStepIndex: int = max(0, min(rawTimeStepIndex, maxTimeStepIndex))
@@ -518,11 +589,13 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
         Args:
             targetY: Raw cursor Y coordinate
         """
-        startLifeLine: Optional[UmlSDLifeLine] = cast(Optional[UmlSDLifeLine], self._umlSDMessage.GetFrom())
-        if startLifeLine is None:
+        referenceLifeLine: Optional[UmlSDLifeLine] = cast(Optional[UmlSDLifeLine], self._umlSDMessage.GetFrom())
+        if referenceLifeLine is None:
+            referenceLifeLine = cast(Optional[UmlSDLifeLine], self._umlSDMessage.GetTo())
+        if referenceLifeLine is None:
             return
 
-        headerBottomY:    int = startLifeLine.rectangle.top
+        headerBottomY:    int = referenceLifeLine.rectangle.top
         rawTimeStepIndex: int = self._layoutEngine.computeNearestTimeStepIndex(headerBottomY=headerBottomY, targetY=targetY)
         span:             int = self._computeMessageSpan()
         canvas:           UmlFrame = self._umlSDMessage.umlFrame
@@ -531,7 +604,7 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
         snappedToY:   int
         if self._preferences.autoGrowLifeLines:
             snappedFromY, snappedToY = self._computeAutoGrowEndpoints(
-                startLifeLine=startLifeLine,
+                referenceLifeLine=referenceLifeLine,
                 headerBottomY=headerBottomY,
                 rawTimeStepIndex=rawTimeStepIndex,
                 span=span,
@@ -539,7 +612,7 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
             )
         else:
             snappedFromY, snappedToY = self._computeBoundedEndpoints(
-                startLifeLine=startLifeLine,
+                referenceLifeLine=referenceLifeLine,
                 headerBottomY=headerBottomY,
                 rawTimeStepIndex=rawTimeStepIndex,
                 span=span

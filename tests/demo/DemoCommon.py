@@ -36,6 +36,8 @@ class Identifiers:
     ID_SD_MSG_SYNC:              ID_REFERENCE = wxNewIdRef()
     ID_SD_MSG_ASYNC:             ID_REFERENCE = wxNewIdRef()
     ID_SD_MSG_RETURN:            ID_REFERENCE = wxNewIdRef()
+    ID_SD_MSG_LOST:              ID_REFERENCE = wxNewIdRef()
+    ID_SD_MSG_FOUND:             ID_REFERENCE = wxNewIdRef()
 
     ID_SOURCE_TOP:    ID_REFERENCE = wxNewIdRef()
     ID_SOURCE_BOTTOM: ID_REFERENCE = wxNewIdRef()

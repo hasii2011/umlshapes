@@ -177,15 +177,33 @@ class UmlSDLifeLine(IdentifierMixin, RectangleShape, TopLeftMixin):
         self.SetY(lifeLineTopY)
         self.logger.debug(f'------------------')
 
-    def addMessage(self, umlSDMessage: UmlSDMessage, destinationLifeLine: 'UmlSDLifeLine'):
+    def addMessage(self, umlSDMessage: UmlSDMessage, destinationLifeLine: Optional['UmlSDLifeLine'] = None):
         """
 
         Args:
-            umlSDMessage:           The message between us and the 'other' lifeline
-            destinationLifeLine:    The 'other'
+            umlSDMessage:        The message between us and the 'other' lifeline
+            destinationLifeLine: The 'other' lifeline (or None for lost messages)
 
         """
-        self.AddLine(line=umlSDMessage, other=destinationLifeLine)
+        if destinationLifeLine is not None:
+            self.AddLine(line=umlSDMessage, other=destinationLifeLine)
+        else:
+            if umlSDMessage not in self._lines:
+                self._lines.append(umlSDMessage)
+            umlSDMessage.SetFrom(self)
+            umlSDMessage.SetTo(None)
+
+    def addFoundMessage(self, umlSDMessage: UmlSDMessage):
+        """
+        Add a found message where this lifeline is the receiving destination lifeline.
+
+        Args:
+            umlSDMessage: The incoming found message
+        """
+        if umlSDMessage not in self._lines:
+            self._lines.append(umlSDMessage)
+        umlSDMessage.SetFrom(None)
+        umlSDMessage.SetTo(self)
 
     def HitTest(self, x: float, y: float) -> tuple[int, float] | bool:
         """

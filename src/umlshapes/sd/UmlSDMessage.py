@@ -40,6 +40,8 @@ from umlshapes.mixins.PubSubMixin import PubSubMixin
 from umlshapes.mixins.IdentifierMixin import IdentifierMixin
 from umlshapes.mixins.ControlPointMixin import ControlPointMixin
 
+from umlshapes.preferences.Defaults import DEFAULT_LOST_FOUND_CIRCLE_RADIUS
+from umlshapes.preferences.Defaults import DEFAULT_LOST_FOUND_MESSAGE_LENGTH
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 
@@ -67,6 +69,8 @@ LineControlPoints = NewType('LineControlPoints', List[Point])
 class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
 
     def __init__(self, sdMessage: SDMessage, umlPubSubEngine: IUmlPubSubEngine, messageType: SDMessageType = SDMessageType.SYNCHRONOUS):
+
+        from umlshapes.sd.UmlSDExecution import UmlSDExecution
 
         self.logger: Logger = getLogger(__name__)
         super().__init__(shape=self)
@@ -113,11 +117,22 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
         self._relativeToY:   int = 0
 
         self._initialised: bool = False
-        self._lineControlPoints: LineControlPoints = LineControlPoints(self._lineControlPoints)
-        self._execution: Optional['UmlSDExecution'] = None
+
+        self._lineControlPoints: LineControlPoints = LineControlPoints(cast(List[Point], self._lineControlPoints))
+        self._execution:         UmlSDExecution    = cast(UmlSDExecution, None)     # noqa
+
+    @property
+    def isLostMessage(self) -> bool:
+        return self._messageType == SDMessageType.LOST
+
+    @property
+    def isFoundMessage(self) -> bool:
+        return self._messageType == SDMessageType.FOUND
 
     @property
     def isReflexiveMessage(self) -> bool:
+        if self.isLostMessage is True or self.isFoundMessage is True:
+            return False
         if self._from is not None and self._to is not None:
             if self._from == self._to:
                 return True
@@ -190,8 +205,11 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
     def fromY(self, newFromY: int):
         from umlshapes.sd.UmlSDLifeLine import UmlSDLifeLine
 
-        sdLifeLine: UmlSDLifeLine = self.GetFrom()
-        if sdLifeLine:
+        sdLifeLine: Optional[UmlSDLifeLine] = self.GetFrom()
+        if sdLifeLine is None:
+            sdLifeLine = self.GetTo()
+
+        if sdLifeLine is not None:
             self._relativeFromY = newFromY - sdLifeLine.rectangle.top
 
         self._fromY = newFromY
@@ -205,8 +223,11 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
     def toY(self, newToY: int):
         from umlshapes.sd.UmlSDLifeLine import UmlSDLifeLine
 
-        sdLifeLine: UmlSDLifeLine = self.GetTo()
-        if sdLifeLine:
+        sdLifeLine: Optional[UmlSDLifeLine] = self.GetTo()
+        if sdLifeLine is None:
+            sdLifeLine = self.GetFrom()
+
+        if sdLifeLine is not None:
             self._relativeToY = newToY - sdLifeLine.rectangle.top
         self._toY = newToY
         self._sdMessage.destinationY = newToY
@@ -272,7 +293,7 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
         return self._execution
 
     @execution.setter
-    def execution(self, execution: Optional['UmlSDExecution']):
+    def execution(self, execution: 'UmlSDExecution'):
         self._execution = execution
 
     def Draggable(self) -> bool:
@@ -309,9 +330,42 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
 
         super().OnDraw(dc=dc)
 
+        if self.isLostMessage:
+            self._drawLostEndPoint(dc=dc)
+        elif self.isFoundMessage:
+            self._drawFoundEndPoint(dc=dc)
+
+    def _drawLostEndPoint(self, dc: MemoryDC):
+        if not self._lineControlPoints or len(self._lineControlPoints) < 2:
+            return
+        lastPoint: Point = self._lineControlPoints[-1]
+        if self.Selected() is True:
+            dc.SetPen(ResourceUtils.redSolidPen())
+            dc.SetBrush(RED_BRUSH)
+        else:
+            dc.SetPen(ResourceUtils.blackSolidPen())
+            dc.SetBrush(BLACK_BRUSH)
+        dc.DrawCircle(lastPoint.x, lastPoint.y, DEFAULT_LOST_FOUND_CIRCLE_RADIUS)
+
+    def _drawFoundEndPoint(self, dc: MemoryDC):
+        if not self._lineControlPoints or len(self._lineControlPoints) < 2:
+            return
+        firstPoint: Point = self._lineControlPoints[0]
+        if self.Selected() is True:
+            dc.SetPen(ResourceUtils.redSolidPen())
+            dc.SetBrush(RED_BRUSH)
+        else:
+            dc.SetPen(ResourceUtils.blackSolidPen())
+            dc.SetBrush(BLACK_BRUSH)
+        dc.DrawCircle(firstPoint.x, firstPoint.y, DEFAULT_LOST_FOUND_CIRCLE_RADIUS)
+
     def DrawArrow(self, dc: MemoryDC, arrow: ArrowHead, XOffset: float = 0.0, proportionalOffset: bool = False):
-        if self._messageType == SDMessageType.SYNCHRONOUS:
-            super().DrawArrow(dc, arrow, XOffset, proportionalOffset)
+        offset: float = XOffset
+        if self.isLostMessage is True and offset == 0.0:
+            offset = float(DEFAULT_LOST_FOUND_CIRCLE_RADIUS)
+
+        if self._messageType in (SDMessageType.SYNCHRONOUS, SDMessageType.LOST, SDMessageType.FOUND):
+            super().DrawArrow(dc, arrow, offset, proportionalOffset)
             return
 
         lineControlPoints: Optional[List[Point]] = self._lineControlPoints
@@ -330,23 +384,23 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
 
         arrowPosition: int = arrow.GetPosition()
         if arrowPosition == ARROW_POSITION_START:
-            realOffset: float = XOffset
+            realOffset: float = offset
             if proportionalOffset:
                 totalLength: float = sqrt((secondLinePoint.x - firstLinePoint.x) ** 2 + (secondLinePoint.y - firstLinePoint.y) ** 2)
-                realOffset = XOffset * totalLength
+                realOffset = offset * totalLength
             positionOnLineX, positionOnLineY = GetPointOnLine(secondLinePoint.x, secondLinePoint.y, firstLinePoint.x, firstLinePoint.y, realOffset)
             startPositionX = secondLinePoint.x
             startPositionY = secondLinePoint.y
         elif arrowPosition == ARROW_POSITION_END:
-            realOffset = XOffset
+            realOffset = offset
             if proportionalOffset:
                 totalLength = sqrt((secondLastLinePoint.x - lastLinePoint.x) ** 2 + (secondLastLinePoint.y - lastLinePoint.y) ** 2)
-                realOffset = XOffset * totalLength
+                realOffset = offset * totalLength
             positionOnLineX, positionOnLineY = GetPointOnLine(secondLastLinePoint.x, secondLastLinePoint.y, lastLinePoint.x, lastLinePoint.y, realOffset)
             startPositionX = secondLastLinePoint.x
             startPositionY = secondLastLinePoint.y
         else:
-            super().DrawArrow(dc, arrow, XOffset, proportionalOffset)
+            super().DrawArrow(dc, arrow, offset, proportionalOffset)
             return
 
         arrowLength: float = arrow.GetSize()
@@ -372,12 +426,24 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
     def OnMoveLink(self, dc: ClientDC, moveControlPoints: bool = True):
         """
         Copied from original but modified to use the original Y positions.
-        Handles both standard inter-instance messages and self-referential message loops.
+        Handles standard inter-instance messages, self-referential message loops,
+        and lost/found messages.
 
         Args:
             dc:
             moveControlPoints:
         """
+        if not self._from and not self._to:
+            return
+
+        if self.isLostMessage:
+            self._moveLostMessageLink(dc=dc)
+            return
+
+        if self.isFoundMessage:
+            self._moveFoundMessageLink(dc=dc)
+            return
+
         if not self._from or not self._to:
             return
 
@@ -437,9 +503,81 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
             self.SetEnds(endX, fromY, otherEndX, toY)
 
         if self._messageLabel is not None:
-            self._updateMessageLabelPosition(dc=dc)
+            self.updateMessageLabelPosition(dc=dc)
 
-    def _updateMessageLabelPosition(self, dc: ClientDC):
+    def _moveLostMessageLink(self, dc: ClientDC):
+        if not self._from:
+            return
+
+        self._ensureLineControlPoints()
+        from umlshapes.sd.UmlSDLifeLine import UmlSDLifeLine
+
+        fromLifeLine: UmlSDLifeLine = cast(UmlSDLifeLine, self.GetFrom())
+        fromY: int = self._computeAbsoluteY(umlSDLifeLine=fromLifeLine, relativeY=self._relativeFromY)
+
+        currentStartX: int = self.lineControlPoints[0].x
+        currentEndX:   int = self.lineControlPoints[-1].x
+        spanX: int = currentEndX - currentStartX
+        if spanX == 0:
+            spanX = DEFAULT_LOST_FOUND_MESSAGE_LENGTH
+
+        fromExecution: Optional['UmlSDExecution'] = fromLifeLine.getExecutionAtY(fromY)
+        startX: int
+        endX:   int
+        if spanX >= 0:
+            if fromExecution is not None:
+                startX = round(fromExecution.GetX() + (fromExecution.GetWidth() / 2.0))
+            else:
+                startX = round(fromLifeLine.GetX())
+            endX = startX + spanX
+        else:
+            if fromExecution is not None:
+                startX = round(fromExecution.GetX() - (fromExecution.GetWidth() / 2.0))
+            else:
+                startX = round(fromLifeLine.GetX())
+            endX = startX + spanX
+
+        self.SetEnds(startX, fromY, endX, fromY)
+        if self._messageLabel is not None:
+            self.updateMessageLabelPosition(dc=dc)
+
+    def _moveFoundMessageLink(self, dc: ClientDC):
+        if not self._to:
+            return
+
+        self._ensureLineControlPoints()
+        from umlshapes.sd.UmlSDLifeLine import UmlSDLifeLine
+
+        toLifeLine: UmlSDLifeLine = cast(UmlSDLifeLine, self.GetTo())
+        toY: int = self._computeAbsoluteY(umlSDLifeLine=toLifeLine, relativeY=self._relativeToY)
+
+        currentStartX: int = self.lineControlPoints[0].x
+        currentEndX:   int = self.lineControlPoints[-1].x
+        spanX: int = currentEndX - currentStartX
+        if spanX == 0:
+            spanX = DEFAULT_LOST_FOUND_MESSAGE_LENGTH
+
+        toExecution: Optional['UmlSDExecution'] = toLifeLine.getExecutionAtY(toY)
+        startX: int
+        endX:   int
+        if spanX >= 0:
+            if toExecution is not None:
+                endX = round(toExecution.GetX() - (toExecution.GetWidth() / 2.0))
+            else:
+                endX = round(toLifeLine.GetX())
+            startX = endX - spanX
+        else:
+            if toExecution is not None:
+                endX = round(toExecution.GetX() + (toExecution.GetWidth() / 2.0))
+            else:
+                endX = round(toLifeLine.GetX())
+            startX = endX - spanX
+
+        self.SetEnds(startX, toY, endX, toY)
+        if self._messageLabel is not None:
+            self.updateMessageLabelPosition(dc=dc)
+
+    def updateMessageLabelPosition(self, dc: ClientDC):
         """
         Position the message label according to the user's placement preference mode.
 
@@ -545,7 +683,7 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
         assert self._messageLabel is not None, 'Developer error'
 
         targetX: int = self._computeMessageLabelX(leftX=startX, rightX=endX, placementMode=placementMode)
-        targetY: int = lineY + self._messageLabel.verticalOffset
+        targetY: int = lineY - (self._messageLabel.size.height // 2) - 2 + self._messageLabel.verticalOffset
 
         return targetX, targetY
 

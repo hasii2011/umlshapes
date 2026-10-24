@@ -9,6 +9,7 @@ from umlmodel.SDMessage import SDMessage
 
 from umlshapes.frames.SequenceDiagramFrame import SequenceDiagramFrame
 
+from umlshapes.preferences.Defaults import DEFAULT_LOST_FOUND_MESSAGE_LENGTH
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 from umlshapes.pubsubengine.UmlMessageType import UmlMessageType
 from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
@@ -22,6 +23,7 @@ from umlshapes.sd.UmlSDExecution import UmlSDExecution
 from umlshapes.sd.UmlSDInstance import UmlSDInstance
 from umlshapes.sd.UmlSDLifeLine import UmlSDLifeLine
 from umlshapes.sd.UmlSDMessage import UmlSDMessage
+from umlshapes.types.UmlPosition import UmlPosition
 
 NO_START_DETAILS: LifeLineClickDetails = cast(LifeLineClickDetails, None)   # noqa
 
@@ -47,8 +49,14 @@ class SDMessageCreationHandler:
             frameId=sequenceDiagramFrame.id,
             listener=self._lifeLineClicked
         )
+        self._umlPubSubEngine.subscribe(
+            UmlMessageType.FRAME_LEFT_CLICK,
+            frameId=sequenceDiagramFrame.id,
+            listener=self._frameLeftClicked
+        )
 
-        self._startDetails: LifeLineClickDetails = NO_START_DETAILS
+        self._startDetails:        LifeLineClickDetails  = NO_START_DETAILS
+        self._canvasClickPosition: Optional[UmlPosition] = None
 
         self._messageCreationInProgress: bool          = False
         self._enableMessageCreation:     bool          = False
@@ -63,6 +71,8 @@ class SDMessageCreationHandler:
     @messageType.setter
     def messageType(self, messageType: SDMessageType):
         self._messageType = messageType
+        if self._enableMessageCreation:
+            self.enableMessageCreation = True
 
     @property
     def sequenceDiagramFrame(self) -> SequenceDiagramFrame:
@@ -108,10 +118,18 @@ class SDMessageCreationHandler:
         """
         self._enableMessageCreation = enable
         if enable:
+            statusMessage: str
+            if self._messageType == SDMessageType.LOST:
+                statusMessage = 'Click on source lifeline for lost message'
+            elif self._messageType == SDMessageType.FOUND:
+                statusMessage = 'Click on destination lifeline (or click diagram first for origin)'
+            else:
+                statusMessage = 'Click on source lifeline'
+
             self._umlPubSubEngine.sendMessage(
                 UmlMessageType.UPDATE_APPLICATION_STATUS,
                 frameId=self._sequenceDiagramFrame.id,
-                message='Click on source lifeline'
+                message=statusMessage
             )
         else:
             self._reset()
@@ -122,7 +140,42 @@ class SDMessageCreationHandler:
         Args:
             clickDetails:
         """
-        if self._enableMessageCreation:
+        if not self._enableMessageCreation:
+            return
+
+        if self._messageType == SDMessageType.LOST:
+            if not self._messageCreationInProgress:
+                self.logger.info(f'\n{clickDetails=}')
+                self._startDetails = clickDetails
+                self._messageCreationInProgress = True
+                self._umlPubSubEngine.sendMessage(
+                    UmlMessageType.UPDATE_APPLICATION_STATUS,
+                    frameId=self._sequenceDiagramFrame.id,
+                    message='Click in diagram for endpoint, or click lifeline again for default'
+                )
+            else:
+                targetDestX: Optional[int] = None
+                if clickDetails.lifeLine != self._startDetails.lifeLine:
+                    targetDestX = round(clickDetails.lifeLine.GetX())
+                self.createLostMessage(
+                    startLifeLine=self._startDetails.lifeLine,
+                    fromY=self._startDetails.clickPosition.y,
+                    destX=targetDestX
+                )
+                self._reset()
+
+        elif self._messageType == SDMessageType.FOUND:
+            originX: Optional[int] = None
+            if self._canvasClickPosition is not None:
+                originX = self._canvasClickPosition.x
+            self.createFoundMessage(
+                destLifeLine=clickDetails.lifeLine,
+                toY=clickDetails.clickPosition.y,
+                sourceX=originX
+            )
+            self._reset()
+
+        else:
             if self._messageCreationInProgress:
                 self._hookThemUp(endDetails=clickDetails)
                 self._messageCreationInProgress = False
@@ -135,6 +188,250 @@ class SDMessageCreationHandler:
                     frameId=self._sequenceDiagramFrame.id,
                     message='Click on destination lifeline'
                 )
+
+    # noinspection PyUnusedLocal
+    def _frameLeftClicked(self, _frame: SequenceDiagramFrame, umlPosition: UmlPosition):
+        """
+        Handle canvas background clicks during interactive message creation.
+
+        Args:
+            _frame:       The sequence diagram frame
+            umlPosition: Clicked canvas coordinates
+        """
+        if not self._enableMessageCreation:
+            return
+
+        if self._messageType == SDMessageType.LOST:
+            if self._messageCreationInProgress is True and self._startDetails != NO_START_DETAILS:
+                self.createLostMessage(
+                    startLifeLine=self._startDetails.lifeLine,
+                    fromY=self._startDetails.clickPosition.y,
+                    destX=umlPosition.x
+                )
+                self._reset()
+
+        elif self._messageType == SDMessageType.FOUND:
+            self._canvasClickPosition = umlPosition
+            self._messageCreationInProgress = True
+            self._umlPubSubEngine.sendMessage(
+                UmlMessageType.UPDATE_APPLICATION_STATUS,
+                frameId=self._sequenceDiagramFrame.id,
+                message='Click on destination lifeline for found message'
+            )
+
+    def createLostMessage(self, startLifeLine: UmlSDLifeLine, fromY: int, destX: Optional[int] = None, messageName: Optional[str] = None) -> UmlSDMessage:
+        """
+        Create and attach a lost message originating from a lifeline and terminating at a solid dot.
+
+        Args:
+            startLifeLine: Source lifeline shape
+            fromY:         Source vertical Y coordinate
+            destX:         Optional target horizontal coordinate for the lost dot
+            messageName:   Optional label text for the message
+
+        Returns:
+            The created UmlSDMessage instance
+        """
+        headerBottomY: int = startLifeLine.rectangle.top
+        rawFromTimeStepIndex: int = self._layoutEngine.computeNearestTimeStepIndex(headerBottomY=headerBottomY, targetY=fromY)
+        fromTimeStepIndex: int = max(0, rawFromTimeStepIndex)
+
+        snappedFromY: int
+        if self._preferences.autoGrowLifeLines:
+            snappedFromY = self._layoutEngine.computeTimeStepY(headerBottomY=headerBottomY, timeStepIndex=fromTimeStepIndex)
+            neededLifelineHeight: int = (snappedFromY - headerBottomY) + self._layoutEngine.parameters.bottomPadding
+            if neededLifelineHeight > startLifeLine.size.height:
+                if self._preferences.uniformLifeLineLength:
+                    self._sequenceDiagramFrame.setAllLifeLinesLength(neededLifelineHeight)
+                else:
+                    startSDInstance: UmlSDInstance | None = startLifeLine.umlSDInstance
+                    if startSDInstance is not None:
+                        startSDInstance.setLifeLineLength(neededLifelineHeight)
+        else:
+            maxTimeStepIndex: int = max(
+                0,
+                (startLifeLine.size.height - self._layoutEngine.parameters.topPadding - self._layoutEngine.parameters.bottomPadding)
+                // self._layoutEngine.parameters.timeStepHeight
+            )
+            fromTimeStepIndex = max(0, min(fromTimeStepIndex, maxTimeStepIndex))
+            snappedFromY = self._layoutEngine.computeTimeStepY(headerBottomY=headerBottomY, timeStepIndex=fromTimeStepIndex)
+
+        actualDestX: int
+        if destX is not None:
+            actualDestX = destX
+        else:
+            actualDestX = round(startLifeLine.GetX() + DEFAULT_LOST_FOUND_MESSAGE_LENGTH)
+
+        fromExecution: Optional[UmlSDExecution] = startLifeLine.getExecutionAtY(y=snappedFromY)
+        startX: float = startLifeLine.GetX()
+        if actualDestX >= startLifeLine.GetX():
+            if fromExecution is not None:
+                startX = fromExecution.GetX() + (fromExecution.GetWidth() / 2.0)
+        else:
+            if fromExecution is not None:
+                startX = fromExecution.GetX() - (fromExecution.GetWidth() / 2.0)
+
+        labelStr: str
+        if messageName is not None:
+            labelStr = messageName
+        else:
+            labelStr = f'demoMessage-{self._messageCount:04d}'
+            self._messageCount += 1
+
+        modelMessage: SDMessage = SDMessage(
+            message=labelStr,
+            src=startLifeLine.umlInstanceName.sdInstance,
+            sourceY=snappedFromY,
+            dst=None,
+            destinationY=snappedFromY,
+        )
+        umlSDMessage: UmlSDMessage = UmlSDMessage(
+            sdMessage=modelMessage,
+            umlPubSubEngine=self._umlPubSubEngine,
+            messageType=SDMessageType.LOST
+        )
+        umlSDMessage.umlFrame = self._sequenceDiagramFrame
+        self.logger.info(f'Created lost message: {umlSDMessage.sdMessage.message}')
+
+        startLifeLine.addMessage(umlSDMessage=umlSDMessage, destinationLifeLine=None)
+
+        umlSDMessage.fromY = snappedFromY
+        umlSDMessage.toY   = snappedFromY
+
+        umlSDMessage.SetEnds(
+            x1=startX,
+            y1=snappedFromY,
+            x2=actualDestX,
+            y2=snappedFromY
+        )
+
+        umlSDMessage.Show(True)
+        self._sequenceDiagramFrame.umlDiagram.AddShape(umlSDMessage)
+        self._sequenceDiagramFrame.refresh()
+
+        eventHandler: UmlSDMessageEventHandler = UmlSDMessageEventHandler(
+            umlSDMessage=umlSDMessage,
+            umlPubSubEngine=self._umlPubSubEngine,
+            previousEventHandler=umlSDMessage.GetEventHandler()
+        )
+        umlSDMessage.SetEventHandler(eventHandler)
+        self._sequenceDiagramFrame.moveShapeToFront(umlSDMessage)
+
+        return umlSDMessage
+
+    def createFoundMessage(self, destLifeLine: UmlSDLifeLine, toY: int, sourceX: Optional[int] = None, messageName: Optional[str] = None) -> UmlSDMessage:
+        """
+        Create and attach a found message originating from a solid dot and terminating at a lifeline.
+
+        Args:
+            destLifeLine: Destination lifeline shape
+            toY:          Destination vertical Y coordinate
+            sourceX:      Optional origin horizontal coordinate for the found dot
+            messageName:  Optional label text for the message
+
+        Returns:
+            The created UmlSDMessage instance
+        """
+        headerBottomY: int = destLifeLine.rectangle.top
+        rawToTimeStepIndex: int = self._layoutEngine.computeNearestTimeStepIndex(headerBottomY=headerBottomY, targetY=toY)
+        toTimeStepIndex: int = max(0, rawToTimeStepIndex)
+
+        snappedToY: int
+        if self._preferences.autoGrowLifeLines:
+            snappedToY = self._layoutEngine.computeTimeStepY(headerBottomY=headerBottomY, timeStepIndex=toTimeStepIndex)
+            neededLifelineHeight: int = (snappedToY - headerBottomY) + self._layoutEngine.parameters.bottomPadding
+            if neededLifelineHeight > destLifeLine.size.height:
+                if self._preferences.uniformLifeLineLength:
+                    self._sequenceDiagramFrame.setAllLifeLinesLength(neededLifelineHeight)
+                else:
+                    destSDInstance: UmlSDInstance | None = destLifeLine.umlSDInstance
+                    if destSDInstance is not None:
+                        destSDInstance.setLifeLineLength(neededLifelineHeight)
+        else:
+            maxTimeStepIndex: int = max(
+                0,
+                (destLifeLine.size.height - self._layoutEngine.parameters.topPadding - self._layoutEngine.parameters.bottomPadding)
+                // self._layoutEngine.parameters.timeStepHeight
+            )
+            toTimeStepIndex = max(0, min(toTimeStepIndex, maxTimeStepIndex))
+            snappedToY = self._layoutEngine.computeTimeStepY(headerBottomY=headerBottomY, timeStepIndex=toTimeStepIndex)
+
+        actualSourceX: int
+        if sourceX is not None:
+            actualSourceX = sourceX
+        else:
+            actualSourceX = round(destLifeLine.GetX() - DEFAULT_LOST_FOUND_MESSAGE_LENGTH)
+
+        toExecution: Optional[UmlSDExecution] = destLifeLine.getExecutionAtY(y=snappedToY)
+        endX: float = destLifeLine.GetX()
+        if actualSourceX <= destLifeLine.GetX():
+            if toExecution is not None:
+                endX = toExecution.GetX() - (toExecution.GetWidth() / 2.0)
+        else:
+            if toExecution is not None:
+                endX = toExecution.GetX() + (toExecution.GetWidth() / 2.0)
+
+        labelStr: str
+        if messageName is not None:
+            labelStr = messageName
+        else:
+            labelStr = f'demoMessage-{self._messageCount:04d}'
+            self._messageCount += 1
+
+        modelMessage: SDMessage = SDMessage(
+            message=labelStr,
+            src=None,
+            sourceY=snappedToY,
+            dst=destLifeLine.umlInstanceName.sdInstance,
+            destinationY=snappedToY,
+        )
+        umlSDMessage: UmlSDMessage = UmlSDMessage(
+            sdMessage=modelMessage,
+            umlPubSubEngine=self._umlPubSubEngine,
+            messageType=SDMessageType.FOUND
+        )
+        umlSDMessage.umlFrame = self._sequenceDiagramFrame
+        self.logger.info(f'Created found message: {umlSDMessage.sdMessage.message}')
+
+        destLifeLine.addFoundMessage(umlSDMessage=umlSDMessage)
+
+        umlSDMessage.fromY = snappedToY
+        umlSDMessage.toY   = snappedToY
+
+        if self._preferences.autoGenerateExecutions:
+            execution: UmlSDExecution = UmlSDExecution(
+                lifeLine=destLifeLine,
+                startY=snappedToY,
+                endY=snappedToY + self._preferences.timeStepHeight
+            )
+            destLifeLine.addExecution(execution=execution)
+            umlSDMessage.execution = execution
+
+            if actualSourceX <= destLifeLine.GetX():
+                endX = execution.GetX() - (execution.GetWidth() / 2.0)
+            else:
+                endX = execution.GetX() + (execution.GetWidth() / 2.0)
+
+        umlSDMessage.SetEnds(
+            x1=actualSourceX,
+            y1=snappedToY,
+            x2=endX,
+            y2=snappedToY
+        )
+
+        umlSDMessage.Show(True)
+        self._sequenceDiagramFrame.umlDiagram.AddShape(umlSDMessage)
+        self._sequenceDiagramFrame.refresh()
+
+        eventHandler: UmlSDMessageEventHandler = UmlSDMessageEventHandler(
+            umlSDMessage=umlSDMessage,
+            umlPubSubEngine=self._umlPubSubEngine,
+            previousEventHandler=umlSDMessage.GetEventHandler()
+        )
+        umlSDMessage.SetEventHandler(eventHandler)
+        self._sequenceDiagramFrame.moveShapeToFront(umlSDMessage)
+
+        return umlSDMessage
 
     def _hookThemUp(self, endDetails: LifeLineClickDetails):
         """
@@ -290,6 +587,7 @@ class SDMessageCreationHandler:
 
     def _reset(self):
         self._startDetails = NO_START_DETAILS
+        self._canvasClickPosition = None
         self._messageCreationInProgress = False
         self._umlPubSubEngine.sendMessage(
             UmlMessageType.UPDATE_APPLICATION_STATUS,

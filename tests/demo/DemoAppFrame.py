@@ -193,6 +193,8 @@ class DemoAppFrame(SizedFrame):
         msgTypeMenu.AppendRadioItem(Identifiers.ID_SD_MSG_SYNC, 'Synchronous', 'Create synchronous messages (solid arrowhead)')
         msgTypeMenu.AppendRadioItem(Identifiers.ID_SD_MSG_ASYNC, 'Asynchronous', 'Create asynchronous messages (open stick arrowhead)')
         msgTypeMenu.AppendRadioItem(Identifiers.ID_SD_MSG_RETURN, 'Return', 'Create return messages (dashed line, open stick arrowhead)')
+        msgTypeMenu.AppendRadioItem(Identifiers.ID_SD_MSG_LOST, 'Lost', 'Create lost messages (solid line, black circle destination)')
+        msgTypeMenu.AppendRadioItem(Identifiers.ID_SD_MSG_FOUND, 'Found', 'Create found messages (black circle origin, arrowhead destination)')
         actionMenu.AppendSubMenu(msgTypeMenu, 'Message Type')
 
         #
@@ -279,6 +281,8 @@ class DemoAppFrame(SizedFrame):
         self.Bind(EVT_MENU, self._onSDMessageTypeSelected, id=Identifiers.ID_SD_MSG_SYNC)
         self.Bind(EVT_MENU, self._onSDMessageTypeSelected, id=Identifiers.ID_SD_MSG_ASYNC)
         self.Bind(EVT_MENU, self._onSDMessageTypeSelected, id=Identifiers.ID_SD_MSG_RETURN)
+        self.Bind(EVT_MENU, self._onSDMessageTypeSelected, id=Identifiers.ID_SD_MSG_LOST)
+        self.Bind(EVT_MENU, self._onSDMessageTypeSelected, id=Identifiers.ID_SD_MSG_FOUND)
 
     # noinspection PyUnusedLocal
     def _onDemoShapeBoundaries(self, event: CommandEvent):
@@ -345,6 +349,12 @@ class DemoAppFrame(SizedFrame):
             case Identifiers.ID_SD_MSG_RETURN:
                 self._sdMessageHandler.messageType = SDMessageType.RETURN
                 self.SetStatusText('Selected Return Message')
+            case Identifiers.ID_SD_MSG_LOST:
+                self._sdMessageHandler.messageType = SDMessageType.LOST
+                self.SetStatusText('Selected Lost Message')
+            case Identifiers.ID_SD_MSG_FOUND:
+                self._sdMessageHandler.messageType = SDMessageType.FOUND
+                self.SetStatusText('Selected Found Message')
             case _:
                 self._sdMessageHandler.messageType = SDMessageType.SYNCHRONOUS
                 self.SetStatusText('Selected Synchronous Message')
