@@ -154,7 +154,7 @@ class SDMessageCreationHandler:
                     message='Click in diagram for endpoint, or click lifeline again for default'
                 )
             else:
-                targetDestX: Optional[int] = None
+                targetDestX: int = -1
                 if clickDetails.lifeLine != self._startDetails.lifeLine:
                     targetDestX = round(clickDetails.lifeLine.GetX())
                 self.createLostMessage(
@@ -165,7 +165,7 @@ class SDMessageCreationHandler:
                 self._reset()
 
         elif self._messageType == SDMessageType.FOUND:
-            originX: Optional[int] = None
+            originX: int = -1
             if self._canvasClickPosition is not None:
                 originX = self._canvasClickPosition.x
             self.createFoundMessage(
@@ -221,7 +221,7 @@ class SDMessageCreationHandler:
                 message='Click on destination lifeline for found message'
             )
 
-    def createLostMessage(self, startLifeLine: UmlSDLifeLine, fromY: int, destX: Optional[int] = None, messageName: Optional[str] = None) -> UmlSDMessage:
+    def createLostMessage(self, startLifeLine: UmlSDLifeLine, fromY: int, destX: int = -1, messageName: str = '') -> UmlSDMessage:
         """
         Create and attach a lost message originating from a lifeline and terminating at a solid dot.
 
@@ -259,7 +259,7 @@ class SDMessageCreationHandler:
             snappedFromY = self._layoutEngine.computeTimeStepY(headerBottomY=headerBottomY, timeStepIndex=fromTimeStepIndex)
 
         actualDestX: int
-        if destX is not None:
+        if destX != -1:
             actualDestX = destX
         else:
             actualDestX = round(startLifeLine.GetX() + DEFAULT_LOST_FOUND_MESSAGE_LENGTH)
@@ -274,7 +274,7 @@ class SDMessageCreationHandler:
                 startX = fromExecution.GetX() - (fromExecution.GetWidth() / 2.0)
 
         labelStr: str
-        if messageName is not None:
+        if messageName != '':
             labelStr = messageName
         else:
             labelStr = f'demoMessage-{self._messageCount:04d}'
@@ -321,7 +321,7 @@ class SDMessageCreationHandler:
 
         return umlSDMessage
 
-    def createFoundMessage(self, destLifeLine: UmlSDLifeLine, toY: int, sourceX: Optional[int] = None, messageName: Optional[str] = None) -> UmlSDMessage:
+    def createFoundMessage(self, destLifeLine: UmlSDLifeLine, toY: int, sourceX: int = -1, messageName: str = '') -> UmlSDMessage:
         """
         Create and attach a found message originating from a solid dot and terminating at a lifeline.
 
@@ -359,7 +359,7 @@ class SDMessageCreationHandler:
             snappedToY = self._layoutEngine.computeTimeStepY(headerBottomY=headerBottomY, timeStepIndex=toTimeStepIndex)
 
         actualSourceX: int
-        if sourceX is not None:
+        if sourceX != -1:
             actualSourceX = sourceX
         else:
             actualSourceX = round(destLifeLine.GetX() - DEFAULT_LOST_FOUND_MESSAGE_LENGTH)
@@ -374,7 +374,7 @@ class SDMessageCreationHandler:
                 endX = toExecution.GetX() + (toExecution.GetWidth() / 2.0)
 
         labelStr: str
-        if messageName is not None:
+        if messageName != '':
             labelStr = messageName
         else:
             labelStr = f'demoMessage-{self._messageCount:04d}'
