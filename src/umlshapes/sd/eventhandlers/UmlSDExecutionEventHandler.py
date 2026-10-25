@@ -24,6 +24,7 @@ from umlshapes.sd.UmlSDExecution import EXECUTION_TOP_HANDLE_INDEX
 from umlshapes.sd.UmlSDExecution import UmlSDExecution
 
 if TYPE_CHECKING:
+    from umlshapes.sd.UmlSDInstance import UmlSDInstance
     from umlshapes.sd.UmlSDLifeLine import UmlSDLifeLine
 
 MIN_EXECUTION_DURATION_PIXELS: int = 20
@@ -105,12 +106,8 @@ class UmlSDExecutionEventHandler(UmlBaseEventHandler):
             keys: Modifier keys bitmask.
             attachment: Attachment point identifier.
         """
-        lifeLine: Optional['UmlSDLifeLine'] = self._umlSDExecution.lifeLine
-        if lifeLine is not None:
-            if lifeLine.umlSDInstance is not None:
-                parentHandler: Optional[ShapeEvtHandler] = lifeLine.umlSDInstance.GetEventHandler()
-                if parentHandler is not None:
-                    parentHandler.OnBeginDragLeft(x, y, keys, attachment)
+        parentHandler: ShapeEvtHandler = self._umlSDExecution.lifeLine.umlSDInstance.GetEventHandler()
+        parentHandler.OnBeginDragLeft(x, y, keys, attachment)
 
     def OnDragLeft(self, draw: bool, x: int, y: int, keys: int = 0, attachment: int = 0):
         """
@@ -123,12 +120,8 @@ class UmlSDExecutionEventHandler(UmlBaseEventHandler):
             keys: Modifier keys bitmask.
             attachment: Attachment point identifier.
         """
-        lifeLine: Optional['UmlSDLifeLine'] = self._umlSDExecution.lifeLine
-        if lifeLine is not None:
-            if lifeLine.umlSDInstance is not None:
-                parentHandler: Optional[ShapeEvtHandler] = lifeLine.umlSDInstance.GetEventHandler()
-                if parentHandler is not None:
-                    parentHandler.OnDragLeft(draw, x, y, keys, attachment)
+        parentHandler: ShapeEvtHandler = self._umlSDExecution.lifeLine.umlSDInstance.GetEventHandler()
+        parentHandler.OnDragLeft(draw, x, y, keys, attachment)
 
     def OnEndDragLeft(self, x: int, y: int, keys: int = 0, attachment: int = 0):
         """
@@ -140,12 +133,8 @@ class UmlSDExecutionEventHandler(UmlBaseEventHandler):
             keys: Modifier keys bitmask.
             attachment: Attachment point identifier.
         """
-        lifeLine: Optional['UmlSDLifeLine'] = self._umlSDExecution.lifeLine
-        if lifeLine is not None:
-            if lifeLine.umlSDInstance is not None:
-                parentHandler: Optional[ShapeEvtHandler] = lifeLine.umlSDInstance.GetEventHandler()
-                if parentHandler is not None:
-                    parentHandler.OnEndDragLeft(x, y, keys, attachment)
+        parentHandler: ShapeEvtHandler = self._umlSDExecution.lifeLine.umlSDInstance.GetEventHandler()
+        parentHandler.OnEndDragLeft(x, y, keys, attachment)
 
     def OnSizingBeginDragLeft(self, pt: ControlPoint, x: int, y: int, keys: int = 0, attachment: int = 0):
         """
@@ -183,9 +172,7 @@ class UmlSDExecutionEventHandler(UmlBaseEventHandler):
         if self._activeHandleIndex is None:
             return
 
-        lifeLine: Optional['UmlSDLifeLine'] = self._umlSDExecution.lifeLine
-        if lifeLine is None:
-            return
+        lifeLine: UmlSDLifeLine = self._umlSDExecution.lifeLine
 
         headerBottomY: int = round(lifeLine.rectangle.top)
         lifelineBottomY: int = round(lifeLine.rectangle.bottom)

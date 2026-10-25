@@ -64,8 +64,8 @@ class UmlSDLifeLine(IdentifierMixin, RectangleShape, TopLeftMixin):
         return self._instanceConstrainer
 
     @property
-    def umlSDInstance(self) -> Optional['UmlSDInstance']:
-        return self._umlSDInstance
+    def umlSDInstance(self) -> 'UmlSDInstance':
+        return cast('UmlSDInstance', self._umlSDInstance)
 
     @umlSDInstance.setter
     def umlSDInstance(self, instance: 'UmlSDInstance'):
