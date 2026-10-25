@@ -28,6 +28,9 @@ from umlshapes.preferences.Defaults import DEFAULT_AUTO_GENERATE_EXECUTIONS
 from umlshapes.preferences.Defaults import DEFAULT_TIME_STEP_HEIGHT
 from umlshapes.preferences.Defaults import DEFAULT_UNIFORM_LIFELINE_LENGTH
 from umlshapes.preferences.Defaults import DEFAULT_USE_CASE_SIZE
+from umlshapes.preferences.Defaults import DEFAULT_FRAGMENT_HEADER_WIDTH
+from umlshapes.preferences.Defaults import DEFAULT_FRAGMENT_HEADER_HEIGHT
+from umlshapes.preferences.Defaults import DEFAULT_FRAGMENT_PADDING
 from umlshapes.preferences.Defaults import FRAME_HEIGHT
 from umlshapes.preferences.Defaults import FRAME_WIDTH
 
@@ -142,6 +145,9 @@ SEQUENCE_DIAGRAM_PREFERENCES: ValueDescriptions = ValueDescriptions(
         KeyName('executionWidth'):                  ValueDescription(defaultValue=str(DEFAULT_EXECUTION_WIDTH),        deserializer=SecureConversions.secureInteger),
         KeyName('autoGenerateExecutions'):          ValueDescription(defaultValue=str(DEFAULT_AUTO_GENERATE_EXECUTIONS), deserializer=SecureConversions.secureBoolean),
         KeyName('executionShiftDelta'):             ValueDescription(defaultValue=str(DEFAULT_EXECUTION_SHIFT_DELTA),  deserializer=SecureConversions.secureInteger),
+        KeyName('fragmentHeaderWidth'):             ValueDescription(defaultValue=str(DEFAULT_FRAGMENT_HEADER_WIDTH),   deserializer=SecureConversions.secureInteger),
+        KeyName('fragmentHeaderHeight'):            ValueDescription(defaultValue=str(DEFAULT_FRAGMENT_HEADER_HEIGHT),  deserializer=SecureConversions.secureInteger),
+        KeyName('fragmentPadding'):                 ValueDescription(defaultValue=str(DEFAULT_FRAGMENT_PADDING),        deserializer=SecureConversions.secureInteger),
     }
 )
 ASSOCIATION_PREFERENCES: ValueDescriptions = ValueDescriptions(

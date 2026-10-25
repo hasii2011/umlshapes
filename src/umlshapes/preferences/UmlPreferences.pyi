@@ -71,6 +71,9 @@ class UmlPreferences:
     executionWidth: int
     autoGenerateExecutions: bool
     executionShiftDelta: int
+    fragmentHeaderWidth: int
+    fragmentHeaderHeight: int
+    fragmentPadding: int
     associationTextFontSize: int
     diamondSize: int
     associationLabelSize: UmlDimensions
