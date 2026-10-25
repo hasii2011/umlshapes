@@ -24,7 +24,6 @@ from umlshapes.sd.UmlSDExecution import EXECUTION_TOP_HANDLE_INDEX
 from umlshapes.sd.UmlSDExecution import UmlSDExecution
 
 if TYPE_CHECKING:
-    from umlshapes.sd.UmlSDInstance import UmlSDInstance
     from umlshapes.sd.UmlSDLifeLine import UmlSDLifeLine
 
 MIN_EXECUTION_DURATION_PIXELS: int = 20

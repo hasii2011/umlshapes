@@ -17,6 +17,7 @@ from umlshapes.sd.UmlSDMessageLabel import UmlSDMessageLabel
 from umlshapes.types.UmlPosition import UmlPosition
 
 if TYPE_CHECKING:
+    from umlshapes.sd.UmlSDMessage import LineControlPoints
     from umlshapes.sd.UmlSDMessage import UmlSDMessage
 
 
@@ -105,15 +106,16 @@ class UmlSDMessageLabelEventHandler(UmlBaseEventHandler):
         from umlshapes.sd.UmlSDMessage import UmlSDMessage
 
         parentMessage: Optional[UmlSDMessage] = cast(Optional[UmlSDMessage], label.parent)
-        if parentMessage is not None and parentMessage._lineControlPoints is not None and len(parentMessage._lineControlPoints) >= 2:
-            startX: int = round(parentMessage._lineControlPoints[0].x)
-            lineY:  int = round(parentMessage._lineControlPoints[0].y)
+        if parentMessage is not None and len(parentMessage.lineControlPoints) >= 2:
+            lineControlPoints: 'LineControlPoints' = parentMessage.lineControlPoints
+            startX: int = round(lineControlPoints[0].x)
+            lineY:  int = round(lineControlPoints[0].y)
 
             lineLength: int
             if parentMessage.isReflexiveMessage:
-                lineLength = round(parentMessage._lineControlPoints[1].x) - startX
+                lineLength = round(lineControlPoints[1].x) - startX
             else:
-                lineLength = round(parentMessage._lineControlPoints[-1].x) - startX
+                lineLength = round(lineControlPoints[-1].x) - startX
 
             if lineLength != 0:
                 fraction: float = (newCenterX - startX) / lineLength
