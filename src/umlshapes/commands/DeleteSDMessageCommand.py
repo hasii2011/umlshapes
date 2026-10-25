@@ -56,11 +56,10 @@ class DeleteSDMessageCommand(Command):
 
         self._umlSDMessage.selected = False
 
-        messageLabel: Optional[UmlSDMessageLabel] = self._umlSDMessage.messageLabel
-        if messageLabel is not None:
-            messageLabel.Select(False)
-            umlDiagram.RemoveShape(messageLabel)
-            messageLabel.Show(False)
+        messageLabel: UmlSDMessageLabel = self._umlSDMessage.messageLabel
+        messageLabel.Select(False)
+        umlDiagram.RemoveShape(messageLabel)
+        messageLabel.Show(False)
 
         if self._fromLifeLine is not None and self._umlSDMessage in self._fromLifeLine.GetLines():
             self._fromLifeLine.GetLines().remove(self._umlSDMessage)
@@ -93,10 +92,9 @@ class DeleteSDMessageCommand(Command):
         umlDiagram.AddShape(self._umlSDMessage)
         self._umlSDMessage.Show(True)
 
-        messageLabel: Optional[UmlSDMessageLabel] = self._umlSDMessage.messageLabel
-        if messageLabel is not None:
-            umlDiagram.AddShape(messageLabel)
-            messageLabel.Show(True)
+        messageLabel: UmlSDMessageLabel = self._umlSDMessage.messageLabel
+        umlDiagram.AddShape(messageLabel)
+        messageLabel.Show(True)
 
         self._umlFrame.refresh()
         return True

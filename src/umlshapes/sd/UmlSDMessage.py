@@ -292,7 +292,11 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
         self._ypos = (fromY + toY) // 2
 
     @property
-    def execution(self) -> Optional['UmlSDExecution']:
+    def hasExecution(self) -> bool:
+        return self._execution is not None
+
+    @property
+    def execution(self) -> 'UmlSDExecution':
         return self._execution
 
     @execution.setter
@@ -686,58 +690,6 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
         label.parent = self
         self._children.append(label)
         return label
-
-    def _createLinkName(self) -> UmlSDMessageLabel:
-
-        labelX: int
-        labelY: int
-        if self.isReflexiveMessage and len(self.lineControlPoints) >= 2:
-            startX: int = self.lineControlPoints[0].x
-            loopX:  int = self.lineControlPoints[1].x
-            lineY:  int = self.lineControlPoints[0].y
-            labelX = (startX + loopX) // 2
-            labelY = lineY
-        else:
-            labelX, labelY = self.GetLabelPosition(position=NAME_IDX)
-
-        return self._createMessageLabel(x=labelX, y=labelY, text=self.sdMessage.message)
-
-    def _createMessageLabel(self, x: int, y: int, text: str) -> UmlSDMessageLabel:
-
-        assert text is not None, 'Developer error'
-
-        umlSDMessageLabel: UmlSDMessageLabel = UmlSDMessageLabel(label=text)
-        umlSDMessageLabel.proportionalOffset = 0.5
-        umlSDMessageLabel.fixedX = x
-        umlSDMessageLabel.verticalOffset = 0
-
-        topLeftX: int = x - (umlSDMessageLabel.size.width // 2)
-        topLeftY: int = y - (umlSDMessageLabel.size.height // 2)
-        umlSDMessageLabel.position = UmlPosition(x=topLeftX, y=topLeftY)
-        #
-        # Maybe not necessary, but let's be consistent
-        #
-        self._children.append(umlSDMessageLabel)
-        self._setupMessageLabel(umlSDMessageLabel)
-
-        return umlSDMessageLabel
-
-    def _setupMessageLabel(self, umlSDMessageLabel: UmlSDMessageLabel):
-        """
-
-        Args:
-            umlSDMessageLabel:
-        """
-        from umlshapes.frames.UmlFrame import UmlFrame
-
-        umlFrame: UmlFrame = self.GetCanvas()
-        umlSDMessageLabel.SetCanvas(umlFrame)
-        umlSDMessageLabel.parent = self
-
-        diagram: UmlDiagram = umlFrame.umlDiagram
-        diagram.AddShape(umlSDMessageLabel)
-
-        self._setMessageLabelEventHandler(umlSDMessageLabel)
 
     def _setMessageLabelEventHandler(self, umlSDMessageLabel: UmlSDMessageLabel):
         """

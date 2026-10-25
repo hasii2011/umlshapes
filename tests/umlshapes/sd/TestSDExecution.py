@@ -421,7 +421,7 @@ class TestSDExecution(UnitTestBaseW):
         self.assertTrue(msg.Draggable())
         self.assertIsNotNone(msg.execution)
 
-        execution: UmlSDExecution = cast(UmlSDExecution, msg.execution)
+        execution: UmlSDExecution = msg.execution
         initialDuration: int = execution.endY - execution.startY
 
         targetDragY: int = EXECUTION_START_Y_1 + (self._preferences.timeStepHeight * 2)

@@ -29,6 +29,7 @@ from umlshapes.preferences.UmlPreferences import UmlPreferences
 from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 
 from umlshapes.sd.SDLayoutEngine import SDLayoutEngine
+from umlshapes.sd.UmlSDExecution import UmlSDExecution
 from umlshapes.sd.UmlSDInstance import UmlSDInstance
 from umlshapes.sd.UmlSDLifeLine import UmlSDLifeLine
 from umlshapes.sd.UmlSDMessage import UmlSDMessage
@@ -79,6 +80,7 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
         self._umlPubSubEngine: IUmlPubSubEngine = umlPubSubEngine
         self._layoutEngine:    SDLayoutEngine   = SDLayoutEngine()
         self._preferences:     UmlPreferences   = UmlPreferences()
+
         self._dragContext: Optional[MessageDragContext] = None
 
     def OnBeginDragLeft(self, x: int, y: int, keys: int = 0, attachment: int = 0):
@@ -531,12 +533,11 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
             if sdInstance is not None:
                 sdInstance.setLifeLineLength(neededHeight)
 
-    def _computeAutoGrowEndpoints(self, referenceLifeLine: UmlSDLifeLine, headerBottomY: int, rawTimeStepIndex: int, span: int, canvas: UmlFrame) -> tuple[int, int]:
+    def _computeAutoGrowEndpoints(self, headerBottomY: int, rawTimeStepIndex: int, span: int, canvas: UmlFrame) -> tuple[int, int]:
         """
         Compute snapped message endpoints and expand lifelines if necessary.
 
         Args:
-            referenceLifeLine: Reference lifeline shape
             headerBottomY:    Bottom Y coordinate of the lifeline header
             rawTimeStepIndex: Unbounded timeStep index based on cursor position
             span:             Vertical span between fromY and toY
@@ -583,16 +584,19 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
             snappedFromY: Snapped Y coordinate for the start of the message
             snappedToY:   Snapped Y coordinate for the end of the message
         """
-        if self._umlSDMessage.execution is not None:
-            duration: int = self._umlSDMessage.execution.endY - self._umlSDMessage.execution.startY
-            targetExecutionY: int
-            if self._umlSDMessage.isReflexiveMessage:
-                targetExecutionY = snappedFromY
-            else:
-                targetExecutionY = snappedToY
-            self._umlSDMessage.execution.startY = targetExecutionY
-            self._umlSDMessage.execution.endY = targetExecutionY + duration
-            self._umlSDMessage.execution.lifeLine.recomputeExecutionsGeometry()
+        if not self._umlSDMessage.hasExecution:
+            return
+
+        execution: UmlSDExecution = self._umlSDMessage.execution
+        duration: int = execution.endY - execution.startY
+        targetExecutionY: int
+        if self._umlSDMessage.isReflexiveMessage:
+            targetExecutionY = snappedFromY
+        else:
+            targetExecutionY = snappedToY
+        execution.startY = targetExecutionY
+        execution.endY   = targetExecutionY + duration
+        execution.lifeLine.recomputeExecutionsGeometry()
 
     def _applyMessageEndpoints(self, snappedFromY: int, snappedToY: int, canvas: UmlFrame):
         """
@@ -635,7 +639,6 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
         snappedToY:   int
         if self._preferences.autoGrowLifeLines:
             snappedFromY, snappedToY = self._computeAutoGrowEndpoints(
-                referenceLifeLine=referenceLifeLine,
                 headerBottomY=headerBottomY,
                 rawTimeStepIndex=rawTimeStepIndex,
                 span=span,

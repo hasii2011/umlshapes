@@ -383,9 +383,7 @@ class TestSDLostFoundMessage(UnitTestBaseW):
         self.assertEqual(expectedY, foundMessage.fromY)
         self.assertEqual(stretchedFreeX, foundMessage.lineControlPoints[0].x)
 
-        expectedDestX: int = lifeLineX
-
-        execution: UmlSDExecution = foundMessage.execution  # type: ignore
+        execution: UmlSDExecution = foundMessage.execution
         expectedDestX = round(execution.GetX() - (execution.GetWidth() / 2.0))
 
         self.assertEqual(expectedDestX, foundMessage.lineControlPoints[-1].x)
