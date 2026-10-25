@@ -316,20 +316,81 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
                 self._umlSDMessage.ResetControlPoints()
                 canvas.refresh()
 
+    def _updateReflexiveLoopWidth(self, startLifeLine: UmlSDLifeLine, x: int, isCorner: bool):
+        """
+        Update the reflexive loop width if dragging a corner control point.
+
+        Args:
+            startLifeLine: Origin lifeline shape
+            x:             Cursor X coordinate
+            isCorner:      True if dragging a corner control point
+        """
+        if isCorner:
+            lifeLineX: int = round(startLifeLine.GetX())
+            rawWidth: int = x - lifeLineX
+            newLoopWidth: int = max(MIN_REFLEXIVE_MESSAGE_WIDTH, rawWidth)
+            self._umlSDMessage.loopWidth = newLoopWidth
+
+    def _finalizeReflexiveResize(self, startLifeLine: UmlSDLifeLine, newFromY: int, newToY: int, isCorner: bool):
+        """
+        Apply auto-grow or clamping constraints, update reflexive message geometry,
+        and refresh the canvas.
+
+        Args:
+            startLifeLine: Origin lifeline shape
+            newFromY:      Proposed fromY coordinate
+            newToY:        Proposed toY coordinate
+            isCorner:      True if dragging a corner control point
+        """
+        headerBottomY:      int = startLifeLine.rectangle.top
+        minTimeStepSpacing: int = self._layoutEngine.parameters.timeStepHeight
+        minFromY:           int = self._layoutEngine.computeTimeStepY(headerBottomY=headerBottomY, timeStepIndex=0)
+        canvas:             UmlFrame = self._umlSDMessage.umlFrame
+
+        if self._preferences.autoGrowLifeLines:
+            neededHeight: int = (newToY - headerBottomY) + self._layoutEngine.parameters.bottomPadding
+            self._growLifeLinesIfNeeded(neededHeight=neededHeight, canvas=canvas)
+        else:
+            maxTimeStepIndex: int = max(
+                0,
+                (startLifeLine.size.height - self._layoutEngine.parameters.topPadding - self._layoutEngine.parameters.bottomPadding)
+                // minTimeStepSpacing
+            )
+            maxToY: int = self._layoutEngine.computeTimeStepY(headerBottomY=headerBottomY, timeStepIndex=maxTimeStepIndex)
+            newToY = min(newToY, maxToY)
+            if newToY <= newFromY:
+                newFromY = max(minFromY, newToY - minTimeStepSpacing)
+
+        hasGeometryChanged: bool = False
+        if newFromY != self._umlSDMessage.fromY or newToY != self._umlSDMessage.toY:
+            hasGeometryChanged = True
+        if isCorner:
+            hasGeometryChanged = True
+
+        if hasGeometryChanged:
+            self._umlSDMessage.fromY = newFromY
+            self._umlSDMessage.toY = newToY
+            dc: ClientDC = ClientDC(canvas)
+            canvas.PrepareDC(dc)
+            self._umlSDMessage.OnMoveLink(dc=dc)
+            self._umlSDMessage.ResetControlPoints()
+            canvas.refresh()
+
     def _resizeOrRepositionReturnMessage(self, x: int, y: int, isCorner: bool):
         """
         Resize vertical span and optionally reposition reflexive message when dragging
         the return branch control point (endpoint or corner).
+
+        Args:
+            x:        Cursor X coordinate
+            y:        Cursor Y coordinate
+            isCorner: True if dragging a corner control point
         """
         startLifeLine: Optional[UmlSDLifeLine] = cast(Optional[UmlSDLifeLine], self._umlSDMessage.GetFrom())
         if startLifeLine is None:
             return
 
-        lifeLineX: int = round(startLifeLine.GetX())
-        if isCorner:
-            rawWidth: int = x - lifeLineX
-            newLoopWidth: int = max(MIN_REFLEXIVE_MESSAGE_WIDTH, rawWidth)
-            self._umlSDMessage.loopWidth = newLoopWidth
+        self._updateReflexiveLoopWidth(startLifeLine=startLifeLine, x=x, isCorner=isCorner)
 
         headerBottomY: int = startLifeLine.rectangle.top
         minTimeStepSpacing: int = self._layoutEngine.parameters.timeStepHeight
@@ -358,60 +419,28 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
             newToY = max(minFromY + minTimeStepSpacing, candidateToY)
             newFromY = newToY - minTimeStepSpacing
 
-        canvas: UmlFrame = self._umlSDMessage.umlFrame
-        if self._preferences.autoGrowLifeLines:
-            neededHeight: int = (newToY - headerBottomY) + self._layoutEngine.parameters.bottomPadding
-            if neededHeight > startLifeLine.size.height:
-                if self._preferences.uniformLifeLineLength:
-                    if hasattr(canvas, 'setAllLifeLinesLength'):
-                        canvas.setAllLifeLinesLength(neededHeight)
-                else:
-                    startSDInstance: UmlSDInstance | None = startLifeLine.umlSDInstance
-                    if startSDInstance is not None:
-                        startSDInstance.setLifeLineLength(neededHeight)
-        else:
-            maxTimeStepIndex: int = max(
-                0,
-                (startLifeLine.size.height - self._layoutEngine.parameters.topPadding - self._layoutEngine.parameters.bottomPadding)
-                // minTimeStepSpacing
-            )
-            maxToY: int = self._layoutEngine.computeTimeStepY(
-                headerBottomY=headerBottomY,
-                timeStepIndex=maxTimeStepIndex
-            )
-            newToY = min(newToY, maxToY)
-            if newToY <= newFromY:
-                newFromY = max(minFromY, newToY - minTimeStepSpacing)
-
-        hasGeometryChanged: bool = False
-        if newFromY != self._umlSDMessage.fromY or newToY != self._umlSDMessage.toY:
-            hasGeometryChanged = True
-        if isCorner:
-            hasGeometryChanged = True
-
-        if hasGeometryChanged:
-            self._umlSDMessage.fromY = newFromY
-            self._umlSDMessage.toY = newToY
-            dc: ClientDC = ClientDC(canvas)
-            canvas.PrepareDC(dc)
-            self._umlSDMessage.OnMoveLink(dc=dc)
-            self._umlSDMessage.ResetControlPoints()
-            canvas.refresh()
+        self._finalizeReflexiveResize(
+            startLifeLine=startLifeLine,
+            newFromY=newFromY,
+            newToY=newToY,
+            isCorner=isCorner
+        )
 
     def _resizeOrRepositionCallMessage(self, x: int, y: int, isCorner: bool):
         """
         Resize vertical span and optionally reposition reflexive message when dragging
         the call branch control point (endpoint or corner).
+
+        Args:
+            x:        Cursor X coordinate
+            y:        Cursor Y coordinate
+            isCorner: True if dragging a corner control point
         """
         startLifeLine: Optional[UmlSDLifeLine] = cast(Optional[UmlSDLifeLine], self._umlSDMessage.GetFrom())
         if startLifeLine is None:
             return
 
-        lifeLineX: int = round(startLifeLine.GetX())
-        if isCorner:
-            rawWidth: int = x - lifeLineX
-            newLoopWidth: int = max(MIN_REFLEXIVE_MESSAGE_WIDTH, rawWidth)
-            self._umlSDMessage.loopWidth = newLoopWidth
+        self._updateReflexiveLoopWidth(startLifeLine=startLifeLine, x=x, isCorner=isCorner)
 
         headerBottomY: int = startLifeLine.rectangle.top
         minTimeStepSpacing: int = self._layoutEngine.parameters.timeStepHeight
@@ -440,45 +469,12 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
             newFromY = candidateFromY
             newToY = candidateFromY + minTimeStepSpacing
 
-        canvas: UmlFrame = self._umlSDMessage.umlFrame
-        if self._preferences.autoGrowLifeLines:
-            neededHeight: int = (newToY - headerBottomY) + self._layoutEngine.parameters.bottomPadding
-            if neededHeight > startLifeLine.size.height:
-                if self._preferences.uniformLifeLineLength:
-                    if hasattr(canvas, 'setAllLifeLinesLength'):
-                        canvas.setAllLifeLinesLength(neededHeight)
-                else:
-                    startSDInstance: UmlSDInstance | None = startLifeLine.umlSDInstance
-                    if startSDInstance is not None:
-                        startSDInstance.setLifeLineLength(neededHeight)
-        else:
-            maxTimeStepIndex: int = max(
-                0,
-                (startLifeLine.size.height - self._layoutEngine.parameters.topPadding - self._layoutEngine.parameters.bottomPadding)
-                // minTimeStepSpacing
-            )
-            maxToY: int = self._layoutEngine.computeTimeStepY(
-                headerBottomY=headerBottomY,
-                timeStepIndex=maxTimeStepIndex
-            )
-            if newToY > maxToY:
-                newToY = maxToY
-                newFromY = max(minFromY, newToY - minTimeStepSpacing)
-
-        hasGeometryChanged: bool = False
-        if newFromY != self._umlSDMessage.fromY or newToY != self._umlSDMessage.toY:
-            hasGeometryChanged = True
-        if isCorner:
-            hasGeometryChanged = True
-
-        if hasGeometryChanged:
-            self._umlSDMessage.fromY = newFromY
-            self._umlSDMessage.toY = newToY
-            dc: ClientDC = ClientDC(canvas)
-            canvas.PrepareDC(dc)
-            self._umlSDMessage.OnMoveLink(dc=dc)
-            self._umlSDMessage.ResetControlPoints()
-            canvas.refresh()
+        self._finalizeReflexiveResize(
+            startLifeLine=startLifeLine,
+            newFromY=newFromY,
+            newToY=newToY,
+            isCorner=isCorner
+        )
 
     def _computeMessageSpan(self) -> int:
         """
