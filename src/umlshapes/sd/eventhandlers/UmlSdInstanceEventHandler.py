@@ -55,20 +55,19 @@ class UmlSdInstanceEventHandler(UmlBaseEventHandler):
 
         if not umlShape.Selected():
             from umlshapes.frames.UmlFrame import UmlFrame
-            from umlshapes.lib.ogl import ShapeCanvas
 
-            canvas: ShapeCanvas = umlShape.GetCanvas()
-            dc: ClientDC = ClientDC(canvas)
-            canvas.PrepareDC(dc)
-            self._unSelectAllShapesOnCanvas(umlShape, canvas, dc)
+            umlFrame: UmlFrame = cast(UmlFrame, umlShape.GetCanvas())
+            dc: ClientDC = ClientDC(umlFrame)
+            umlFrame.PrepareDC(dc)
+            self._unSelectAllShapesOnCanvas(umlShape, umlFrame, dc)
             umlShape.Select(True, dc)
             if self._umlPubSubEngine is not None:
                 self._umlPubSubEngine.sendMessage(
                     messageType=UmlMessageType.UML_SHAPE_SELECTED,
-                    frameId=cast(UmlFrame, canvas).id,
+                    frameId=umlFrame.id,
                     umlShape=umlShape
                 )
-            cast(UmlFrame, canvas).refresh()
+            umlFrame.refresh()
 
         super().OnBeginDragLeft(x, y, keys, attachment)
 

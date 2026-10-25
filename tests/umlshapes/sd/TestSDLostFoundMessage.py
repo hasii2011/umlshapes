@@ -245,8 +245,8 @@ class TestSDLostFoundMessage(UnitTestBaseW):
         )
         self._creationHandler._lifeLineClicked(clickDetails=click1)
 
-        canvasClick: UmlPosition = UmlPosition(x=lifeLineX + 120, y=MESSAGE_START_Y_1)
-        self._creationHandler._frameLeftClicked(self._diagramFrame, umlPosition=canvasClick)
+        frameClick: UmlPosition = UmlPosition(x=lifeLineX + 120, y=MESSAGE_START_Y_1)
+        self._creationHandler._frameLeftClicked(self._diagramFrame, umlPosition=frameClick)
 
         createdMsg: UmlSDMessage = self._getSingleCreatedMessage()
         self.assertTrue(createdMsg.isLostMessage)
@@ -259,8 +259,8 @@ class TestSDLostFoundMessage(UnitTestBaseW):
         self._creationHandler.messageType = SDMessageType.FOUND
         self._creationHandler.enableMessageCreation = True
 
-        canvasClick: UmlPosition = UmlPosition(x=lifeLineX - 110, y=MESSAGE_START_Y_1)
-        self._creationHandler._frameLeftClicked(self._diagramFrame, umlPosition=canvasClick)
+        frameClick: UmlPosition = UmlPosition(x=lifeLineX - 110, y=MESSAGE_START_Y_1)
+        self._creationHandler._frameLeftClicked(self._diagramFrame, umlPosition=frameClick)
 
         click2: LifeLineClickDetails = LifeLineClickDetails(
             lifeLine=inst2.umlSDLifeLine,

@@ -9,9 +9,9 @@ from wx import MOD_CMD
 from wx import ClientDC
 
 from umlshapes.UmlBaseEventHandler import UmlBaseEventHandler
+from umlshapes.frames.UmlFrame import UmlFrame
 
 from umlshapes.lib.ogl import ControlPoint
-from umlshapes.lib.ogl import ShapeCanvas
 from umlshapes.lib.ogl import ShapeEvtHandler
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
@@ -24,7 +24,6 @@ from umlshapes.sd.UmlSDExecution import EXECUTION_TOP_HANDLE_INDEX
 from umlshapes.sd.UmlSDExecution import UmlSDExecution
 
 if TYPE_CHECKING:
-    from umlshapes.frames.UmlFrame import UmlFrame
     from umlshapes.sd.UmlSDLifeLine import UmlSDLifeLine
 
 MIN_EXECUTION_DURATION_PIXELS: int = 20
@@ -72,15 +71,15 @@ class UmlSDExecutionEventHandler(UmlBaseEventHandler):
             attachment: Attachment point identifier.
         """
         execution: UmlSDExecution = self._umlSDExecution
-        canvas: Optional[ShapeCanvas] = execution.GetCanvas()
-        if canvas is None:
+        umlFrame: Optional[UmlFrame] = cast(Optional[UmlFrame], execution.GetCanvas())
+        if umlFrame is None:
             return
 
-        dc: ClientDC = ClientDC(canvas)
-        canvas.PrepareDC(dc)
+        dc: ClientDC = ClientDC(umlFrame)
+        umlFrame.PrepareDC(dc)
 
         if keys != MOD_CMD:
-            self._unSelectAllShapesOnCanvas(execution, canvas, dc)
+            self._unSelectAllShapesOnCanvas(execution, umlFrame, dc)
 
         isCurrentlySelected: bool = execution.Selected()
         newSelectionState: bool = not isCurrentlySelected
@@ -88,14 +87,13 @@ class UmlSDExecutionEventHandler(UmlBaseEventHandler):
 
         if self._umlPubSubEngine is not None:
             if newSelectionState:
-                umlFrame: 'UmlFrame' = cast('UmlFrame', canvas)
                 self._umlPubSubEngine.sendMessage(
                     messageType=UmlMessageType.UML_SHAPE_SELECTED,
                     frameId=umlFrame.id,
                     umlShape=execution
                 )
 
-        cast('UmlFrame', canvas).refresh()
+        umlFrame.refresh()
 
     def OnBeginDragLeft(self, x: int, y: int, keys: int = 0, attachment: int = 0):
         """
@@ -211,9 +209,9 @@ class UmlSDExecutionEventHandler(UmlBaseEventHandler):
         lifeLine.recalculateNestingLevels()
         lifeLine.recomputeExecutionsGeometry()
 
-        canvas: Optional[ShapeCanvas] = self._umlSDExecution.GetCanvas()
-        if canvas is not None:
-            cast('UmlFrame', canvas).refresh()
+        umlFrame: Optional[UmlFrame] = cast(Optional[UmlFrame], self._umlSDExecution.GetCanvas())
+        if umlFrame is not None:
+            umlFrame.refresh()
 
     def OnSizingEndDragLeft(self, pt: ControlPoint, x: int, y: int, keys: int = 0, attachment: int = 0):
         """

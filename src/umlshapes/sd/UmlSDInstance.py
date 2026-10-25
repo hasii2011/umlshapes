@@ -185,14 +185,14 @@ class UmlSDInstance(ControlPointMixin, IdentifierMixin, CompositeShape, TopLeftM
     def MakeControlPoints(self):
         from umlshapes.frames.UmlFrame import UmlFrame
 
-        canvas: UmlFrame = self.GetCanvas()
+        umlFrame: UmlFrame = self.GetCanvas()
         umlControlPointSize: int = self._preferences.controlPointSize
 
         lifelineBottomY:  float = self._umlSDLifeLine.GetY() + (self._umlSDLifeLine.GetHeight() / 2.0)
         compositeCenterY: float = self.GetY()
         yOffset:          float = lifelineBottomY - compositeCenterY
         control: UmlControlPoint = UmlControlPoint(
-            umlFrame=canvas,
+            umlFrame=umlFrame,
             shape=self,
             size=umlControlPointSize,
             xOffSet=0.0,

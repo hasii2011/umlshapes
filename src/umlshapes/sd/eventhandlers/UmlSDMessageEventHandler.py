@@ -202,10 +202,10 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
 
         super().OnSizingBeginDragLeft(pt, x, y, keys, attachment)
 
-        diagramCanvas: Optional[UmlFrame] = self._umlSDMessage.umlFrame
-        if diagramCanvas is not None:
+        umlFrame: Optional[UmlFrame] = self._umlSDMessage.umlFrame
+        if umlFrame is not None:
             defaultCursor: Cursor = Cursor(CURSOR_DEFAULT)
-            diagramCanvas.SetCursor(defaultCursor)
+            umlFrame.SetCursor(defaultCursor)
             pt._oldCursor = defaultCursor
 
     def OnSizingDragLeft(self, pt: ControlPoint, draw: bool, x: int, y: int, keys: int = 0, attachment: int = 0):
@@ -237,10 +237,10 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
         else:
             self.OnDragLeft(draw=draw, x=x, y=y, keys=keys, attachment=attachment)
 
-        diagramCanvas: Optional[UmlFrame] = self._umlSDMessage.umlFrame
-        if diagramCanvas is not None:
+        umlFrame: Optional[UmlFrame] = self._umlSDMessage.umlFrame
+        if umlFrame is not None:
             defaultCursor: Cursor = Cursor(CURSOR_DEFAULT)
-            diagramCanvas.SetCursor(defaultCursor)
+            umlFrame.SetCursor(defaultCursor)
 
     def OnSizingEndDragLeft(self, pt: ControlPoint, x: int, y: int, keys: int = 0, attachment: int = 0):
         """
@@ -283,10 +283,10 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
         self._dragContext = None
         super().OnSizingEndDragLeft(pt, x, y, keys, attachment)
 
-        diagramCanvas: Optional[UmlFrame] = self._umlSDMessage.umlFrame
-        if diagramCanvas is not None:
+        umlFrame: Optional[UmlFrame] = self._umlSDMessage.umlFrame
+        if umlFrame is not None:
             defaultCursor: Cursor = Cursor(CURSOR_DEFAULT)
-            diagramCanvas.SetCursor(defaultCursor)
+            umlFrame.SetCursor(defaultCursor)
 
     def _resizeLostMessageEndpoint(self, x: int):
         startX: int = self._umlSDMessage.lineControlPoints[0].x
@@ -294,13 +294,13 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
         if abs(newSpanX) >= 20:
             y: int = self._umlSDMessage.fromY
             self._umlSDMessage.SetEnds(startX, y, x, y)
-            canvas: Optional[UmlFrame] = self._umlSDMessage.umlFrame
-            if canvas is not None:
-                dc: ClientDC = ClientDC(canvas)
-                canvas.PrepareDC(dc)
+            umlFrame: Optional[UmlFrame] = self._umlSDMessage.umlFrame
+            if umlFrame is not None:
+                dc: ClientDC = ClientDC(umlFrame)
+                umlFrame.PrepareDC(dc)
                 self._umlSDMessage.updateMessageLabelPosition(dc=dc)
                 self._umlSDMessage.ResetControlPoints()
-                canvas.refresh()
+                umlFrame.refresh()
 
     def _resizeFoundMessageEndpoint(self, x: int):
         endX: int = self._umlSDMessage.lineControlPoints[-1].x
@@ -308,13 +308,13 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
         if abs(newSpanX) >= 20:
             y: int = self._umlSDMessage.toY
             self._umlSDMessage.SetEnds(x, y, endX, y)
-            canvas: Optional[UmlFrame] = self._umlSDMessage.umlFrame
-            if canvas is not None:
-                dc: ClientDC = ClientDC(canvas)
-                canvas.PrepareDC(dc)
+            umlFrame: Optional[UmlFrame] = self._umlSDMessage.umlFrame
+            if umlFrame is not None:
+                dc: ClientDC = ClientDC(umlFrame)
+                umlFrame.PrepareDC(dc)
                 self._umlSDMessage.updateMessageLabelPosition(dc=dc)
                 self._umlSDMessage.ResetControlPoints()
-                canvas.refresh()
+                umlFrame.refresh()
 
     def _updateReflexiveLoopWidth(self, startLifeLine: UmlSDLifeLine, x: int, isCorner: bool):
         """
@@ -334,7 +334,7 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
     def _finalizeReflexiveResize(self, startLifeLine: UmlSDLifeLine, newFromY: int, newToY: int, isCorner: bool):
         """
         Apply auto-grow or clamping constraints, update reflexive message geometry,
-        and refresh the canvas.
+        and refresh the frame.
 
         Args:
             startLifeLine: Origin lifeline shape
@@ -345,11 +345,11 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
         headerBottomY:      int = startLifeLine.rectangle.top
         minTimeStepSpacing: int = self._layoutEngine.parameters.timeStepHeight
         minFromY:           int = self._layoutEngine.computeTimeStepY(headerBottomY=headerBottomY, timeStepIndex=0)
-        canvas:             UmlFrame = self._umlSDMessage.umlFrame
+        umlFrame:           UmlFrame = self._umlSDMessage.umlFrame
 
         if self._preferences.autoGrowLifeLines:
             neededHeight: int = (newToY - headerBottomY) + self._layoutEngine.parameters.bottomPadding
-            self._growLifeLinesIfNeeded(neededHeight=neededHeight, canvas=canvas)
+            self._growLifeLinesIfNeeded(neededHeight=neededHeight, umlFrame=umlFrame)
         else:
             maxTimeStepIndex: int = max(
                 0,
@@ -370,11 +370,11 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
         if hasGeometryChanged:
             self._umlSDMessage.fromY = newFromY
             self._umlSDMessage.toY = newToY
-            dc: ClientDC = ClientDC(canvas)
-            canvas.PrepareDC(dc)
+            dc: ClientDC = ClientDC(umlFrame)
+            umlFrame.PrepareDC(dc)
             self._umlSDMessage.OnMoveLink(dc=dc)
             self._umlSDMessage.ResetControlPoints()
-            canvas.refresh()
+            umlFrame.refresh()
 
     def _resizeOrRepositionReturnMessage(self, x: int, y: int, isCorner: bool):
         """
@@ -487,13 +487,13 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
             span = self._umlSDMessage.toY - self._umlSDMessage.fromY
         return span
 
-    def _growLifeLinesIfNeeded(self, neededHeight: int, canvas: UmlFrame):
+    def _growLifeLinesIfNeeded(self, neededHeight: int, umlFrame: UmlFrame):
         """
         Extend lifeline length for start and destination instances when auto-grow is active.
 
         Args:
-            neededHeight:      Calculated minimum height needed for the lifeline
-            canvas:            The canvas frame
+            neededHeight: Calculated minimum height needed for the lifeline
+            umlFrame:     The UML frame
         """
         destLifeLine:  Optional[UmlSDLifeLine] = cast(Optional[UmlSDLifeLine], self._umlSDMessage.GetTo())
         startLifeLine: Optional[UmlSDLifeLine] = cast(Optional[UmlSDLifeLine], self._umlSDMessage.GetFrom())
@@ -509,8 +509,8 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
         if (neededHeight > currentStartHeight) or (neededHeight > currentDestHeight):
 
             if self._preferences.uniformLifeLineLength:
-                if hasattr(canvas, 'setAllLifeLinesLength'):
-                    canvas.setAllLifeLinesLength(neededHeight)
+                if hasattr(umlFrame, 'setAllLifeLinesLength'):
+                    umlFrame.setAllLifeLinesLength(neededHeight)
             else:
                 self._growSingleLifeLine(lifeLine=startLifeLine, neededHeight=neededHeight)
                 if destLifeLine != startLifeLine:
@@ -529,7 +529,7 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
             if sdInstance is not None:
                 sdInstance.setLifeLineLength(neededHeight)
 
-    def _computeAutoGrowEndpoints(self, headerBottomY: int, rawTimeStepIndex: int, span: int, canvas: UmlFrame) -> tuple[int, int]:
+    def _computeAutoGrowEndpoints(self, headerBottomY: int, rawTimeStepIndex: int, span: int, umlFrame: UmlFrame) -> tuple[int, int]:
         """
         Compute snapped message endpoints and expand lifelines if necessary.
 
@@ -537,7 +537,7 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
             headerBottomY:    Bottom Y coordinate of the lifeline header
             rawTimeStepIndex: Unbounded timeStep index based on cursor position
             span:             Vertical span between fromY and toY
-            canvas:           The canvas frame
+            umlFrame:         The UML frame
 
         Returns:
             Tuple of (snappedFromY, snappedToY)
@@ -546,7 +546,7 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
         snappedFromY:  int = self._layoutEngine.computeTimeStepY(headerBottomY=headerBottomY, timeStepIndex=timeStepIndex)
         snappedToY:    int = snappedFromY + span
         neededHeight:  int = (snappedToY - headerBottomY) + self._layoutEngine.parameters.bottomPadding
-        self._growLifeLinesIfNeeded(neededHeight=neededHeight, canvas=canvas)
+        self._growLifeLinesIfNeeded(neededHeight=neededHeight, umlFrame=umlFrame)
         return snappedFromY, snappedToY
 
     def _computeBoundedEndpoints(self, referenceLifeLine: UmlSDLifeLine, headerBottomY: int, rawTimeStepIndex: int, span: int) -> tuple[int, int]:
@@ -594,24 +594,24 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
         execution.endY   = targetExecutionY + duration
         execution.lifeLine.recomputeExecutionsGeometry()
 
-    def _applyMessageEndpoints(self, snappedFromY: int, snappedToY: int, canvas: UmlFrame):
+    def _applyMessageEndpoints(self, snappedFromY: int, snappedToY: int, umlFrame: UmlFrame):
         """
-        Apply new endpoints to the message, synchronize execution, and refresh canvas.
+        Apply new endpoints to the message, synchronize execution, and refresh frame.
 
         Args:
             snappedFromY: Snapped Y coordinate for the start of the message
             snappedToY:   Snapped Y coordinate for the end of the message
-            canvas:       The canvas frame
+            umlFrame:     The UML frame
         """
         if snappedFromY != self._umlSDMessage.fromY or snappedToY != self._umlSDMessage.toY:
             self._umlSDMessage.fromY = snappedFromY
             self._umlSDMessage.toY = snappedToY
             self._synchronizeAssociatedExecution(snappedFromY=snappedFromY, snappedToY=snappedToY)
-            dc: ClientDC = ClientDC(canvas)
-            canvas.PrepareDC(dc)
+            dc: ClientDC = ClientDC(umlFrame)
+            umlFrame.PrepareDC(dc)
             self._umlSDMessage.OnMoveLink(dc=dc)
             self._umlSDMessage.ResetControlPoints()
-            canvas.refresh()
+            umlFrame.refresh()
 
     def _snapMessageToTimeStep(self, targetY: int):
         """
@@ -629,7 +629,7 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
         headerBottomY:    int = referenceLifeLine.rectangle.top
         rawTimeStepIndex: int = self._layoutEngine.computeNearestTimeStepIndex(headerBottomY=headerBottomY, targetY=targetY)
         span:             int = self._computeMessageSpan()
-        canvas:           UmlFrame = self._umlSDMessage.umlFrame
+        umlFrame:         UmlFrame = self._umlSDMessage.umlFrame
 
         snappedFromY: int
         snappedToY:   int
@@ -638,7 +638,7 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
                 headerBottomY=headerBottomY,
                 rawTimeStepIndex=rawTimeStepIndex,
                 span=span,
-                canvas=canvas
+                umlFrame=umlFrame
             )
         else:
             snappedFromY, snappedToY = self._computeBoundedEndpoints(
@@ -648,7 +648,7 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
                 span=span
             )
 
-        self._applyMessageEndpoints(snappedFromY=snappedFromY, snappedToY=snappedToY, canvas=canvas)
+        self._applyMessageEndpoints(snappedFromY=snappedFromY, snappedToY=snappedToY, umlFrame=umlFrame)
 
     def OnLeftClick(self, x: int, y: int, keys: int = 0, attachment: int = 0):
         """

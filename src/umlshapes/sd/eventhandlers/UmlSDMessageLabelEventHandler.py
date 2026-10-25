@@ -45,9 +45,9 @@ class UmlSDMessageLabelEventHandler(UmlBaseEventHandler):
         self._dragOffsetX = round(label.GetX() - x)
         self._dragOffsetY = round(label.GetY() - y)
 
-        canvas: UmlFrame = label.umlFrame
-        if not canvas.HasCapture():
-            canvas.CaptureMouse()
+        umlFrame: UmlFrame = label.umlFrame
+        if not umlFrame.HasCapture():
+            umlFrame.CaptureMouse()
 
     def OnDragLeft(self, draw: bool, x: int, y: int, keys: int = 0, attachment: int = 0):
         """
@@ -65,16 +65,16 @@ class UmlSDMessageLabelEventHandler(UmlBaseEventHandler):
         newCenterX: int = round(x + self._dragOffsetX)
         newCenterY: int = round(y + self._dragOffsetY)
 
-        canvas: UmlFrame = label.umlFrame
-        dc: ClientDC = ClientDC(canvas)
-        canvas.PrepareDC(dc)
+        umlFrame: UmlFrame = label.umlFrame
+        dc: ClientDC = ClientDC(umlFrame)
+        umlFrame.PrepareDC(dc)
 
         label.Move(dc, newCenterX, newCenterY)
         topLeftX: int = newCenterX - (label.size.width // 2)
         topLeftY: int = newCenterY - (label.size.height // 2)
         label.position = UmlPosition(x=topLeftX, y=topLeftY)
 
-        canvas.refresh()
+        umlFrame.refresh()
 
     def OnEndDragLeft(self, x: int, y: int, keys: int = 0, attachment: int = 0):
         """
@@ -87,15 +87,15 @@ class UmlSDMessageLabelEventHandler(UmlBaseEventHandler):
             attachment: Attachment point
         """
         label: UmlSDMessageLabel = cast(UmlSDMessageLabel, self.GetShape())
-        canvas: UmlFrame = label.umlFrame
-        if canvas.HasCapture():
-            canvas.ReleaseMouse()
+        umlFrame: UmlFrame = label.umlFrame
+        if umlFrame.HasCapture():
+            umlFrame.ReleaseMouse()
 
         newCenterX: int = round(x + self._dragOffsetX)
         newCenterY: int = round(y + self._dragOffsetY)
 
-        dc: ClientDC = ClientDC(canvas)
-        canvas.PrepareDC(dc)
+        dc: ClientDC = ClientDC(umlFrame)
+        umlFrame.PrepareDC(dc)
 
         label.Move(dc, newCenterX, newCenterY)
         topLeftX: int = newCenterX - (label.size.width // 2)
@@ -118,16 +118,20 @@ class UmlSDMessageLabelEventHandler(UmlBaseEventHandler):
             if lineLength != 0:
                 fraction: float = (newCenterX - startX) / lineLength
                 label.proportionalOffset = fraction
+
             label.fixedX = newCenterX
             label.verticalOffset = newCenterY - lineY
 
         self._indicateFrameModified()
-        canvas.refresh()
+        umlFrame.refresh()
 
     def OnSizingEndDragLeft(self, pt: ControlPoint, x: int, y: int, keys: int = 0, attachment: int = 0):
+
         super().OnSizingEndDragLeft(pt, x, y, keys, attachment)
+
         label: UmlSDMessageLabel = cast(UmlSDMessageLabel, self.GetShape())
         label.fitToText()
-        canvas: UmlFrame = label.umlFrame
+
+        umlFrame: UmlFrame = label.umlFrame
         self._indicateFrameModified()
-        canvas.refresh()
+        umlFrame.refresh()

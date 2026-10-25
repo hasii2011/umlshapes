@@ -55,8 +55,8 @@ class SDMessageCreationHandler:
             listener=self._frameLeftClicked
         )
 
-        self._startDetails:        LifeLineClickDetails  = NO_START_DETAILS
-        self._canvasClickPosition: Optional[UmlPosition] = None
+        self._startDetails:       LifeLineClickDetails  = NO_START_DETAILS
+        self._frameClickPosition: Optional[UmlPosition] = None
 
         self._messageCreationInProgress: bool          = False
         self._enableMessageCreation:     bool          = False
@@ -166,8 +166,8 @@ class SDMessageCreationHandler:
 
         elif self._messageType == SDMessageType.FOUND:
             originX: int = -1
-            if self._canvasClickPosition is not None:
-                originX = self._canvasClickPosition.x
+            if self._frameClickPosition is not None:
+                originX = self._frameClickPosition.x
             self.createFoundMessage(
                 destLifeLine=clickDetails.lifeLine,
                 toY=clickDetails.clickPosition.y,
@@ -192,11 +192,11 @@ class SDMessageCreationHandler:
     # noinspection PyUnusedLocal
     def _frameLeftClicked(self, frame: SequenceDiagramFrame, umlPosition: UmlPosition):
         """
-        Handle canvas background clicks during interactive message creation.
+        Handle frame background clicks during interactive message creation.
 
         Args:
             frame:       The sequence diagram frame
-            umlPosition: Clicked canvas coordinates
+            umlPosition: Clicked frame coordinates
         """
         del frame       # just to get rid of PyCharm warning
 
@@ -213,7 +213,7 @@ class SDMessageCreationHandler:
                 self._reset()
 
         elif self._messageType == SDMessageType.FOUND:
-            self._canvasClickPosition = umlPosition
+            self._frameClickPosition = umlPosition
             self._messageCreationInProgress = True
             self._umlPubSubEngine.sendMessage(
                 UmlMessageType.UPDATE_APPLICATION_STATUS,
@@ -295,7 +295,7 @@ class SDMessageCreationHandler:
         umlSDMessage.umlFrame = self._sequenceDiagramFrame
         self.logger.info(f'Created lost message: {umlSDMessage.sdMessage.message}')
 
-        startLifeLine.addMessage(umlSDMessage=umlSDMessage, destinationLifeLine=None)
+        startLifeLine.addMessage(umlSDMessage=umlSDMessage)
 
         umlSDMessage.fromY = snappedFromY
         umlSDMessage.toY   = snappedFromY
@@ -395,7 +395,7 @@ class SDMessageCreationHandler:
         umlSDMessage.umlFrame = self._sequenceDiagramFrame
         self.logger.info(f'Created found message: {umlSDMessage.sdMessage.message}')
 
-        destLifeLine.addFoundMessage(umlSDMessage=umlSDMessage)
+        destLifeLine.addMessage(umlSDMessage=umlSDMessage)
 
         umlSDMessage.fromY = snappedToY
         umlSDMessage.toY   = snappedToY
@@ -589,7 +589,7 @@ class SDMessageCreationHandler:
 
     def _reset(self):
         self._startDetails = NO_START_DETAILS
-        self._canvasClickPosition = None
+        self._frameClickPosition = None
         self._messageCreationInProgress = False
         self._umlPubSubEngine.sendMessage(
             UmlMessageType.UPDATE_APPLICATION_STATUS,

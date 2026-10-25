@@ -70,14 +70,14 @@ class UmlSDExecution(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeft
 
         self.recomputeGeometry()
 
-        canvas = lifeLine.GetCanvas()
-        if canvas is not None:
-            if hasattr(canvas, 'umlPubSubEngine'):
+        umlFrame: Optional['UmlFrame'] = cast(Optional['UmlFrame'], lifeLine.GetCanvas())
+        if umlFrame is not None:
+            if hasattr(umlFrame, 'umlPubSubEngine'):
                 from umlshapes.sd.eventhandlers.UmlSDExecutionEventHandler import UmlSDExecutionEventHandler
 
                 eventHandler: UmlSDExecutionEventHandler = UmlSDExecutionEventHandler(
                     umlSDExecution=self,
-                    umlPubSubEngine=canvas.umlPubSubEngine,
+                    umlPubSubEngine=umlFrame.umlPubSubEngine,
                     previousEventHandler=self.GetEventHandler()
                 )
                 self.SetEventHandler(eventHandler)
@@ -148,11 +148,11 @@ class UmlSDExecution(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeft
         halfHeight: float = self.GetHeight() / 2.0
         centerX: float = self.GetX()
         centerY: float = self.GetY()
-        canvas: UmlFrame = cast(UmlFrame, self.GetCanvas())
+        umlFrame: 'UmlFrame' = cast('UmlFrame', self.GetCanvas())
         umlControlPointSize: int = self._preferences.controlPointSize
 
         topControlPoint: UmlControlPoint = UmlControlPoint(
-            umlFrame=canvas,
+            umlFrame=umlFrame,
             shape=self,
             size=umlControlPointSize,
             xOffSet=0.0,
@@ -163,12 +163,12 @@ class UmlSDExecution(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeft
         topControlPoint.SetY(centerY - halfHeight)
         topControlPoint.SetParent(self)
         self.GetChildren().append(topControlPoint)
-        self.GetCanvas().AddShape(topControlPoint)
+        umlFrame.AddShape(topControlPoint)
         self._controlPoints.append(topControlPoint)
         self._addEventHandler(umlControlPoint=topControlPoint)
 
         bottomControlPoint: UmlControlPoint = UmlControlPoint(
-            umlFrame=canvas,
+            umlFrame=umlFrame,
             shape=self,
             size=umlControlPointSize,
             xOffSet=0.0,
@@ -179,7 +179,7 @@ class UmlSDExecution(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeft
         bottomControlPoint.SetY(centerY + halfHeight)
         bottomControlPoint.SetParent(self)
         self.GetChildren().append(bottomControlPoint)
-        self.GetCanvas().AddShape(bottomControlPoint)
+        umlFrame.AddShape(bottomControlPoint)
         self._controlPoints.append(bottomControlPoint)
         self._addEventHandler(umlControlPoint=bottomControlPoint)
 

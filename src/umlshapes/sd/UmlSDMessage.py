@@ -53,7 +53,6 @@ from umlshapes.sd.SDMessageType import SDMessageType
 from umlshapes.sd.UmlSDMessageLabel import UmlSDMessageLabel
 from umlshapes.sd.eventhandlers.UmlSDMessageLabelEventHandler import UmlSDMessageLabelEventHandler
 
-from umlshapes.types.Common import NAME_IDX
 from umlshapes.types.UmlPosition import UmlPosition
 
 if TYPE_CHECKING:
@@ -105,7 +104,6 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
 
         self._fromY: int = 0
         self._toY:   int = 0
-
 
         self._relativeFromY: int = 0
         self._relativeToY:   int = 0
@@ -170,13 +168,8 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
     @umlFrame.setter
     def umlFrame(self, frame: 'SequenceDiagramFrame'):
         self.SetCanvas(frame)
-
-    def SetCanvas(self, theCanvas):
-        super().SetCanvas(theCanvas)
-        if theCanvas is not None:
-            from umlshapes.frames.UmlFrame import UmlFrame
-            umlFrame: UmlFrame = cast(UmlFrame, theCanvas)
-            diagram: UmlDiagram = umlFrame.umlDiagram
+        if frame is not None:
+            diagram: UmlDiagram = frame.umlDiagram
             if self._messageLabel not in diagram.GetShapeList():
                 diagram.AddShape(self._messageLabel)
             self._setMessageLabelEventHandler(self._messageLabel)
@@ -265,7 +258,7 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
 
     def MakeControlPoints(self):
 
-        if self._canvas is not None and len(self.lineControlPoints) > 0:
+        if self.GetCanvas() is not None and len(self.lineControlPoints) > 0:
             firstPoint: Point = self.lineControlPoints[0]
             lastPoint:  Point = self.lineControlPoints[-1]
 
@@ -709,9 +702,10 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
 
     def _makeLineControlPoint(self, point: Point, controlPointType: UmlLineControlPointType):
         umlControlPointSize: int = self._preferences.controlPointSize
+        umlFrame: UmlFrame = self.umlFrame
 
         control: UmlLineControlPoint = UmlLineControlPoint(
-            umlFrame=self._canvas,
+            umlFrame=umlFrame,
             umlLink=self,
             controlPointType=controlPointType,
             size=umlControlPointSize,
@@ -719,7 +713,7 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
             y=point.y,
         )
         control._point = point
-        self._canvas.AddShape(control)
+        umlFrame.AddShape(control)
         self._controlPoints.append(control)
 
     def __str__(self) -> str:
