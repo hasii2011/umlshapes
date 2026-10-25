@@ -1,5 +1,6 @@
 
 from typing import cast
+from dataclasses import dataclass
 from typing import Optional
 
 from logging import Logger
@@ -33,6 +34,34 @@ from umlshapes.sd.UmlSDLifeLine import UmlSDLifeLine
 from umlshapes.sd.UmlSDMessage import UmlSDMessage
 
 
+@dataclass
+class MessageDragContext:
+    """
+    Encapsulates transient mouse drag and sizing state for sequence diagram messages.
+
+    Rationale:
+        1. Unified Lifecycle: Coordinates and indices
+           (fromY, toY, mouseX, mouseY, loopWidth, control point index) share an identical
+
+           * lifecycle—instantiated together on mouse-down,
+           * consumed during mouse-drag, and
+           * discarded on mouse-up.
+        2. Moving these transient attributes from the
+           event handler into a dedicated context ensures all drag fields are strictly
+           non-optional (int and bool) and eliminates compound '
+        3. Atomic Cleanup: Discarding the context via 'self._dragContext = None' prevents
+           partial state leakage across distinct drag operations without needing to reset
+           multiple loosely-coupled instance variables.
+    """
+    initialFromY:            int
+    initialToY:              int
+    initialMouseX:           int
+    initialMouseY:           int
+    initialLoopWidth:        int
+    activeControlPointIndex: int  = -1
+    isDirectEndpointDrag:    bool = False
+
+
 class UmlSDMessageEventHandler(UmlBaseEventHandler):
     def __init__(self, umlSDMessage: UmlSDMessage, umlPubSubEngine: IUmlPubSubEngine, previousEventHandler: ShapeEvtHandler):
         """
@@ -50,13 +79,7 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
         self._umlPubSubEngine: IUmlPubSubEngine = umlPubSubEngine
         self._layoutEngine:    SDLayoutEngine   = SDLayoutEngine()
         self._preferences:     UmlPreferences   = UmlPreferences()
-        self._initialFromY:            Optional[int] = None
-        self._initialToY:              Optional[int] = None
-        self._initialMouseY:           Optional[int] = None
-        self._initialMouseX:           Optional[int] = None
-        self._initialLoopWidth:        Optional[int] = None
-        self._activeControlPointIndex: Optional[int] = None
-        self._isDirectEndpointDrag:    bool          = False
+        self._dragContext: Optional[MessageDragContext] = None
 
     def OnBeginDragLeft(self, x: int, y: int, keys: int = 0, attachment: int = 0):
         """
@@ -68,20 +91,25 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
             keys:
             attachment:
         """
-        self._initialFromY = self._umlSDMessage.fromY
-        self._initialToY = self._umlSDMessage.toY
-        self._initialMouseY = y
-        self._isDirectEndpointDrag = False
-
+        isDirectEndpointDrag: bool = False
         freeX: int
         if self._umlSDMessage.isLostMessage is True and len(self._umlSDMessage.lineControlPoints) >= 2:
             freeX = self._umlSDMessage.lineControlPoints[-1].x
             if abs(x - freeX) <= 15:
-                self._isDirectEndpointDrag = True
+                isDirectEndpointDrag = True
         elif self._umlSDMessage.isFoundMessage is True and len(self._umlSDMessage.lineControlPoints) >= 2:
             freeX = self._umlSDMessage.lineControlPoints[0].x
             if abs(x - freeX) <= 15:
-                self._isDirectEndpointDrag = True
+                isDirectEndpointDrag = True
+
+        self._dragContext = MessageDragContext(
+            initialFromY=self._umlSDMessage.fromY,
+            initialToY=self._umlSDMessage.toY,
+            initialMouseX=x,
+            initialMouseY=y,
+            initialLoopWidth=self._umlSDMessage.loopWidth,
+            isDirectEndpointDrag=isDirectEndpointDrag
+        )
 
         super().OnBeginDragLeft(x, y, keys, attachment)
 
@@ -96,7 +124,7 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
             keys:
             attachment:
         """
-        if self._isDirectEndpointDrag:
+        if self._dragContext is not None and self._dragContext.isDirectEndpointDrag:
             if self._umlSDMessage.isLostMessage:
                 self._resizeLostMessageEndpoint(x=x)
             elif self._umlSDMessage.isFoundMessage:
@@ -104,9 +132,9 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
             return
 
         targetY: int
-        if self._initialMouseY is not None and self._initialFromY is not None:
-            deltaY: int = y - self._initialMouseY
-            targetY = self._initialFromY + deltaY
+        if self._dragContext is not None:
+            deltaY: int = y - self._dragContext.initialMouseY
+            targetY = self._dragContext.initialFromY + deltaY
         else:
             targetY = y
         self._snapMessageToTimeStep(targetY=targetY)
@@ -121,32 +149,27 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
             keys:
             attachment:
         """
-        if self._isDirectEndpointDrag:
+        if self._dragContext is not None and self._dragContext.isDirectEndpointDrag:
             if self._umlSDMessage.isLostMessage:
                 self._resizeLostMessageEndpoint(x=x)
             elif self._umlSDMessage.isFoundMessage:
                 self._resizeFoundMessageEndpoint(x=x)
             self._indicateFrameModified()
-            self._isDirectEndpointDrag = False
-            self._initialFromY = None
-            self._initialToY = None
-            self._initialMouseY = None
+            self._dragContext = None
             super().OnEndDragLeft(x, y, keys, attachment)
             return
 
         targetY: int
-        if self._initialMouseY is not None and self._initialFromY is not None:
-            deltaY: int = y - self._initialMouseY
-            targetY = self._initialFromY + deltaY
+        if self._dragContext is not None:
+            deltaY: int = y - self._dragContext.initialMouseY
+            targetY = self._dragContext.initialFromY + deltaY
         else:
             targetY = y
         self._snapMessageToTimeStep(targetY=targetY)
-        if self._initialFromY is not None and self._umlSDMessage.fromY != self._initialFromY:
+        if self._dragContext is not None and self._umlSDMessage.fromY != self._dragContext.initialFromY:
             self._indicateFrameModified()
 
-        self._initialFromY = None
-        self._initialToY = None
-        self._initialMouseY = None
+        self._dragContext = None
         super().OnEndDragLeft(x, y, keys, attachment)
 
     def OnSizingBeginDragLeft(self, pt: ControlPoint, x: int, y: int, keys: int = 0, attachment: int = 0):
@@ -160,20 +183,20 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
             keys:
             attachment:
         """
-        self._initialFromY = self._umlSDMessage.fromY
-        self._initialToY = self._umlSDMessage.toY
-        self._initialMouseY = y
-        self._initialMouseX = x
-        self._initialLoopWidth = self._umlSDMessage.loopWidth
-
+        activeControlPointIndex: int = -1
         if self._umlSDMessage.isReflexiveMessage or self._umlSDMessage.isLostMessage or self._umlSDMessage.isFoundMessage:
             controlPoints: list[ControlPoint] = self._umlSDMessage.GetControlPoints()
             if pt in controlPoints:
-                self._activeControlPointIndex = controlPoints.index(pt)
-            else:
-                self._activeControlPointIndex = None
-        else:
-            self._activeControlPointIndex = None
+                activeControlPointIndex = controlPoints.index(pt)
+
+        self._dragContext = MessageDragContext(
+            initialFromY=self._umlSDMessage.fromY,
+            initialToY=self._umlSDMessage.toY,
+            initialMouseX=x,
+            initialMouseY=y,
+            initialLoopWidth=self._umlSDMessage.loopWidth,
+            activeControlPointIndex=activeControlPointIndex
+        )
 
         super().OnSizingBeginDragLeft(pt, x, y, keys, attachment)
 
@@ -195,16 +218,19 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
             keys:
             attachment:
         """
-        if self._umlSDMessage.isReflexiveMessage is True and self._activeControlPointIndex is not None:
-            if self._activeControlPointIndex == 2 or self._activeControlPointIndex == 3:
-                isCorner: bool = (self._activeControlPointIndex == 2)
+        activeIdx: int = -1
+        if self._dragContext is not None:
+            activeIdx = self._dragContext.activeControlPointIndex
+        if self._umlSDMessage.isReflexiveMessage is True and activeIdx != -1:
+            if activeIdx == 2 or activeIdx == 3:
+                isCorner: bool = (activeIdx == 2)
                 self._resizeOrRepositionReturnMessage(x=x, y=y, isCorner=isCorner)
-            elif self._activeControlPointIndex == 0 or self._activeControlPointIndex == 1:
-                isCorner = (self._activeControlPointIndex == 1)
+            elif activeIdx == 0 or activeIdx == 1:
+                isCorner = (activeIdx == 1)
                 self._resizeOrRepositionCallMessage(x=x, y=y, isCorner=isCorner)
-        elif self._umlSDMessage.isLostMessage is True and self._activeControlPointIndex == 1:
+        elif self._umlSDMessage.isLostMessage is True and activeIdx == 1:
             self._resizeLostMessageEndpoint(x=x)
-        elif self._umlSDMessage.isFoundMessage is True and self._activeControlPointIndex == 0:
+        elif self._umlSDMessage.isFoundMessage is True and activeIdx == 0:
             self._resizeFoundMessageEndpoint(x=x)
         else:
             self.OnDragLeft(draw=draw, x=x, y=y, keys=keys, attachment=attachment)
@@ -225,35 +251,34 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
             keys:
             attachment:
         """
-        if self._umlSDMessage.isReflexiveMessage is True and self._activeControlPointIndex is not None:
-            if self._activeControlPointIndex == 2 or self._activeControlPointIndex == 3:
-                isCorner: bool = (self._activeControlPointIndex == 2)
+        activeIdx: int = -1
+        if self._dragContext is not None:
+            activeIdx = self._dragContext.activeControlPointIndex
+        if self._umlSDMessage.isReflexiveMessage is True and activeIdx != -1:
+            if activeIdx == 2 or activeIdx == 3:
+                isCorner: bool = (activeIdx == 2)
                 self._resizeOrRepositionReturnMessage(x=x, y=y, isCorner=isCorner)
-            elif self._activeControlPointIndex == 0 or self._activeControlPointIndex == 1:
-                isCorner = (self._activeControlPointIndex == 1)
+            elif activeIdx == 0 or activeIdx == 1:
+                isCorner = (activeIdx == 1)
                 self._resizeOrRepositionCallMessage(x=x, y=y, isCorner=isCorner)
 
             hasChanged: bool = False
-            if self._initialFromY is not None and self._umlSDMessage.fromY != self._initialFromY:
-                hasChanged = True
-            if self._initialToY is not None and self._umlSDMessage.toY != self._initialToY:
-                hasChanged = True
-            if self._initialLoopWidth is not None and self._umlSDMessage.loopWidth != self._initialLoopWidth:
-                hasChanged = True
+            if self._dragContext is not None:
+                if self._umlSDMessage.fromY != self._dragContext.initialFromY:
+                    hasChanged = True
+                if self._umlSDMessage.toY != self._dragContext.initialToY:
+                    hasChanged = True
+                if self._umlSDMessage.loopWidth != self._dragContext.initialLoopWidth:
+                    hasChanged = True
 
             if hasChanged:
                 self._indicateFrameModified()
-        elif (self._umlSDMessage.isLostMessage is True and self._activeControlPointIndex == 1) or (self._umlSDMessage.isFoundMessage is True and self._activeControlPointIndex == 0):
+        elif (self._umlSDMessage.isLostMessage is True and activeIdx == 1) or (self._umlSDMessage.isFoundMessage is True and activeIdx == 0):
             self._indicateFrameModified()
         else:
             self.OnEndDragLeft(x=x, y=y, keys=keys, attachment=attachment)
 
-        self._activeControlPointIndex = None
-        self._initialFromY = None
-        self._initialToY = None
-        self._initialMouseY = None
-        self._initialMouseX = None
-        self._initialLoopWidth = None
+        self._dragContext = None
         super().OnSizingEndDragLeft(pt, x, y, keys, attachment)
 
         diagramCanvas: Optional[UmlFrame] = self._umlSDMessage.umlFrame
@@ -458,8 +483,8 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
         Compute the vertical span between the message endpoints.
         """
         span: int
-        if self._initialToY is not None and self._initialFromY is not None:
-            span = self._initialToY - self._initialFromY
+        if self._dragContext is not None:
+            span = self._dragContext.initialToY - self._dragContext.initialFromY
         else:
             span = self._umlSDMessage.toY - self._umlSDMessage.fromY
         return span
@@ -469,7 +494,6 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
         Extend lifeline length for start and destination instances when auto-grow is active.
 
         Args:
-            referenceLifeLine: Reference lifeline shape
             neededHeight:      Calculated minimum height needed for the lifeline
             canvas:            The canvas frame
         """
@@ -490,15 +514,22 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
                 if hasattr(canvas, 'setAllLifeLinesLength'):
                     canvas.setAllLifeLinesLength(neededHeight)
             else:
-                if startLifeLine is not None:
-                    startSDInstance: UmlSDInstance | None = startLifeLine.umlSDInstance
-                    if startSDInstance is not None:
-                        startSDInstance.setLifeLineLength(neededHeight)
+                self._growSingleLifeLine(lifeLine=startLifeLine, neededHeight=neededHeight)
+                if destLifeLine != startLifeLine:
+                    self._growSingleLifeLine(lifeLine=destLifeLine, neededHeight=neededHeight)
 
-                if destLifeLine is not None and destLifeLine != startLifeLine:
-                    destSDInstance: UmlSDInstance | None = destLifeLine.umlSDInstance
-                    if destSDInstance is not None:
-                        destSDInstance.setLifeLineLength(neededHeight)
+    def _growSingleLifeLine(self, lifeLine: Optional[UmlSDLifeLine], neededHeight: int):
+        """
+        Extend individual lifeline instance height if present.
+
+        Args:
+            lifeLine:     Target lifeline shape if present
+            neededHeight: Calculated minimum height needed for the lifeline
+        """
+        if lifeLine is not None:
+            sdInstance: UmlSDInstance | None = lifeLine.umlSDInstance
+            if sdInstance is not None:
+                sdInstance.setLifeLineLength(neededHeight)
 
     def _computeAutoGrowEndpoints(self, referenceLifeLine: UmlSDLifeLine, headerBottomY: int, rawTimeStepIndex: int, span: int, canvas: UmlFrame) -> tuple[int, int]:
         """
