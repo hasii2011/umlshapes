@@ -71,6 +71,11 @@ from umlshapes.links.eventhandlers.UmlLollipopInterfaceEventHandler import UmlLo
 
 from umlshapes.sd.SDMessageCreationHandler import SDMessageCreationHandler
 
+from umlshapes.sd.SDFragmentBounds import SDFragmentBounds
+from umlshapes.sd.SDFragmentOperator import SDFragmentOperator
+from umlshapes.sd.SDLayoutEngine import SDLayoutEngine
+from umlshapes.sd.UmlSDCombinedFragment import UmlSDCombinedFragment
+
 from umlshapes.shapes.UmlClass import UmlClass
 from umlshapes.sd.UmlSDInstance import UmlSDInstance
 from umlshapes.sd.eventhandlers.UmlSdInstanceEventHandler import UmlSdInstanceEventHandler
@@ -224,7 +229,8 @@ class DemoAppFrame(SizedFrame):
         viewMenu.AppendSeparator()
         viewMenu.Append(id=Identifiers.ID_DISPLAY_ORTHOGONAL_LINK, item='Orthogonal Link',    helpString='Display Orthogonal Link')
         viewMenu.AppendSeparator()
-        viewMenu.Append(id=Identifiers.ID_DISPLAY_SEQUENCE_DIAGRAM,    item='Sequence Diagram', helpString='Display Sequence Diagram')
+        viewMenu.Append(id=Identifiers.ID_DISPLAY_SEQUENCE_DIAGRAM, item='Sequence Diagram',         helpString='Display Sequence Diagram')
+        viewMenu.Append(id=Identifiers.ID_DEMO_COMBINED_FRAGMENTS,  item='Demo Combined Fragments',  helpString='Display Sequence Diagram with Combined Fragments')
         viewMenu.AppendSeparator()
 
         smartPlacementMenu: Menu = Menu()
@@ -261,6 +267,7 @@ class DemoAppFrame(SizedFrame):
         self.Bind(EVT_MENU, self._onDisplayElement, id=Identifiers.ID_DISPLAY_UML_NOTE_LINK)
         self.Bind(EVT_MENU, self._onDisplayElement, id=Identifiers.ID_DISPLAY_ORTHOGONAL_LINK)
         self.Bind(EVT_MENU, self._onDisplayElement, id=Identifiers.ID_DISPLAY_SEQUENCE_DIAGRAM)
+        self.Bind(EVT_MENU, self._onDisplayElement, id=Identifiers.ID_DEMO_COMBINED_FRAGMENTS)
 
         self.Bind(EVT_MENU, self._onDisplayElement, id=Identifiers.ID_SOURCE_TOP)
         self.Bind(EVT_MENU, self._onDisplayElement, id=Identifiers.ID_SOURCE_BOTTOM)
@@ -401,6 +408,9 @@ class DemoAppFrame(SizedFrame):
                 linkCreator.displayOrthogonalLink(diagramFrame=self._currentFrame)
             case Identifiers.ID_DISPLAY_SEQUENCE_DIAGRAM:
                 self._displaySequenceDiagram(diagramFrame=self._currentFrame)
+            case Identifiers.ID_DEMO_COMBINED_FRAGMENTS:
+                self._displayCombinedFragmentsDemo(diagramFrame=self._currentFrame)
+                self.SetStatusText('See the combined fragments !!')
 
             case Identifiers.ID_SOURCE_TOP:
                 linkCreator.displaySmartPlacement(diagramFrame=self._currentFrame, placement=SmartPlacement.SOURCE_ABOVE)
@@ -431,6 +441,68 @@ class DemoAppFrame(SizedFrame):
             msgDlg: MessageDialog = MessageDialog(
                 parent=None,
                 message='Sequence Diagrams must be placed on a Sequence Diagram frame',
+                caption='Bad News',
+                style=OK | ICON_ERROR
+            )
+            msgDlg.ShowModal()
+
+    def _displayCombinedFragmentsDemo(self, diagramFrame: UmlFrame):
+        """
+        Display a Sequence Diagram demo with participants and combined fragments (loop, alt).
+
+        Args:
+            diagramFrame: The UmlFrame on which to display the demo.
+        """
+        if isinstance(diagramFrame, SequenceDiagramFrame):
+
+            customer:       UmlSDInstance = self._createSDInstance(diagramFrame=diagramFrame, instanceName='Customer', xCoordinate=100)
+            orderService:   UmlSDInstance = self._createSDInstance(diagramFrame=diagramFrame, instanceName='OrderService', xCoordinate=320)
+            paymentGateway: UmlSDInstance = self._createSDInstance(diagramFrame=diagramFrame, instanceName='PaymentGateway', xCoordinate=540)
+
+            layoutEngine: SDLayoutEngine = SDLayoutEngine()
+
+            # Loop fragment: spans Customer and OrderService
+            loopBounds: SDFragmentBounds = layoutEngine.computeFragmentBounds(
+                lifeLines=[customer.umlSDLifeLine, orderService.umlSDLifeLine],
+                startY=140,
+                endY=220
+            )
+            loopFragment: UmlSDCombinedFragment = UmlSDCombinedFragment(
+                operator=SDFragmentOperator.LOOP,
+                x=float(loopBounds.centerX),
+                y=float(loopBounds.centerY),
+                width=loopBounds.width,
+                height=loopBounds.height
+            )
+            loopFragment.addOperand(guard='for each item in cart', startTimeStep=0, endTimeStep=1)
+            diagramFrame.umlDiagram.AddShape(loopFragment)
+            loopFragment.umlFrame = diagramFrame
+            loopFragment.Show(True)
+
+            # Alt fragment: spans Customer, OrderService, and PaymentGateway
+            altBounds: SDFragmentBounds = layoutEngine.computeFragmentBounds(
+                lifeLines=[customer.umlSDLifeLine, orderService.umlSDLifeLine, paymentGateway.umlSDLifeLine],
+                startY=260,
+                endY=420
+            )
+            altFragment: UmlSDCombinedFragment = UmlSDCombinedFragment(
+                operator=SDFragmentOperator.ALT,
+                x=float(altBounds.centerX),
+                y=float(altBounds.centerY),
+                width=altBounds.width,
+                height=altBounds.height
+            )
+            altFragment.addOperand(guard='balance >= total', startTimeStep=2, endTimeStep=3)
+            altFragment.addOperand(guard='else', startTimeStep=3, endTimeStep=4)
+            diagramFrame.umlDiagram.AddShape(altFragment)
+            altFragment.umlFrame = diagramFrame
+            altFragment.Show(True)
+
+            diagramFrame.refresh()
+        else:
+            msgDlg: MessageDialog = MessageDialog(
+                parent=None,
+                message='Combined Fragments demo must be placed on a Sequence Diagram frame',
                 caption='Bad News',
                 style=OK | ICON_ERROR
             )

@@ -55,6 +55,56 @@ CUSTOM_FRAGMENT_Y:      float = 150.0
 CUSTOM_FRAGMENT_WIDTH:  int = 300
 CUSTOM_FRAGMENT_HEIGHT: int = 180
 
+BOUNDS_CENTER_X: int = 200
+BOUNDS_CENTER_Y: int = 150
+BOUNDS_WIDTH:    int = 120
+BOUNDS_HEIGHT:   int = 80
+
+EXPECTED_BOUNDS_LEFT:   int = 140
+EXPECTED_BOUNDS_RIGHT:  int = 260
+EXPECTED_BOUNDS_TOP:    int = 110
+EXPECTED_BOUNDS_BOTTOM: int = 190
+
+HIT_TEST_FRAGMENT_X:      float = 100.0
+HIT_TEST_FRAGMENT_Y:      float = 100.0
+HIT_TEST_FRAGMENT_WIDTH:  int = 100
+HIT_TEST_FRAGMENT_HEIGHT: int = 100
+
+HIT_TEST_INSIDE_LEFT_X:   float = 50.0
+HIT_TEST_INSIDE_RIGHT_X:  float = 150.0
+HIT_TEST_INSIDE_TOP_Y:    float = 50.0
+HIT_TEST_INSIDE_BOTTOM_Y: float = 150.0
+
+HIT_TEST_OUTSIDE_LEFT_X:   float = 49.0
+HIT_TEST_OUTSIDE_RIGHT_X:  float = 151.0
+HIT_TEST_OUTSIDE_TOP_Y:    float = 49.0
+HIT_TEST_OUTSIDE_BOTTOM_Y: float = 151.0
+
+DRAG_FRAGMENT_X:      float = 200.0
+DRAG_FRAGMENT_Y:      float = 150.0
+DRAG_FRAGMENT_WIDTH:  int = 200
+DRAG_FRAGMENT_HEIGHT: int = 120
+
+DRAG_START_X: int = 200
+DRAG_START_Y: int = 150
+
+DRAG_TARGET_X: int = 250
+DRAG_TARGET_Y: int = 190
+DRAG_DELTA_Y:  int = 40
+
+EXPECTED_DRAG_X: float = 250.0
+
+SIZING_CLAMP_FRAGMENT_X:      float = 200.0
+SIZING_CLAMP_FRAGMENT_Y:      float = 150.0
+SIZING_CLAMP_FRAGMENT_WIDTH:  int = 200
+SIZING_CLAMP_FRAGMENT_HEIGHT: int = 120
+
+SIZING_CLAMP_START_X: int = 300
+SIZING_CLAMP_START_Y: int = 150
+
+SIZING_CLAMP_TARGET_X: int = 120
+SIZING_CLAMP_TARGET_Y: int = 150
+
 
 class TestSDCombinedFragment(UnitTestBaseW):
     """
@@ -139,43 +189,43 @@ class TestSDCombinedFragment(UnitTestBaseW):
 
     def testFragmentHitTest(self):
         fragment: UmlSDCombinedFragment = UmlSDCombinedFragment(
-            x=100.0,
-            y=100.0,
-            width=100,
-            height=100
+            x=HIT_TEST_FRAGMENT_X,
+            y=HIT_TEST_FRAGMENT_Y,
+            width=HIT_TEST_FRAGMENT_WIDTH,
+            height=HIT_TEST_FRAGMENT_HEIGHT
         )
 
         # Inside center
-        insideHitResult = fragment.HitTest(x=100.0, y=100.0)
+        insideHitResult: object = fragment.HitTest(x=HIT_TEST_FRAGMENT_X, y=HIT_TEST_FRAGMENT_Y)
         self.assertNotEqual(False, insideHitResult)
 
         # Inside corners
-        self.assertNotEqual(False, fragment.HitTest(x=50.0, y=50.0))
-        self.assertNotEqual(False, fragment.HitTest(x=150.0, y=150.0))
+        self.assertNotEqual(False, fragment.HitTest(x=HIT_TEST_INSIDE_LEFT_X, y=HIT_TEST_INSIDE_TOP_Y))
+        self.assertNotEqual(False, fragment.HitTest(x=HIT_TEST_INSIDE_RIGHT_X, y=HIT_TEST_INSIDE_BOTTOM_Y))
 
         # Outside bounds
-        self.assertEqual(False, fragment.HitTest(x=49.0, y=100.0))
-        self.assertEqual(False, fragment.HitTest(x=151.0, y=100.0))
-        self.assertEqual(False, fragment.HitTest(x=100.0, y=49.0))
-        self.assertEqual(False, fragment.HitTest(x=100.0, y=151.0))
+        self.assertEqual(False, fragment.HitTest(x=HIT_TEST_OUTSIDE_LEFT_X, y=HIT_TEST_FRAGMENT_Y))
+        self.assertEqual(False, fragment.HitTest(x=HIT_TEST_OUTSIDE_RIGHT_X, y=HIT_TEST_FRAGMENT_Y))
+        self.assertEqual(False, fragment.HitTest(x=HIT_TEST_FRAGMENT_X, y=HIT_TEST_OUTSIDE_TOP_Y))
+        self.assertEqual(False, fragment.HitTest(x=HIT_TEST_FRAGMENT_X, y=HIT_TEST_OUTSIDE_BOTTOM_Y))
 
     def testFragmentBoundsDataclass(self):
         bounds: SDFragmentBounds = SDFragmentBounds(
-            centerX=200,
-            centerY=150,
-            width=120,
-            height=80
+            centerX=BOUNDS_CENTER_X,
+            centerY=BOUNDS_CENTER_Y,
+            width=BOUNDS_WIDTH,
+            height=BOUNDS_HEIGHT
         )
 
-        self.assertEqual(200, bounds.centerX)
-        self.assertEqual(150, bounds.centerY)
-        self.assertEqual(120, bounds.width)
-        self.assertEqual(80, bounds.height)
+        self.assertEqual(BOUNDS_CENTER_X, bounds.centerX)
+        self.assertEqual(BOUNDS_CENTER_Y, bounds.centerY)
+        self.assertEqual(BOUNDS_WIDTH, bounds.width)
+        self.assertEqual(BOUNDS_HEIGHT, bounds.height)
 
-        self.assertEqual(140, bounds.left)
-        self.assertEqual(260, bounds.right)
-        self.assertEqual(110, bounds.top)
-        self.assertEqual(190, bounds.bottom)
+        self.assertEqual(EXPECTED_BOUNDS_LEFT, bounds.left)
+        self.assertEqual(EXPECTED_BOUNDS_RIGHT, bounds.right)
+        self.assertEqual(EXPECTED_BOUNDS_TOP, bounds.top)
+        self.assertEqual(EXPECTED_BOUNDS_BOTTOM, bounds.bottom)
 
     def testFragmentLayoutEngineIntegration(self):
 
@@ -305,10 +355,10 @@ class TestSDCombinedFragment(UnitTestBaseW):
         self._createSDInstance(name='inst2', x=INSTANCE_2_X)
 
         fragment: UmlSDCombinedFragment = UmlSDCombinedFragment(
-            x=200.0,
-            y=150.0,
-            width=200,
-            height=120
+            x=DRAG_FRAGMENT_X,
+            y=DRAG_FRAGMENT_Y,
+            width=DRAG_FRAGMENT_WIDTH,
+            height=DRAG_FRAGMENT_HEIGHT
         )
         self._diagramFrame.umlDiagram.AddShape(fragment)
         fragment.umlFrame = self._diagramFrame
@@ -318,23 +368,23 @@ class TestSDCombinedFragment(UnitTestBaseW):
             fragment.GetEventHandler()
         )
 
-        eventHandler.OnBeginDragLeft(x=200, y=150)
+        eventHandler.OnBeginDragLeft(x=DRAG_START_X, y=DRAG_START_Y)
         self.assertTrue(fragment.Selected())
 
-        # Drag 50px right, 40px down
-        eventHandler.OnDragLeft(draw=False, x=250, y=190)
-        self.assertEqual(250.0, fragment.GetX())
+        # Drag right and down
+        eventHandler.OnDragLeft(draw=False, x=DRAG_TARGET_X, y=DRAG_TARGET_Y)
+        self.assertEqual(EXPECTED_DRAG_X, fragment.GetX())
 
         headerBottomY: int   = round(inst1.umlSDLifeLine.rectangle.top)
         halfHeight:    float = fragment.GetHeight() / 2.0
         expectedTopY:  int   = self._layoutEngine.computeNearestTimeStepY(
             headerBottomY=headerBottomY,
-            targetY=round((150.0 + 40) - halfHeight)
+            targetY=round((DRAG_FRAGMENT_Y + DRAG_DELTA_Y) - halfHeight)
         )
         self.assertEqual(expectedTopY + halfHeight, fragment.GetY())
 
-        eventHandler.OnEndDragLeft(x=250, y=190)
-        self.assertEqual(250.0, fragment.GetX())
+        eventHandler.OnEndDragLeft(x=DRAG_TARGET_X, y=DRAG_TARGET_Y)
+        self.assertEqual(EXPECTED_DRAG_X, fragment.GetX())
         self.assertEqual(expectedTopY + halfHeight, fragment.GetY())
 
     def testFragmentEventHandlerSizingBottomHandle(self):
@@ -426,10 +476,10 @@ class TestSDCombinedFragment(UnitTestBaseW):
 
     def testFragmentEventHandlerSizingWidthClamp(self):
         fragment: UmlSDCombinedFragment = UmlSDCombinedFragment(
-            x=200.0,
-            y=150.0,
-            width=200,
-            height=120
+            x=SIZING_CLAMP_FRAGMENT_X,
+            y=SIZING_CLAMP_FRAGMENT_Y,
+            width=SIZING_CLAMP_FRAGMENT_WIDTH,
+            height=SIZING_CLAMP_FRAGMENT_HEIGHT
         )
         self._diagramFrame.umlDiagram.AddShape(fragment)
         fragment.umlFrame = self._diagramFrame
@@ -444,9 +494,9 @@ class TestSDCombinedFragment(UnitTestBaseW):
         )
 
         # Drag right handle leftwards towards minimum width
-        eventHandler.OnSizingBeginDragLeft(pt=rightHandle, x=300, y=150)
-        eventHandler.OnSizingDragLeft(pt=rightHandle, draw=False, x=120, y=150)
-        eventHandler.OnSizingEndDragLeft(pt=rightHandle, x=120, y=150)
+        eventHandler.OnSizingBeginDragLeft(pt=rightHandle, x=SIZING_CLAMP_START_X, y=SIZING_CLAMP_START_Y)
+        eventHandler.OnSizingDragLeft(pt=rightHandle, draw=False, x=SIZING_CLAMP_TARGET_X, y=SIZING_CLAMP_TARGET_Y)
+        eventHandler.OnSizingEndDragLeft(pt=rightHandle, x=SIZING_CLAMP_TARGET_X, y=SIZING_CLAMP_TARGET_Y)
 
         self.assertGreaterEqual(fragment.GetWidth(), MIN_FRAGMENT_WIDTH)
 
