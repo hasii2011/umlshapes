@@ -114,4 +114,4 @@ flowchart TD
     - 3 participants: `Customer`, `OrderService`, `PaymentGateway`.
     - A `loop` fragment: `[for each item in cart]`.
     - An `alt` fragment with 2 operands separated by a dashed divider: `[balance >= total]` vs. `[else]`.
-  - Interactive selection and resizing on the live canvas.
+    - Interactive selection and resizing on the live canvas.

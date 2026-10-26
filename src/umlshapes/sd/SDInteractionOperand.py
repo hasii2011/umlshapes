@@ -1,5 +1,8 @@
-from dataclasses import dataclass
 
+from typing import List
+from typing import NewType
+
+from dataclasses import dataclass
 
 @dataclass
 class SDInteractionOperand:
@@ -10,3 +13,5 @@ class SDInteractionOperand:
     guard:         str = ''
     startTimeStep: int = 0
     endTimeStep:   int = 0
+
+SDInteractionOperands = NewType('SDInteractionOperands', List[SDInteractionOperand])

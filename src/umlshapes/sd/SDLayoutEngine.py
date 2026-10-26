@@ -1,11 +1,16 @@
 from dataclasses import replace
+from typing import TYPE_CHECKING
 
 from logging import Logger
 from logging import getLogger
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
+from umlshapes.sd.SDFragmentBounds import SDFragmentBounds
 from umlshapes.sd.SDLayoutParameters import SDLayoutParameters
+
+if TYPE_CHECKING:
+    from umlshapes.sd.UmlSDLifeLine import UmlSDLifeLine
 
 
 class SDLayoutEngine:
@@ -29,7 +34,8 @@ class SDLayoutEngine:
             timeStepHeight=self._preferences.timeStepHeight,
             reflexiveMessageWidth=self._preferences.reflexiveMessageWidth,
             executionWidth=self._preferences.executionWidth,
-            executionShiftDelta=self._preferences.executionShiftDelta
+            executionShiftDelta=self._preferences.executionShiftDelta,
+            fragmentPadding=self._preferences.fragmentPadding
         )
 
     @property
@@ -113,3 +119,64 @@ class SDLayoutEngine:
         initialHeight: int = self._preferences.initialLifeLineLength
         neededHeight: int = self._parameters.topPadding + ((totalTimeSteps + 1) * self._parameters.timeStepHeight) + self._parameters.bottomPadding
         return max(initialHeight, neededHeight)
+
+    def computeFragmentBounds(
+        self,
+        lifeLines: list['UmlSDLifeLine'],
+        startY: int,
+        endY: int
+    ) -> SDFragmentBounds:
+        """
+        Compute the bounding box (SDFragmentBounds) for a combined fragment.
+
+        The horizontal span extends from the leftmost to the rightmost participant
+        lifelines, expanded on each side by `fragmentPadding`. The vertical span is
+        bounded by `startY` and `endY`, constrained to at least one `timeStepHeight`.
+        Coordinates are centered per wxOGL / RectangleShape conventions.
+
+        Args:
+            lifeLines: Participant lifelines covered by the combined fragment.
+            startY:    Top vertical coordinate (typically snapped to a timeStep).
+            endY:      Bottom vertical coordinate (typically snapped to a timeStep).
+
+        Returns:
+            SDFragmentBounds: Dataclass containing centerX, centerY, width, and height.
+        """
+        if len(lifeLines) == 0:
+            return SDFragmentBounds(
+                centerX=0,
+                centerY=(startY + endY) // 2,
+                width=0,
+                height=max(self._parameters.timeStepHeight, endY - startY)
+            )
+
+        padding: int = self._parameters.fragmentPadding
+        xPositions: list[int] = [round(lifeLine.GetX()) for lifeLine in lifeLines]
+        minX: int = min(xPositions) - padding
+        maxX: int = max(xPositions) + padding
+
+        width: int = maxX - minX
+        centerX: int = (minX + maxX) // 2
+
+        height: int = max(self._parameters.timeStepHeight, endY - startY)
+        centerY: int = (startY + endY) // 2
+
+        return SDFragmentBounds(
+            centerX=centerX,
+            centerY=centerY,
+            width=width,
+            height=height
+        )
+
+    def snapFragmentToTimeSteps(self, headerBottomY: int, startY: int, endY: int) -> tuple[int, int]:
+        """
+        Snap top and bottom Y coordinates of a fragment to the nearest discrete time steps.
+        Ensures endY is at least one timeStep below startY.
+        """
+        snappedStartY: int = self.computeNearestTimeStepY(headerBottomY=headerBottomY, targetY=startY)
+        snappedEndY: int = self.computeNearestTimeStepY(headerBottomY=headerBottomY, targetY=endY)
+
+        if snappedEndY <= snappedStartY:
+            snappedEndY = snappedStartY + self._parameters.timeStepHeight
+
+        return snappedStartY, snappedEndY

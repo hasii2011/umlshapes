@@ -9,6 +9,7 @@ DEFAULT_START_Y:                 int = 50
 DEFAULT_REFLEXIVE_MESSAGE_WIDTH: int = 50
 DEFAULT_EXECUTION_WIDTH:        int = 14
 DEFAULT_EXECUTION_SHIFT_DELTA:  int = 7
+DEFAULT_FRAGMENT_PADDING:       int = 15
 
 
 @dataclass
@@ -26,3 +27,4 @@ class SDLayoutParameters:
     reflexiveMessageWidth: int = DEFAULT_REFLEXIVE_MESSAGE_WIDTH
     executionWidth:       int = DEFAULT_EXECUTION_WIDTH
     executionShiftDelta:  int = DEFAULT_EXECUTION_SHIFT_DELTA
+    fragmentPadding:      int = DEFAULT_FRAGMENT_PADDING
