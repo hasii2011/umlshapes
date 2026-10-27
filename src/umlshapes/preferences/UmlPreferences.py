@@ -20,6 +20,8 @@ from umlshapes.preferences.Defaults import DEFAULT_GRID_LINE_COLOR
 from umlshapes.preferences.Defaults import DEFAULT_GRID_LINE_STYLE
 from umlshapes.preferences.Defaults import DEFAULT_MESSAGE_LABEL_PLACEMENT
 from umlshapes.preferences.Defaults import DEFAULT_SD_INSTANCE_DIMENSIONS
+from umlshapes.preferences.Defaults import DEFAULT_AUTO_FIT_INSTANCE_WIDTH
+from umlshapes.preferences.Defaults import DEFAULT_RE_FIT_EXISTING_INSTANCES
 from umlshapes.preferences.Defaults import DEFAULT_REFLEXIVE_MESSAGE_WIDTH
 from umlshapes.preferences.Defaults import DEFAULT_TEXT_BACKGROUND_COLOR
 from umlshapes.preferences.Defaults import DEFAULT_EXECUTION_SHIFT_DELTA
@@ -135,6 +137,8 @@ SEQUENCE_DIAGRAM_PREFERENCES: ValueDescriptions = ValueDescriptions(
         KeyName('instanceDimensions'):               ValueDescription(defaultValue=DEFAULT_SD_INSTANCE_DIMENSIONS, deserializer=UmlDimensions.deSerialize),
         KeyName('instanceYPosition'):                ValueDescription(defaultValue=DEFAULT_INSTANCE_Y,             deserializer=SecureConversions.secureInteger),
         KeyName('instanceNameRelativeHeight'):       ValueDescription(defaultValue=DEFAULT_NAME_RELATIVE_HEIGHT,   deserializer=SecureConversions.secureFloat),
+        KeyName('autoFitInstanceWidth'):             ValueDescription(defaultValue=str(DEFAULT_AUTO_FIT_INSTANCE_WIDTH), deserializer=SecureConversions.secureBoolean),
+        KeyName('reFitExistingInstances'):           ValueDescription(defaultValue=str(DEFAULT_RE_FIT_EXISTING_INSTANCES), deserializer=SecureConversions.secureBoolean),
         KeyName('initialLifeLineLength'):            ValueDescription(defaultValue=DEFAULT_LIFE_LINE_LENGTH, deserializer=SecureConversions.secureInteger),
         KeyName('messageArrowHeadSize'):             ValueDescription(defaultValue='10.0', deserializer=SecureConversions.secureFloat),
         KeyName('messageLabelPlacement'):            ValueDescription(defaultValue=DEFAULT_MESSAGE_LABEL_PLACEMENT, enumUseValue=True, deserializer=SDMessageLabelPlacement),

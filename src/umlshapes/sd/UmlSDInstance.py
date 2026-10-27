@@ -12,6 +12,7 @@ from umlshapes.lib.ogl import ControlPoint
 from umlshapes.lib.ogl import CONSTRAINT_ALIGNED_TOP
 from umlshapes.lib.ogl import CONSTRAINT_BELOW
 from umlshapes.lib.ogl import CONSTRAINT_CENTRED_HORIZONTALLY
+from umlshapes.lib.ogl import CONTROL_POINT_HORIZONTAL
 from umlshapes.lib.ogl import CONTROL_POINT_VERTICAL
 
 from umlshapes.utils.ResourceUtils import ResourceUtils
@@ -38,6 +39,10 @@ if TYPE_CHECKING:
 OP_NONE:             int = 0    # None of OP_CLICK_LEFT, OP_CLICK_RIGHT, OP_DRAG_LEFT, OP_DRAG_RIGHT
 MIN_LIFELINE_LENGTH: int = 80
 
+HANDLE_LIFELINE_BOTTOM:   int = 0
+HANDLE_NAME_MIDDLE_LEFT:  int = 1
+HANDLE_NAME_MIDDLE_RIGHT: int = 2
+
 
 class UmlSDInstance(ControlPointMixin, IdentifierMixin, CompositeShape, TopLeftMixin):
 
@@ -50,22 +55,26 @@ class UmlSDInstance(ControlPointMixin, IdentifierMixin, CompositeShape, TopLeftM
 
         instanceDimensions: UmlDimensions = self._preferences.instanceDimensions
 
-        ControlPointMixin.__init__(self, shape=self)
-        IdentifierMixin.__init__(self)
-        CompositeShape.__init__(self)
-        TopLeftMixin.__init__(self, umlShape=self, width=instanceDimensions.width, height=instanceDimensions.height)
-
-        self.SetCanvas(diagramFrame)
-
-        self.logger: Logger = getLogger(__name__)
-
-        constrainingShape: SDInstanceConstrainer = SDInstanceConstrainer(diagramFrame)
         instanceName:      UmlInstanceName       = UmlInstanceName(sdInstance=sdInstance)
+        initialWidth:      int                   = round(instanceName.GetWidth())
+        constrainingShape: SDInstanceConstrainer = SDInstanceConstrainer(
+            diagramFrame=diagramFrame,
+            width=initialWidth
+        )
         sdLifeLine:        UmlSDLifeLine         = UmlSDLifeLine(
             instanceConstrainer=constrainingShape,
             instanceName=instanceName,
             sequenceDiagramFrame=diagramFrame
         )
+
+        ControlPointMixin.__init__(self, shape=self)
+        IdentifierMixin.__init__(self)
+        CompositeShape.__init__(self)
+        TopLeftMixin.__init__(self, umlShape=self, width=initialWidth, height=instanceDimensions.height)
+
+        self.SetCanvas(diagramFrame)
+
+        self.logger: Logger = getLogger(__name__)
 
         instanceName.SetPen(ResourceUtils.blackSolidPen())
         instanceName.SetTextColour('Black')
@@ -129,6 +138,42 @@ class UmlSDInstance(ControlPointMixin, IdentifierMixin, CompositeShape, TopLeftM
     def getLifeLineLength(self) -> int:
         return round(self._umlSDLifeLine.GetHeight())
 
+    @property
+    def instanceWidth(self) -> int:
+        return self._instanceName.width
+
+    @instanceWidth.setter
+    def instanceWidth(self, newWidth: int):
+        from umlshapes.preferences.Defaults import MIN_INSTANCE_WIDTH
+
+        targetWidth: int
+        if newWidth < MIN_INSTANCE_WIDTH:
+            targetWidth = MIN_INSTANCE_WIDTH
+        else:
+            targetWidth = round(newWidth)
+
+        self._instanceName.width = targetWidth
+
+        constrainingHeight: int = round(self._constrainingShape.GetHeight())
+        self._constrainingShape.size = UmlDimensions(width=targetWidth, height=constrainingHeight)
+
+        self.Recompute()
+        self.ResetControlPoints()
+        self._umlSDLifeLine.recomputeExecutionsGeometry()
+
+    def getInstanceWidth(self) -> int:
+        return self.instanceWidth
+
+    def setInstanceWidth(self, newWidth: int):
+        self.instanceWidth = newWidth
+
+    def reFitWidth(self):
+        """
+        Re-compute and apply the auto-fitted width based on the current instance name.
+        """
+        autoFitWidth: int = self._instanceName.computeAutoFitWidth(text=self._sdInstance.instanceName)
+        self.instanceWidth = autoFitWidth
+
     def setLifeLineLength(self, newLength: int):
         targetLength: int
         if newLength < MIN_LIFELINE_LENGTH:
@@ -188,24 +233,67 @@ class UmlSDInstance(ControlPointMixin, IdentifierMixin, CompositeShape, TopLeftM
         umlFrame: UmlFrame = self.GetCanvas()
         umlControlPointSize: int = self._preferences.controlPointSize
 
-        lifelineBottomY:  float = self._umlSDLifeLine.GetY() + (self._umlSDLifeLine.GetHeight() / 2.0)
+        compositeCenterX: float = self.GetX()
         compositeCenterY: float = self.GetY()
-        yOffset:          float = lifelineBottomY - compositeCenterY
-        control: UmlControlPoint = UmlControlPoint(
+
+        # Handle 0: Lifeline Bottom
+        lifelineBottomY: float = self._umlSDLifeLine.GetY() + (self._umlSDLifeLine.GetHeight() / 2.0)
+        yOffsetBottom:   float = lifelineBottomY - compositeCenterY
+        bottomControl:   UmlControlPoint = UmlControlPoint(
             umlFrame=umlFrame,
             shape=self,
             size=umlControlPointSize,
             xOffSet=0.0,
-            yOffSet=yOffset,
+            yOffSet=yOffsetBottom,
             controlPointType=CONTROL_POINT_VERTICAL
         )
-        control.SetX(self.GetX())
-        control.SetY(self.GetY() + yOffset)
-        control.SetParent(self)
-        self.GetChildren().append(control)
-        self.GetCanvas().AddShape(control)
-        self._controlPoints.append(control)
-        self._addEventHandler(umlControlPoint=control)
+        bottomControl.SetX(compositeCenterX)
+        bottomControl.SetY(compositeCenterY + yOffsetBottom)
+        bottomControl.SetParent(self)
+        self.GetChildren().append(bottomControl)
+        self.GetCanvas().AddShape(bottomControl)
+        self._controlPoints.append(bottomControl)
+        self._addEventHandler(umlControlPoint=bottomControl)
+
+        if not self._preferences.autoFitInstanceWidth:
+            # Handle 1: Name Middle-Left
+            nameLeftX:   float = self._instanceName.GetX() - (self._instanceName.GetWidth() / 2.0)
+            xOffsetLeft: float = nameLeftX - compositeCenterX
+            yOffsetName: float = self._instanceName.GetY() - compositeCenterY
+            leftControl: UmlControlPoint = UmlControlPoint(
+                umlFrame=umlFrame,
+                shape=self,
+                size=umlControlPointSize,
+                xOffSet=xOffsetLeft,
+                yOffSet=yOffsetName,
+                controlPointType=CONTROL_POINT_HORIZONTAL
+            )
+            leftControl.SetX(compositeCenterX + xOffsetLeft)
+            leftControl.SetY(compositeCenterY + yOffsetName)
+            leftControl.SetParent(self)
+            self.GetChildren().append(leftControl)
+            self.GetCanvas().AddShape(leftControl)
+            self._controlPoints.append(leftControl)
+            self._addEventHandler(umlControlPoint=leftControl)
+
+            # Handle 2: Name Middle-Right
+            nameRightX:   float = self._instanceName.GetX() + (self._instanceName.GetWidth() / 2.0)
+            xOffsetRight: float = nameRightX - compositeCenterX
+            rightControl: UmlControlPoint = UmlControlPoint(
+                umlFrame=umlFrame,
+                shape=self,
+                size=umlControlPointSize,
+                xOffSet=xOffsetRight,
+                yOffSet=yOffsetName,
+                controlPointType=CONTROL_POINT_HORIZONTAL
+            )
+            rightControl.SetX(compositeCenterX + xOffsetRight)
+            rightControl.SetY(compositeCenterY + yOffsetName)
+            rightControl.SetParent(self)
+            self.GetChildren().append(rightControl)
+            self.GetCanvas().AddShape(rightControl)
+            self._controlPoints.append(rightControl)
+            self._addEventHandler(umlControlPoint=rightControl)
 
     def ResetControlPoints(self):
 
@@ -213,19 +301,38 @@ class UmlSDInstance(ControlPointMixin, IdentifierMixin, CompositeShape, TopLeftM
         if len(self._controlPoints) == 0:
             return
 
-        # In OGL, control point positions are drawn relative to the parent shape's center:
-        # controlPoint.Y = self.GetY() + yOffset. To place the resize handle at the
-        # bottom of the lifeline, compute the lifeline's bottom Y and subtract the
-        # composite shape's vertical center.
-        lifelineBottomY:  float = self._umlSDLifeLine.GetY() + (self._umlSDLifeLine.GetHeight() / 2.0)
+        compositeCenterX: float = self.GetX()
         compositeCenterY: float = self.GetY()
-        yOffset:          float = lifelineBottomY - compositeCenterY
 
-        controlPoint: UmlControlPoint = cast(UmlControlPoint, self._controlPoints[0])
-        controlPoint.xOffset = 0.0
-        controlPoint.yOffset = yOffset
-        controlPoint.SetX(self.GetX())
-        controlPoint.SetY(self.GetY() + yOffset)
+        # Handle 0: Lifeline Bottom
+        lifelineBottomY: float = self._umlSDLifeLine.GetY() + (self._umlSDLifeLine.GetHeight() / 2.0)
+        yOffsetBottom:   float = lifelineBottomY - compositeCenterY
+        bottomControl:   UmlControlPoint = cast(UmlControlPoint, self._controlPoints[HANDLE_LIFELINE_BOTTOM])
+        bottomControl.xOffset = 0.0
+        bottomControl.yOffset = yOffsetBottom
+        bottomControl.SetX(compositeCenterX)
+        bottomControl.SetY(compositeCenterY + yOffsetBottom)
+
+        if len(self._controlPoints) >= 3:
+            # Handle 1: Name Middle-Left
+            nameLeftX:   float = self._instanceName.GetX() - (self._instanceName.GetWidth() / 2.0)
+            xOffsetLeft: float = nameLeftX - compositeCenterX
+            yOffsetName: float = self._instanceName.GetY() - compositeCenterY
+            leftControl: UmlControlPoint = cast(UmlControlPoint, self._controlPoints[HANDLE_NAME_MIDDLE_LEFT])
+            leftControl.xOffset = xOffsetLeft
+            leftControl.yOffset = yOffsetName
+            leftControl.SetX(compositeCenterX + xOffsetLeft)
+            leftControl.SetY(compositeCenterY + yOffsetName)
+
+            # Handle 2: Name Middle-Right
+            nameRightX:   float = self._instanceName.GetX() + (self._instanceName.GetWidth() / 2.0)
+            xOffsetRight: float = nameRightX - compositeCenterX
+            rightControl: UmlControlPoint = cast(UmlControlPoint, self._controlPoints[HANDLE_NAME_MIDDLE_RIGHT])
+            rightControl.xOffset = xOffsetRight
+            rightControl.yOffset = yOffsetName
+            rightControl.SetX(compositeCenterX + xOffsetRight)
+            rightControl.SetY(compositeCenterY + yOffsetName)
+
         self._umlSDLifeLine.recomputeExecutionsGeometry()
 
     def DeleteControlPoints(self, dc = None):

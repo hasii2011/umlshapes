@@ -1,3 +1,5 @@
+from typing import Optional
+
 from logging import Logger
 from logging import getLogger
 
@@ -25,13 +27,19 @@ class SDInstanceConstrainer(RectangleShape, TopLeftMixin):
     required by wx ogl composite shapes
     """
 
-    def __init__(self, diagramFrame: SequenceDiagramFrame):
+    def __init__(self, diagramFrame: SequenceDiagramFrame, width: Optional[int] = None):
 
         self._preferences:  UmlPreferences = UmlPreferences()
         instanceDimensions: UmlDimensions  = self._preferences.instanceDimensions
 
-        super().__init__(w=instanceDimensions.width, h=instanceDimensions.height)
-        TopLeftMixin.__init__(self, umlShape=self, width=instanceDimensions.width, height=instanceDimensions.height)
+        initialWidth: int
+        if width is not None:
+            initialWidth = width
+        else:
+            initialWidth = instanceDimensions.width
+
+        super().__init__(w=initialWidth, h=instanceDimensions.height)
+        TopLeftMixin.__init__(self, umlShape=self, width=initialWidth, height=instanceDimensions.height)
 
         self.SetCanvas(diagramFrame)
 
@@ -49,7 +57,6 @@ class SDInstanceConstrainer(RectangleShape, TopLeftMixin):
         self.SetBrush(brush)
 
         pen: Pen = self.GetPen()
-
         if self._preferences.debugSDInstance:
             pen.SetStyle(PENSTYLE_DOT)
         else:

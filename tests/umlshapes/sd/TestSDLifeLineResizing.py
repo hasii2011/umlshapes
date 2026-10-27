@@ -17,8 +17,9 @@ from umlshapes.sd.UmlSDInstance import UmlSDInstance
 INITIAL_LIFELINE_LENGTH: int = 360
 NEW_LIFELINE_LENGTH:     int = 500
 TOO_SHORT_LENGTH:        int = 20
-EXPECTED_MIN_LENGTH:     int = 80
-DRAG_HORIZONTAL_DELTA:   int = 50
+EXPECTED_MIN_LENGTH:           int = 80
+EXPECTED_CONTROL_POINT_COUNT:  int = 1
+DRAG_HORIZONTAL_DELTA:         int = 50
 RESIZE_VERTICAL_DELTA:   int = 80
 
 
@@ -110,7 +111,7 @@ class TestSDLifeLineResizing(UnitTestBaseW):
         )
 
         umlSDInstance.MakeControlPoints()
-        self.assertEqual(1, len(umlSDInstance.controlPoints))
+        self.assertEqual(EXPECTED_CONTROL_POINT_COUNT, len(umlSDInstance.controlPoints))
 
         expectedYOffset: float = (
             umlSDInstance.umlSDLifeLine.GetY()
@@ -187,7 +188,7 @@ class TestSDLifeLineResizing(UnitTestBaseW):
         umlSDInstance.instanceName.GetEventHandler().OnLeftClick(headerX, headerY)
 
         self.assertTrue(umlSDInstance.Selected())
-        self.assertEqual(1, len(umlSDInstance.controlPoints))
+        self.assertEqual(EXPECTED_CONTROL_POINT_COUNT, len(umlSDInstance.controlPoints))
 
         controlPoint: ControlPoint = umlSDInstance.controlPoints[0]
         expectedY: float = (
@@ -236,7 +237,7 @@ class TestSDLifeLineResizing(UnitTestBaseW):
         umlSDInstance.umlSDLifeLine.GetEventHandler().OnLeftClick(lifeLineX, lifeLineY)
 
         self.assertTrue(umlSDInstance.Selected())
-        self.assertEqual(1, len(umlSDInstance.controlPoints))
+        self.assertEqual(EXPECTED_CONTROL_POINT_COUNT, len(umlSDInstance.controlPoints))
 
         # Dragging on the lifeline moves the composite horizontally
         startX: int = round(umlSDInstance.GetX())
@@ -295,7 +296,7 @@ class TestSDLifeLineResizing(UnitTestBaseW):
 
         # Select instance 1
         umlSDInstance1.instanceName.GetEventHandler().OnLeftClick(150, 70)
-        self.assertEqual(1, len(umlSDInstance1.controlPoints))
+        self.assertEqual(EXPECTED_CONTROL_POINT_COUNT, len(umlSDInstance1.controlPoints))
 
         controlPoint: ControlPoint = umlSDInstance1.controlPoints[0]
         dragTargetY: int = round(controlPoint.GetY() + RESIZE_VERTICAL_DELTA)

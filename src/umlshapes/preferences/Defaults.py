@@ -37,10 +37,14 @@ DEFAULT_TEXT_BACKGROUND_COLOR:  str = UmlColor.WHITE.value
 DEFAULT_USE_CASE_SIZE: str = str(UmlDimensions(width=100, height=60))
 DEFAULT_ACTOR_SIZE:    str = str(UmlDimensions(width=80, height=100))
 
-DEFAULT_SD_INSTANCE_DIMENSIONS:    str   = str(UmlDimensions(100, 400))
-DEFAULT_NAME_RELATIVE_HEIGHT:      float = 0.10
-DEFAULT_LIFE_LINE_LENGTH:          int   = 360
-DEFAULT_INSTANCE_Y:                int   = 50
+DEFAULT_SD_INSTANCE_DIMENSIONS:        str   = str(UmlDimensions(100, 400))
+DEFAULT_NAME_RELATIVE_HEIGHT:          float = 0.10
+DEFAULT_LIFE_LINE_LENGTH:              int   = 360
+DEFAULT_INSTANCE_Y:                    int   = 50
+DEFAULT_AUTO_FIT_INSTANCE_WIDTH:       bool  = True
+DEFAULT_RE_FIT_EXISTING_INSTANCES:     bool  = False
+DEFAULT_INSTANCE_HORIZONTAL_PADDING:   int   = 20
+MIN_INSTANCE_WIDTH:                    int   = 60
 DEFAULT_TIME_STEP_HEIGHT:          int   = 40
 DEFAULT_REFLEXIVE_MESSAGE_WIDTH:   int   = 50
 MIN_REFLEXIVE_MESSAGE_WIDTH:       int   = 20

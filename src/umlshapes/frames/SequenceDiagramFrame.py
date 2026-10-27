@@ -58,3 +58,14 @@ class SequenceDiagramFrame(UmlFrame):
             if isinstance(shape, UmlSDInstance):
                 shape.setLifeLineLength(newLength=length)
         self.refresh()
+
+    def reFitAllInstancesWidth(self):
+        """
+        Re-fit all instances on this diagram to match their participant names.
+        """
+        from umlshapes.sd.UmlSDInstance import UmlSDInstance
+
+        for shape in self.umlShapes:
+            if isinstance(shape, UmlSDInstance):
+                shape.reFitWidth()
+        self.refresh()

@@ -128,7 +128,7 @@ class UmlSdInstanceEventHandler(UmlBaseEventHandler):
 
     def OnSizingDragLeft(self, pt: ControlPoint, draw: bool, x: int, y: int, keys: int = 0, attachment: int = 0):
         """
-        Interactively adjust the lifeline length during drag.
+        Interactively adjust the lifeline length or instance width during drag.
 
         Args:
             pt:
@@ -138,7 +138,24 @@ class UmlSdInstanceEventHandler(UmlBaseEventHandler):
             keys:
             attachment:
         """
+        from umlshapes.preferences.Defaults import MIN_INSTANCE_WIDTH
+        from umlshapes.sd.UmlSDInstance import HANDLE_NAME_MIDDLE_LEFT
+        from umlshapes.sd.UmlSDInstance import HANDLE_NAME_MIDDLE_RIGHT
+
         umlSDInstance: UmlSDInstance = cast(UmlSDInstance, self.GetShape())
+        controlPoints: list[ControlPoint] = umlSDInstance.controlPoints
+
+        if not self._preferences.autoFitInstanceWidth:
+            if len(controlPoints) >= 3 and (pt is controlPoints[HANDLE_NAME_MIDDLE_LEFT] or pt is controlPoints[HANDLE_NAME_MIDDLE_RIGHT]):
+                instanceCenterX: float = umlSDInstance.instanceName.GetX()
+                halfWidth:       float = abs(x - instanceCenterX)
+                newWidth:        int   = round(halfWidth * 2.0)
+                if newWidth < MIN_INSTANCE_WIDTH:
+                    newWidth = MIN_INSTANCE_WIDTH
+                umlSDInstance.instanceWidth = newWidth
+                umlSDInstance.umlFrame.refresh()
+                return
+
         headerBottomY: int = round(umlSDInstance.umlSDLifeLine.rectangle.top)
         rawLength: int = round(y - headerBottomY)
 
@@ -157,7 +174,7 @@ class UmlSdInstanceEventHandler(UmlBaseEventHandler):
 
     def OnSizingEndDragLeft(self, pt: ControlPoint, x: int, y: int, keys: int = 0, attachment: int = 0):
         """
-        Finalize interactive sizing of the lifeline.
+        Finalize interactive sizing of the lifeline or instance width.
 
         Args:
             pt:
@@ -166,7 +183,27 @@ class UmlSdInstanceEventHandler(UmlBaseEventHandler):
             keys:
             attachment:
         """
+        from umlshapes.preferences.Defaults import MIN_INSTANCE_WIDTH
+        from umlshapes.sd.UmlSDInstance import HANDLE_NAME_MIDDLE_LEFT
+        from umlshapes.sd.UmlSDInstance import HANDLE_NAME_MIDDLE_RIGHT
+
         umlSDInstance: UmlSDInstance = cast(UmlSDInstance, self.GetShape())
+        controlPoints: list[ControlPoint] = umlSDInstance.controlPoints
+
+        if not self._preferences.autoFitInstanceWidth:
+            if len(controlPoints) >= 3 and (pt is controlPoints[HANDLE_NAME_MIDDLE_LEFT] or pt is controlPoints[HANDLE_NAME_MIDDLE_RIGHT]):
+
+                instanceCenterX: float = umlSDInstance.instanceName.GetX()
+                halfWidth:       float = abs(x - instanceCenterX)
+                newWidth:        int   = round(halfWidth * 2.0)
+
+                if newWidth < MIN_INSTANCE_WIDTH:
+                    newWidth = MIN_INSTANCE_WIDTH
+                umlSDInstance.instanceWidth = newWidth
+                umlSDInstance.umlFrame.refresh()
+
+                return
+
         headerBottomY: int = round(umlSDInstance.umlSDLifeLine.rectangle.top)
         rawLength: int = round(y - headerBottomY)
 

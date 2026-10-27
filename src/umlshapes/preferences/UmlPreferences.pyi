@@ -61,6 +61,8 @@ class UmlPreferences:
     instanceDimensions: UmlDimensions
     instanceYPosition: int
     instanceNameRelativeHeight: float
+    autoFitInstanceWidth: bool
+    reFitExistingInstances: bool
     initialLifeLineLength: int
     messageArrowHeadSize: float
     messageLabelPlacement: SDMessageLabelPlacement

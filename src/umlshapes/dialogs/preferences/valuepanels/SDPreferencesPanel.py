@@ -72,6 +72,8 @@ AUTO_GENERATE_EXECUTIONS_TOOLTIP:       str = 'Automatically generate execution 
 INITIAL_LIFELINE_LENGTH_TOOLTIP:         str = 'Default starting length in pixels for new instance lifelines'
 AUTO_GROW_LIFELINES_TOOLTIP:             str = 'Automatically extend lifeline length when messages are placed or dragged beyond the current bottom'
 UNIFORM_LIFELINE_LENGTH_TOOLTIP:         str = 'Keep all lifelines at equal length when any lifeline is resized or auto-grown'
+AUTO_FIT_INSTANCE_WIDTH_TOOLTIP:         str = 'Automatically expand instance name rectangle width to fit the instance/class name'
+RE_FIT_EXISTING_INSTANCES_TOOLTIP:       str = 'When Auto-fit is enabled, also re-fit all existing instances on open sequence diagrams to their name widths'
 
 
 class SDPreferencesPanel(BasePreferencesPanel):
@@ -92,6 +94,8 @@ class SDPreferencesPanel(BasePreferencesPanel):
         self._initialLifeLineLength:      SpinCtrl                = cast(SpinCtrl, None)                # noqa
         self._autoGrowLifeLines:          CheckBox                = cast(CheckBox, None)                # noqa
         self._uniformLifeLineLength:      CheckBox                = cast(CheckBox, None)                # noqa
+        self._autoFitInstanceWidth:       CheckBox                = cast(CheckBox, None)                # noqa
+        self._reFitExistingInstances:     CheckBox                = cast(CheckBox, None)                # noqa
         self._executionWidth:            SpinCtrl                = cast(SpinCtrl, None)                # noqa
         self._autoGenerateExecutions:    CheckBox                = cast(CheckBox, None)                # noqa
 
@@ -120,6 +124,7 @@ class SDPreferencesPanel(BasePreferencesPanel):
         instanceNameRow.SetSizerProps(expand=False)
 
         self._layoutInstanceNameRelativeHeightControl(parentSizedPanel=instanceNameRow)
+        self._layoutAutoFitInstanceWidthControl(parentSizedPanel=instanceNameRow)
 
         messageRow: SizedPanel = SizedPanel(parentSizedPanel)
         messageRow.SetSizerType('horizontal')
@@ -201,6 +206,9 @@ class SDPreferencesPanel(BasePreferencesPanel):
         height: int = self._preferences.instanceDimensions.height
         self._instanceDimensions.dimensions = Dimensions(width=width, height=height)
         self._instanceNameRelativeHeight.SetValue(self._preferences.instanceNameRelativeHeight)
+        self._autoFitInstanceWidth.SetValue(self._preferences.autoFitInstanceWidth)
+        self._reFitExistingInstances.SetValue(self._preferences.reFitExistingInstances)
+        self._reFitExistingInstances.Enable(self._preferences.autoFitInstanceWidth)
 
         currentPlacement: SDMessageLabelPlacement = self._preferences.messageLabelPlacement
         self._labelPlacementChoice.SetStringSelection(currentPlacement.value)
@@ -229,6 +237,19 @@ class SDPreferencesPanel(BasePreferencesPanel):
         self._instanceNameRelativeHeight.SetDigits(DIGITS_INSTANCE_NAME_RELATIVE_HEIGHT)
         self._instanceNameRelativeHeight.SetToolTip(INSTANCE_NAME_RELATIVE_HEIGHT_TOOLTIP)
         self.Bind(EVT_SPINCTRLDOUBLE, self._onInstanceNameRelativeHeightChanged, self._instanceNameRelativeHeight)
+
+    def _layoutAutoFitInstanceWidthControl(self, parentSizedPanel: SizedPanel):
+
+        autoFitPanel: TitledPanel = TitledPanel(parent=parentSizedPanel, titleLabel='Instance Width Auto-Fit')
+        autoFitPanel.SetSizerProps(expand=False)
+
+        self._autoFitInstanceWidth = CheckBox(parent=autoFitPanel, label='Auto-fit to Name Width')
+        self._autoFitInstanceWidth.SetToolTip(AUTO_FIT_INSTANCE_WIDTH_TOOLTIP)
+        self.Bind(EVT_CHECKBOX, self._onAutoFitInstanceWidthChanged, self._autoFitInstanceWidth)
+
+        self._reFitExistingInstances = CheckBox(parent=autoFitPanel, label='Re-fit Existing Instances')
+        self._reFitExistingInstances.SetToolTip(RE_FIT_EXISTING_INSTANCES_TOOLTIP)
+        self.Bind(EVT_CHECKBOX, self._onReFitExistingInstancesChanged, self._reFitExistingInstances)
 
     def _layoutMessageArrowHeadSizeControl(self, parentSizedPanel: SizedPanel):
 
@@ -328,6 +349,43 @@ class SDPreferencesPanel(BasePreferencesPanel):
 
         newValue: float = event.GetValue()
         self._preferences.instanceNameRelativeHeight = newValue
+
+    def _onAutoFitInstanceWidthChanged(self, event: CommandEvent):
+
+        newValue: bool = event.IsChecked()
+        self._preferences.autoFitInstanceWidth = newValue
+        self._reFitExistingInstances.Enable(newValue)
+        if newValue:
+            if self._preferences.reFitExistingInstances:
+                self._reFitAllExistingInstances()
+
+    def _onReFitExistingInstancesChanged(self, event: CommandEvent):
+
+        newValue: bool = event.IsChecked()
+        self._preferences.reFitExistingInstances = newValue
+        if newValue:
+            if self._preferences.autoFitInstanceWidth:
+                self._reFitAllExistingInstances()
+
+    def _reFitAllExistingInstances(self):
+        """
+        Iterate across all top-level windows and re-fit instances on any open SequenceDiagramFrame.
+        """
+        from wx import GetTopLevelWindows
+        from wx import Window
+
+        topWindows: list[Window] = GetTopLevelWindows()
+        for window in topWindows:
+            self._reFitInstancesInWindow(window=window)
+
+    def _reFitInstancesInWindow(self, window: Window):
+        from umlshapes.frames.SequenceDiagramFrame import SequenceDiagramFrame
+
+        if isinstance(window, SequenceDiagramFrame):
+            window.reFitAllInstancesWidth()
+
+        for child in window.GetChildren():
+            self._reFitInstancesInWindow(window=child)
 
     def _onMessageArrowHeadSizeChanged(self, event: SpinDoubleEvent):
 
