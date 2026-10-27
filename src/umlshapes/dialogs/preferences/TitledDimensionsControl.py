@@ -101,8 +101,9 @@ class TitledDimensionsControl(TitledPanel):
         Args:
             tip: The tooltip instance.
         """
-        super().SetToolTip(tip)
-        self._dualSpinnerPanel.SetToolTip(tip)
+        tipString: str = tip.GetTip()
+        super().SetToolTip(ToolTip(tipString))
+        self._dualSpinnerPanel.SetToolTip(ToolTip(tipString))
 
     def _onSpinnerValuesChanged(self, firstValue: int, secondValue: int):
         """

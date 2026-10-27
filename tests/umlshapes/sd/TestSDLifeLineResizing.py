@@ -37,6 +37,8 @@ class TestSDLifeLineResizing(UnitTestBaseW):
         OGLInitialize()
 
         self._preferences:     UmlPreferences       = UmlPreferences()
+        self._saveAutoFit:     bool                 = self._preferences.autoFitInstanceWidth
+        self._preferences.autoFitInstanceWidth      = True
         self._umlPubSubEngine: IUmlPubSubEngine     = UmlPubSubEngine()
         self._diagramFrame:    SequenceDiagramFrame = SequenceDiagramFrame(
             parent=self._listeningWindow,
@@ -44,6 +46,7 @@ class TestSDLifeLineResizing(UnitTestBaseW):
         )
 
     def tearDown(self):
+        self._preferences.autoFitInstanceWidth = self._saveAutoFit
         self._diagramFrame.Destroy()
         super().tearDown()
 

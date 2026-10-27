@@ -78,4 +78,7 @@ class DlgUmlShapesPreferences(SizedDialog):
     def _onClose(self, _event: CommandEvent):
         """
         """
-        self.EndModal(CANCEL)
+        if self.IsModal():
+            self.EndModal(CANCEL)
+        else:
+            self.Destroy()

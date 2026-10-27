@@ -1,3 +1,4 @@
+
 from typing import cast
 from typing import TYPE_CHECKING
 
@@ -130,6 +131,10 @@ class UmlSDInstance(ControlPointMixin, IdentifierMixin, CompositeShape, TopLeftM
     @property
     def instanceName(self) -> UmlInstanceName:
         return self._instanceName
+
+    @property
+    def sdInstance(self) -> SDInstance:
+        return self._sdInstance
 
     @property
     def controlPoints(self) -> list[ControlPoint]:

@@ -4,6 +4,7 @@ from logging import Logger
 from logging import getLogger
 
 from umlshapes.lib.ogl import ShapeEvtHandler
+from umlshapes.preferences.UmlPreferences import UmlPreferences
 
 if TYPE_CHECKING:
     from umlshapes.sd.UmlInstanceName import UmlInstanceName
@@ -26,6 +27,7 @@ class UmlInstanceNameEventHandler(ShapeEvtHandler):
         super().__init__(prev=previousEventHandler, shape=umlInstanceName)
         self._umlInstanceName: 'UmlInstanceName' = umlInstanceName
         self._umlSDInstance:   'UmlSDInstance'   = umlSDInstance
+        self._preferences:     UmlPreferences    = UmlPreferences()
 
     def OnLeftClick(self, x: int, y: int, keys: int = 0, attachment: int = 0):
         """
@@ -87,7 +89,7 @@ class UmlInstanceNameEventHandler(ShapeEvtHandler):
 
     def OnLeftDoubleClick(self, x: int, y: int, keys: int = 0, attachment: int = 0):
         """
-        Delegate left double click to the parent UmlSDInstance.
+        Open the edit instance name dialog to rename the sequence diagram participant.
 
         Args:
             x:
@@ -95,9 +97,25 @@ class UmlInstanceNameEventHandler(ShapeEvtHandler):
             keys:
             attachment:
         """
-        parentHandler: ShapeEvtHandler = self._umlSDInstance.GetEventHandler()
-        if parentHandler is not None:
-            parentHandler.OnLeftDoubleClick(x, y, keys, attachment)
+        from wx import ID_OK
+
+        from umlshapes.dialogs.DlgEditInstanceName import DlgEditInstanceName
+        from umlshapes.frames.UmlFrame import UmlFrame
+
+        super().OnLeftDoubleClick(x, y, keys, attachment)
+
+        umlFrame: UmlFrame = self._umlSDInstance.GetCanvas()
+
+        with DlgEditInstanceName(parent=umlFrame, instanceName=self._umlInstanceName.instanceName) as dlg:
+
+            if dlg.ShowModal() == ID_OK:
+                newName: str = dlg.instanceName
+                self._umlInstanceName.instanceName = newName
+                if self._preferences.autoFitInstanceWidth:
+                    self._umlSDInstance.reFitWidth()
+                if umlFrame is not None:
+                    umlFrame.refresh()
+                    umlFrame.frameModified = True
 
     def OnRightClick(self, x: int, y: int, keys: int = 0, attachment: int = 0):
         """

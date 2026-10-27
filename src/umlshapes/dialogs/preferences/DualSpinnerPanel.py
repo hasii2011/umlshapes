@@ -110,8 +110,8 @@ class DualSpinnerPanel(SizedPanel):
         Args:
             tip: The tooltip instance.
         """
-        super().SetToolTip(tip)
         tipString: str = tip.GetTip()
+        super().SetToolTip(ToolTip(tipString))
         self._spinner0.SetToolTip(ToolTip(tipString))
         self._spinner1.SetToolTip(ToolTip(tipString))
 

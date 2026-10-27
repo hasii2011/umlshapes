@@ -1,8 +1,14 @@
 from typing import cast
 
+from unittest.mock import MagicMock
+from unittest.mock import patch
+
 from unittest import TestSuite
 from unittest import defaultTestLoader
 from unittest import main as unitTestMain
+
+from wx import CANCEL
+from wx import ID_OK
 
 from codeallyadvanced.ui.UnitTestBaseW import UnitTestBaseW
 from umlmodel.SDInstance import SDInstance
@@ -19,6 +25,7 @@ from umlshapes.frames.SequenceDiagramFrame import SequenceDiagramFrame
 from umlshapes.sd.eventhandlers.UmlSdInstanceEventHandler import UmlSdInstanceEventHandler
 from umlshapes.sd.UmlSDInstance import HANDLE_NAME_MIDDLE_LEFT
 from umlshapes.sd.UmlSDInstance import HANDLE_NAME_MIDDLE_RIGHT
+from umlshapes.sd.UmlInstanceName import UmlInstanceName
 from umlshapes.sd.UmlSDInstance import UmlSDInstance
 
 DEFAULT_NAME:               str = 'Short'
@@ -305,6 +312,92 @@ class TestSDInstanceNameResizing(UnitTestBaseW):
         # Re-fitting updates the width to match the name
         self._diagramFrame.reFitAllInstancesWidth()
         self.assertGreater(umlSDInstance.instanceWidth, defaultWidth)
+
+    def testDoubleClickInstanceNameRenamesAndAutoFitsWhenAutoFitOn(self):
+        self._preferences.autoFitInstanceWidth = True
+
+        sdModel: SDInstance = SDInstance()
+        sdModel.instanceName = DEFAULT_NAME
+
+        umlSDInstance: UmlSDInstance = UmlSDInstance(
+            sdInstance=sdModel,
+            diagramFrame=self._diagramFrame,
+            umlPubSubEngine=self._umlPubSubEngine
+        )
+        self._diagramFrame.umlDiagram.AddShape(umlSDInstance)
+        umlSDInstance.umlFrame = self._diagramFrame
+
+        initialWidth: int = umlSDInstance.instanceWidth
+
+        mockDlg: MagicMock = MagicMock()
+        mockDlg.ShowModal.return_value = ID_OK
+        mockDlg.instanceName = LONG_NAME
+        mockDlg.__enter__.return_value = mockDlg
+
+        with patch('umlshapes.dialogs.DlgEditInstanceName.DlgEditInstanceName', return_value=mockDlg):
+            instanceNameShape: UmlInstanceName = umlSDInstance.instanceName
+            instanceNameShape.GetEventHandler().OnLeftDoubleClick(100, 100)
+
+        self.assertEqual(LONG_NAME, umlSDInstance.sdInstance.instanceName)
+        self.assertEqual(LONG_NAME, instanceNameShape.instanceName)
+        self.assertGreater(umlSDInstance.instanceWidth, initialWidth)
+        self.assertTrue(self._diagramFrame.frameModified)
+
+    def testDoubleClickInstanceNameRenamesAndPreservesWidthWhenAutoFitOff(self):
+        self._preferences.autoFitInstanceWidth = False
+
+        sdModel: SDInstance = SDInstance()
+        sdModel.instanceName = DEFAULT_NAME
+
+        umlSDInstance: UmlSDInstance = UmlSDInstance(
+            sdInstance=sdModel,
+            diagramFrame=self._diagramFrame,
+            umlPubSubEngine=self._umlPubSubEngine
+        )
+        self._diagramFrame.umlDiagram.AddShape(umlSDInstance)
+        umlSDInstance.umlFrame = self._diagramFrame
+        umlSDInstance.instanceWidth = CUSTOM_MANUAL_WIDTH
+
+        mockDlg: MagicMock = MagicMock()
+        mockDlg.ShowModal.return_value = ID_OK
+        mockDlg.instanceName = LONG_NAME
+        mockDlg.__enter__.return_value = mockDlg
+
+        with patch('umlshapes.dialogs.DlgEditInstanceName.DlgEditInstanceName', return_value=mockDlg):
+            instanceNameShape: UmlInstanceName = umlSDInstance.instanceName
+            instanceNameShape.GetEventHandler().OnLeftDoubleClick(100, 100)
+
+        self.assertEqual(LONG_NAME, umlSDInstance.sdInstance.instanceName)
+        self.assertEqual(LONG_NAME, instanceNameShape.instanceName)
+        self.assertEqual(CUSTOM_MANUAL_WIDTH, umlSDInstance.instanceWidth)
+
+    def testDoubleClickInstanceNameCanceledPreservesNameAndWidth(self):
+        self._preferences.autoFitInstanceWidth = True
+
+        sdModel: SDInstance = SDInstance()
+        sdModel.instanceName = DEFAULT_NAME
+
+        umlSDInstance: UmlSDInstance = UmlSDInstance(
+            sdInstance=sdModel,
+            diagramFrame=self._diagramFrame,
+            umlPubSubEngine=self._umlPubSubEngine
+        )
+        self._diagramFrame.umlDiagram.AddShape(umlSDInstance)
+        umlSDInstance.umlFrame = self._diagramFrame
+
+        initialWidth: int = umlSDInstance.instanceWidth
+
+        mockDlg: MagicMock = MagicMock()
+        mockDlg.ShowModal.return_value = CANCEL
+        mockDlg.instanceName = LONG_NAME
+        mockDlg.__enter__.return_value = mockDlg
+
+        with patch('umlshapes.dialogs.DlgEditInstanceName.DlgEditInstanceName', return_value=mockDlg):
+            instanceNameShape: UmlInstanceName = umlSDInstance.instanceName
+            instanceNameShape.GetEventHandler().OnLeftDoubleClick(100, 100)
+
+        self.assertEqual(DEFAULT_NAME, umlSDInstance.sdInstance.instanceName)
+        self.assertEqual(initialWidth, umlSDInstance.instanceWidth)
 
 
 def suite() -> TestSuite:

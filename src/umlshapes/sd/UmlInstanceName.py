@@ -105,6 +105,16 @@ class UmlInstanceName(RectangleShape, TopLeftMixin):
         self.ClearText()
         self.AddText(sdInstance.instanceName)
 
+    @property
+    def instanceName(self) -> str:
+        return self._sdInstance.instanceName
+
+    @instanceName.setter
+    def instanceName(self, newName: str):
+        self._sdInstance.instanceName = newName
+        self.ClearText()
+        self.AddText(newName)
+
     def OnDraw(self, dc: MemoryDC):
         """
         Draw the instance name rectangle, highlighting in red dashed pen when selected.
