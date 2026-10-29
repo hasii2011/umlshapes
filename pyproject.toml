@@ -17,7 +17,7 @@ license-files = ['LICENSE']
 classifiers = [
   "Programming Language :: Python",
   "Intended Audience :: Developers",
-  "Operating System :: macOS :: Mac OS X",
+  "Operating System :: MacOS :: MacOS X",
   "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 
