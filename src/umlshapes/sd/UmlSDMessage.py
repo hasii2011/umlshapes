@@ -295,6 +295,13 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
     @execution.setter
     def execution(self, execution: 'UmlSDExecution'):
         self._execution = execution
+        if execution is not None:
+            if self._messageType == SDMessageType.RETURN:
+                execution.finishMessage = self._sdMessage
+            else:
+                execution.startMessage = self._sdMessage
+                if execution.operation is None or execution.operation == '':
+                    execution.operation = self._sdMessage.message
 
     def Draggable(self) -> bool:
         """

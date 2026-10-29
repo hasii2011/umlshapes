@@ -527,7 +527,7 @@ class SDMessageCreationHandler:
         umlSDMessage.fromY = snappedFromY
         umlSDMessage.toY   = snappedToY
 
-        if self._preferences.autoGenerateExecutions:
+        if self._preferences.autoGenerateExecutions and self._messageType != SDMessageType.RETURN:
             executionDuration: int
             if isReflexiveMessage:
                 executionDuration = snappedToY - snappedFromY
@@ -544,6 +544,13 @@ class SDMessageCreationHandler:
 
         fromExecution: Optional[UmlSDExecution] = startLifeLine.getExecutionAtY(y=snappedFromY)
         toExecution:   Optional[UmlSDExecution] = destLifeLine.getExecutionAtY(y=snappedToY)
+
+        if self._messageType == SDMessageType.RETURN:
+            if fromExecution is not None:
+                umlSDMessage.execution = fromExecution
+        else:
+            if toExecution is not None and not umlSDMessage.hasExecution:
+                umlSDMessage.execution = toExecution
 
         if isReflexiveMessage:
             if fromExecution is not None:

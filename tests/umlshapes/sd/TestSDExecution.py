@@ -221,6 +221,7 @@ class TestSDExecution(UnitTestBaseW):
         )
         lifeLine.addExecution(execution=exec1)
         self.assertEqual(EXPECTED_NESTING_LEVEL_0, exec1.nestingLevel)
+        self.assertEqual(EXPECTED_NESTING_LEVEL_0, exec1.sdExecution.nestingLevel)
 
         execNonOverlap: UmlSDExecution = UmlSDExecution(
             lifeLine=lifeLine,
@@ -229,6 +230,7 @@ class TestSDExecution(UnitTestBaseW):
         )
         lifeLine.addExecution(execution=execNonOverlap)
         self.assertEqual(EXPECTED_NESTING_LEVEL_0, execNonOverlap.nestingLevel)
+        self.assertEqual(EXPECTED_NESTING_LEVEL_0, execNonOverlap.sdExecution.nestingLevel)
 
         exec2: UmlSDExecution = UmlSDExecution(
             lifeLine=lifeLine,
@@ -237,6 +239,7 @@ class TestSDExecution(UnitTestBaseW):
         )
         lifeLine.addExecution(execution=exec2)
         self.assertEqual(EXPECTED_NESTING_LEVEL_1, exec2.nestingLevel)
+        self.assertEqual(EXPECTED_NESTING_LEVEL_1, exec2.sdExecution.nestingLevel)
         self.assertGreater(exec2.GetX(), exec1.GetX())
 
         exec3: UmlSDExecution = UmlSDExecution(
@@ -246,10 +249,12 @@ class TestSDExecution(UnitTestBaseW):
         )
         lifeLine.addExecution(execution=exec3)
         self.assertEqual(EXPECTED_NESTING_LEVEL_2, exec3.nestingLevel)
+        self.assertEqual(EXPECTED_NESTING_LEVEL_2, exec3.sdExecution.nestingLevel)
         self.assertGreater(exec3.GetX(), exec2.GetX())
 
         lifeLine.removeExecution(execution=exec2)
         self.assertEqual(EXPECTED_NESTING_LEVEL_1, exec3.nestingLevel)
+        self.assertEqual(EXPECTED_NESTING_LEVEL_1, exec3.sdExecution.nestingLevel)
 
     def testDeepestExecutionAtY(self):
         umlSDInstance: UmlSDInstance = self._createSDInstance(name='inst1', x=INSTANCE_1_X)
@@ -416,6 +421,7 @@ class TestSDExecution(UnitTestBaseW):
         eventHandler.OnSizingEndDragLeft(pt=topHandle, x=round(topHandle.GetX()), y=RESIZE_DRAG_TOP_TARGET_Y)
 
         self.assertEqual(EXPECTED_TOP_SNAPPED_Y, execution.startY)
+        self.assertEqual(EXPECTED_TOP_SNAPPED_Y, execution.sdExecution.startTime)
 
         eventHandler.OnSizingBeginDragLeft(pt=bottomHandle, x=round(bottomHandle.GetX()), y=round(bottomHandle.GetY()))
         eventHandler.OnSizingDragLeft(
@@ -427,6 +433,7 @@ class TestSDExecution(UnitTestBaseW):
         eventHandler.OnSizingEndDragLeft(pt=bottomHandle, x=round(bottomHandle.GetX()), y=RESIZE_DRAG_BOTTOM_TARGET_Y)
 
         self.assertEqual(EXPECTED_BOTTOM_SNAPPED_Y, execution.endY)
+        self.assertEqual(EXPECTED_BOTTOM_SNAPPED_Y, execution.sdExecution.endTime)
 
     def testDiagramRegistrationOnAddAndRemove(self):
         inst1: UmlSDInstance = self._createSDInstance(name='inst1', x=INSTANCE_1_X)
@@ -469,6 +476,9 @@ class TestSDExecution(UnitTestBaseW):
         self.assertEqual(1, len(inst2.umlSDLifeLine.executions))
         createdExec: UmlSDExecution = inst2.umlSDLifeLine.executions[0]
         self.assertIn(createdExec, self._diagramFrame.umlDiagram.GetShapeList())
+        self.assertEqual(inst2.umlSDLifeLine.sdInstance, createdExec.sdExecution.instance)
+        self.assertEqual(createdExec.startY, createdExec.sdExecution.startTime)
+        self.assertEqual(createdExec.endY, createdExec.sdExecution.endTime)
 
     def testMessageDraggableAndExecutionSynchronization(self):
         inst1: UmlSDInstance = self._createSDInstance(name='inst1', x=INSTANCE_1_X)
@@ -518,6 +528,148 @@ class TestSDExecution(UnitTestBaseW):
         self.assertEqual(expectedNewY, msg.toY)
         self.assertEqual(expectedNewY, execution.startY)
         self.assertEqual(expectedNewY + initialDuration, execution.endY)
+        self.assertEqual(expectedNewY, execution.sdExecution.startTime)
+        self.assertEqual(expectedNewY + initialDuration, execution.sdExecution.endTime)
+
+    def testMessageLinkageOnTriggerMessage(self):
+        inst1: UmlSDInstance = self._createSDInstance(name='inst1', x=INSTANCE_1_X)
+        inst2: UmlSDInstance = self._createSDInstance(name='inst2', x=INSTANCE_2_X)
+
+        execution: UmlSDExecution = UmlSDExecution(
+            lifeLine=inst2.umlSDLifeLine,
+            startY=EXECUTION_START_Y_1,
+            endY=EXECUTION_END_Y_1
+        )
+        inst2.umlSDLifeLine.addExecution(execution=execution)
+
+        sdMessageModel: SDMessage = SDMessage(
+            message='computeTotal()',
+            src=inst1.umlSDLifeLine.sdInstance,
+            sourceY=EXECUTION_START_Y_1,
+            dst=inst2.umlSDLifeLine.sdInstance,
+            destinationY=EXECUTION_START_Y_1
+        )
+        message: UmlSDMessage = UmlSDMessage(
+            sdMessage=sdMessageModel,
+            umlPubSubEngine=self._umlPubSubEngine,
+            messageType=SDMessageType.SYNCHRONOUS
+        )
+        message.execution = execution
+
+        self.assertIs(sdMessageModel, execution.startMessage)
+        self.assertIs(sdMessageModel, execution.sdExecution.startMessage)
+        self.assertEqual('computeTotal()', execution.operation)
+        self.assertEqual('computeTotal()', execution.sdExecution.operation)
+        self.assertIsNone(execution.finishMessage)
+        self.assertIsNone(execution.sdExecution.finishMessage)
+
+    def testMessageLinkageOnReturnMessage(self):
+        inst1: UmlSDInstance = self._createSDInstance(name='inst1', x=INSTANCE_1_X)
+        inst2: UmlSDInstance = self._createSDInstance(name='inst2', x=INSTANCE_2_X)
+
+        execution: UmlSDExecution = UmlSDExecution(
+            lifeLine=inst2.umlSDLifeLine,
+            startY=EXECUTION_START_Y_1,
+            endY=EXECUTION_END_Y_1
+        )
+        inst2.umlSDLifeLine.addExecution(execution=execution)
+
+        callModelMessage: SDMessage = SDMessage(
+            message='computeTotal()',
+            src=inst1.umlSDLifeLine.sdInstance,
+            sourceY=EXECUTION_START_Y_1,
+            dst=inst2.umlSDLifeLine.sdInstance,
+            destinationY=EXECUTION_START_Y_1
+        )
+        callMessage: UmlSDMessage = UmlSDMessage(
+            sdMessage=callModelMessage,
+            umlPubSubEngine=self._umlPubSubEngine,
+            messageType=SDMessageType.SYNCHRONOUS
+        )
+        callMessage.execution = execution
+
+        returnModelMessage: SDMessage = SDMessage(
+            message='totalAmount',
+            src=inst2.umlSDLifeLine.sdInstance,
+            sourceY=EXECUTION_END_Y_1,
+            dst=inst1.umlSDLifeLine.sdInstance,
+            destinationY=EXECUTION_END_Y_1
+        )
+        returnMessage: UmlSDMessage = UmlSDMessage(
+            sdMessage=returnModelMessage,
+            umlPubSubEngine=self._umlPubSubEngine,
+            messageType=SDMessageType.RETURN
+        )
+        returnMessage.execution = execution
+
+        self.assertIs(callModelMessage, execution.startMessage)
+        self.assertIs(callModelMessage, execution.sdExecution.startMessage)
+        self.assertIs(returnModelMessage, execution.finishMessage)
+        self.assertIs(returnModelMessage, execution.sdExecution.finishMessage)
+        self.assertEqual('computeTotal()', execution.operation)
+
+    def testOperationPropertyExplicit(self):
+        inst1: UmlSDInstance = self._createSDInstance(name='inst1', x=INSTANCE_1_X)
+        execution: UmlSDExecution = UmlSDExecution(
+            lifeLine=inst1.umlSDLifeLine,
+            startY=EXECUTION_START_Y_1,
+            endY=EXECUTION_END_Y_1
+        )
+        self.assertIsNone(execution.operation)
+
+        explicitOperation: str = 'executeOrder()'
+        execution.operation = explicitOperation
+        self.assertEqual(explicitOperation, execution.operation)
+        self.assertEqual(explicitOperation, execution.sdExecution.operation)
+
+    def testAutoGenerateExecutionLinksStartAndFinishMessages(self):
+        inst1: UmlSDInstance = self._createSDInstance(name='inst1', x=INSTANCE_1_X)
+        inst2: UmlSDInstance = self._createSDInstance(name='inst2', x=INSTANCE_2_X)
+
+        handler: SDMessageCreationHandler = SDMessageCreationHandler(
+            sequenceDiagramFrame=self._diagramFrame,
+            umlPubSubEngine=self._umlPubSubEngine
+        )
+        handler.enableMessageCreation = True
+
+        callClick1: LifeLineClickDetails = LifeLineClickDetails(
+            lifeLine=inst1.umlSDLifeLine,
+            clickPosition=UmlPosition(x=INSTANCE_1_X, y=EXECUTION_START_Y_1)
+        )
+        callClick2: LifeLineClickDetails = LifeLineClickDetails(
+            lifeLine=inst2.umlSDLifeLine,
+            clickPosition=UmlPosition(x=INSTANCE_2_X, y=EXECUTION_START_Y_1)
+        )
+
+        handler._lifeLineClicked(clickDetails=callClick1)
+        handler._lifeLineClicked(clickDetails=callClick2)
+
+        self.assertEqual(1, len(inst2.umlSDLifeLine.executions))
+        createdExec: UmlSDExecution = inst2.umlSDLifeLine.executions[0]
+        self.assertEqual(1, len(inst1.umlSDLifeLine.messages))
+        callMsg: UmlSDMessage = inst1.umlSDLifeLine.messages[0]
+
+        self.assertIs(callMsg.sdMessage, createdExec.startMessage)
+        self.assertEqual(callMsg.sdMessage.message, createdExec.operation)
+        self.assertIsNone(createdExec.finishMessage)
+
+        handler.messageType = SDMessageType.RETURN
+        returnClick1: LifeLineClickDetails = LifeLineClickDetails(
+            lifeLine=inst2.umlSDLifeLine,
+            clickPosition=UmlPosition(x=INSTANCE_2_X, y=EXECUTION_START_Y_1 + self._preferences.timeStepHeight)
+        )
+        returnClick2: LifeLineClickDetails = LifeLineClickDetails(
+            lifeLine=inst1.umlSDLifeLine,
+            clickPosition=UmlPosition(x=INSTANCE_1_X, y=EXECUTION_START_Y_1 + self._preferences.timeStepHeight)
+        )
+
+        handler._lifeLineClicked(clickDetails=returnClick1)
+        handler._lifeLineClicked(clickDetails=returnClick2)
+        handler.enableMessageCreation = False
+
+        self.assertEqual(2, len(inst2.umlSDLifeLine.messages))
+        returnMsg: UmlSDMessage = inst2.umlSDLifeLine.messages[1]
+        self.assertIs(returnMsg.sdMessage, createdExec.finishMessage)
 
 
 def suite() -> TestSuite:

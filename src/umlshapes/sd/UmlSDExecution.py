@@ -9,6 +9,7 @@ from logging import getLogger
 from wx import MemoryDC
 
 from umlmodel.SDExecution import SDExecution
+from umlmodel.SDMessage import SDMessage
 
 from umlshapes.lib.ogl import CONTROL_POINT_VERTICAL
 from umlshapes.lib.ogl import RectangleShape
@@ -147,6 +148,30 @@ class UmlSDExecution(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeft
 
         self._sdExecution.nestingLevel = newLevel
         self.recomputeGeometry()
+
+    @property
+    def operation(self) -> Optional[str]:
+        return self._sdExecution.operation
+
+    @operation.setter
+    def operation(self, operation: Optional[str]):
+        self._sdExecution.operation = operation
+
+    @property
+    def startMessage(self) -> Optional[SDMessage]:
+        return self._sdExecution.startMessage
+
+    @startMessage.setter
+    def startMessage(self, message: Optional[SDMessage]):
+        self._sdExecution.startMessage = message
+
+    @property
+    def finishMessage(self) -> Optional[SDMessage]:
+        return self._sdExecution.finishMessage
+
+    @finishMessage.setter
+    def finishMessage(self, message: Optional[SDMessage]):
+        self._sdExecution.finishMessage = message
 
     def recomputeGeometry(self):
         """
