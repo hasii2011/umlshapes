@@ -2,7 +2,7 @@
 
 ## Overview
 
-With the release of **`umlmodel 4.0.0`**, the domain layer now provides formal model support for sequence diagram execution specifications via `SDExecution`:
+With the release of **`umlmodel 4.0.0`**, the domain layer provides formal model support for sequence diagram execution specifications via `SDExecution`:
 
 ```python
 from umlmodel.SDExecution import SDExecution
@@ -10,76 +10,72 @@ from umlmodel.SDInstance import SDInstance
 from umlmodel.SDMessage import SDMessage
 ```
 
-Currently, in `umlshapes`, `UmlSDExecution` functions purely as a presentation-layer visual rectangle on a lifeline (`lifeLine`, `startY`, `endY`, `nestingLevel`) without an associated domain model instance. This document outlines the implementation plan to bind `UmlSDExecution` directly to `SDExecution`.
+In `umlshapes`, `UmlSDExecution` is directly bound to `SDExecution` as its **Single Source of Truth (SSOT)**. This document outlines the completed implementation and downstream integration points.
 
 ---
 
-## 1. Prerequisites & Dependencies
+## 1. Prerequisites & Dependencies `[Completed]`
 
-Update `pyproject.toml` in `umlshapes`:
-* Bump dependency to `umlmodel >= 4.0.0` to pull in `SDExecution` and the keyword-only base class `UmlModelBase`.
+Updated `pyproject.toml` in `umlshapes`:
+* Bumped dependency to `umlmodel >= 4.0.0` to pull in `SDExecution` and keyword-only base class `UmlModelBase`.
 
 ---
 
-## 2. Model Association in `UmlSDExecution`
+## 2. Model Association in `UmlSDExecution` `[Completed]`
 
-### Constructor & Property
+### Single Source of Truth (SSOT) Architecture
+Rather than duplicating coordinates in local instance variables (`_startY`, `_endY`, `_nestingLevel`) alongside `_sdExecution`, `UmlSDExecution` maintains `self._sdExecution: SDExecution` as its sole state store.
+
+### Constructor & Property Delegation
 In `src/umlshapes/sd/UmlSDExecution.py`:
-1. Add `sdExecution: Optional[SDExecution] = None` to `UmlSDExecution.__init__`:
-   - If `sdExecution` is provided:
-     - Initialize `startY` and `endY` from `sdExecution.startTime` and `sdExecution.endTime`.
-     - Initialize `nestingLevel` from `sdExecution.nestingLevel`.
-   - If `sdExecution` is omitted (e.g., interactive creation on canvas):
-     - Instantiate a new `SDExecution` bound to `lifeLine.sdInstance`:
-       ```python
-       self._sdExecution = SDExecution(
-           instance=lifeLine.sdInstance,
-           startTime=self._startY,
-           endTime=self._endY,
-           nestingLevel=self._nestingLevel,
-       )
-       ```
-2. Provide a getter and setter property:
-   ```python
-   @property
-   def sdExecution(self) -> SDExecution:
-       return self._sdExecution
+1. `UmlSDExecution.__init__`:
+   - Accepts `lifeLine: UmlSDLifeLine, startY: int = 0, endY: int = 0, nestingLevel: int = 0, sdExecution: Optional[SDExecution] = None`.
+   - If `sdExecution` is provided: wraps the domain model directly.
+   - If `sdExecution` is omitted (canvas creation): instantiates a new `SDExecution` bound to `lifeLine.sdInstance`.
+2. Property Delegations:
+   - `startY` delegates to `_sdExecution.startTime` (and enforces minimum time step duration).
+   - `endY` delegates to `_sdExecution.endTime`.
+   - `nestingLevel` delegates to `_sdExecution.nestingLevel`.
+   - `operation` delegates to `_sdExecution.operation`.
+   - `startMessage` delegates to `_sdExecution.startMessage`.
+   - `finishMessage` delegates to `_sdExecution.finishMessage`.
+   - `sdExecution` getter and setter properties allow inspection and complete model swapping.
 
-   @sdExecution.setter
-   def sdExecution(self, sdExecution: SDExecution):
-       self._sdExecution = sdExecution
-       self._startY = sdExecution.startTime
-       self._endY = sdExecution.endTime
-       self._nestingLevel = sdExecution.nestingLevel
-       self.recomputeGeometry()
-   ```
+In `src/umlshapes/sd/UmlSDLifeLine.py`:
+* Added `sdInstance` property delegating to `self._umlInstanceName.sdInstance`.
 
 ---
 
-## 3. Geometry & Event Handler Synchronization
+## 3. Geometry & Event Handler Synchronization `[Completed]`
 
-In `src/umlshapes/sd/eventhandlers/UmlSDExecutionEventHandler.py`:
+In `src/umlshapes/sd/eventhandlers/UmlSDExecutionEventHandler.py` and `UmlSDMessageEventHandler.py`:
 * **Dragging & Resizing:**
   When control points or the shape move along the time axis:
-  - Update `self._sdExecution.startTime = self._startY`
-  - Update `self._sdExecution.endTime = self._endY`
-  - Update `self._sdExecution.nestingLevel = self._nestingLevel`
+  - Interactive top and bottom sizing handle drags update `execution.startY` and `execution.endY`, which directly mutate `sdExecution.startTime` and `sdExecution.endTime`.
+  - Message dragging via `_synchronizeAssociatedExecution` updates attached execution coordinates in lockstep.
+  - Lifeline nesting recalculation updates `execution.nestingLevel`, mutating `sdExecution.nestingLevel`.
 
 ---
 
-## 4. Message Linkage (Start & Finish Messages)
+## 4. Message Linkage (Start & Finish Messages) `[Completed]`
 
-In `SDMessageCreationHandler.py` and `UmlSDMessage.py`:
-* When a synchronous or asynchronous message connects to an execution occurrence:
-  - If it is the initiating / trigger message, associate `sdExecution.startMessage = umlSDMessage.sdMessage`.
-  - If it is the return / reply message, associate `sdExecution.finishMessage = umlSDMessage.sdMessage`.
-* Support optional operation binding (`sdExecution.operation`) when an execution represents an explicit method invocation.
+In `src/umlshapes/sd/UmlSDMessage.py`:
+* `UmlSDMessage.execution.setter`:
+  - When attaching a call message (`SYNCHRONOUS`, `ASYNCHRONOUS`, `FOUND`):
+    - Sets `execution.startMessage = self._sdMessage`.
+    - Auto-populates `execution.operation = self._sdMessage.message` if not already set.
+  - When attaching a return message (`RETURN`):
+    - Sets `execution.finishMessage = self._sdMessage`.
+
+In `src/umlshapes/sd/SDMessageCreationHandler.py`:
+* Return messages are guarded against spurious execution creation on destination lifelines.
+* Return messages link directly to the originating active execution occurrence (`fromExecution.finishMessage = modelMessage`).
 
 ---
 
-## 5. Downstream `umlio` Serialization Alignment
+## 5. Downstream `umlio` Serialization Alignment `[Ready]`
 
-Linking `UmlSDExecution` to `SDExecution` prepares for the XML schema update in `umlio`:
+`UmlSDExecution` exposes all necessary attributes for the XML schema update in `umlio`:
 ```xml
 <UmlSDExecution id="...">
     <ModelSDExecution
@@ -91,4 +87,16 @@ Linking `UmlSDExecution` to `SDExecution` prepares for the XML schema update in 
     />
 </UmlSDExecution>
 ```
-This mirrors how `<UmlSDInstance>` wraps `<ModelSDInstance>` and `<UmlSDMessage>` wraps `<ModelSDMessage>`.
+
+### Shape Traversal API Contract for `umlio`:
+* `umlSDLifeLine.executions -> list[UmlSDExecution]`
+* `umlSDExecution.id` -> presentation shape ID
+* `umlSDExecution.sdExecution` -> domain model instance:
+  - `sdExecution.id` -> unique model ID
+  - `sdExecution.instance.id` -> participant instance ID
+  - `sdExecution.startTime` -> start time offset
+  - `sdExecution.endTime` -> end time offset
+  - `sdExecution.nestingLevel` -> nesting level
+  - `sdExecution.operation` -> optional operation name
+  - `sdExecution.startMessage.id` -> trigger message ID (if present)
+  - `sdExecution.finishMessage.id` -> return message ID (if present)
