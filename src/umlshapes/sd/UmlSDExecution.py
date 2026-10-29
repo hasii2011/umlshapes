@@ -8,6 +8,8 @@ from logging import getLogger
 
 from wx import MemoryDC
 
+from umlmodel.SDExecution import SDExecution
+
 from umlshapes.lib.ogl import CONTROL_POINT_VERTICAL
 from umlshapes.lib.ogl import RectangleShape
 
@@ -44,19 +46,36 @@ class UmlSDExecution(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeft
     per the OMG UML standard specification.
     """
 
-    def __init__(self, lifeLine: 'UmlSDLifeLine', startY: int, endY: int, nestingLevel: int = 0):
+    def __init__(
+        self,
+        lifeLine: 'UmlSDLifeLine',
+        startY: int = 0,
+        endY: int = 0,
+        nestingLevel: int = 0,
+        sdExecution: Optional[SDExecution] = None
+    ):
 
         self.logger: Logger = getLogger(__name__)
         self._preferences: UmlPreferences = UmlPreferences()
         self._layoutEngine: SDLayoutEngine = SDLayoutEngine()
 
         self._lifeLine: 'UmlSDLifeLine' = lifeLine
-        self._startY: int = startY
-        self._endY: int = max(startY + self._preferences.timeStepHeight, endY)
-        self._nestingLevel: int = nestingLevel
 
-        width: int = self._preferences.executionWidth
-        height: int = self._endY - self._startY
+        if sdExecution is not None:
+            self._sdExecution: SDExecution = sdExecution
+            if self._sdExecution.endTime - self._sdExecution.startTime < self._preferences.timeStepHeight:
+                self._sdExecution.endTime = self._sdExecution.startTime + self._preferences.timeStepHeight
+        else:
+            calculatedEndY: int = max(startY + self._preferences.timeStepHeight, endY)
+            self._sdExecution = SDExecution(
+                instance=lifeLine.sdInstance,
+                startTime=startY,
+                endTime=calculatedEndY,
+                nestingLevel=nestingLevel
+            )
+
+        width:  int = self._preferences.executionWidth
+        height: int = self._sdExecution.endTime - self._sdExecution.startTime
 
         ControlPointMixin.__init__(self, shape=self)
         IdentifierMixin.__init__(self)
@@ -87,32 +106,46 @@ class UmlSDExecution(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeft
         return self._lifeLine
 
     @property
+    def sdExecution(self) -> SDExecution:
+        return self._sdExecution
+
+    @sdExecution.setter
+    def sdExecution(self, sdExecution: SDExecution):
+
+        self._sdExecution = sdExecution
+        if self._sdExecution.endTime - self._sdExecution.startTime < self._preferences.timeStepHeight:
+            self._sdExecution.endTime = self._sdExecution.startTime + self._preferences.timeStepHeight
+
+        self.recomputeGeometry()
+
+    @property
     def startY(self) -> int:
-        return self._startY
+        return self._sdExecution.startTime
 
     @startY.setter
     def startY(self, newStartY: int):
-        self._startY = newStartY
-        if self._endY - self._startY < self._preferences.timeStepHeight:
-            self._endY = self._startY + self._preferences.timeStepHeight
+        self._sdExecution.startTime = newStartY
+        if self._sdExecution.endTime - self._sdExecution.startTime < self._preferences.timeStepHeight:
+            self._sdExecution.endTime = self._sdExecution.startTime + self._preferences.timeStepHeight
         self.recomputeGeometry()
 
     @property
     def endY(self) -> int:
-        return self._endY
+        return self._sdExecution.endTime
 
     @endY.setter
     def endY(self, newEndY: int):
-        self._endY = max(self._startY + self._preferences.timeStepHeight, newEndY)
+        self._sdExecution.endTime = max(self._sdExecution.startTime + self._preferences.timeStepHeight, newEndY)
         self.recomputeGeometry()
 
     @property
     def nestingLevel(self) -> int:
-        return self._nestingLevel
+        return self._sdExecution.nestingLevel
 
     @nestingLevel.setter
     def nestingLevel(self, newLevel: int):
-        self._nestingLevel = newLevel
+
+        self._sdExecution.nestingLevel = newLevel
         self.recomputeGeometry()
 
     def recomputeGeometry(self):
@@ -121,16 +154,16 @@ class UmlSDExecution(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeft
         and nesting offset, updating the underlying OGL shape geometry.
         """
         lifeLineX: int = round(self._lifeLine.GetX())
-        centerX: int
-        centerY: int
-        width: int
-        height: int
+        centerX:   int
+        centerY:   int
+        width:     int
+        height:    int
 
         centerX, centerY, width, height = self._layoutEngine.computeExecutionBounds(
             lifeLineX=lifeLineX,
-            startY=self._startY,
-            endY=self._endY,
-            nestingLevel=self._nestingLevel
+            startY=self._sdExecution.startTime,
+            endY=self._sdExecution.endTime,
+            nestingLevel=self._sdExecution.nestingLevel
         )
 
         self.SetX(centerX)
@@ -148,6 +181,7 @@ class UmlSDExecution(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeft
         halfHeight: float = self.GetHeight() / 2.0
         centerX: float = self.GetX()
         centerY: float = self.GetY()
+
         umlFrame: 'UmlFrame' = cast('UmlFrame', self.GetCanvas())
         umlControlPointSize: int = self._preferences.controlPointSize
 
@@ -237,7 +271,7 @@ class UmlSDExecution(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeft
         super().OnDraw(dc)
 
     def __str__(self) -> str:
-        return f'UmlSDExecution(id={self.id}, startY={self._startY}, endY={self._endY}, nestingLevel={self._nestingLevel})'
+        return f'UmlSDExecution(id={self.id}, modelId={self._sdExecution.id}, startY={self.startY}, endY={self.endY}, nestingLevel={self.nestingLevel})'
 
     def __repr__(self) -> str:
         return self.__str__()

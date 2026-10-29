@@ -8,6 +8,8 @@ from logging import getLogger
 from wx import MemoryDC
 from wx import ClientDC
 
+from umlmodel.SDInstance import SDInstance
+
 from umlshapes.lib.ogl import RectangleShape
 
 from umlshapes.utils.ResourceUtils import ResourceUtils
@@ -58,6 +60,10 @@ class UmlSDLifeLine(IdentifierMixin, RectangleShape, TopLeftMixin):
     @property
     def umlInstanceName(self) -> UmlInstanceName:
         return self._umlInstanceName
+
+    @property
+    def sdInstance(self) -> SDInstance:
+        return self._umlInstanceName.sdInstance
 
     @property
     def instanceConstrainer(self) -> SDInstanceConstrainer:

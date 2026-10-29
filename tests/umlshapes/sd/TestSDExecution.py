@@ -10,6 +10,7 @@ from wx import ClientDC
 
 from codeallyadvanced.ui.UnitTestBaseW import UnitTestBaseW
 
+from umlmodel.SDExecution import SDExecution
 from umlmodel.SDInstance import SDInstance
 from umlmodel.SDMessage import SDMessage
 
@@ -132,6 +133,82 @@ class TestSDExecution(UnitTestBaseW):
         self.assertEqual(self._preferences.executionWidth, execution.GetWidth())
         self.assertEqual(EXPECTED_INITIAL_HEIGHT, execution.GetHeight())
         self.assertEqual(round(lifeLine.GetX()), round(execution.GetX()))
+
+        self.assertIsNotNone(execution.sdExecution)
+        self.assertEqual(lifeLine.sdInstance, execution.sdExecution.instance)
+        self.assertEqual(EXECUTION_START_Y_1, execution.sdExecution.startTime)
+        self.assertEqual(EXECUTION_END_Y_1, execution.sdExecution.endTime)
+        self.assertEqual(EXPECTED_NESTING_LEVEL_0, execution.sdExecution.nestingLevel)
+
+    def testExplicitSDExecutionInjection(self):
+        umlSDInstance: UmlSDInstance = self._createSDInstance(name='inst1', x=INSTANCE_1_X)
+        lifeLine: UmlSDLifeLine = umlSDInstance.umlSDLifeLine
+
+        modelExecution: SDExecution = SDExecution(
+            instance=lifeLine.sdInstance,
+            startTime=EXECUTION_START_Y_1,
+            endTime=EXECUTION_END_Y_1,
+            nestingLevel=EXPECTED_NESTING_LEVEL_0
+        )
+
+        execution: UmlSDExecution = UmlSDExecution(
+            lifeLine=lifeLine,
+            sdExecution=modelExecution
+        )
+        lifeLine.addExecution(execution=execution)
+
+        self.assertIs(modelExecution, execution.sdExecution)
+        self.assertEqual(EXECUTION_START_Y_1, execution.startY)
+        self.assertEqual(EXECUTION_END_Y_1, execution.endY)
+        self.assertEqual(EXPECTED_NESTING_LEVEL_0, execution.nestingLevel)
+
+    def testSDExecutionModelSynchronizationOnPropertyChange(self):
+        umlSDInstance: UmlSDInstance = self._createSDInstance(name='inst1', x=INSTANCE_1_X)
+        lifeLine: UmlSDLifeLine = umlSDInstance.umlSDLifeLine
+
+        execution: UmlSDExecution = UmlSDExecution(
+            lifeLine=lifeLine,
+            startY=EXECUTION_START_Y_1,
+            endY=EXECUTION_END_Y_1
+        )
+        lifeLine.addExecution(execution=execution)
+
+        newStartY: int = EXECUTION_START_Y_1 + 20
+        newEndY: int = EXECUTION_END_Y_1 + 40
+        newNestingLevel: int = EXPECTED_NESTING_LEVEL_1
+
+        execution.startY = newStartY
+        self.assertEqual(newStartY, execution.sdExecution.startTime)
+
+        execution.endY = newEndY
+        self.assertEqual(newEndY, execution.sdExecution.endTime)
+
+        execution.nestingLevel = newNestingLevel
+        self.assertEqual(newNestingLevel, execution.sdExecution.nestingLevel)
+
+    def testSDExecutionSetter(self):
+        umlSDInstance: UmlSDInstance = self._createSDInstance(name='inst1', x=INSTANCE_1_X)
+        lifeLine: UmlSDLifeLine = umlSDInstance.umlSDLifeLine
+
+        execution: UmlSDExecution = UmlSDExecution(
+            lifeLine=lifeLine,
+            startY=EXECUTION_START_Y_1,
+            endY=EXECUTION_END_Y_1
+        )
+        lifeLine.addExecution(execution=execution)
+
+        newModelExecution: SDExecution = SDExecution(
+            instance=lifeLine.sdInstance,
+            startTime=EXECUTION_START_Y_2,
+            endTime=EXECUTION_END_Y_2,
+            nestingLevel=EXPECTED_NESTING_LEVEL_1
+        )
+
+        execution.sdExecution = newModelExecution
+        self.assertIs(newModelExecution, execution.sdExecution)
+        self.assertEqual(EXECUTION_START_Y_2, execution.startY)
+        self.assertEqual(EXECUTION_END_Y_2, execution.endY)
+        self.assertEqual(EXPECTED_NESTING_LEVEL_1, execution.nestingLevel)
 
     def testExecutionNestingLevels(self):
         umlSDInstance: UmlSDInstance = self._createSDInstance(name='inst1', x=INSTANCE_1_X)
