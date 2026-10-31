@@ -289,7 +289,6 @@ class SDMessageCreationHandler:
         )
         umlSDMessage: UmlSDMessage = UmlSDMessage(
             sdMessage=modelMessage,
-            umlPubSubEngine=self._umlPubSubEngine,
             messageType=SDMessageType.LOST
         )
         umlSDMessage.umlFrame = self._sequenceDiagramFrame
@@ -389,7 +388,6 @@ class SDMessageCreationHandler:
         )
         umlSDMessage: UmlSDMessage = UmlSDMessage(
             sdMessage=modelMessage,
-            umlPubSubEngine=self._umlPubSubEngine,
             messageType=SDMessageType.FOUND
         )
         umlSDMessage.umlFrame = self._sequenceDiagramFrame
@@ -516,7 +514,6 @@ class SDMessageCreationHandler:
         self._messageCount += 1
         umlSDMessage: UmlSDMessage = UmlSDMessage(
             sdMessage=modelMessage,
-            umlPubSubEngine=self._umlPubSubEngine,
             messageType=self._messageType
         )
         umlSDMessage.umlFrame = self._sequenceDiagramFrame

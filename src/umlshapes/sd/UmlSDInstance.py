@@ -23,7 +23,6 @@ from umlshapes.mixins.IdentifierMixin import IdentifierMixin
 from umlshapes.mixins.TopLeftMixin import TopLeftMixin
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
-from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 from umlshapes.sd.eventhandlers.UmlSDLifeLineEventHandler import UmlSDLifeLineEventHandler
 from umlshapes.shapes.UmlControlPoint import UmlControlPoint
 
@@ -47,33 +46,28 @@ HANDLE_NAME_MIDDLE_RIGHT: int = 2
 
 class UmlSDInstance(ControlPointMixin, IdentifierMixin, CompositeShape, TopLeftMixin):
 
-    def __init__(self, sdInstance: SDInstance, diagramFrame: 'SequenceDiagramFrame', umlPubSubEngine: IUmlPubSubEngine):
+    def __init__(self, sdInstance: SDInstance):
 
         self._preferences:  UmlPreferences = UmlPreferences()
 
-        self._sdInstance:      SDInstance       = sdInstance
-        self._umlPubSubEngine: IUmlPubSubEngine = umlPubSubEngine
+        self._sdInstance: SDInstance = sdInstance
 
         instanceDimensions: UmlDimensions = self._preferences.instanceDimensions
 
         instanceName:      UmlInstanceName       = UmlInstanceName(sdInstance=sdInstance)
         initialWidth:      int                   = round(instanceName.GetWidth())
         constrainingShape: SDInstanceConstrainer = SDInstanceConstrainer(
-            diagramFrame=diagramFrame,
             width=initialWidth
         )
         sdLifeLine:        UmlSDLifeLine         = UmlSDLifeLine(
             instanceConstrainer=constrainingShape,
-            instanceName=instanceName,
-            sequenceDiagramFrame=diagramFrame
+            instanceName=instanceName
         )
 
         ControlPointMixin.__init__(self, shape=self)
         IdentifierMixin.__init__(self)
         CompositeShape.__init__(self)
         TopLeftMixin.__init__(self, umlShape=self, width=initialWidth, height=instanceDimensions.height)
-
-        self.SetCanvas(diagramFrame)
 
         self.logger: Logger = getLogger(__name__)
 
@@ -93,7 +87,6 @@ class UmlSDInstance(ControlPointMixin, IdentifierMixin, CompositeShape, TopLeftM
         self.AddConstraint(centerNameConstraint)
         self.AddConstraint(centerLifeLineConstraint)
         self.AddConstraint(belowConstraint)
-        self.Recompute()
 
         # If we don't do this, the shapes will be able to move on their
         # own, instead of moving the composite
@@ -119,6 +112,8 @@ class UmlSDInstance(ControlPointMixin, IdentifierMixin, CompositeShape, TopLeftM
     @umlFrame.setter
     def umlFrame(self, frame: 'SequenceDiagramFrame'):
         self.SetCanvas(frame)
+        if frame is not None:
+            self.Recompute()
 
     @property
     def umlSDLifeLine(self) -> UmlSDLifeLine:
@@ -162,9 +157,10 @@ class UmlSDInstance(ControlPointMixin, IdentifierMixin, CompositeShape, TopLeftM
         constrainingHeight: int = round(self._constrainingShape.GetHeight())
         self._constrainingShape.size = UmlDimensions(width=targetWidth, height=constrainingHeight)
 
-        self.Recompute()
-        self.ResetControlPoints()
-        self._umlSDLifeLine.recomputeExecutionsGeometry()
+        if self.GetCanvas() is not None:
+            self.Recompute()
+            self.ResetControlPoints()
+            self._umlSDLifeLine.recomputeExecutionsGeometry()
 
     def getInstanceWidth(self) -> int:
         return self.instanceWidth
@@ -199,9 +195,10 @@ class UmlSDInstance(ControlPointMixin, IdentifierMixin, CompositeShape, TopLeftM
         self._constrainingShape.size = UmlDimensions(width=round(constrainingWidth), height=newTotalHeight)
         self._constrainingShape.SetY(instanceTopY + (newTotalHeight / 2.0))
 
-        self.Recompute()
-        self.ResetControlPoints()
-        self._umlSDLifeLine.recomputeExecutionsGeometry()
+        if self.GetCanvas() is not None:
+            self.Recompute()
+            self.ResetControlPoints()
+            self._umlSDLifeLine.recomputeExecutionsGeometry()
 
     def CalculateSize(self):
         maxX: float = -999999.9
@@ -363,7 +360,6 @@ class UmlSDInstance(ControlPointMixin, IdentifierMixin, CompositeShape, TopLeftM
 
         eventHandler: UmlSDLifeLineEventHandler = UmlSDLifeLineEventHandler(
             umlSDLifeLine=umlSDLifeLine,
-            umlPubSubEngine=self._umlPubSubEngine,
             previousEventHandler=umlSDLifeLine.GetEventHandler()
         )
         umlSDLifeLine.SetEventHandler(eventHandler)

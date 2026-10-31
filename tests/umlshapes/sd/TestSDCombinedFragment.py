@@ -505,10 +505,9 @@ class TestSDCombinedFragment(UnitTestBaseW):
         sdInstanceModel.instanceName = name
 
         umlSDInstance: UmlSDInstance = UmlSDInstance(
-            sdInstance=sdInstanceModel,
-            diagramFrame=self._diagramFrame,
-            umlPubSubEngine=self._umlPubSubEngine
+            sdInstance=sdInstanceModel
         )
+        umlSDInstance.umlFrame = self._diagramFrame
         umlPosition: UmlPosition = UmlPosition(x=x, y=y)
         dc: ClientDC = ClientDC(self._diagramFrame)
         self._diagramFrame.PrepareDC(dc)

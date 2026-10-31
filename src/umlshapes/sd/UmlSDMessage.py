@@ -43,7 +43,6 @@ from umlshapes.mixins.ControlPointMixin import ControlPointMixin
 from umlshapes.preferences.Defaults import DEFAULT_LOST_FOUND_CIRCLE_RADIUS
 from umlshapes.preferences.Defaults import DEFAULT_LOST_FOUND_MESSAGE_LENGTH
 from umlshapes.preferences.UmlPreferences import UmlPreferences
-from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 
 from umlshapes.shapes.UmlLineControlPoint import UmlLineControlPoint
 from umlshapes.shapes.UmlLineControlPoint import UmlLineControlPointType
@@ -67,7 +66,7 @@ LineControlPoints = NewType('LineControlPoints', List[Point])
 
 class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
 
-    def __init__(self, sdMessage: SDMessage, umlPubSubEngine: IUmlPubSubEngine, messageType: SDMessageType = SDMessageType.SYNCHRONOUS):
+    def __init__(self, sdMessage: SDMessage, messageType: SDMessageType = SDMessageType.SYNCHRONOUS):
 
         from umlshapes.sd.UmlSDExecution import UmlSDExecution
 
@@ -82,7 +81,6 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
         self._messageType: SDMessageType = messageType
         self._preferences: UmlPreferences  = UmlPreferences()
 
-        self._umlPubSubEngine = umlPubSubEngine
         self._messageBackGroundBrush: Brush = Brush(colour=WHITE, style=BRUSHSTYLE_TRANSPARENT)
 
         self.SetFont(ResourceUtils.defaultFont())
@@ -700,7 +698,6 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
         eventHandler: UmlSDMessageLabelEventHandler = UmlSDMessageLabelEventHandler(previousEventHandler=umlSDMessageLabel.GetEventHandler())
 
         eventHandler.SetShape(umlSDMessageLabel)
-        eventHandler.umlPubSubEngine = self._umlPubSubEngine
 
         umlSDMessageLabel.SetEventHandler(eventHandler)
 

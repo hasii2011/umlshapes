@@ -61,10 +61,9 @@ class TestSDLifeLineResizing(UnitTestBaseW):
         sdInstanceModel.instanceName = 'testInstance'
 
         umlSDInstance: UmlSDInstance = UmlSDInstance(
-            sdInstance=sdInstanceModel,
-            diagramFrame=self._diagramFrame,
-            umlPubSubEngine=self._umlPubSubEngine
+            sdInstance=sdInstanceModel
         )
+        umlSDInstance.umlFrame = self._diagramFrame
 
         initialLength: int = umlSDInstance.getLifeLineLength()
         self.assertEqual(INITIAL_LIFELINE_LENGTH, initialLength)
@@ -95,10 +94,9 @@ class TestSDLifeLineResizing(UnitTestBaseW):
         sdInstanceModel.instanceName = 'testInstanceMin'
 
         umlSDInstance: UmlSDInstance = UmlSDInstance(
-            sdInstance=sdInstanceModel,
-            diagramFrame=self._diagramFrame,
-            umlPubSubEngine=self._umlPubSubEngine
+            sdInstance=sdInstanceModel
         )
+        umlSDInstance.umlFrame = self._diagramFrame
 
         umlSDInstance.setLifeLineLength(newLength=TOO_SHORT_LENGTH)
         self.assertEqual(EXPECTED_MIN_LENGTH, umlSDInstance.getLifeLineLength())
@@ -108,10 +106,9 @@ class TestSDLifeLineResizing(UnitTestBaseW):
         sdInstanceModel.instanceName = 'testInstanceCP'
 
         umlSDInstance: UmlSDInstance = UmlSDInstance(
-            sdInstance=sdInstanceModel,
-            diagramFrame=self._diagramFrame,
-            umlPubSubEngine=self._umlPubSubEngine
+            sdInstance=sdInstanceModel
         )
+        umlSDInstance.umlFrame = self._diagramFrame
 
         umlSDInstance.MakeControlPoints()
         self.assertEqual(EXPECTED_CONTROL_POINT_COUNT, len(umlSDInstance.controlPoints))
@@ -131,18 +128,16 @@ class TestSDLifeLineResizing(UnitTestBaseW):
         sdModel1: SDInstance = SDInstance()
         sdModel1.instanceName = 'instance1'
         umlSDInstance1: UmlSDInstance = UmlSDInstance(
-            sdInstance=sdModel1,
-            diagramFrame=self._diagramFrame,
-            umlPubSubEngine=self._umlPubSubEngine
+            sdInstance=sdModel1
         )
+        umlSDInstance1.umlFrame = self._diagramFrame
 
         sdModel2: SDInstance = SDInstance()
         sdModel2.instanceName = 'instance2'
         umlSDInstance2: UmlSDInstance = UmlSDInstance(
-            sdInstance=sdModel2,
-            diagramFrame=self._diagramFrame,
-            umlPubSubEngine=self._umlPubSubEngine
+            sdInstance=sdModel2
         )
+        umlSDInstance2.umlFrame = self._diagramFrame
 
         self._diagramFrame.umlDiagram.AddShape(umlSDInstance1)
         self._diagramFrame.umlDiagram.AddShape(umlSDInstance2)
@@ -164,10 +159,9 @@ class TestSDLifeLineResizing(UnitTestBaseW):
         sdInstanceModel.instanceName = 'testSelectionInstance'
 
         umlSDInstance: UmlSDInstance = UmlSDInstance(
-            sdInstance=sdInstanceModel,
-            diagramFrame=self._diagramFrame,
-            umlPubSubEngine=self._umlPubSubEngine
+            sdInstance=sdInstanceModel
         )
+        umlSDInstance.umlFrame = self._diagramFrame
         self._diagramFrame.umlDiagram.AddShape(umlSDInstance)
         umlSDInstance.Show(True)
 
@@ -216,10 +210,9 @@ class TestSDLifeLineResizing(UnitTestBaseW):
         sdInstanceModel.instanceName = 'testLifeLineDragInstance'
 
         umlSDInstance: UmlSDInstance = UmlSDInstance(
-            sdInstance=sdInstanceModel,
-            diagramFrame=self._diagramFrame,
-            umlPubSubEngine=self._umlPubSubEngine
+            sdInstance=sdInstanceModel
         )
+        umlSDInstance.umlFrame = self._diagramFrame
         self._diagramFrame.umlDiagram.AddShape(umlSDInstance)
         umlSDInstance.Show(True)
 
@@ -258,18 +251,16 @@ class TestSDLifeLineResizing(UnitTestBaseW):
         sdModel1: SDInstance = SDInstance()
         sdModel1.instanceName = 'instance1'
         umlSDInstance1: UmlSDInstance = UmlSDInstance(
-            sdInstance=sdModel1,
-            diagramFrame=self._diagramFrame,
-            umlPubSubEngine=self._umlPubSubEngine
+            sdInstance=sdModel1
         )
+        umlSDInstance1.umlFrame = self._diagramFrame
 
         sdModel2: SDInstance = SDInstance()
         sdModel2.instanceName = 'instance2'
         umlSDInstance2: UmlSDInstance = UmlSDInstance(
-            sdInstance=sdModel2,
-            diagramFrame=self._diagramFrame,
-            umlPubSubEngine=self._umlPubSubEngine
+            sdInstance=sdModel2
         )
+        umlSDInstance2.umlFrame = self._diagramFrame
 
         self._diagramFrame.umlDiagram.AddShape(umlSDInstance1)
         self._diagramFrame.umlDiagram.AddShape(umlSDInstance2)

@@ -81,9 +81,7 @@ class TestSDInstanceNameResizing(UnitTestBaseW):
         sdModel.instanceName = DEFAULT_NAME
 
         umlSDInstance: UmlSDInstance = UmlSDInstance(
-            sdInstance=sdModel,
-            diagramFrame=self._diagramFrame,
-            umlPubSubEngine=self._umlPubSubEngine
+            sdInstance=sdModel
         )
         self._diagramFrame.umlDiagram.AddShape(umlSDInstance)
         umlSDInstance.umlFrame = self._diagramFrame
@@ -98,9 +96,7 @@ class TestSDInstanceNameResizing(UnitTestBaseW):
         sdModel.instanceName = DEFAULT_NAME
 
         umlSDInstance: UmlSDInstance = UmlSDInstance(
-            sdInstance=sdModel,
-            diagramFrame=self._diagramFrame,
-            umlPubSubEngine=self._umlPubSubEngine
+            sdInstance=sdModel
         )
         self._diagramFrame.umlDiagram.AddShape(umlSDInstance)
         umlSDInstance.umlFrame = self._diagramFrame
@@ -115,9 +111,7 @@ class TestSDInstanceNameResizing(UnitTestBaseW):
         sdModel.instanceName = LONG_NAME
 
         umlSDInstance: UmlSDInstance = UmlSDInstance(
-            sdInstance=sdModel,
-            diagramFrame=self._diagramFrame,
-            umlPubSubEngine=self._umlPubSubEngine
+            sdInstance=sdModel
         )
 
         defaultWidth: int = self._preferences.instanceDimensions.width
@@ -132,9 +126,7 @@ class TestSDInstanceNameResizing(UnitTestBaseW):
         sdModel.instanceName = LONG_NAME
 
         umlSDInstance: UmlSDInstance = UmlSDInstance(
-            sdInstance=sdModel,
-            diagramFrame=self._diagramFrame,
-            umlPubSubEngine=self._umlPubSubEngine
+            sdInstance=sdModel
         )
 
         defaultWidth: int = self._preferences.instanceDimensions.width
@@ -145,10 +137,9 @@ class TestSDInstanceNameResizing(UnitTestBaseW):
         sdModel.instanceName = DEFAULT_NAME
 
         umlSDInstance: UmlSDInstance = UmlSDInstance(
-            sdInstance=sdModel,
-            diagramFrame=self._diagramFrame,
-            umlPubSubEngine=self._umlPubSubEngine
+            sdInstance=sdModel
         )
+        umlSDInstance.umlFrame = self._diagramFrame
 
         lifelineCenterXBefore: float = umlSDInstance.umlSDLifeLine.GetX()
 
@@ -165,10 +156,9 @@ class TestSDInstanceNameResizing(UnitTestBaseW):
         sdModel.instanceName = DEFAULT_NAME
 
         umlSDInstance: UmlSDInstance = UmlSDInstance(
-            sdInstance=sdModel,
-            diagramFrame=self._diagramFrame,
-            umlPubSubEngine=self._umlPubSubEngine
+            sdInstance=sdModel
         )
+        umlSDInstance.umlFrame = self._diagramFrame
 
         umlSDInstance.instanceWidth = TOO_SMALL_WIDTH
         self.assertEqual(MIN_INSTANCE_WIDTH, umlSDInstance.instanceWidth)
@@ -180,9 +170,7 @@ class TestSDInstanceNameResizing(UnitTestBaseW):
         sdModel.instanceName = DEFAULT_NAME
 
         umlSDInstance: UmlSDInstance = UmlSDInstance(
-            sdInstance=sdModel,
-            diagramFrame=self._diagramFrame,
-            umlPubSubEngine=self._umlPubSubEngine
+            sdInstance=sdModel
         )
         self._diagramFrame.umlDiagram.AddShape(umlSDInstance)
         umlSDInstance.umlFrame = self._diagramFrame
@@ -224,9 +212,7 @@ class TestSDInstanceNameResizing(UnitTestBaseW):
         sdModel.instanceName = DEFAULT_NAME
 
         umlSDInstance: UmlSDInstance = UmlSDInstance(
-            sdInstance=sdModel,
-            diagramFrame=self._diagramFrame,
-            umlPubSubEngine=self._umlPubSubEngine
+            sdInstance=sdModel
         )
         self._diagramFrame.umlDiagram.AddShape(umlSDInstance)
         umlSDInstance.umlFrame = self._diagramFrame
@@ -263,9 +249,7 @@ class TestSDInstanceNameResizing(UnitTestBaseW):
         sdModel.instanceName = DEFAULT_NAME
 
         umlSDInstance: UmlSDInstance = UmlSDInstance(
-            sdInstance=sdModel,
-            diagramFrame=self._diagramFrame,
-            umlPubSubEngine=self._umlPubSubEngine
+            sdInstance=sdModel
         )
         initialWidth: int = umlSDInstance.instanceWidth
 
@@ -281,10 +265,9 @@ class TestSDInstanceNameResizing(UnitTestBaseW):
         sdModel.instanceName = DEFAULT_NAME
 
         umlSDInstance: UmlSDInstance = UmlSDInstance(
-            sdInstance=sdModel,
-            diagramFrame=self._diagramFrame,
-            umlPubSubEngine=self._umlPubSubEngine
+            sdInstance=sdModel
         )
+        umlSDInstance.umlFrame = self._diagramFrame
         umlSDInstance.instanceWidth = CUSTOM_MANUAL_WIDTH
 
         sdModel.instanceName = EXTREMELY_LONG_NAME
@@ -299,9 +282,7 @@ class TestSDInstanceNameResizing(UnitTestBaseW):
         sdModel.instanceName = LONG_NAME
 
         umlSDInstance: UmlSDInstance = UmlSDInstance(
-            sdInstance=sdModel,
-            diagramFrame=self._diagramFrame,
-            umlPubSubEngine=self._umlPubSubEngine
+            sdInstance=sdModel
         )
         self._diagramFrame.umlDiagram.AddShape(umlSDInstance)
         umlSDInstance.umlFrame = self._diagramFrame
@@ -320,9 +301,7 @@ class TestSDInstanceNameResizing(UnitTestBaseW):
         sdModel.instanceName = DEFAULT_NAME
 
         umlSDInstance: UmlSDInstance = UmlSDInstance(
-            sdInstance=sdModel,
-            diagramFrame=self._diagramFrame,
-            umlPubSubEngine=self._umlPubSubEngine
+            sdInstance=sdModel
         )
         self._diagramFrame.umlDiagram.AddShape(umlSDInstance)
         umlSDInstance.umlFrame = self._diagramFrame
@@ -350,9 +329,7 @@ class TestSDInstanceNameResizing(UnitTestBaseW):
         sdModel.instanceName = DEFAULT_NAME
 
         umlSDInstance: UmlSDInstance = UmlSDInstance(
-            sdInstance=sdModel,
-            diagramFrame=self._diagramFrame,
-            umlPubSubEngine=self._umlPubSubEngine
+            sdInstance=sdModel
         )
         self._diagramFrame.umlDiagram.AddShape(umlSDInstance)
         umlSDInstance.umlFrame = self._diagramFrame
@@ -378,9 +355,7 @@ class TestSDInstanceNameResizing(UnitTestBaseW):
         sdModel.instanceName = DEFAULT_NAME
 
         umlSDInstance: UmlSDInstance = UmlSDInstance(
-            sdInstance=sdModel,
-            diagramFrame=self._diagramFrame,
-            umlPubSubEngine=self._umlPubSubEngine
+            sdInstance=sdModel
         )
         self._diagramFrame.umlDiagram.AddShape(umlSDInstance)
         umlSDInstance.umlFrame = self._diagramFrame

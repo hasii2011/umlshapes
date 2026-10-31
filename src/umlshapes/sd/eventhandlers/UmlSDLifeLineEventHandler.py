@@ -13,7 +13,6 @@ from umlshapes.frames.UmlFrame import UmlFrame
 from umlshapes.types.UmlPosition import UmlPosition
 
 from umlshapes.pubsubengine.UmlMessageType import UmlMessageType
-from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 
 from umlshapes.sd.UmlSDLifeLine import UmlSDLifeLine
 
@@ -29,12 +28,11 @@ class LifeLineClickDetails:
 
 class UmlSDLifeLineEventHandler(ShapeEvtHandler):
 
-    def __init__(self, umlSDLifeLine: UmlSDLifeLine,  umlPubSubEngine: IUmlPubSubEngine, previousEventHandler: ShapeEvtHandler):
+    def __init__(self, umlSDLifeLine: UmlSDLifeLine, previousEventHandler: ShapeEvtHandler):
         """
 
         Args:
             umlSDLifeLine:          The lifeline we are managing
-            umlPubSubEngine:        The pub sub engine
             previousEventHandler:   The previous event handler in order to correctly chain
         """
 
@@ -42,8 +40,7 @@ class UmlSDLifeLineEventHandler(ShapeEvtHandler):
 
         super().__init__(prev=previousEventHandler, shape=umlSDLifeLine)
 
-        self._umlSDLifeLine:   UmlSDLifeLine    = umlSDLifeLine
-        self._umlPubSubEngine: IUmlPubSubEngine = umlPubSubEngine
+        self._umlSDLifeLine: UmlSDLifeLine = umlSDLifeLine
 
     def OnLeftClick(self, x: int, y: int, keys: int = 0, attachment: int = 0):
         """
@@ -63,14 +60,15 @@ class UmlSDLifeLineEventHandler(ShapeEvtHandler):
         sdLifeLine: UmlSDLifeLine = self.GetShape()
         umlFrame:   UmlFrame      = sdLifeLine.GetCanvas()
 
-        self._umlPubSubEngine.sendMessage(
-            messageType=UmlMessageType.SD_LIFELINE_CLICKED,
-            frameId=umlFrame.id,
-            clickDetails=LifeLineClickDetails(
-                clickPosition=clickPosition,
-                lifeLine=sdLifeLine
+        if umlFrame is not None and hasattr(umlFrame, 'umlPubSubEngine') and umlFrame.umlPubSubEngine is not None:
+            umlFrame.umlPubSubEngine.sendMessage(
+                messageType=UmlMessageType.SD_LIFELINE_CLICKED,
+                frameId=umlFrame.id,
+                clickDetails=LifeLineClickDetails(
+                    clickPosition=clickPosition,
+                    lifeLine=sdLifeLine
+                )
             )
-        )
 
         parentInstance: Optional['UmlSDInstance'] = sdLifeLine.umlSDInstance
         if parentInstance is not None:

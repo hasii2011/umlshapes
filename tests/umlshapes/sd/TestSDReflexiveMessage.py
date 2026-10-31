@@ -257,10 +257,9 @@ class TestSDReflexiveMessage(UnitTestBaseW):
         sdInstanceModel.instanceName = name
 
         umlSDInstance: UmlSDInstance = UmlSDInstance(
-            sdInstance=sdInstanceModel,
-            diagramFrame=self._diagramFrame,
-            umlPubSubEngine=self._umlPubSubEngine
+            sdInstance=sdInstanceModel
         )
+        umlSDInstance.umlFrame = self._diagramFrame
         umlSDInstance.SetX(x)
         umlSDInstance.SetY(y)
         umlSDInstance.umlSDLifeLine.SetX(x)
@@ -284,7 +283,6 @@ class TestSDReflexiveMessage(UnitTestBaseW):
         )
         umlSDMessage: UmlSDMessage = UmlSDMessage(
             sdMessage=modelMessage,
-            umlPubSubEngine=self._umlPubSubEngine,
             messageType=SDMessageType.SYNCHRONOUS
         )
         umlSDMessage.umlFrame = self._diagramFrame

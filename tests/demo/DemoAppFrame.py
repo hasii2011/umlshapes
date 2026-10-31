@@ -633,10 +633,9 @@ class DemoAppFrame(SizedFrame):
         sdInstance.instanceName = instanceName
 
         umlSDInstance: UmlSDInstance = UmlSDInstance(
-            sdInstance=sdInstance,
-            diagramFrame=diagramFrame,
-            umlPubSubEngine=self._umlPubSubEngine
+            sdInstance=sdInstance
         )
+        umlSDInstance.umlFrame = diagramFrame
 
         instanceY:   int         = self._preferences.instanceYPosition
         umlPosition: UmlPosition = UmlPosition(x=xCoordinate, y=instanceY)

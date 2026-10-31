@@ -35,7 +35,7 @@ HIT_TEST_TOLERANCE: int = 15
 
 class UmlSDLifeLine(IdentifierMixin, RectangleShape, TopLeftMixin):
 
-    def __init__(self, sequenceDiagramFrame: SequenceDiagramFrame, instanceName: UmlInstanceName, instanceConstrainer: SDInstanceConstrainer):
+    def __init__(self, instanceName: UmlInstanceName, instanceConstrainer: SDInstanceConstrainer):
 
         self.logger:       Logger         = getLogger(__name__)
         self._preferences: UmlPreferences = UmlPreferences()
@@ -47,11 +47,10 @@ class UmlSDLifeLine(IdentifierMixin, RectangleShape, TopLeftMixin):
         RectangleShape.__init__(self, w=width, h=height)
         TopLeftMixin.__init__(self, umlShape=self, width=width, height=height)
 
-        self.SetCanvas(sequenceDiagramFrame)
-        self._umlInstanceName:     UmlInstanceName               = instanceName
-        self._instanceConstrainer: SDInstanceConstrainer         = instanceConstrainer
-        self._umlSDInstance:       Optional['UmlSDInstance']     = None
-        self._executions:         list[UmlSDExecution]        = []
+        self._umlInstanceName:     UmlInstanceName           = instanceName
+        self._instanceConstrainer: SDInstanceConstrainer     = instanceConstrainer
+        self._umlSDInstance:       Optional['UmlSDInstance'] = None
+        self._executions:          list[UmlSDExecution]      = []
 
     @property
     def umlFrame(self) -> SequenceDiagramFrame:

@@ -98,10 +98,9 @@ class TestSDExecution(UnitTestBaseW):
         sdInstanceModel.instanceName = name
 
         umlSDInstance: UmlSDInstance = UmlSDInstance(
-            sdInstance=sdInstanceModel,
-            diagramFrame=self._diagramFrame,
-            umlPubSubEngine=self._umlPubSubEngine
+            sdInstance=sdInstanceModel
         )
+        umlSDInstance.umlFrame = self._diagramFrame
         umlPosition: UmlPosition = UmlPosition(x=x, y=y)
         dc: ClientDC = ClientDC(self._diagramFrame)
         self._diagramFrame.PrepareDC(dc)
@@ -326,7 +325,6 @@ class TestSDExecution(UnitTestBaseW):
 
         message: UmlSDMessage = UmlSDMessage(
             sdMessage=sdMessageModel,
-            umlPubSubEngine=self._umlPubSubEngine,
             messageType=SDMessageType.SYNCHRONOUS
         )
         message.umlFrame = self._diagramFrame
@@ -370,7 +368,6 @@ class TestSDExecution(UnitTestBaseW):
 
         message: UmlSDMessage = UmlSDMessage(
             sdMessage=sdMessageModel,
-            umlPubSubEngine=self._umlPubSubEngine,
             messageType=SDMessageType.SYNCHRONOUS
         )
         message.umlFrame = self._diagramFrame
@@ -551,7 +548,6 @@ class TestSDExecution(UnitTestBaseW):
         )
         message: UmlSDMessage = UmlSDMessage(
             sdMessage=sdMessageModel,
-            umlPubSubEngine=self._umlPubSubEngine,
             messageType=SDMessageType.SYNCHRONOUS
         )
         message.execution = execution
@@ -583,7 +579,6 @@ class TestSDExecution(UnitTestBaseW):
         )
         callMessage: UmlSDMessage = UmlSDMessage(
             sdMessage=callModelMessage,
-            umlPubSubEngine=self._umlPubSubEngine,
             messageType=SDMessageType.SYNCHRONOUS
         )
         callMessage.execution = execution
@@ -597,7 +592,6 @@ class TestSDExecution(UnitTestBaseW):
         )
         returnMessage: UmlSDMessage = UmlSDMessage(
             sdMessage=returnModelMessage,
-            umlPubSubEngine=self._umlPubSubEngine,
             messageType=SDMessageType.RETURN
         )
         returnMessage.execution = execution

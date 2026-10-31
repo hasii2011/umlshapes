@@ -13,6 +13,7 @@ from umlshapes.lib.ogl import ShapeEvtHandler
 
 from umlshapes.UmlBaseEventHandler import UmlBaseEventHandler
 from umlshapes.frames.UmlFrame import UmlFrame
+from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 from umlshapes.sd.UmlSDMessageLabel import UmlSDMessageLabel
 from umlshapes.types.UmlPosition import UmlPosition
 
@@ -31,6 +32,23 @@ class UmlSDMessageLabelEventHandler(UmlBaseEventHandler):
         super().__init__(previousEventHandler=previousEventHandler)
         self._dragOffsetX: int = 0
         self._dragOffsetY: int = 0
+
+    @property
+    def umlPubSubEngine(self) -> IUmlPubSubEngine:
+        if self._umlPubSubEngine is not None:
+            return self._umlPubSubEngine
+
+        label: UmlSDMessageLabel = cast(UmlSDMessageLabel, self.GetShape())
+        umlFrame: UmlFrame = label.umlFrame
+        if umlFrame is not None and hasattr(umlFrame, 'umlPubSubEngine') and umlFrame.umlPubSubEngine is not None:
+            return umlFrame.umlPubSubEngine
+
+        assert self._umlPubSubEngine is not None, 'Developer error: pub sub engine not set and not available from canvas'
+        return self._umlPubSubEngine
+
+    @umlPubSubEngine.setter
+    def umlPubSubEngine(self, engine: IUmlPubSubEngine):
+        self._umlPubSubEngine = engine
 
     def OnBeginDragLeft(self, x: int, y: int, keys: int = 0, attachment: int = 0):
         """

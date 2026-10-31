@@ -13,7 +13,6 @@ from wx import MemoryDC
 
 from umlshapes.lib.ogl import RectangleShape
 
-from umlshapes.frames.SequenceDiagramFrame import SequenceDiagramFrame
 from umlshapes.mixins.TopLeftMixin import TopLeftMixin
 
 from umlshapes.types.UmlDimensions import UmlDimensions
@@ -27,7 +26,7 @@ class SDInstanceConstrainer(RectangleShape, TopLeftMixin):
     required by wx ogl composite shapes
     """
 
-    def __init__(self, diagramFrame: SequenceDiagramFrame, width: Optional[int] = None):
+    def __init__(self, width: Optional[int] = None):
 
         self._preferences:  UmlPreferences = UmlPreferences()
         instanceDimensions: UmlDimensions  = self._preferences.instanceDimensions
@@ -40,8 +39,6 @@ class SDInstanceConstrainer(RectangleShape, TopLeftMixin):
 
         super().__init__(w=initialWidth, h=instanceDimensions.height)
         TopLeftMixin.__init__(self, umlShape=self, width=initialWidth, height=instanceDimensions.height)
-
-        self.SetCanvas(diagramFrame)
 
         self.logger: Logger = getLogger(__name__)
 
