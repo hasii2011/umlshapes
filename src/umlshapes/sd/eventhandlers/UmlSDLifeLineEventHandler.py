@@ -60,7 +60,7 @@ class UmlSDLifeLineEventHandler(ShapeEvtHandler):
         sdLifeLine: UmlSDLifeLine = self.GetShape()
         umlFrame:   UmlFrame      = sdLifeLine.GetCanvas()
 
-        if umlFrame is not None and hasattr(umlFrame, 'umlPubSubEngine') and umlFrame.umlPubSubEngine is not None:
+        if umlFrame is not None:
             umlFrame.umlPubSubEngine.sendMessage(
                 messageType=UmlMessageType.SD_LIFELINE_CLICKED,
                 frameId=umlFrame.id,

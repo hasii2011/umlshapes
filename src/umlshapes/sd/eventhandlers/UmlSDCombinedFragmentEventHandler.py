@@ -16,7 +16,6 @@ from umlshapes.lib.ogl import ControlPoint
 from umlshapes.lib.ogl import ShapeEvtHandler
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
-from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 from umlshapes.pubsubengine.UmlMessageType import UmlMessageType
 
 from umlshapes.sd.SDLayoutEngine import SDLayoutEngine
@@ -48,7 +47,6 @@ class UmlSDCombinedFragmentEventHandler(UmlBaseEventHandler):
     def __init__(
         self,
         umlSDCombinedFragment: UmlSDCombinedFragment,
-        umlPubSubEngine: IUmlPubSubEngine,
         previousEventHandler: ShapeEvtHandler
     ):
         """
@@ -56,7 +54,6 @@ class UmlSDCombinedFragmentEventHandler(UmlBaseEventHandler):
 
         Args:
             umlSDCombinedFragment: The combined fragment shape being managed.
-            umlPubSubEngine:       The pub-sub notification engine.
             previousEventHandler:  The previous event handler in the chain.
         """
 
@@ -65,7 +62,6 @@ class UmlSDCombinedFragmentEventHandler(UmlBaseEventHandler):
         self.logger: Logger = getLogger(__name__)
 
         self._umlSDCombinedFragment: UmlSDCombinedFragment = umlSDCombinedFragment
-        self._umlPubSubEngine:       IUmlPubSubEngine      = umlPubSubEngine
         self._preferences:           UmlPreferences        = UmlPreferences()
         self._layoutEngine:          SDLayoutEngine        = SDLayoutEngine()
 
@@ -106,13 +102,12 @@ class UmlSDCombinedFragmentEventHandler(UmlBaseEventHandler):
         newSelectionState: bool = not isCurrentlySelected
         fragment.Select(newSelectionState, dc)
 
-        if self._umlPubSubEngine is not None:
-            if newSelectionState:
-                self._umlPubSubEngine.sendMessage(
-                    messageType=UmlMessageType.UML_SHAPE_SELECTED,
-                    frameId=umlFrame.id,
-                    umlShape=fragment
-                )
+        if newSelectionState:
+            umlFrame.umlPubSubEngine.sendMessage(
+                messageType=UmlMessageType.UML_SHAPE_SELECTED,
+                frameId=umlFrame.id,
+                umlShape=fragment
+            )
 
         umlFrame.refresh()
 
@@ -140,12 +135,11 @@ class UmlSDCombinedFragmentEventHandler(UmlBaseEventHandler):
                 if keys != MOD_CMD:
                     self._unSelectAllShapesOnCanvas(fragment, umlFrame, dc)
                 fragment.Select(True, dc)
-                if self._umlPubSubEngine is not None:
-                    self._umlPubSubEngine.sendMessage(
-                        messageType=UmlMessageType.UML_SHAPE_SELECTED,
-                        frameId=umlFrame.id,
-                        umlShape=fragment
-                    )
+                umlFrame.umlPubSubEngine.sendMessage(
+                    messageType=UmlMessageType.UML_SHAPE_SELECTED,
+                    frameId=umlFrame.id,
+                    umlShape=fragment
+                )
                 umlFrame.refresh()
 
         super().OnBeginDragLeft(x, y, keys, attachment)

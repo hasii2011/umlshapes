@@ -177,7 +177,6 @@ class TestSDInstanceNameResizing(UnitTestBaseW):
 
         eventHandler: UmlSdInstanceEventHandler = UmlSdInstanceEventHandler(
             umlSdInstance=umlSDInstance,
-            umlPubSubEngine=self._umlPubSubEngine,
             previousEventHandler=umlSDInstance.GetEventHandler()
         )
         umlSDInstance.SetEventHandler(eventHandler)
@@ -219,7 +218,6 @@ class TestSDInstanceNameResizing(UnitTestBaseW):
 
         eventHandler: UmlSdInstanceEventHandler = UmlSdInstanceEventHandler(
             umlSdInstance=umlSDInstance,
-            umlPubSubEngine=self._umlPubSubEngine,
             previousEventHandler=umlSDInstance.GetEventHandler()
         )
         umlSDInstance.SetEventHandler(eventHandler)

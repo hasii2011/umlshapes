@@ -312,9 +312,9 @@ class SDMessageCreationHandler:
 
         eventHandler: UmlSDMessageEventHandler = UmlSDMessageEventHandler(
             umlSDMessage=umlSDMessage,
-            umlPubSubEngine=self._umlPubSubEngine,
             previousEventHandler=umlSDMessage.GetEventHandler()
         )
+        eventHandler.umlPubSubEngine = self._umlPubSubEngine
         umlSDMessage.SetEventHandler(eventHandler)
         self._sequenceDiagramFrame.moveShapeToFront(umlSDMessage)
 
@@ -425,9 +425,9 @@ class SDMessageCreationHandler:
 
         eventHandler: UmlSDMessageEventHandler = UmlSDMessageEventHandler(
             umlSDMessage=umlSDMessage,
-            umlPubSubEngine=self._umlPubSubEngine,
             previousEventHandler=umlSDMessage.GetEventHandler()
         )
+        eventHandler.umlPubSubEngine = self._umlPubSubEngine
         umlSDMessage.SetEventHandler(eventHandler)
         self._sequenceDiagramFrame.moveShapeToFront(umlSDMessage)
 
@@ -584,9 +584,9 @@ class SDMessageCreationHandler:
 
         eventHandler: UmlSDMessageEventHandler = UmlSDMessageEventHandler(
             umlSDMessage=umlSDMessage,
-            umlPubSubEngine=self._umlPubSubEngine,
             previousEventHandler=umlSDMessage.GetEventHandler()
         )
+        eventHandler.umlPubSubEngine = self._umlPubSubEngine
         umlSDMessage.SetEventHandler(eventHandler)
 
         self._sequenceDiagramFrame.moveShapeToFront(umlSDMessage)

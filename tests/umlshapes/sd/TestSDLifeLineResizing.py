@@ -167,9 +167,9 @@ class TestSDLifeLineResizing(UnitTestBaseW):
 
         eventHandler: UmlSdInstanceEventHandler = UmlSdInstanceEventHandler(
             umlSdInstance=umlSDInstance,
-            umlPubSubEngine=self._umlPubSubEngine,
             previousEventHandler=umlSDInstance.GetEventHandler()
         )
+        eventHandler.umlPubSubEngine = self._umlPubSubEngine
         umlSDInstance.SetEventHandler(eventHandler)
 
         dc: ClientDC = ClientDC(self._diagramFrame)
@@ -218,9 +218,9 @@ class TestSDLifeLineResizing(UnitTestBaseW):
 
         eventHandler: UmlSdInstanceEventHandler = UmlSdInstanceEventHandler(
             umlSdInstance=umlSDInstance,
-            umlPubSubEngine=self._umlPubSubEngine,
             previousEventHandler=umlSDInstance.GetEventHandler()
         )
+        eventHandler.umlPubSubEngine = self._umlPubSubEngine
         umlSDInstance.SetEventHandler(eventHandler)
 
         dc: ClientDC = ClientDC(self._diagramFrame)
@@ -269,16 +269,16 @@ class TestSDLifeLineResizing(UnitTestBaseW):
 
         handler1: UmlSdInstanceEventHandler = UmlSdInstanceEventHandler(
             umlSdInstance=umlSDInstance1,
-            umlPubSubEngine=self._umlPubSubEngine,
             previousEventHandler=umlSDInstance1.GetEventHandler()
         )
+        handler1.umlPubSubEngine = self._umlPubSubEngine
         umlSDInstance1.SetEventHandler(handler1)
 
         handler2: UmlSdInstanceEventHandler = UmlSdInstanceEventHandler(
             umlSdInstance=umlSDInstance2,
-            umlPubSubEngine=self._umlPubSubEngine,
             previousEventHandler=umlSDInstance2.GetEventHandler()
         )
+        handler2.umlPubSubEngine = self._umlPubSubEngine
         umlSDInstance2.SetEventHandler(handler2)
 
         dc: ClientDC = ClientDC(self._diagramFrame)

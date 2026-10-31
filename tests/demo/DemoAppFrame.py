@@ -656,9 +656,9 @@ class DemoAppFrame(SizedFrame):
 
         eventHandler: UmlSdInstanceEventHandler = UmlSdInstanceEventHandler(
             umlSdInstance=umlSDInstance,
-            umlPubSubEngine=self._umlPubSubEngine,
             previousEventHandler=umlSDInstance.GetEventHandler()
         )
+        eventHandler.umlPubSubEngine = diagramFrame.umlPubSubEngine
         umlSDInstance.SetEventHandler(eventHandler)
 
         diagramFrame.refresh()

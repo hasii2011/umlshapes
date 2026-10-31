@@ -92,15 +92,14 @@ class UmlSDExecution(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeft
 
         umlFrame: Optional['UmlFrame'] = cast(Optional['UmlFrame'], lifeLine.GetCanvas())
         if umlFrame is not None:
-            if hasattr(umlFrame, 'umlPubSubEngine'):
-                from umlshapes.sd.eventhandlers.UmlSDExecutionEventHandler import UmlSDExecutionEventHandler
+            from umlshapes.sd.eventhandlers.UmlSDExecutionEventHandler import UmlSDExecutionEventHandler
 
-                eventHandler: UmlSDExecutionEventHandler = UmlSDExecutionEventHandler(
-                    umlSDExecution=self,
-                    umlPubSubEngine=umlFrame.umlPubSubEngine,
-                    previousEventHandler=self.GetEventHandler()
-                )
-                self.SetEventHandler(eventHandler)
+            eventHandler: UmlSDExecutionEventHandler = UmlSDExecutionEventHandler(
+                umlSDExecution=self,
+                previousEventHandler=self.GetEventHandler()
+            )
+            eventHandler.umlPubSubEngine = umlFrame.umlPubSubEngine
+            self.SetEventHandler(eventHandler)
 
     @property
     def lifeLine(self) -> 'UmlSDLifeLine':

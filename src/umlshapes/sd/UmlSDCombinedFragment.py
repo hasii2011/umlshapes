@@ -112,18 +112,17 @@ class UmlSDCombinedFragment(ControlPointMixin, IdentifierMixin, RectangleShape, 
     def umlFrame(self, frame: 'SequenceDiagramFrame'):
         self.SetCanvas(frame)
         if frame is not None:
-            if hasattr(frame, 'umlPubSubEngine'):
-                from umlshapes.lib.ogl import ShapeEvtHandler
-                from umlshapes.sd.eventhandlers.UmlSDCombinedFragmentEventHandler import UmlSDCombinedFragmentEventHandler
+            from umlshapes.lib.ogl import ShapeEvtHandler
+            from umlshapes.sd.eventhandlers.UmlSDCombinedFragmentEventHandler import UmlSDCombinedFragmentEventHandler
 
-                currentHandler: ShapeEvtHandler = self.GetEventHandler()
-                if not isinstance(currentHandler, UmlSDCombinedFragmentEventHandler):
-                    eventHandler: UmlSDCombinedFragmentEventHandler = UmlSDCombinedFragmentEventHandler(
-                        umlSDCombinedFragment=self,
-                        umlPubSubEngine=frame.umlPubSubEngine,
-                        previousEventHandler=currentHandler
-                    )
-                    self.SetEventHandler(eventHandler)
+            currentHandler: ShapeEvtHandler = self.GetEventHandler()
+            if not isinstance(currentHandler, UmlSDCombinedFragmentEventHandler):
+                eventHandler: UmlSDCombinedFragmentEventHandler = UmlSDCombinedFragmentEventHandler(
+                    umlSDCombinedFragment=self,
+                    previousEventHandler=currentHandler
+                )
+                eventHandler.umlPubSubEngine = frame.umlPubSubEngine
+                self.SetEventHandler(eventHandler)
 
     def setPosition(self, x: float, y: float):
         """

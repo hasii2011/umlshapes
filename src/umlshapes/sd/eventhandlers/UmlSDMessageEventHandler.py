@@ -26,7 +26,6 @@ from umlshapes.frames.UmlFrame import UmlFrame
 
 from umlshapes.preferences.Defaults import MIN_REFLEXIVE_MESSAGE_WIDTH
 from umlshapes.preferences.UmlPreferences import UmlPreferences
-from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 
 from umlshapes.sd.SDLayoutEngine import SDLayoutEngine
 from umlshapes.sd.UmlSDExecution import UmlSDExecution
@@ -64,22 +63,20 @@ class MessageDragContext:
 
 
 class UmlSDMessageEventHandler(UmlBaseEventHandler):
-    def __init__(self, umlSDMessage: UmlSDMessage, umlPubSubEngine: IUmlPubSubEngine, previousEventHandler: ShapeEvtHandler):
+    def __init__(self, umlSDMessage: UmlSDMessage, previousEventHandler: ShapeEvtHandler):
         """
 
         Args:
             umlSDMessage:         The UML SD Message we are managing
-            umlPubSubEngine:      The pub sub engine
             previousEventHandler: The previous event handler in order to correctly chain
         """
         self.logger: Logger = getLogger(__name__)
 
         super().__init__(previousEventHandler=previousEventHandler, shape=umlSDMessage)
 
-        self._umlSDMessage:    UmlSDMessage     = umlSDMessage
-        self._umlPubSubEngine: IUmlPubSubEngine = umlPubSubEngine
-        self._layoutEngine:    SDLayoutEngine   = SDLayoutEngine()
-        self._preferences:     UmlPreferences   = UmlPreferences()
+        self._umlSDMessage: UmlSDMessage   = umlSDMessage
+        self._layoutEngine: SDLayoutEngine = SDLayoutEngine()
+        self._preferences:  UmlPreferences = UmlPreferences()
 
         self._dragContext: Optional[MessageDragContext] = None
 

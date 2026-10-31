@@ -404,9 +404,9 @@ class TestSDExecution(UnitTestBaseW):
 
         eventHandler: UmlSDExecutionEventHandler = UmlSDExecutionEventHandler(
             umlSDExecution=execution,
-            umlPubSubEngine=self._umlPubSubEngine,
             previousEventHandler=execution.GetEventHandler()
         )
+        eventHandler.umlPubSubEngine = self._umlPubSubEngine
 
         eventHandler.OnSizingBeginDragLeft(pt=topHandle, x=round(topHandle.GetX()), y=round(topHandle.GetY()))
         eventHandler.OnSizingDragLeft(

@@ -301,9 +301,9 @@ class TestSDReflexiveMessage(UnitTestBaseW):
     def _attachEventHandler(self, umlSDMessage: UmlSDMessage) -> UmlSDMessageEventHandler:
         eventHandler: UmlSDMessageEventHandler = UmlSDMessageEventHandler(
             umlSDMessage=umlSDMessage,
-            umlPubSubEngine=self._umlPubSubEngine,
             previousEventHandler=umlSDMessage.GetEventHandler()
         )
+        eventHandler.umlPubSubEngine = self._umlPubSubEngine
         umlSDMessage.SetEventHandler(eventHandler)
         return eventHandler
 

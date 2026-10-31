@@ -10,7 +10,6 @@ from umlshapes.lib.ogl import ControlPoint
 from umlshapes.lib.ogl import ShapeEvtHandler
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
-from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 from umlshapes.pubsubengine.UmlMessageType import UmlMessageType
 
 from umlshapes.sd.UmlSDInstance import UmlSDInstance
@@ -25,15 +24,14 @@ MIN_LIFELINE_BOTTOM_PADDING: int = 30
 
 class UmlSdInstanceEventHandler(UmlBaseEventHandler):
 
-    def __init__(self, umlSdInstance: UmlSDInstance, umlPubSubEngine: IUmlPubSubEngine, previousEventHandler: ShapeEvtHandler):
+    def __init__(self, umlSdInstance: UmlSDInstance, previousEventHandler: ShapeEvtHandler):
 
         self.logger: Logger = getLogger(__name__)
 
         super().__init__(previousEventHandler=previousEventHandler, shape=umlSdInstance)
-        self._preferences:     UmlPreferences   = UmlPreferences()
-        self._umlPubSubEngine: IUmlPubSubEngine = umlPubSubEngine
-        self._fixedY:          Optional[int]    = None
-        self._fixedMouseY:     Optional[int]    = None
+        self._preferences: UmlPreferences = UmlPreferences()
+        self._fixedY:      Optional[int]  = None
+        self._fixedMouseY: Optional[int]  = None
 
     def OnBeginDragLeft(self, x: int, y: int, keys: int = 0, attachment: int = 0):
         """
@@ -61,12 +59,11 @@ class UmlSdInstanceEventHandler(UmlBaseEventHandler):
             umlFrame.PrepareDC(dc)
             self._unSelectAllShapesOnCanvas(umlShape, umlFrame, dc)
             umlShape.Select(True, dc)
-            if self._umlPubSubEngine is not None:
-                self._umlPubSubEngine.sendMessage(
-                    messageType=UmlMessageType.UML_SHAPE_SELECTED,
-                    frameId=umlFrame.id,
-                    umlShape=umlShape
-                )
+            umlFrame.umlPubSubEngine.sendMessage(
+                messageType=UmlMessageType.UML_SHAPE_SELECTED,
+                frameId=umlFrame.id,
+                umlShape=umlShape
+            )
             umlFrame.refresh()
 
         super().OnBeginDragLeft(x, y, keys, attachment)

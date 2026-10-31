@@ -40,7 +40,7 @@ class UmlSDMessageLabelEventHandler(UmlBaseEventHandler):
 
         label: UmlSDMessageLabel = cast(UmlSDMessageLabel, self.GetShape())
         umlFrame: UmlFrame = label.umlFrame
-        if umlFrame is not None and hasattr(umlFrame, 'umlPubSubEngine') and umlFrame.umlPubSubEngine is not None:
+        if umlFrame is not None:
             return umlFrame.umlPubSubEngine
 
         assert self._umlPubSubEngine is not None, 'Developer error: pub sub engine not set and not available from canvas'

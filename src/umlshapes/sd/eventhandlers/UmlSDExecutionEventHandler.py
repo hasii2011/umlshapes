@@ -15,7 +15,6 @@ from umlshapes.lib.ogl import ControlPoint
 from umlshapes.lib.ogl import ShapeEvtHandler
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
-from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 from umlshapes.pubsubengine.UmlMessageType import UmlMessageType
 
 from umlshapes.sd.SDLayoutEngine import SDLayoutEngine
@@ -39,7 +38,6 @@ class UmlSDExecutionEventHandler(UmlBaseEventHandler):
     def __init__(
         self,
         umlSDExecution: UmlSDExecution,
-        umlPubSubEngine: IUmlPubSubEngine,
         previousEventHandler: ShapeEvtHandler
     ):
         """
@@ -47,18 +45,16 @@ class UmlSDExecutionEventHandler(UmlBaseEventHandler):
 
         Args:
             umlSDExecution: The execution shape being managed.
-            umlPubSubEngine: The pub-sub notification engine.
             previousEventHandler: The previous event handler in the chain.
         """
         super().__init__(previousEventHandler=previousEventHandler, shape=umlSDExecution)
         self.logger: Logger = getLogger(__name__)
-        self._umlSDExecution: UmlSDExecution = umlSDExecution
-        self._umlPubSubEngine: IUmlPubSubEngine = umlPubSubEngine
-        self._preferences: UmlPreferences = UmlPreferences()
-        self._layoutEngine: SDLayoutEngine = SDLayoutEngine()
-        self._activeHandleIndex: Optional[int] = None
-        self._initialStartY: Optional[int] = None
-        self._initialEndY: Optional[int] = None
+        self._umlSDExecution:    UmlSDExecution = umlSDExecution
+        self._preferences:       UmlPreferences = UmlPreferences()
+        self._layoutEngine:      SDLayoutEngine = SDLayoutEngine()
+        self._activeHandleIndex: Optional[int]  = None
+        self._initialStartY:     Optional[int]  = None
+        self._initialEndY:       Optional[int]  = None
 
     def OnLeftClick(self, x: int, y: int, keys: int = 0, attachment: int = 0):
         """
@@ -85,13 +81,12 @@ class UmlSDExecutionEventHandler(UmlBaseEventHandler):
         newSelectionState: bool = not isCurrentlySelected
         execution.Select(newSelectionState, dc)
 
-        if self._umlPubSubEngine is not None:
-            if newSelectionState:
-                self._umlPubSubEngine.sendMessage(
-                    messageType=UmlMessageType.UML_SHAPE_SELECTED,
-                    frameId=umlFrame.id,
-                    umlShape=execution
-                )
+        if newSelectionState:
+            umlFrame.umlPubSubEngine.sendMessage(
+                messageType=UmlMessageType.UML_SHAPE_SELECTED,
+                frameId=umlFrame.id,
+                umlShape=execution
+            )
 
         umlFrame.refresh()
 
