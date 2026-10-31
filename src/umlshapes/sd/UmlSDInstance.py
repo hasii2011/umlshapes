@@ -35,6 +35,7 @@ from umlshapes.sd.UmlSDLifeLine import UmlSDLifeLine
 if TYPE_CHECKING:
     from umlshapes.frames.SequenceDiagramFrame import SequenceDiagramFrame
     from umlshapes.frames.UmlFrame import UmlFrame
+    from umlshapes.UmlDiagram import UmlDiagram
 
 OP_NONE:             int = 0    # None of OP_CLICK_LEFT, OP_CLICK_RIGHT, OP_DRAG_LEFT, OP_DRAG_RIGHT
 MIN_LIFELINE_LENGTH: int = 80
@@ -113,6 +114,10 @@ class UmlSDInstance(ControlPointMixin, IdentifierMixin, CompositeShape, TopLeftM
     def umlFrame(self, frame: 'SequenceDiagramFrame'):
         self.SetCanvas(frame)
         if frame is not None:
+            diagram: 'UmlDiagram' = frame.umlDiagram
+            for child in self._children:
+                if child not in diagram.GetShapeList():
+                    child.AddToCanvas(frame)
             self.Recompute()
 
     @property
