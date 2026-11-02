@@ -5,6 +5,8 @@ from typing import cast
 from logging import Logger
 from logging import getLogger
 
+from wx import ClientDC
+
 from umlmodel.SDMessage import SDMessage
 
 from umlshapes.frames.SequenceDiagramFrame import SequenceDiagramFrame
@@ -313,6 +315,11 @@ class SDMessageCreationHandler:
             y2=snappedFromY
         )
 
+        if self._sequenceDiagramFrame is not None:
+            dc: ClientDC = ClientDC(self._sequenceDiagramFrame)
+            self._sequenceDiagramFrame.PrepareDC(dc)
+            umlSDMessage.updateMessageLabelPosition(dc=dc)
+
         umlSDMessage.Show(True)
         self._sequenceDiagramFrame.umlDiagram.AddShape(umlSDMessage)
         self._sequenceDiagramFrame.refresh()
@@ -425,6 +432,11 @@ class SDMessageCreationHandler:
             x2=endX,
             y2=snappedToY
         )
+
+        if self._sequenceDiagramFrame is not None:
+            dc: ClientDC = ClientDC(self._sequenceDiagramFrame)
+            self._sequenceDiagramFrame.PrepareDC(dc)
+            umlSDMessage.updateMessageLabelPosition(dc=dc)
 
         umlSDMessage.Show(True)
         self._sequenceDiagramFrame.umlDiagram.AddShape(umlSDMessage)
@@ -584,6 +596,11 @@ class SDMessageCreationHandler:
                 x2=endX,
                 y2=snappedToY
             )
+
+        if self._sequenceDiagramFrame is not None:
+            dc: ClientDC = ClientDC(self._sequenceDiagramFrame)
+            self._sequenceDiagramFrame.PrepareDC(dc)
+            umlSDMessage.updateMessageLabelPosition(dc=dc)
 
         umlSDMessage.Show(True)
         self._sequenceDiagramFrame.umlDiagram.AddShape(umlSDMessage)

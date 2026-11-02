@@ -121,8 +121,9 @@ class UmlSDMessageLabelEventHandler(UmlBaseEventHandler):
                 fraction: float = (newCenterX - startX) / lineLength
                 label.proportionalOffset = fraction
 
+            defaultCenterY: int = lineY - (label.size.height // 2) - 2
             label.fixedX = newCenterX
-            label.verticalOffset = newCenterY - lineY
+            label.verticalOffset = newCenterY - defaultCenterY
 
         self._indicateFrameModified()
         umlFrame.refresh()
