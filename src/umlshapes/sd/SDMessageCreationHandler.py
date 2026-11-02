@@ -27,6 +27,13 @@ from umlshapes.types.UmlPosition import UmlPosition
 
 NO_START_DETAILS: LifeLineClickDetails = cast(LifeLineClickDetails, None)   # noqa
 
+DEFAULT_REFLEXIVE_MESSAGE_NAME:    str = 'reflexiveMessage()'
+DEFAULT_SYNCHRONOUS_MESSAGE_NAME:  str = 'synchronousMessage()'
+DEFAULT_ASYNCHRONOUS_MESSAGE_NAME: str = 'asynchronousMessage()'
+DEFAULT_RETURN_MESSAGE_NAME:       str = 'returnMessage()'
+DEFAULT_LOST_MESSAGE_NAME:         str = 'lostMessage()'
+DEFAULT_FOUND_MESSAGE_NAME:        str = 'foundMessage()'
+
 
 class SDMessageCreationHandler:
     def __init__(self, sequenceDiagramFrame: SequenceDiagramFrame, umlPubSubEngine: IUmlPubSubEngine):
@@ -277,7 +284,7 @@ class SDMessageCreationHandler:
         if messageName != '':
             labelStr = messageName
         else:
-            labelStr = f'demoMessage-{self._messageCount:04d}'
+            labelStr = DEFAULT_LOST_MESSAGE_NAME
             self._messageCount += 1
 
         modelMessage: SDMessage = SDMessage(
@@ -376,7 +383,7 @@ class SDMessageCreationHandler:
         if messageName != '':
             labelStr = messageName
         else:
-            labelStr = f'demoMessage-{self._messageCount:04d}'
+            labelStr = DEFAULT_FOUND_MESSAGE_NAME
             self._messageCount += 1
 
         modelMessage: SDMessage = SDMessage(
@@ -504,8 +511,10 @@ class SDMessageCreationHandler:
         startX: float = startLifeLine.GetX()
         endX:   float = destLifeLine.GetX()
 
+        messageName: str = self._computeDefaultMessageName(isReflexiveMessage=isReflexiveMessage)
+
         modelMessage: SDMessage = SDMessage(
-            message=f'demoMessage-{self._messageCount:04d}',
+            message=messageName,
             src=startLifeLine.umlInstanceName.sdInstance,
             sourceY=snappedFromY,
             dst=destLifeLine.umlInstanceName.sdInstance,
@@ -600,3 +609,28 @@ class SDMessageCreationHandler:
             frameId=self._sequenceDiagramFrame.id,
             message=''
         )
+
+    def _computeDefaultMessageName(self, isReflexiveMessage: bool = False) -> str:
+        """
+        Compute default message label text matching the message type.
+
+        Args:
+            isReflexiveMessage: Whether the message is a self-call on the same lifeline
+
+        Returns:
+            Default message label string
+        """
+        if isReflexiveMessage:
+            return DEFAULT_REFLEXIVE_MESSAGE_NAME
+        elif self._messageType == SDMessageType.SYNCHRONOUS:
+            return DEFAULT_SYNCHRONOUS_MESSAGE_NAME
+        elif self._messageType == SDMessageType.ASYNCHRONOUS:
+            return DEFAULT_ASYNCHRONOUS_MESSAGE_NAME
+        elif self._messageType == SDMessageType.RETURN:
+            return DEFAULT_RETURN_MESSAGE_NAME
+        elif self._messageType == SDMessageType.LOST:
+            return DEFAULT_LOST_MESSAGE_NAME
+        elif self._messageType == SDMessageType.FOUND:
+            return DEFAULT_FOUND_MESSAGE_NAME
+        else:
+            return DEFAULT_SYNCHRONOUS_MESSAGE_NAME
