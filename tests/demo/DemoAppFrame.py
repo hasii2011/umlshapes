@@ -352,16 +352,16 @@ class DemoAppFrame(SizedFrame):
         match menuId:
             case Identifiers.ID_SD_MSG_ASYNC:
                 self._sdMessageHandler.messageType = SDMessageType.ASYNCHRONOUS
-                self.SetStatusText('Selected Asynchronous Message')
+                self.SetStatusText('Set to create an Asynchronous Message')
             case Identifiers.ID_SD_MSG_RETURN:
                 self._sdMessageHandler.messageType = SDMessageType.RETURN
-                self.SetStatusText('Selected Return Message')
+                self.SetStatusText('Set to create a Return Message')
             case Identifiers.ID_SD_MSG_LOST:
                 self._sdMessageHandler.messageType = SDMessageType.LOST
-                self.SetStatusText('Selected Lost Message')
+                self.SetStatusText('Set to create a Lost Message')
             case Identifiers.ID_SD_MSG_FOUND:
                 self._sdMessageHandler.messageType = SDMessageType.FOUND
-                self.SetStatusText('Selected Found Message')
+                self.SetStatusText('Set to create a Found Message')
             case _:
                 self._sdMessageHandler.messageType = SDMessageType.SYNCHRONOUS
                 self.SetStatusText('Selected Synchronous Message')
@@ -437,6 +437,7 @@ class DemoAppFrame(SizedFrame):
 
             self._createSDInstance(diagramFrame=diagramFrame, instanceName='instance1', xCoordinate=100)
             self._createSDInstance(diagramFrame=diagramFrame, instanceName='instance2', xCoordinate=300)
+            self._createSDInstance(diagramFrame=diagramFrame, instanceName='instance3', xCoordinate=500)
         else:
             msgDlg: MessageDialog = MessageDialog(
                 parent=None,
