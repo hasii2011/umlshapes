@@ -181,12 +181,9 @@ class UmlBaseEventHandler(ShapeEvtHandler):
             self._unSelectAllShapesOnCanvas(shape, canvas, dc)
 
         shape.Select(True, dc)
-        if self._umlPubSubEngine is None:
-            self._baseLogger.warning(f'We do not have a pub sub engine for {shape}.  Seems like a developer error')
-        else:
-            self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.UML_SHAPE_SELECTED,
-                                              frameId=cast(UmlFrame, canvas).id,
-                                              umlShape=shape)
+        self.umlPubSubEngine.sendMessage(messageType=UmlMessageType.UML_SHAPE_SELECTED,
+                                         frameId=cast(UmlFrame, canvas).id,
+                                         umlShape=shape)
 
         cast(UmlFrame, canvas).refresh()
 

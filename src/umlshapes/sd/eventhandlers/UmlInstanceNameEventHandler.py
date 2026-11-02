@@ -19,8 +19,8 @@ class UmlInstanceNameEventHandler(ShapeEvtHandler):
 
     def __init__(
         self,
-        umlInstanceName: 'UmlInstanceName',
-        umlSDInstance: 'UmlSDInstance',
+        umlInstanceName:      'UmlInstanceName',
+        umlSDInstance:        'UmlSDInstance',
         previousEventHandler: ShapeEvtHandler
     ):
         self.logger: Logger = getLogger(__name__)

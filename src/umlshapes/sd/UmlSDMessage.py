@@ -698,6 +698,8 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
         eventHandler: UmlSDMessageLabelEventHandler = UmlSDMessageLabelEventHandler(previousEventHandler=umlSDMessageLabel.GetEventHandler())
 
         eventHandler.SetShape(umlSDMessageLabel)
+        if self.umlFrame is not None:
+            eventHandler.umlPubSubEngine = self.umlFrame.umlPubSubEngine
 
         umlSDMessageLabel.SetEventHandler(eventHandler)
 
