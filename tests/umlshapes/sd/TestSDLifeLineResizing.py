@@ -2,9 +2,14 @@ from unittest import TestSuite
 from unittest import defaultTestLoader
 from unittest import main as unitTestMain
 
+from wx import ClientDC
+from wx import MOD_CMD
+
 from codeallyadvanced.ui.UnitTestBaseW import UnitTestBaseW
 from umlmodel.SDInstance import SDInstance
+from umlmodel.SDMessage import SDMessage
 
+from umlshapes.lib.ogl import ControlPoint
 from umlshapes.lib.ogl import OGLInitialize
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
@@ -12,7 +17,11 @@ from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 from umlshapes.pubsubengine.UmlPubSubEngine import UmlPubSubEngine
 
 from umlshapes.frames.SequenceDiagramFrame import SequenceDiagramFrame
+from umlshapes.sd.SDMessageType import SDMessageType
 from umlshapes.sd.UmlSDInstance import UmlSDInstance
+from umlshapes.sd.UmlSDLifeLine import UmlSDLifeLine
+from umlshapes.sd.UmlSDMessage import UmlSDMessage
+from umlshapes.sd.eventhandlers.UmlSdInstanceEventHandler import UmlSdInstanceEventHandler
 
 INITIAL_LIFELINE_LENGTH: int = 360
 NEW_LIFELINE_LENGTH:     int = 500
@@ -151,10 +160,6 @@ class TestSDLifeLineResizing(UnitTestBaseW):
         self.assertEqual(NEW_LIFELINE_LENGTH, umlSDInstance2.getLifeLineLength())
 
     def testInstanceNameSelectionAndDrag(self):
-        from wx import ClientDC
-        from umlshapes.lib.ogl import ControlPoint
-        from umlshapes.sd.eventhandlers.UmlSdInstanceEventHandler import UmlSdInstanceEventHandler
-
         sdInstanceModel: SDInstance = SDInstance()
         sdInstanceModel.instanceName = 'testSelectionInstance'
 
@@ -203,9 +208,6 @@ class TestSDLifeLineResizing(UnitTestBaseW):
         self.assertNotEqual(startX, round(umlSDInstance.GetX()))
 
     def testLifeLineSelectionAndDrag(self):
-        from wx import ClientDC
-        from umlshapes.sd.eventhandlers.UmlSdInstanceEventHandler import UmlSdInstanceEventHandler
-
         sdInstanceModel: SDInstance = SDInstance()
         sdInstanceModel.instanceName = 'testLifeLineDragInstance'
 
@@ -244,10 +246,6 @@ class TestSDLifeLineResizing(UnitTestBaseW):
         self.assertNotEqual(startX, round(umlSDInstance.GetX()))
 
     def testInteractiveLifelineSizingDrag(self):
-        from wx import ClientDC
-        from umlshapes.lib.ogl import ControlPoint
-        from umlshapes.sd.eventhandlers.UmlSdInstanceEventHandler import UmlSdInstanceEventHandler
-
         sdModel1: SDInstance = SDInstance()
         sdModel1.instanceName = 'instance1'
         umlSDInstance1: UmlSDInstance = UmlSDInstance(
@@ -302,6 +300,60 @@ class TestSDLifeLineResizing(UnitTestBaseW):
         expectedLength: int = initialLength + RESIZE_VERTICAL_DELTA
         self.assertEqual(expectedLength, umlSDInstance1.getLifeLineLength())
         self.assertEqual(expectedLength, umlSDInstance2.getLifeLineLength())
+
+    def testDragInstanceWhileSDMessageSelectedDoesNotCrash(self):
+        sdModel: SDInstance = SDInstance()
+        sdModel.instanceName = 'dragInstanceWithSelectedMessage'
+
+        umlSDInstance: UmlSDInstance = UmlSDInstance(sdInstance=sdModel)
+        umlSDInstance.umlFrame = self._diagramFrame
+        self._diagramFrame.umlDiagram.AddShape(umlSDInstance)
+        umlSDInstance.Show(True)
+
+        instanceHandler: UmlSdInstanceEventHandler = UmlSdInstanceEventHandler(
+            umlSdInstance=umlSDInstance,
+            previousEventHandler=umlSDInstance.GetEventHandler()
+        )
+        instanceHandler.umlPubSubEngine = self._umlPubSubEngine
+        umlSDInstance.SetEventHandler(instanceHandler)
+
+        dc: ClientDC = ClientDC(self._diagramFrame)
+        self._diagramFrame.PrepareDC(dc)
+        umlSDInstance.Move(dc, 150, 250)
+
+        lifeLine: UmlSDLifeLine = umlSDInstance.umlSDLifeLine
+        modelMessage: SDMessage = SDMessage(
+            message='checkout(cartId)',
+            src=sdModel,
+            sourceY=100,
+            dst=sdModel,
+            destinationY=140
+        )
+        umlSDMessage: UmlSDMessage = UmlSDMessage(
+            sdMessage=modelMessage,
+            messageType=SDMessageType.SYNCHRONOUS
+        )
+        umlSDMessage.umlFrame = self._diagramFrame
+        lifeLine.addMessage(umlSDMessage=umlSDMessage, destinationLifeLine=lifeLine)
+        umlSDMessage.fromY = 100
+        umlSDMessage.toY = 140
+        umlSDMessage.setReflexiveMessagePoints(lifeLineX=round(lifeLine.GetX()), fromY=100, toY=140)
+        self._diagramFrame.umlDiagram.AddShape(umlSDMessage)
+        umlSDMessage.Show(True)
+
+        # Select both the message and the instance (simulating multi-select or message already selected)
+        umlSDMessage.Select(True, dc)
+        self.assertTrue(umlSDMessage.Selected())
+
+        startX: int = round(umlSDInstance.GetX())
+        headerY: int = round(umlSDInstance.instanceName.GetY())
+
+        umlSDInstance.instanceName.GetEventHandler().OnBeginDragLeft(startX, headerY, keys=MOD_CMD)
+        umlSDMessage.Select(True, dc)
+        umlSDInstance.instanceName.GetEventHandler().OnDragLeft(True, startX + DRAG_HORIZONTAL_DELTA, headerY, keys=MOD_CMD)
+        umlSDInstance.instanceName.GetEventHandler().OnEndDragLeft(startX + DRAG_HORIZONTAL_DELTA, headerY, keys=MOD_CMD)
+
+        self.assertNotEqual(startX, round(umlSDInstance.GetX()))
 
 
 def suite() -> TestSuite:

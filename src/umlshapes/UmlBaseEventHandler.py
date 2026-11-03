@@ -26,6 +26,7 @@ from umlshapes.types.UmlDimensions import UmlDimensions
 
 
 if TYPE_CHECKING:
+    from umlshapes.ShapeTypes import UmlShapeGenre
     from umlshapes.frames.UmlFrame import UmlFrame
 
 ShapeList = NewType('ShapeList', List[Shape])
@@ -72,46 +73,18 @@ class UmlBaseEventHandler(ShapeEvtHandler):
             keys:
             attachment:
         """
-        from umlshapes.links.UmlLink import UmlLink
-        from umlshapes.links.UmlLinkLabel import UmlLinkLabel
+        from umlshapes.mixins.TopLeftMixin import TopLeftMixin
+        from umlshapes.shapes.UmlBaseLabel import UmlBaseLabel
 
         from umlshapes.ShapeTypes import UmlShapeGenre
 
         from umlshapes.frames.UmlFrame import UmlFrame
-        from umlshapes.frames.ShapeMoveInfo import ShapeId
 
         umlShape: UmlShapeGenre = cast(UmlShapeGenre, self.GetShape())
         umlFrame: UmlFrame      = self._extractFrame()
 
-        if not isinstance(umlShape, UmlLinkLabel) and not isinstance(umlShape, UmlLink):
-            #
-            # Only the move master moves himself
-            # The first time through we have no way of calculating the delta
-            # The other selected shapes get moved by the frame operations listener (indirectly)
-            #
-            if self._previousPosition is NO_POSITION:
-                self._previousPosition = UmlPosition(x=x, y=y)
-                umlShape.moveMaster = True
-                self._saveSelectedShapesInitialPositions()
-
-                umlFrame.markShapeAsMoved(umlShape=umlShape)
-                #
-                # Save the master shape position, in case he is not selected
-                #
-                self._initialPositions[ShapeId(umlShape.id)] = umlShape.position
-
-                self._baseLogger.info(f'Initial Position Count: {len(self._initialPositions)}')
-
-                self.umlPubSubEngine.sendMessage(messageType=UmlMessageType.FRAME_MODIFIED, frameId=umlShape.umlFrame.id, modifiedFrameId=umlShape.umlFrame.id)
-            else:
-
-                deltaXY: DeltaXY = DeltaXY(
-                    deltaX=x - self._previousPosition.x,
-                    deltaY=y - self._previousPosition.y
-                )
-                self._previousPosition = UmlPosition(x=x, y=y)
-
-                self.umlPubSubEngine.sendMessage(messageType=UmlMessageType.SHAPE_MOVING, frameId=umlShape.umlFrame.id, deltaXY=deltaXY)
+        if isinstance(umlShape, TopLeftMixin) and not isinstance(umlShape, UmlBaseLabel):
+            self._handleTopLeftShapeDrag(umlShape=umlShape, umlFrame=umlFrame, x=x, y=y)
 
         super().OnDragLeft(draw, x, y, keys, attachment)
 
@@ -206,6 +179,48 @@ class UmlBaseEventHandler(ShapeEvtHandler):
         umlShape.size = UmlDimensions(width=w, height=h)
         umlShape.umlFrame.refresh()
 
+    def _handleTopLeftShapeDrag(self, umlShape: 'UmlShapeGenre', umlFrame: 'UmlFrame', x: int, y: int):
+        """
+        Track initial positions on the first drag event and publish movement deltas
+        on subsequent drag events for shapes that inherit from TopLeftMixin.
+
+        Args:
+            umlShape: The dragged shape acting as move master
+            umlFrame: The diagram frame containing the shape
+            x:        New cursor X coordinate
+            y:        New cursor Y coordinate
+        """
+        from umlshapes.frames.ShapeMoveInfo import ShapeId
+
+        #
+        # Only the move master moves himself
+        # The first time through we have no way of calculating the delta
+        # The other selected shapes get moved by the frame operations listener (indirectly)
+        #
+        if self._previousPosition is NO_POSITION:
+            self._previousPosition = UmlPosition(x=x, y=y)
+            umlShape.moveMaster = True
+            self._saveSelectedShapesInitialPositions()
+
+            umlFrame.markShapeAsMoved(umlShape=umlShape)
+            #
+            # Save the master shape position, in case he is not selected
+            #
+            self._initialPositions[ShapeId(umlShape.id)] = umlShape.position
+
+            self._baseLogger.info(f'Initial Position Count: {len(self._initialPositions)}')
+
+            self.umlPubSubEngine.sendMessage(messageType=UmlMessageType.FRAME_MODIFIED, frameId=umlShape.umlFrame.id, modifiedFrameId=umlShape.umlFrame.id)
+        else:
+
+            deltaXY: DeltaXY = DeltaXY(
+                deltaX=x - self._previousPosition.x,
+                deltaY=y - self._previousPosition.y
+            )
+            self._previousPosition = UmlPosition(x=x, y=y)
+
+            self.umlPubSubEngine.sendMessage(messageType=UmlMessageType.SHAPE_MOVING, frameId=umlShape.umlFrame.id, deltaXY=deltaXY)
+
     def _unSelectAllShapesOnCanvas(self, shape: Shape, canvas: ShapeCanvas, dc: ClientDC):
 
         # Unselect if already selected
@@ -236,17 +251,17 @@ class UmlBaseEventHandler(ShapeEvtHandler):
         """
         from umlshapes.frames.ShapeMoveInfo import ShapeId
 
-        from umlshapes.links.UmlLink import UmlLink
+        from umlshapes.mixins.TopLeftMixin import TopLeftMixin
         from umlshapes.ShapeTypes import UmlShapeGenre
         from umlshapes.frames.UmlFrame import UmlFrame
-        from umlshapes.links.UmlLinkLabel import UmlLinkLabel
+        from umlshapes.shapes.UmlBaseLabel import UmlBaseLabel
 
         umlFrame: UmlFrame = self._extractFrame()
 
         shapes = umlFrame.selectedShapes
         for s in shapes:
             umlShape: UmlShapeGenre = cast(UmlShapeGenre, s)
-            if not isinstance(umlShape, UmlLink) and not isinstance(umlShape, UmlLinkLabel):
+            if isinstance(umlShape, TopLeftMixin) and not isinstance(umlShape, UmlBaseLabel):
                 self._initialPositions[ShapeId(umlShape.id)] = umlShape.position
 
     def _extractFrame(self) -> 'UmlFrame':
