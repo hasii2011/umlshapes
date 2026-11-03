@@ -50,8 +50,10 @@ INSTANCE_2_X:        int = 320
 INSTANCE_DEFAULT_Y:  int = 50
 MESSAGE_START_Y_1:   int = 140
 MESSAGE_DRAG_DELTA:  int = 40
-CANVAS_BITMAP_WIDTH:  int = 400
-CANVAS_BITMAP_HEIGHT: int = 400
+CANVAS_BITMAP_WIDTH:      int = 400
+CANVAS_BITMAP_HEIGHT:     int = 400
+EXTENDED_LIFELINE_LENGTH: int = 580
+AUTO_GROW_DRAG_DELTA:     int = 520
 
 
 class TestSDLostFoundMessage(UnitTestBaseW):
@@ -387,6 +389,65 @@ class TestSDLostFoundMessage(UnitTestBaseW):
         expectedDestX = round(execution.GetX() - (execution.GetWidth() / 2.0))
 
         self.assertEqual(expectedDestX, foundMessage.lineControlPoints[-1].x)
+
+    def testLostAndFoundMessageDragDoesNotCollapseLifelines(self):
+        inst1: UmlSDInstance = self._createSDInstance(name='inst1', x=INSTANCE_1_X)
+        inst2: UmlSDInstance = self._createSDInstance(name='inst2', x=INSTANCE_2_X)
+        self._diagramFrame.setAllLifeLinesLength(length=EXTENDED_LIFELINE_LENGTH)
+
+        self.assertEqual(EXTENDED_LIFELINE_LENGTH, inst1.getLifeLineLength())
+        self.assertEqual(EXTENDED_LIFELINE_LENGTH, inst2.getLifeLineLength())
+
+        lostMessage: UmlSDMessage = self._creationHandler.createLostMessage(
+            startLifeLine=inst1.umlSDLifeLine,
+            fromY=MESSAGE_START_Y_1
+        )
+        foundMessage: UmlSDMessage = self._creationHandler.createFoundMessage(
+            destLifeLine=inst2.umlSDLifeLine,
+            toY=MESSAGE_START_Y_1
+        )
+
+        lostHandler: UmlSDMessageEventHandler = cast(UmlSDMessageEventHandler, lostMessage.GetEventHandler())
+        self._simulateVerticalDrag(
+            eventHandler=lostHandler,
+            startX=INSTANCE_1_X,
+            startY=lostMessage.fromY,
+            deltaY=MESSAGE_DRAG_DELTA
+        )
+
+        self.assertEqual(EXTENDED_LIFELINE_LENGTH, inst1.getLifeLineLength())
+        self.assertEqual(EXTENDED_LIFELINE_LENGTH, inst2.getLifeLineLength())
+
+        foundHandler: UmlSDMessageEventHandler = cast(UmlSDMessageEventHandler, foundMessage.GetEventHandler())
+        self._simulateVerticalDrag(
+            eventHandler=foundHandler,
+            startX=INSTANCE_2_X,
+            startY=foundMessage.toY,
+            deltaY=MESSAGE_DRAG_DELTA
+        )
+
+        self.assertEqual(EXTENDED_LIFELINE_LENGTH, inst1.getLifeLineLength())
+        self.assertEqual(EXTENDED_LIFELINE_LENGTH, inst2.getLifeLineLength())
+
+    def testLostAndFoundMessageAutoGrowExtendsLifelines(self):
+        inst1: UmlSDInstance = self._createSDInstance(name='inst1', x=INSTANCE_1_X)
+        inst2: UmlSDInstance = self._createSDInstance(name='inst2', x=INSTANCE_2_X)
+        initialLength: int = inst1.getLifeLineLength()
+
+        foundMessage: UmlSDMessage = self._creationHandler.createFoundMessage(
+            destLifeLine=inst2.umlSDLifeLine,
+            toY=MESSAGE_START_Y_1
+        )
+        foundHandler: UmlSDMessageEventHandler = cast(UmlSDMessageEventHandler, foundMessage.GetEventHandler())
+        self._simulateVerticalDrag(
+            eventHandler=foundHandler,
+            startX=INSTANCE_2_X,
+            startY=foundMessage.toY,
+            deltaY=AUTO_GROW_DRAG_DELTA
+        )
+
+        self.assertGreater(inst1.getLifeLineLength(), initialLength)
+        self.assertEqual(inst1.getLifeLineLength(), inst2.getLifeLineLength())
 
     def _simulateVerticalDrag(self, eventHandler: UmlSDMessageEventHandler, startX: int, startY: int, deltaY: int):
         eventHandler.OnBeginDragLeft(x=startX, y=startY)

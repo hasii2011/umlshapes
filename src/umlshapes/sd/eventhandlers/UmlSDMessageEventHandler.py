@@ -495,22 +495,25 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
         destLifeLine:  Optional[UmlSDLifeLine] = cast(Optional[UmlSDLifeLine], self._umlSDMessage.GetTo())
         startLifeLine: Optional[UmlSDLifeLine] = cast(Optional[UmlSDLifeLine], self._umlSDMessage.GetFrom())
 
-        currentStartHeight: int = 0
-        if startLifeLine is not None:
-            currentStartHeight = startLifeLine.size.height
+        shouldGrow: bool = False
+        if startLifeLine is not None and neededHeight > startLifeLine.size.height:
+            shouldGrow = True
+        if destLifeLine is not None and neededHeight > destLifeLine.size.height:
+            shouldGrow = True
 
-        currentDestHeight: int = 0
-        if destLifeLine is not None:
-            currentDestHeight = destLifeLine.size.height
-
-        if (neededHeight > currentStartHeight) or (neededHeight > currentDestHeight):
-
+        if shouldGrow:
             if self._preferences.uniformLifeLineLength:
-                if hasattr(umlFrame, 'setAllLifeLinesLength'):
-                    umlFrame.setAllLifeLinesLength(neededHeight)
+                if hasattr(umlFrame, 'setAllLifeLinesLength') and hasattr(umlFrame, 'getSDInstances'):
+                    currentMaxLength: int = max(
+                        (inst.getLifeLineLength() for inst in umlFrame.getSDInstances()),
+                        default=0
+                    )
+                    if neededHeight > currentMaxLength:
+                        umlFrame.setAllLifeLinesLength(neededHeight)
             else:
-                self._growSingleLifeLine(lifeLine=startLifeLine, neededHeight=neededHeight)
-                if destLifeLine != startLifeLine:
+                if startLifeLine is not None and neededHeight > startLifeLine.size.height:
+                    self._growSingleLifeLine(lifeLine=startLifeLine, neededHeight=neededHeight)
+                if destLifeLine is not None and destLifeLine != startLifeLine and neededHeight > destLifeLine.size.height:
                     self._growSingleLifeLine(lifeLine=destLifeLine, neededHeight=neededHeight)
 
     def _growSingleLifeLine(self, lifeLine: Optional[UmlSDLifeLine], neededHeight: int):

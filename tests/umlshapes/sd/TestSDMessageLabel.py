@@ -1,4 +1,4 @@
-from typing import Optional
+
 from typing import cast
 
 from unittest import TestSuite
@@ -86,12 +86,11 @@ class TestSDMessageLabel(UnitTestBaseW):
         umlSDMessage: UmlSDMessage       = self._createReflexiveMessage(lifeLine=self._lifeLine)
         messageLabel: UmlSDMessageLabel = umlSDMessage.messageLabel
 
-        labelHandler: ShapeEvtHandler               = messageLabel.GetEventHandler()
+        labelHandler: UmlSDMessageLabelEventHandler = messageLabel.GetEventHandler()
         self.assertIsInstance(labelHandler, UmlSDMessageLabelEventHandler)
-        typedHandler: UmlSDMessageLabelEventHandler = cast(UmlSDMessageLabelEventHandler, labelHandler)
 
-        self.assertIsNotNone(typedHandler.umlPubSubEngine)
-        self.assertIs(typedHandler.umlPubSubEngine, self._diagramFrame.umlPubSubEngine)
+        self.assertIsNotNone(labelHandler.umlPubSubEngine)
+        self.assertIs(labelHandler.umlPubSubEngine, self._diagramFrame.umlPubSubEngine)
 
     def testMessageLabelRaisesIfPubSubEngineNotSet(self):
         """
@@ -100,12 +99,14 @@ class TestSDMessageLabel(UnitTestBaseW):
         umlSDMessage: UmlSDMessage      = self._createReflexiveMessage(lifeLine=self._lifeLine)
         messageLabel: UmlSDMessageLabel = umlSDMessage.messageLabel
 
-        labelHandler: ShapeEvtHandler               = messageLabel.GetEventHandler()
-        typedHandler: UmlSDMessageLabelEventHandler = cast(UmlSDMessageLabelEventHandler, labelHandler)
+        labelHandler: UmlSDMessageLabelEventHandler = messageLabel.GetEventHandler()
 
-        typedHandler._umlPubSubEngine = None
+        labelHandler._umlPubSubEngine = None
         with self.assertRaises(AssertionError):
-            _ = typedHandler.umlPubSubEngine
+            # Access the @property getter (assigning to _ so linters/IDEs do not warn
+            # about a statement with no effect) to trigger the fail-fast assert in
+            # UmlBaseEventHandler.umlPubSubEngine.
+            _ = labelHandler.umlPubSubEngine
 
     def testMessageLabelLeftClickPublishesSelectionEvent(self):
         """
@@ -116,7 +117,7 @@ class TestSDMessageLabel(UnitTestBaseW):
 
         selectedShapes: list[Shape] = []
 
-        def onShapeSelected(umlShape: object, **kwargs):
+        def onShapeSelected(umlShape: object):
             selectedShapes.append(cast(Shape, umlShape))
 
         self._umlPubSubEngine.subscribe(
