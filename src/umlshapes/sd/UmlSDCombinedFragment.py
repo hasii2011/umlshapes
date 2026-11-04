@@ -1,6 +1,7 @@
 
 from typing import Optional
 from typing import TYPE_CHECKING
+from typing import cast
 
 from logging import Logger
 from logging import getLogger
@@ -87,6 +88,26 @@ class UmlSDCombinedFragment(ControlPointMixin, IdentifierMixin, RectangleShape, 
         self.SetBrush(TRANSPARENT_BRUSH)
         self.SetPen(ResourceUtils.blackSolidPen())
         self.SetCentreResize(False)
+
+    @property
+    def selected(self) -> bool:
+        """
+        Syntactic sugar around Selected().
+
+        Returns:
+            True if this shape is currently selected.
+        """
+        return self.Selected()
+
+    @selected.setter
+    def selected(self, select: bool):
+        """
+        Syntactic sugar around Select().
+
+        Args:
+            select: True to select the shape.
+        """
+        self.Select(select=select)
 
     @property
     def operator(self) -> SDFragmentOperator:

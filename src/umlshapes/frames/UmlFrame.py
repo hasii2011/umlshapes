@@ -261,19 +261,28 @@ class UmlFrame(DiagramFrame):
         self.Unbind(EVT_MOTION, handler=self._onSelectorMove)
         self.umlDiagram.RemoveShape(self._selector)
 
-        for s in self.umlDiagram.shapes:
-            if self._ignoreShape(shapeToCheck=s) is False:      # noqa
-                if isinstance(s, UmlLink) or isinstance(s, UmlSDMessage):
+        selectedRoots: list[Shape] = []
+
+        for s in list(self.umlDiagram.shapes):
+            if self._ignoreShape(shapeToCheck=s) is False and s is not self._selector:
+                if isinstance(s, (UmlLink, UmlSDMessage)):
                     umlLink: UmlLink | UmlSDMessage = s
                     x1, y1, x2, y2 = umlLink.GetEnds()
                     umlLine: UmlLine = UmlLine(start=UmlPoint(x=x1, y=y1), end=UmlPoint(x=x2, y=y2))
-                    if CoordinateUtils.isLineWhollyContainedByRectangle(boundingRectangle=self._selector.rectangle, umlLine=umlLine):   # type: ignore
-                        umlLink.selected = True
+                    if CoordinateUtils.isLineWhollyContainedByRectangle(boundingRectangle=self._selector.rectangle, umlLine=umlLine):  # type: ignore
+                        if umlLink not in selectedRoots:
+                            selectedRoots.append(umlLink)
                 else:
-                    from umlshapes.ShapeTypes import UmlShapeGenre
-                    shape: UmlShapeGenre = cast(UmlShapeGenre, s)
-                    if CoordinateUtils.isShapeInRectangle(boundingRectangle=self._selector.rectangle, shapeRectangle=shape.rectangle):  # type: ignore
-                        shape.selected = True
+                    rect = getattr(s, 'rectangle', None)
+                    if rect is not None and CoordinateUtils.isShapeInRectangle(boundingRectangle=self._selector.rectangle, shapeRectangle=rect):  # type: ignore
+                        targetShape: Shape = s
+                        while targetShape.GetParent() is not None:
+                            targetShape = targetShape.GetParent()
+                        if targetShape not in selectedRoots:
+                            selectedRoots.append(targetShape)
+
+        for target in selectedRoots:
+            target.Select(True)
 
         self.refresh()
         self._selector = cast(ShapeSelector, None)  # noqa

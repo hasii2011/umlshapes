@@ -5,6 +5,7 @@ from logging import Logger
 from logging import getLogger
 
 from wx import ClientDC
+from wx import MOD_CMD
 
 from umlshapes.lib.ogl import ControlPoint
 from umlshapes.lib.ogl import ShapeEvtHandler
@@ -15,6 +16,7 @@ from umlshapes.pubsubengine.UmlMessageType import UmlMessageType
 from umlshapes.sd.UmlSDInstance import UmlSDInstance
 
 from umlshapes.types.UmlDimensions import UmlDimensions
+from umlshapes.types.UmlPosition import NO_POSITION
 
 from umlshapes.UmlBaseEventHandler import UmlBaseEventHandler
 
@@ -35,9 +37,9 @@ class UmlSdInstanceEventHandler(UmlBaseEventHandler):
 
     def OnBeginDragLeft(self, x: int, y: int, keys: int = 0, attachment: int = 0):
         """
-        Record the baseline Y position so the instance is constrained strictly
-        to horizontal dragging. Ensure the instance is selected so it is highlighted
-        in red during drag.
+        Overrides UmlBaseEventHandler.OnBeginDragLeft to record the baseline Y
+        position so the instance is constrained strictly to horizontal dragging,
+        and ensure the instance is selected so it is highlighted in red during drag.
 
         Args:
             x:
@@ -57,7 +59,8 @@ class UmlSdInstanceEventHandler(UmlBaseEventHandler):
             umlFrame: UmlFrame = cast(UmlFrame, umlShape.GetCanvas())
             dc: ClientDC = ClientDC(umlFrame)
             umlFrame.PrepareDC(dc)
-            self._unSelectAllShapesOnCanvas(umlShape, umlFrame, dc)
+            if keys != MOD_CMD:
+                self._unSelectAllShapesOnCanvas(umlShape, umlFrame, dc)
             umlShape.Select(True, dc)
             umlFrame.umlPubSubEngine.sendMessage(
                 messageType=UmlMessageType.UML_SHAPE_SELECTED,
@@ -70,8 +73,8 @@ class UmlSdInstanceEventHandler(UmlBaseEventHandler):
 
     def OnDragLeft(self, draw: bool, x: int, y: int, keys: int = 0, attachment: int = 0):
         """
-        Lock Y to the fixed baseline mouse Y so that movement and deltaXY are
-        strictly horizontal.
+        Overrides UmlBaseEventHandler.OnDragLeft to lock Y to the fixed baseline
+        mouse Y so that movement and deltaXY are strictly horizontal.
 
         Args:
             draw:
@@ -91,8 +94,8 @@ class UmlSdInstanceEventHandler(UmlBaseEventHandler):
 
     def OnEndDragLeft(self, x: int, y: int, keys: int = 0, attachment: int = 0):
         """
-        Finalize the horizontal-only drag by locking the release Y coordinate to
-        the initial mouse baseline Y.
+        Overrides UmlBaseEventHandler.OnEndDragLeft to finalize the horizontal-only
+        drag without applying a duplicate offset when live composite dragging is enabled.
 
         Args:
             x:
@@ -100,13 +103,39 @@ class UmlSdInstanceEventHandler(UmlBaseEventHandler):
             keys:
             attachment:
         """
+        from umlshapes.ShapeTypes import UmlShapeGenre
+        from umlshapes.commands.ShapesMovedCommand import ShapesMovedCommand
+        from umlshapes.frames.ShapeMoveInfo import InitialPositions
+        from umlshapes.frames.UmlFrame import UmlFrame
+
         lockedY: int
         if self._fixedMouseY is not None:
             lockedY = self._fixedMouseY
         else:
             lockedY = y
 
-        super().OnEndDragLeft(x, lockedY, keys, attachment)
+        if self._preferences.enableCompositeShapeLiveDragging is True:
+            self._previousPosition = NO_POSITION
+            umlShape: UmlShapeGenre = cast(UmlShapeGenre, self.GetShape())
+            umlShape.moveMaster = False
+
+            umlFrame: UmlFrame = umlShape.umlFrame
+            if umlFrame.HasCapture():
+                umlFrame.ReleaseMouse()
+
+            shapesMovedCommand: ShapesMovedCommand = ShapesMovedCommand(
+                umlFrame=umlFrame,
+                movedShapes=umlFrame.movedShapes,
+                initialPositions=self._initialPositions
+            )
+            umlFrame.commandProcessor.Submit(command=shapesMovedCommand, storeIt=True)
+            self._debugDumpMovedShapes(umlFrame)
+            umlFrame.clearMovedShapes()
+            self._initialPositions = InitialPositions({})
+            umlFrame.refresh()
+        else:
+            super().OnEndDragLeft(x, lockedY, keys, attachment)
+
         self._fixedY = None
         self._fixedMouseY = None
 
@@ -259,8 +288,9 @@ class UmlSdInstanceEventHandler(UmlBaseEventHandler):
 
     def OnDrawOutline(self, dc: ClientDC, x: int, y: int, w: int, h: int):
         """
-        Called when shape is moving or is resized. Enforce the fixed baseline Y
-        position so the instance never drifts vertically.
+        Overrides UmlBaseEventHandler.OnDrawOutline. Called when shape is moving
+        or is resized. Enforces the fixed baseline Y position so the instance
+        never drifts vertically.
 
         Args:
             dc:  This is a client DC; It won't draw on OS X

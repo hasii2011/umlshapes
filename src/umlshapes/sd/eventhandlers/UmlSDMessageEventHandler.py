@@ -1,5 +1,9 @@
 
 from typing import cast
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from umlshapes.ShapeTypes import UmlShapeGenre
 from dataclasses import dataclass
 from typing import Optional
 
@@ -7,6 +11,7 @@ from logging import Logger
 from logging import getLogger
 
 from wx import ClientDC
+from wx import MOD_CMD
 from wx import OK
 from wx import CURSOR_DEFAULT
 from wx import Cursor
@@ -27,11 +32,13 @@ from umlshapes.frames.UmlFrame import UmlFrame
 from umlshapes.preferences.Defaults import MIN_REFLEXIVE_MESSAGE_WIDTH
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
+from umlshapes.pubsubengine.UmlMessageType import UmlMessageType
+
 from umlshapes.sd.SDLayoutEngine import SDLayoutEngine
-from umlshapes.sd.UmlSDExecution import UmlSDExecution
-from umlshapes.sd.UmlSDInstance import UmlSDInstance
 from umlshapes.sd.UmlSDLifeLine import UmlSDLifeLine
 from umlshapes.sd.UmlSDMessage import UmlSDMessage
+
+from umlshapes.types.DeltaXY import DeltaXY
 
 
 @dataclass
@@ -82,7 +89,8 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
 
     def OnBeginDragLeft(self, x: int, y: int, keys: int = 0, attachment: int = 0):
         """
-        Record initial Y coordinates before dragging begins.
+        Overrides UmlBaseEventHandler.OnBeginDragLeft to record initial Y coordinates
+        and selection state before vertical dragging begins.
 
         Args:
             x:
@@ -90,6 +98,20 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
             keys:
             attachment:
         """
+        if not self._umlSDMessage.Selected():
+            umlFrame: UmlFrame = self._umlSDMessage.umlFrame
+            dc: ClientDC = ClientDC(umlFrame)
+            umlFrame.PrepareDC(dc)
+            if keys != MOD_CMD:
+                self._unSelectAllShapesOnCanvas(self._umlSDMessage, umlFrame, dc)
+            self._umlSDMessage.Select(True, dc)
+            self.umlPubSubEngine.sendMessage(
+                messageType=UmlMessageType.UML_SHAPE_SELECTED,
+                frameId=umlFrame.id,
+                umlShape=self._umlSDMessage
+            )
+            umlFrame.refresh()
+
         isDirectEndpointDrag: bool = False
         freeX: int
         if self._umlSDMessage.isLostMessage is True and len(self._umlSDMessage.lineControlPoints) >= 2:
@@ -110,11 +132,17 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
             isDirectEndpointDrag=isDirectEndpointDrag
         )
 
+        if not isDirectEndpointDrag:
+            self._umlSDMessage.moveMaster = True
+            self._saveSelectedShapesInitialPositions()
+            self._umlSDMessage.umlFrame.markShapeAsMoved(umlShape=cast('UmlShapeGenre', self._umlSDMessage))
+
         super().OnBeginDragLeft(x, y, keys, attachment)
 
     def OnDragLeft(self, draw: bool, x: int, y: int, keys: int = 0, attachment: int = 0):
         """
-        Move the entire message to the nearest snapped vertical time step.
+        Overrides UmlBaseEventHandler.OnDragLeft to move the message to the nearest
+        snapped vertical time step and publish vertical deltaXY to any other selected shapes.
 
         Args:
             draw:
@@ -130,6 +158,9 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
                 self._resizeFoundMessageEndpoint(x=x)
             return
 
+        self._umlSDMessage.moveMaster = True
+        previousFromY: int = self._umlSDMessage.fromY
+
         targetY: int
         if self._dragContext is not None:
             deltaY: int = y - self._dragContext.initialMouseY
@@ -138,9 +169,18 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
             targetY = y
         self._snapMessageToTimeStep(targetY=targetY)
 
+        actualDeltaY: int = self._umlSDMessage.fromY - previousFromY
+        if actualDeltaY != 0:
+            self.umlPubSubEngine.sendMessage(
+                messageType=UmlMessageType.SHAPE_MOVING,
+                frameId=self._umlSDMessage.umlFrame.id,
+                deltaXY=DeltaXY(deltaX=0, deltaY=actualDeltaY)
+            )
+
     def OnEndDragLeft(self, x: int, y: int, keys: int = 0, attachment: int = 0):
         """
-        Finalize message placement at the snapped time step and notify frame of modification.
+        Overrides UmlBaseEventHandler.OnEndDragLeft to finalize message placement at
+        the snapped time step, update other selected shapes, and notify frame of modification.
 
         Args:
             x:
@@ -155,8 +195,10 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
                 self._resizeFoundMessageEndpoint(x=x)
             self._indicateFrameModified()
             self._dragContext = None
-            super().OnEndDragLeft(x, y, keys, attachment)
+            super(UmlBaseEventHandler, self).OnEndDragLeft(x, y, keys, attachment)
             return
+
+        previousFromY: int = self._umlSDMessage.fromY
 
         targetY: int
         if self._dragContext is not None:
@@ -165,15 +207,43 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
         else:
             targetY = y
         self._snapMessageToTimeStep(targetY=targetY)
+
+        actualDeltaY: int = self._umlSDMessage.fromY - previousFromY
+        if actualDeltaY != 0:
+            self.umlPubSubEngine.sendMessage(
+                messageType=UmlMessageType.SHAPE_MOVING,
+                frameId=self._umlSDMessage.umlFrame.id,
+                deltaXY=DeltaXY(deltaX=0, deltaY=actualDeltaY)
+            )
+
         if self._dragContext is not None and self._umlSDMessage.fromY != self._dragContext.initialFromY:
             self._indicateFrameModified()
 
+        self._umlSDMessage.moveMaster = False
         self._dragContext = None
-        super().OnEndDragLeft(x, y, keys, attachment)
+
+        umlFrame: UmlFrame = self._umlSDMessage.umlFrame
+        from umlshapes.commands.ShapesMovedCommand import ShapesMovedCommand
+        from umlshapes.frames.ShapeMoveInfo import InitialPositions
+
+        if len(self._initialPositions) > 0:
+            shapesMovedCommand: ShapesMovedCommand = ShapesMovedCommand(
+                umlFrame=umlFrame,
+                movedShapes=umlFrame.movedShapes,
+                initialPositions=self._initialPositions
+            )
+            umlFrame.commandProcessor.Submit(command=shapesMovedCommand, storeIt=True)
+            self._debugDumpMovedShapes(umlFrame)
+            umlFrame.clearMovedShapes()
+            self._initialPositions = InitialPositions({})
+            umlFrame.refresh()
+
+        super(UmlBaseEventHandler, self).OnEndDragLeft(x, y, keys, attachment)
 
     def OnSizingBeginDragLeft(self, pt: ControlPoint, x: int, y: int, keys: int = 0, attachment: int = 0):
         """
-        Record initial coordinates when dragging via line control points.
+        Overrides ShapeEvtHandler.OnSizingBeginDragLeft to record initial coordinates
+        when dragging via line control points.
 
         Args:
             pt:
@@ -207,7 +277,7 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
 
     def OnSizingDragLeft(self, pt: ControlPoint, draw: bool, x: int, y: int, keys: int = 0, attachment: int = 0):
         """
-        Handle dragging via line control points.
+        Overrides ShapeEvtHandler.OnSizingDragLeft to handle dragging via line control points.
 
         Args:
             pt:
@@ -241,7 +311,7 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
 
     def OnSizingEndDragLeft(self, pt: ControlPoint, x: int, y: int, keys: int = 0, attachment: int = 0):
         """
-        Handle drag completion via line control points.
+        Overrides ShapeEvtHandler.OnSizingEndDragLeft to handle drag completion via line control points.
 
         Args:
             pt:
@@ -284,6 +354,36 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
         if umlFrame is not None:
             defaultCursor: Cursor = Cursor(CURSOR_DEFAULT)
             umlFrame.SetCursor(defaultCursor)
+
+    def OnLeftClick(self, x: int, y: int, keys: int = 0, attachment: int = 0):
+        """
+        Overrides UmlBaseEventHandler.OnLeftClick to log click coordinates and select the message.
+
+        Args:
+            x:              The x-coordinate we will pass along
+            y:              The y-coordinate we will pass along
+            keys:
+            attachment:
+        """
+        self.logger.info(f'xy: ({x},{y})')
+        super().OnLeftClick(x, y, keys, attachment)
+
+    def OnLeftDoubleClick(self, x: int, y: int, keys: int = 0, attachment: int = 0):
+        """
+        Overrides ShapeEvtHandler.OnLeftDoubleClick to open the edit message dialog.
+        """
+        super().OnLeftDoubleClick(x=x, y=y, keys=keys, attachment=attachment)
+
+        umlSDMessage: UmlSDMessage = self._umlSDMessage
+        umlFrame:     UmlFrame     = umlSDMessage.umlFrame
+        modelClass:   SDMessage    = umlSDMessage.sdMessage
+
+        messages: MessageList = MessageList([Message('message1'), Message('message2')])
+
+        with DlgEditSDMessage(parent=umlFrame, sdMessage=modelClass, messages=messages) as dlg:
+            if dlg.ShowModal() == OK:
+                umlSDMessage.sdMessage = dlg.sdMessage
+                umlFrame.refresh()
 
     def _resizeLostMessageEndpoint(self, x: int):
         startX: int = self._umlSDMessage.lineControlPoints[0].x
@@ -346,7 +446,7 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
 
         if self._preferences.autoGrowLifeLines:
             neededHeight: int = (newToY - headerBottomY) + self._layoutEngine.parameters.bottomPadding
-            self._growLifeLinesIfNeeded(neededHeight=neededHeight, umlFrame=umlFrame)
+            self._umlSDMessage.growLifeLinesIfNeeded(neededHeight=neededHeight, umlFrame=umlFrame)
         else:
             maxTimeStepIndex: int = max(
                 0,
@@ -484,51 +584,6 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
             span = self._umlSDMessage.toY - self._umlSDMessage.fromY
         return span
 
-    def _growLifeLinesIfNeeded(self, neededHeight: int, umlFrame: UmlFrame):
-        """
-        Extend lifeline length for start and destination instances when auto-grow is active.
-
-        Args:
-            neededHeight: Calculated minimum height needed for the lifeline
-            umlFrame:     The UML frame
-        """
-        destLifeLine:  Optional[UmlSDLifeLine] = cast(Optional[UmlSDLifeLine], self._umlSDMessage.GetTo())
-        startLifeLine: Optional[UmlSDLifeLine] = cast(Optional[UmlSDLifeLine], self._umlSDMessage.GetFrom())
-
-        shouldGrow: bool = False
-        if startLifeLine is not None and neededHeight > startLifeLine.size.height:
-            shouldGrow = True
-        if destLifeLine is not None and neededHeight > destLifeLine.size.height:
-            shouldGrow = True
-
-        if shouldGrow:
-            if self._preferences.uniformLifeLineLength:
-                if hasattr(umlFrame, 'setAllLifeLinesLength') and hasattr(umlFrame, 'getSDInstances'):
-                    currentMaxLength: int = max(
-                        (inst.getLifeLineLength() for inst in umlFrame.getSDInstances()),
-                        default=0
-                    )
-                    if neededHeight > currentMaxLength:
-                        umlFrame.setAllLifeLinesLength(neededHeight)
-            else:
-                if startLifeLine is not None and neededHeight > startLifeLine.size.height:
-                    self._growSingleLifeLine(lifeLine=startLifeLine, neededHeight=neededHeight)
-                if destLifeLine is not None and destLifeLine != startLifeLine and neededHeight > destLifeLine.size.height:
-                    self._growSingleLifeLine(lifeLine=destLifeLine, neededHeight=neededHeight)
-
-    def _growSingleLifeLine(self, lifeLine: Optional[UmlSDLifeLine], neededHeight: int):
-        """
-        Extend individual lifeline instance height if present.
-
-        Args:
-            lifeLine:     Target lifeline shape if present
-            neededHeight: Calculated minimum height needed for the lifeline
-        """
-        if lifeLine is not None:
-            sdInstance: UmlSDInstance | None = lifeLine.umlSDInstance
-            if sdInstance is not None:
-                sdInstance.setLifeLineLength(neededHeight)
-
     def _computeAutoGrowEndpoints(self, headerBottomY: int, rawTimeStepIndex: int, span: int, umlFrame: UmlFrame) -> tuple[int, int]:
         """
         Compute snapped message endpoints and expand lifelines if necessary.
@@ -546,7 +601,7 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
         snappedFromY:  int = self._layoutEngine.computeTimeStepY(headerBottomY=headerBottomY, timeStepIndex=timeStepIndex)
         snappedToY:    int = snappedFromY + span
         neededHeight:  int = (snappedToY - headerBottomY) + self._layoutEngine.parameters.bottomPadding
-        self._growLifeLinesIfNeeded(neededHeight=neededHeight, umlFrame=umlFrame)
+        self._umlSDMessage.growLifeLinesIfNeeded(neededHeight=neededHeight, umlFrame=umlFrame)
         return snappedFromY, snappedToY
 
     def _computeBoundedEndpoints(self, referenceLifeLine: UmlSDLifeLine, headerBottomY: int, rawTimeStepIndex: int, span: int) -> tuple[int, int]:
@@ -572,28 +627,6 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
         snappedToY:    int = snappedFromY + span
         return snappedFromY, snappedToY
 
-    def _synchronizeAssociatedExecution(self, snappedFromY: int, snappedToY: int):
-        """
-        Synchronize position and geometry of any execution bar attached to this message.
-
-        Args:
-            snappedFromY: Snapped Y coordinate for the start of the message
-            snappedToY:   Snapped Y coordinate for the end of the message
-        """
-        if not self._umlSDMessage.hasExecution:
-            return
-
-        execution: UmlSDExecution = self._umlSDMessage.execution
-        duration: int = execution.endY - execution.startY
-        targetExecutionY: int
-        if self._umlSDMessage.isReflexiveMessage:
-            targetExecutionY = snappedFromY
-        else:
-            targetExecutionY = snappedToY
-        execution.startY = targetExecutionY
-        execution.endY   = targetExecutionY + duration
-        execution.lifeLine.recomputeExecutionsGeometry()
-
     def _applyMessageEndpoints(self, snappedFromY: int, snappedToY: int, umlFrame: UmlFrame):
         """
         Apply new endpoints to the message, synchronize execution, and refresh frame.
@@ -604,13 +637,9 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
             umlFrame:     The UML frame
         """
         if snappedFromY != self._umlSDMessage.fromY or snappedToY != self._umlSDMessage.toY:
-            self._umlSDMessage.fromY = snappedFromY
-            self._umlSDMessage.toY = snappedToY
-            self._synchronizeAssociatedExecution(snappedFromY=snappedFromY, snappedToY=snappedToY)
             dc: ClientDC = ClientDC(umlFrame)
             umlFrame.PrepareDC(dc)
-            self._umlSDMessage.OnMoveLink(dc=dc)
-            self._umlSDMessage.ResetControlPoints()
+            self._umlSDMessage.setVerticalEndpoints(fromY=snappedFromY, toY=snappedToY, dc=dc)
             umlFrame.refresh()
 
     def _snapMessageToTimeStep(self, targetY: int):
@@ -649,30 +678,3 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
             )
 
         self._applyMessageEndpoints(snappedFromY=snappedFromY, snappedToY=snappedToY, umlFrame=umlFrame)
-
-    def OnLeftClick(self, x: int, y: int, keys: int = 0, attachment: int = 0):
-        """
-
-        Args:
-            x:              The x-coordinate we will pass along
-            y:              The y-coordinate we will pass along
-            keys:
-            attachment:
-        """
-        self.logger.info(f'xy: ({x},{y})')
-        super().OnLeftClick(x, y, keys, attachment)
-
-    def OnLeftDoubleClick(self, x: int, y: int, keys: int = 0, attachment: int = 0):
-
-        super().OnLeftDoubleClick(x=x, y=y, keys=keys, attachment=attachment)
-
-        umlSDMessage: UmlSDMessage = self._umlSDMessage
-        umlFrame:     UmlFrame     = umlSDMessage.umlFrame
-        modelClass:   SDMessage    = umlSDMessage.sdMessage
-
-        messages: MessageList = MessageList([Message('message1'), Message('message2')])
-
-        with DlgEditSDMessage(parent=umlFrame, sdMessage=modelClass, messages=messages) as dlg:
-            if dlg.ShowModal() == OK:
-                umlSDMessage.sdMessage = dlg.sdMessage
-                umlFrame.refresh()

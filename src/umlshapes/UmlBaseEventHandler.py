@@ -61,10 +61,36 @@ class UmlBaseEventHandler(ShapeEvtHandler):
     def umlPubSubEngine(self, umlPubSubEngine: IUmlPubSubEngine):
         self._umlPubSubEngine = umlPubSubEngine
 
+    def OnBeginDragLeft(self, x: int, y: int, keys: int = 0, attachment: int = 0):
+        """
+        Overrides ShapeEvtHandler.OnBeginDragLeft to record the initial position
+        of the dragged shape and any other selected shapes before movement starts.
+
+        Args:
+            x:          initial x position
+            y:          initial y position
+            keys:
+            attachment:
+        """
+        from umlshapes.mixins.TopLeftMixin import TopLeftMixin
+        from umlshapes.shapes.UmlBaseLabel import UmlBaseLabel
+
+        from umlshapes.ShapeTypes import UmlShapeGenre
+
+        from umlshapes.frames.UmlFrame import UmlFrame
+
+        umlShape: UmlShapeGenre = cast(UmlShapeGenre, self.GetShape())
+        umlFrame: UmlFrame      = self._extractFrame()
+
+        if isinstance(umlShape, TopLeftMixin) and not isinstance(umlShape, UmlBaseLabel):
+            self._handleTopLeftShapeDrag(umlShape=umlShape, umlFrame=umlFrame, x=x, y=y)
+
+        super().OnBeginDragLeft(x, y, keys, attachment)
+
     def OnDragLeft(self, draw, x, y, keys=0, attachment=0):
         """
-        Move this shape, then subsequently send messages to move the other
-        selected shapes (if any)
+        Overrides ShapeEvtHandler.OnDragLeft to move this shape, then subsequently
+        send messages to move the other selected shapes (if any).
 
         Args:
             draw:
@@ -90,6 +116,8 @@ class UmlBaseEventHandler(ShapeEvtHandler):
 
     def OnEndDragLeft(self, x, y, keys=0, attachment=0):
         """
+        Overrides ShapeEvtHandler.OnEndDragLeft to finalize the drag operation
+        and submit a ShapesMovedCommand.
 
         Args:
             x:
@@ -128,7 +156,8 @@ class UmlBaseEventHandler(ShapeEvtHandler):
 
     def OnLeftClick(self, x: int, y: int, keys=0, attachment=0):
         """
-        Keep things simple here by interacting more with OGL layer
+        Overrides ShapeEvtHandler.OnLeftClick. Keep things simple here by
+        interacting more with OGL layer.
 
         Args:
             x:
@@ -162,7 +191,9 @@ class UmlBaseEventHandler(ShapeEvtHandler):
 
     def OnDrawOutline(self, dc: ClientDC, x: int, y: int, w: int, h: int):
         """
-        Called when shape is moving or is resized
+        Overrides ShapeEvtHandler.OnDrawOutline. Called when shape is moving
+        or is resized.
+
         Args:
             dc:  This is a client DC; It won't draw on OS X
             x:
@@ -259,10 +290,14 @@ class UmlBaseEventHandler(ShapeEvtHandler):
         umlFrame: UmlFrame = self._extractFrame()
 
         shapes = umlFrame.selectedShapes
+        from umlshapes.sd.UmlSDMessage import UmlSDMessage
         for s in shapes:
-            umlShape: UmlShapeGenre = cast(UmlShapeGenre, s)
-            if isinstance(umlShape, TopLeftMixin) and not isinstance(umlShape, UmlBaseLabel):
-                self._initialPositions[ShapeId(umlShape.id)] = umlShape.position
+            if isinstance(s, UmlSDMessage):
+                self._initialPositions[ShapeId(s.id)] = s.position
+            else:
+                umlShape: UmlShapeGenre = cast(UmlShapeGenre, s)
+                if isinstance(umlShape, TopLeftMixin) and not isinstance(umlShape, UmlBaseLabel):
+                    self._initialPositions[ShapeId(umlShape.id)] = umlShape.position
 
     def _extractFrame(self) -> 'UmlFrame':
         """

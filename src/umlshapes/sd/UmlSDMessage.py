@@ -58,6 +58,7 @@ if TYPE_CHECKING:
     from umlshapes.frames.SequenceDiagramFrame import SequenceDiagramFrame
     from umlshapes.frames.UmlFrame import UmlFrame
     from umlshapes.sd.UmlSDExecution import UmlSDExecution
+    from umlshapes.sd.UmlSDInstance import UmlSDInstance
     from umlshapes.sd.UmlSDLifeLine import UmlSDLifeLine
 
 
@@ -153,6 +154,9 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
 
     @property
     def controlPoints(self) -> list[ControlPoint]:
+        """
+        Overrides ControlPointMixin.controlPoints to return the message's line control points.
+        """
         return self._controlPoints
 
     @property
@@ -171,6 +175,35 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
             if self._messageLabel not in diagram.GetShapeList():
                 diagram.AddShape(self._messageLabel)
             self._setMessageLabelEventHandler(self._messageLabel)
+
+    @property
+    def position(self) -> UmlPosition:
+        """
+        Syntactic sugar to return message vertical position as an UmlPosition (x=0, y=self.fromY).
+        """
+        return UmlPosition(x=0, y=self._fromY)
+
+    @position.setter
+    def position(self, pos: UmlPosition):
+        """
+        Apply new vertical position to the message, maintaining relative span, synchronizing
+        associated execution bars, and updating control points.
+
+        Args:
+            pos: Target position with the new y coordinate.
+        """
+        span: int = self._toY - self._fromY
+        newFromY: int = pos.y
+        newToY: int = newFromY + span
+        umlFrame: 'SequenceDiagramFrame' = self.umlFrame
+        if umlFrame is not None:
+            dc: ClientDC = ClientDC(umlFrame)
+            umlFrame.PrepareDC(dc)
+            self.setVerticalEndpoints(fromY=newFromY, toY=newToY, dc=dc)
+        else:
+            self.fromY = newFromY
+            self.toY = newToY
+            self.synchronizeAssociatedExecution()
 
     @property
     def selected(self) -> bool:
@@ -251,11 +284,98 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
         """
         self._messageLabel.label = self._sdMessage.message
 
+    def synchronizeAssociatedExecution(self):
+        """
+        Synchronize position and geometry of any execution bar attached to this message.
+        """
+        if not self.hasExecution:
+            return
+
+        execution: 'UmlSDExecution' = self.execution
+        duration: int = execution.endY - execution.startY
+        targetExecutionY: int
+        if self.isReflexiveMessage:
+            targetExecutionY = self._fromY
+        else:
+            targetExecutionY = self._toY
+        execution.startY = targetExecutionY
+        execution.endY   = targetExecutionY + duration
+        execution.lifeLine.recomputeExecutionsGeometry()
+
+    def growLifeLinesIfNeeded(self, neededHeight: int, umlFrame: 'UmlFrame'):
+        """
+        Extend lifeline length for start and destination instances when auto-grow is active.
+
+        Args:
+            neededHeight: Calculated minimum height needed for the lifeline
+            umlFrame:     The UML frame
+        """
+        from umlshapes.sd.UmlSDLifeLine import UmlSDLifeLine
+
+        destLifeLine:  Optional[UmlSDLifeLine] = cast(Optional[UmlSDLifeLine], self.GetTo())
+        startLifeLine: Optional[UmlSDLifeLine] = cast(Optional[UmlSDLifeLine], self.GetFrom())
+
+        shouldGrow: bool = False
+        if startLifeLine is not None and neededHeight > startLifeLine.size.height:
+            shouldGrow = True
+        if destLifeLine is not None and neededHeight > destLifeLine.size.height:
+            shouldGrow = True
+
+        if shouldGrow:
+            if self._preferences.uniformLifeLineLength:
+                if hasattr(umlFrame, 'setAllLifeLinesLength') and hasattr(umlFrame, 'getSDInstances'):
+                    currentMaxLength: int = max(
+                        (inst.getLifeLineLength() for inst in umlFrame.getSDInstances()),
+                        default=0
+                    )
+                    if neededHeight > currentMaxLength:
+                        umlFrame.setAllLifeLinesLength(neededHeight)
+            else:
+                if startLifeLine is not None and neededHeight > startLifeLine.size.height:
+                    self._growSingleLifeLine(lifeLine=startLifeLine, neededHeight=neededHeight)
+                if destLifeLine is not None and destLifeLine != startLifeLine and neededHeight > destLifeLine.size.height:
+                    self._growSingleLifeLine(lifeLine=destLifeLine, neededHeight=neededHeight)
+
+    def _growSingleLifeLine(self, lifeLine: Optional['UmlSDLifeLine'], neededHeight: int):
+        """
+        Extend individual lifeline instance height if present.
+
+        Args:
+            lifeLine:     Target lifeline shape if present
+            neededHeight: Calculated minimum height needed for the lifeline
+        """
+        if lifeLine is not None:
+            sdInstance: Optional['UmlSDInstance'] = lifeLine.umlSDInstance
+            if sdInstance is not None:
+                sdInstance.setLifeLineLength(neededHeight)
+
+    def setVerticalEndpoints(self, fromY: int, toY: int, dc: ClientDC):
+        """
+        Apply new vertical endpoints to the message, synchronize any attached
+        execution bar, reposition the link and label, and reset control points.
+
+        Args:
+            fromY: New source Y coordinate
+            toY:   New destination Y coordinate
+            dc:    The device context
+        """
+        if fromY != self._fromY or toY != self._toY:
+            self.fromY = fromY
+            self.toY = toY
+            self.synchronizeAssociatedExecution()
+            self.OnMoveLink(dc=dc)
+            self.ResetControlPoints()
+
     def GetControlPoints(self) -> list[ControlPoint]:
+        """
+        Overrides ControlPointMixin.GetControlPoints to return the message's line control points.
+        """
         return self._controlPoints
 
     def MakeControlPoints(self):
-
+        """
+        Overrides LineShape.MakeControlPoints to create custom UmlLineControlPoint handles.
+        """
         if self.GetCanvas() is not None and len(self.lineControlPoints) > 0:
             firstPoint: Point = self.lineControlPoints[0]
             lastPoint:  Point = self.lineControlPoints[-1]
@@ -303,20 +423,24 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
 
     def Draggable(self) -> bool:
         """
-        Override base LineShape behavior (which hardcodes False) so sequence diagram
+        Overrides LineShape.Draggable (which hardcodes False) so sequence diagram
         messages can be dragged vertically to adjust time steps.
         """
         return True
 
     def GetBackgroundBrush(self) -> Brush:
         """
-        Override default behavior;  So we can see 'through' the message text
+        Overrides LineShape.GetBackgroundBrush so we can see 'through' the message text.
 
         Returns:  our precomputed transparent brush
         """
         return self._messageBackGroundBrush
 
     def OnDraw(self, dc: MemoryDC):
+        """
+        Overrides LineShape.OnDraw to style selected/unselected and return messages,
+        and draw endpoint circles for lost and found messages.
+        """
         if self.Selected() is True:
             if self._messageType == SDMessageType.RETURN:
                 self.SetPen(ResourceUtils.redDashedPen())
@@ -362,6 +486,10 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
         dc.DrawCircle(firstPoint.x, firstPoint.y, DEFAULT_LOST_FOUND_CIRCLE_RADIUS)
 
     def DrawArrow(self, dc: MemoryDC, arrow: ArrowHead, XOffset: float = 0.0, proportionalOffset: bool = False):
+        """
+        Overrides LineShape.DrawArrow to render open-stick arrowheads for asynchronous
+        and return messages and solid arrowheads for synchronous/lost/found messages.
+        """
         offset: float = XOffset
         if self.isLostMessage is True and offset == 0.0:
             offset = float(DEFAULT_LOST_FOUND_CIRCLE_RADIUS)
@@ -427,7 +555,7 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
 
     def OnMoveLink(self, dc: ClientDC, moveControlPoints: bool = True):
         """
-        Copied from original but modified to use the original Y positions.
+        Overrides LineShape.OnMoveLink to use the stored relative Y positions.
         Handles standard inter-instance messages, self-referential message loops,
         and lost/found messages.
 

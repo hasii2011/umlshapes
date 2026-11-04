@@ -20,8 +20,10 @@ from umlshapes.pubsubengine.UmlMessageType import UmlMessageType
 
 from umlshapes.sd.SDLayoutEngine import SDLayoutEngine
 from umlshapes.sd.UmlSDCombinedFragment import UmlSDCombinedFragment
+from umlshapes.types.UmlPosition import NO_POSITION
 
 if TYPE_CHECKING:
+    from umlshapes.ShapeTypes import UmlShapeGenre
     from umlshapes.sd.UmlSDInstance import UmlSDInstance
 
 MIN_FRAGMENT_WIDTH: int = 100
@@ -79,7 +81,8 @@ class UmlSDCombinedFragmentEventHandler(UmlBaseEventHandler):
 
     def OnLeftClick(self, x: int, y: int, keys: int = 0, attachment: int = 0):
         """
-        Handle left-click on the combined fragment to toggle selection state.
+        Overrides UmlBaseEventHandler.OnLeftClick to handle left-click on the
+        combined fragment and toggle its selection state.
 
         Args:
             x: Click X position.
@@ -113,7 +116,9 @@ class UmlSDCombinedFragmentEventHandler(UmlBaseEventHandler):
 
     def OnBeginDragLeft(self, x: int, y: int, keys: int = 0, attachment: int = 0):
         """
-        Record initial coordinates when dragging begins and ensure selection.
+        Overrides UmlBaseEventHandler.OnBeginDragLeft to record initial
+        coordinates when dragging begins, ensure selection, and initialize
+        multi-shape drag tracking.
 
         Args:
             x: Initial drag X position.
@@ -127,26 +132,34 @@ class UmlSDCombinedFragmentEventHandler(UmlBaseEventHandler):
         self._initialFragmentX = fragment.GetX()
         self._initialFragmentY = fragment.GetY()
 
+        umlFrame: UmlFrame = fragment.umlFrame
         if not fragment.Selected():
-            umlFrame: Optional[UmlFrame] = cast(Optional[UmlFrame], fragment.GetCanvas())
-            if umlFrame is not None:
-                dc: ClientDC = ClientDC(umlFrame)
-                umlFrame.PrepareDC(dc)
-                if keys != MOD_CMD:
-                    self._unSelectAllShapesOnCanvas(fragment, umlFrame, dc)
-                fragment.Select(True, dc)
-                umlFrame.umlPubSubEngine.sendMessage(
-                    messageType=UmlMessageType.UML_SHAPE_SELECTED,
-                    frameId=umlFrame.id,
-                    umlShape=fragment
-                )
-                umlFrame.refresh()
+            dc: ClientDC = ClientDC(umlFrame)
+            umlFrame.PrepareDC(dc)
+            if keys != MOD_CMD:
+                self._unSelectAllShapesOnCanvas(fragment, umlFrame, dc)
+            fragment.Select(True, dc)
+            umlFrame.umlPubSubEngine.sendMessage(
+                messageType=UmlMessageType.UML_SHAPE_SELECTED,
+                frameId=umlFrame.id,
+                umlShape=fragment
+            )
+            umlFrame.refresh()
+
+        self._handleTopLeftShapeDrag(
+            umlShape=cast('UmlShapeGenre', fragment),
+            umlFrame=umlFrame,
+            x=round(fragment.GetX()),
+            y=round(fragment.GetY())
+        )
 
         super().OnBeginDragLeft(x, y, keys, attachment)
 
     def OnDragLeft(self, draw: bool, x: int, y: int, keys: int = 0, attachment: int = 0):
         """
-        Move fragment during drag, snapping vertical position to discrete time steps.
+        Overrides UmlBaseEventHandler.OnDragLeft to move the fragment during drag,
+        snapping its vertical position to discrete time steps and broadcasting
+        the snapped movement delta to other selected shapes.
 
         Args:
             draw: Whether to draw intermediate feedback.
@@ -183,13 +196,19 @@ class UmlSDCombinedFragmentEventHandler(UmlBaseEventHandler):
         fragment.setPosition(newCenterX, newCenterY)
         fragment.ResetControlPoints()
 
-        umlFrame: Optional[UmlFrame] = cast(Optional[UmlFrame], fragment.GetCanvas())
-        if umlFrame is not None:
-            umlFrame.refresh()
+        umlFrame: UmlFrame = fragment.umlFrame
+        self._handleTopLeftShapeDrag(
+            umlShape=cast('UmlShapeGenre', fragment),
+            umlFrame=umlFrame,
+            x=round(newCenterX),
+            y=round(newCenterY)
+        )
+        umlFrame.refresh()
 
     def OnEndDragLeft(self, x: int, y: int, keys: int = 0, attachment: int = 0):
         """
-        Finalize dragging motion and reset drag state variables.
+        Overrides UmlBaseEventHandler.OnEndDragLeft to finalize dragging motion,
+        submit the ShapesMovedCommand, and reset drag state variables.
 
         Args:
             x: Final drag X coordinate.
@@ -197,11 +216,28 @@ class UmlSDCombinedFragmentEventHandler(UmlBaseEventHandler):
             keys: Modifier keys bitmask.
             attachment: Attachment point identifier.
         """
+        from umlshapes.commands.ShapesMovedCommand import ShapesMovedCommand
+        from umlshapes.frames.ShapeMoveInfo import InitialPositions
+
         self.OnDragLeft(draw=False, x=x, y=y, keys=keys, attachment=attachment)
         self._dragStartX = None
         self._dragStartY = None
         self._initialFragmentX = None
         self._initialFragmentY = None
+
+        self._previousPosition = NO_POSITION
+        fragment: UmlSDCombinedFragment = self._umlSDCombinedFragment
+        fragment.moveMaster = False
+
+        umlFrame: UmlFrame = fragment.umlFrame
+        shapesMovedCommand: ShapesMovedCommand = ShapesMovedCommand(
+            umlFrame=umlFrame,
+            movedShapes=umlFrame.movedShapes,
+            initialPositions=self._initialPositions
+        )
+        umlFrame.commandProcessor.Submit(command=shapesMovedCommand, storeIt=True)
+        umlFrame.clearMovedShapes()
+        self._initialPositions = InitialPositions({})
 
     def OnSizingBeginDragLeft(self, pt: ControlPoint, x: int, y: int, keys: int = 0, attachment: int = 0):
         """

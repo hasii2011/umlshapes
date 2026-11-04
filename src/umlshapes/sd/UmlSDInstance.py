@@ -5,6 +5,8 @@ from typing import TYPE_CHECKING
 from logging import Logger
 from logging import getLogger
 
+from wx import ClientDC
+
 from umlmodel.SDInstance import SDInstance
 
 from umlshapes.lib.ogl import CompositeShape
@@ -27,6 +29,7 @@ from umlshapes.sd.eventhandlers.UmlSDLifeLineEventHandler import UmlSDLifeLineEv
 from umlshapes.shapes.UmlControlPoint import UmlControlPoint
 
 from umlshapes.types.UmlDimensions import UmlDimensions
+from umlshapes.types.UmlPosition import UmlPosition
 
 from umlshapes.sd.SDInstanceConstrainer import SDInstanceConstrainer
 from umlshapes.sd.UmlInstanceName import UmlInstanceName
@@ -107,6 +110,26 @@ class UmlSDInstance(ControlPointMixin, IdentifierMixin, CompositeShape, TopLeftM
         sdLifeLine.umlSDInstance = self
 
     @property
+    def selected(self) -> bool:
+        """
+        Syntactic sugar around Selected().
+
+        Returns:
+            True if this participant instance is currently selected.
+        """
+        return self.Selected()
+
+    @selected.setter
+    def selected(self, select: bool):
+        """
+        Syntactic sugar around Select().
+
+        Args:
+            select: True to select the participant instance.
+        """
+        self.Select(select=select)
+
+    @property
     def umlFrame(self) -> 'SequenceDiagramFrame':
         return self.GetCanvas()
 
@@ -119,6 +142,39 @@ class UmlSDInstance(ControlPointMixin, IdentifierMixin, CompositeShape, TopLeftM
                 if child not in diagram.GetShapeList():
                     child.AddToCanvas(frame)
             self.Recompute()
+
+    @property
+    def position(self) -> UmlPosition:
+        """
+        Overrides TopLeftMixin.position getter to return the top-left coordinate
+        of the composite shape.
+
+        Returns:
+            The top-left UmlPosition of this participant instance.
+        """
+        return super().position
+
+    @position.setter
+    def position(self, position: UmlPosition):
+        """
+        Overrides TopLeftMixin.position setter so that moving the composite shape
+        also moves its child shapes (constrainer, header box, lifeline), execution
+        bars, and attached messages via OGL Move().
+
+        Args:
+            position: The requested top-left UmlPosition.
+        """
+        centerX: int
+        centerY: int
+        centerX, centerY = self.computeCenterXY(position=position)
+        canvas: 'SequenceDiagramFrame' = self.GetCanvas()
+        if canvas is not None:
+            dc: ClientDC = ClientDC(canvas)
+            canvas.PrepareDC(dc)
+            self.Move(dc=dc, x=centerX, y=centerY)
+        else:
+            self.SetX(centerX)
+            self.SetY(centerY)
 
     @property
     def umlSDLifeLine(self) -> UmlSDLifeLine:
