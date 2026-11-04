@@ -7,7 +7,6 @@ from wx import MemoryDC
 
 from umlshapes.lib.ogl import EllipseShape
 
-from umlshapes.utils.DrawingUtils import DrawingUtils
 from umlshapes.utils.ResourceUtils import ResourceUtils
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
@@ -48,6 +47,8 @@ class UmlUseCase(ControlPointMixin,  IdentifierMixin, EllipseShape, TopLeftMixin
         IdentifierMixin.__init__(self)
 
         self.SetDraggable(drag=True)
+        self.SetPen(ResourceUtils.blackSolidPen())
+        self.SetBrush(ResourceUtils.backGroundBrush())
 
         self.SetFont(ResourceUtils.defaultFont())
         self.AddText(self._modelUseCase.name)
@@ -78,22 +79,20 @@ class UmlUseCase(ControlPointMixin,  IdentifierMixin, EllipseShape, TopLeftMixin
 
     def OnDraw(self, dc: MemoryDC):
         """
-        Lots of work around code on retrieved values from Shape, since it
-        keeps returning floats
+        Draw the use case shape and its label.
 
         Args:
-            dc:
+            dc: Memory device context
         """
         self.ClearText()
         self.AddText(self.modelUseCase.name)
 
-        super().OnDraw(dc)
-
-        if self.Selected() is True:
-            if self.Selected() is True:
-                DrawingUtils.drawSelectedEllipse(dc=dc, shape=self)
+        if self.selected is True:
+            self.SetPen(ResourceUtils.redDashedPen())
         else:
-            super().OnDraw(dc)
+            self.SetPen(ResourceUtils.blackSolidPen())
+
+        super().OnDraw(dc)
 
     # This is dangerous, accessing internal stuff
     # noinspection PyProtectedMember
@@ -170,4 +169,3 @@ class UmlUseCase(ControlPointMixin,  IdentifierMixin, EllipseShape, TopLeftMixin
     def __hash__(self):
 
         return hash((self.modelUseCase.name, self.id))
-

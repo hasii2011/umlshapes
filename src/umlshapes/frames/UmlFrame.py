@@ -247,17 +247,54 @@ class UmlFrame(DiagramFrame):
             else:
                 self._currentReportInterval -= 1
 
-    def OnDragLeft(self, draw, x, y, keys=0):
+    def OnBeginDragLeft(self, x: int, y: int, keys: int = 0):
+        """
+        Overrides ShapeCanvas.OnBeginDragLeft to begin rubber-band selection.
+
+        Args:
+            x: Logical x coordinate
+            y: Logical y coordinate
+            keys: Modifier keys bitmask
+        """
+        self._beginSelect(x=x, y=y)
+
+    def OnDragLeft(self, draw: bool, x: int, y: int, keys: int = 0):
+        """
+        Overrides ShapeCanvas.OnDragLeft to resize and reposition the rubber-band
+        selector rectangle during live dragging.
+
+        Args:
+            draw: True if drawing at the new position
+            x: Logical x coordinate
+            y: Logical y coordinate
+            keys: Modifier keys bitmask
+        """
         self.ufLogger.debug(f'{draw=} - x,y=({x},{y}) - {keys=}')
 
         if self._selector is None:
             self._beginSelect(x=x, y=y)
+        elif draw is True:
+            self._updateSelector(x=x, y=y)
 
-    def OnEndDragLeft(self, x, y, keys=0):
+    def OnEndDragLeft(self, x: int, y: int, keys: int = 0) -> bool:
+        """
+        Overrides ShapeCanvas.OnEndDragLeft to finalize the rubber-band selection.
 
+        Args:
+            x: Logical x coordinate
+            y: Logical y coordinate
+            keys: Modifier keys bitmask
+
+        Returns:
+            True indicating the event was handled
+        """
         from umlshapes.links.UmlLink import UmlLink
         from umlshapes.sd.UmlSDMessage import UmlSDMessage
 
+        if self._selector is None:
+            return True
+
+        self._updateSelector(x=x, y=y)
         self.Unbind(EVT_MOTION, handler=self._onSelectorMove)
         self.umlDiagram.RemoveShape(self._selector)
 
@@ -269,12 +306,12 @@ class UmlFrame(DiagramFrame):
                     umlLink: UmlLink | UmlSDMessage = s
                     x1, y1, x2, y2 = umlLink.GetEnds()
                     umlLine: UmlLine = UmlLine(start=UmlPoint(x=x1, y=y1), end=UmlPoint(x=x2, y=y2))
-                    if CoordinateUtils.isLineWhollyContainedByRectangle(boundingRectangle=self._selector.rectangle, umlLine=umlLine):  # type: ignore
+                    if CoordinateUtils.isLineWhollyContainedByRectangle(boundingRectangle=self._selector.rectangle, umlLine=umlLine):
                         if umlLink not in selectedRoots:
                             selectedRoots.append(umlLink)
                 else:
                     rect = getattr(s, 'rectangle', None)
-                    if rect is not None and CoordinateUtils.isShapeInRectangle(boundingRectangle=self._selector.rectangle, shapeRectangle=rect):  # type: ignore
+                    if rect is not None and CoordinateUtils.isShapeInRectangle(boundingRectangle=self._selector.rectangle, shapeRectangle=rect):
                         targetShape: Shape = s
                         while targetShape.GetParent() is not None:
                             targetShape = targetShape.GetParent()
@@ -459,21 +496,36 @@ class UmlFrame(DiagramFrame):
         self.Bind(EVT_MOTION, self._onSelectorMove)
 
     def _onSelectorMove(self, event: MouseEvent):
-        # from wx import Rect as WxRect
+        """
+        Handle mouse motion during selection dragging.
 
+        Args:
+            event: The mouse event
+        """
         if self._selector is not None:
             eventPosition: UmlPosition = self._getEventPosition(event)
-            umlPosition:   UmlPosition = self._selector.position
+            self._updateSelector(x=eventPosition.x, y=eventPosition.y)
 
-            x: int = eventPosition.x
-            y: int = eventPosition.y
+    def _updateSelector(self, x: int, y: int):
+        """
+        Update the selection rectangle boundaries and refresh the canvas to render
+        the rubber-band outline.
 
-            x0 = umlPosition.x
-            y0 = umlPosition.y
+        Args:
+            x: Current mouse x-coordinate
+            y: Current mouse y-coordinate
+        """
+        if self._selector is not None:
+            x0: int = self._selector.originalPosition.x
+            y0: int = self._selector.originalPosition.y
 
-            # self._selector.SetSize(x - x0, y - y0)
-            self._selector.size = UmlDimensions(width=x - x0, height=y - y0)
-            self._selector.position = self._selector.originalPosition
+            left: int = min(x0, x)
+            top: int = min(y0, y)
+            width: int = abs(x - x0)
+            height: int = abs(y - y0)
+
+            self._selector.size = UmlDimensions(width=width, height=height)
+            self._selector.position = UmlPosition(x=left, y=top)
 
             self.refresh()
 

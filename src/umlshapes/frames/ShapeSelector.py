@@ -12,6 +12,7 @@ from umlshapes.lib.ogl import RectangleShape
 
 from umlshapes.mixins.TopLeftMixin import TopLeftMixin
 from umlshapes.types.UmlPosition import UmlPosition
+from umlshapes.utils.ResourceUtils import ResourceUtils
 
 if TYPE_CHECKING:
     from umlshapes.frames.DiagramFrame import DiagramFrame
@@ -34,6 +35,7 @@ class ShapeSelector(RectangleShape, TopLeftMixin):
 
         self.SetCentreResize(False)
         self.SetBrush(TRANSPARENT_BRUSH)
+        self.SetPen(ResourceUtils.blackDashedPen())
 
     @property
     def diagramFrame(self) -> 'DiagramFrame':

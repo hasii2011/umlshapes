@@ -7,7 +7,6 @@ from wx import DC
 from wx import Size
 from wx import MemoryDC
 
-from umlshapes.lib.ogl import EllipseShape
 from umlshapes.lib.ogl import RectangleShape
 
 from umlshapes.utils.ResourceUtils import ResourceUtils
@@ -44,13 +43,6 @@ class DrawingUtils:
         dc.DrawRectangle(x1, y1, width, height)
 
     @classmethod
-    def drawSelectedEllipse(cls, dc: MemoryDC, shape: EllipseShape):
-
-        dc.SetPen(ResourceUtils.redDashedPen())
-
-        dc.DrawEllipse(int(shape.GetX() - shape.GetWidth() / 2.0), int(shape.GetY() - shape.GetHeight() / 2.0), shape.GetWidth(), shape.GetHeight())
-
-    @classmethod
     def fixBadFloat(cls, badFloat: float, message: str) -> int:
 
         DrawingUtils.clsLogger.warning(f'{message}: {badFloat} - rounded')
@@ -77,7 +69,7 @@ class DrawingUtils:
         for line in splitLines:
             words:     List[str] = line.split()
             lineWidth: int       = 0
-            newLine:   str       = ""
+            newLine:   str       = ''
             for wordX in words:
 
                 word:       str  = f'{wordX} '
