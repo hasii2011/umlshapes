@@ -1,23 +1,26 @@
+from typing import cast
 from typing import List
 from typing import NewType
+from typing import Optional
 
 from logging import Logger
 from logging import getLogger
 
 from copy import deepcopy
 
-from wx import CB_SORT
-from wx import EVT_TEXT
-from wx import ID_ANY
+from wx import Button
 from wx import CB_DROPDOWN
-from wx import EVT_COMBOBOX
-from wx import EVT_TEXT_ENTER
-from wx import TE_PROCESS_ENTER
-
-from wx import Window
+from wx import CB_SORT
+from wx import CommandEvent
 from wx import ComboBox
 from wx import DefaultSize
-from wx import CommandEvent
+from wx import EVT_COMBOBOX
+from wx import EVT_TEXT
+from wx import EVT_TEXT_ENTER
+from wx import ID_ANY
+from wx import ID_OK
+from wx import TE_PROCESS_ENTER
+from wx import Window
 
 from wx.lib.sized_controls import SizedPanel
 
@@ -32,7 +35,7 @@ MessageList = NewType('MessageList', List[Message])
 class DlgEditSDMessage(BaseEditDialog):
     def __init__(self, parent: Window, sdMessage: SDMessage, messages: MessageList):
 
-        super().__init__(parent, title="Edit SD Message")
+        super().__init__(parent, title='Edit SD Message')
 
         self.logger:     Logger    = getLogger(__name__)
         self._sdMessage: SDMessage = sdMessage
@@ -41,8 +44,8 @@ class DlgEditSDMessage(BaseEditDialog):
         sizedPanel.SetSizerType('horizontal')
 
         # Ensure the current message is in the list and avoid duplicates
-        currentMessage = sdMessage.message
-        choices = list(messages)
+        currentMessage: str = sdMessage.message
+        choices: list[Message] = list(messages)
         if currentMessage not in choices:
             choices.append(Message(currentMessage))
 
@@ -62,6 +65,10 @@ class DlgEditSDMessage(BaseEditDialog):
         self.Bind(EVT_TEXT_ENTER, self.EvtTextEnter,     self._cb)
 
         self._layoutStandardOkCancelButtonSizer()
+        okBtn: Optional[Window] = self.FindWindow(ID_OK)
+        if okBtn is not None:
+            cast(Button, okBtn).SetDefault()
+
         # a little trick to make sure that you can't resize the dialog to
         # less screen space than the controls need
         self.Fit()
@@ -92,4 +99,4 @@ class DlgEditSDMessage(BaseEditDialog):
     def EvtTextEnter(self, event: CommandEvent):
         message: str = event.GetString()
         self.logger.debug(f'{message=}')
-        event.Skip()
+        self.EndModal(ID_OK)

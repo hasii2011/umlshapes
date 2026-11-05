@@ -12,7 +12,7 @@ from logging import getLogger
 
 from wx import ClientDC
 from wx import MOD_CMD
-from wx import OK
+from wx import ID_OK
 from wx import CURSOR_DEFAULT
 from wx import Cursor
 
@@ -381,8 +381,12 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
         messages: MessageList = MessageList([Message('message1'), Message('message2')])
 
         with DlgEditSDMessage(parent=umlFrame, sdMessage=modelClass, messages=messages) as dlg:
-            if dlg.ShowModal() == OK:
+            if dlg.ShowModal() == ID_OK:
                 umlSDMessage.sdMessage = dlg.sdMessage
+                dc: ClientDC = ClientDC(umlFrame)
+                umlFrame.PrepareDC(dc)
+                umlSDMessage.updateMessageLabelPosition(dc=dc)
+                self._indicateFrameModified()
                 umlFrame.refresh()
 
     def _resizeLostMessageEndpoint(self, x: int):

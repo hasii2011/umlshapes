@@ -11,6 +11,7 @@ from logging import getLogger
 
 from wx import MOD_CMD
 from wx import ClientDC
+from wx import Window
 
 from umlshapes.lib.ogl import Shape
 from umlshapes.lib.ogl import ShapeCanvas
@@ -60,6 +61,32 @@ class UmlBaseEventHandler(ShapeEvtHandler):
     @umlPubSubEngine.setter
     def umlPubSubEngine(self, umlPubSubEngine: IUmlPubSubEngine):
         self._umlPubSubEngine = umlPubSubEngine
+
+    def OnLeftDoubleClick(self, x: int, y: int, keys: int = 0, attachment: int = 0):
+        """
+        Overrides ShapeEvtHandler.OnLeftDoubleClick to ensure any active mouse
+        capture on the diagram canvas or frame is released before double-click
+        handling proceeds.
+
+        Args:
+            x:          Cursor X coordinate
+            y:          Cursor Y coordinate
+            keys:       Modifier keys mask
+            attachment: Attachment point index
+        """
+        super().OnLeftDoubleClick(x=x, y=y, keys=keys, attachment=attachment)
+
+        shape: Optional[Shape] = self.GetShape()
+        if shape is not None:
+            canvas: Optional[ShapeCanvas] = shape.GetCanvas()
+            if canvas is not None:
+                if canvas.HasCapture():
+                    canvas.ReleaseMouse()
+            else:
+                umlFrame: Optional[Window] = getattr(shape, 'umlFrame', None)
+                if umlFrame is not None:
+                    if umlFrame.HasCapture():
+                        umlFrame.ReleaseMouse()
 
     def OnBeginDragLeft(self, x: int, y: int, keys: int = 0, attachment: int = 0):
         """

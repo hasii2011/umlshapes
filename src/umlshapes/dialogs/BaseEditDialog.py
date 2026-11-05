@@ -1,8 +1,9 @@
 
 from typing import Callable
-from typing import NewType
-from typing import cast
 from typing import List
+from typing import NewType
+from typing import Optional
+from typing import cast
 
 from logging import Logger
 from logging import getLogger
@@ -50,6 +51,20 @@ class BaseEditDialog(SizedDialog):
 
         self.baseDlgLogger: Logger = getLogger(__name__)
 
+    def ShowModal(self) -> int:
+        """
+        Overrides SizedDialog.ShowModal to ensure any active mouse capture
+        on the parent window is released before entering the modal event loop.
+
+        Returns:
+            The dialog return code (e.g. ID_OK or ID_CANCEL)
+        """
+        parent: Optional[Window] = self.GetParent()
+        if parent is not None:
+            if parent.HasCapture():
+                parent.ReleaseMouse()
+        return super().ShowModal()
+
     def _layoutStandardOkCancelButtonSizer(self):
         """
         Call this last when creating controls;  Will take care of
@@ -58,6 +73,7 @@ class BaseEditDialog(SizedDialog):
         buttSizer: StdDialogButtonSizer = self.CreateStdDialogButtonSizer(OK | CANCEL)
 
         self.SetButtonSizer(buttSizer)
+        self.SetEscapeId(ID_CANCEL)
         self.Bind(EVT_BUTTON, self._onOk,    id=ID_OK)
         self.Bind(EVT_BUTTON, self._onClose, id=ID_CANCEL)
         self.Bind(EVT_CLOSE,  self._onClose)
@@ -93,13 +109,13 @@ class BaseEditDialog(SizedDialog):
     def _onOk(self, event: CommandEvent):
         """
         """
-        self.EndModal(OK)
+        self.EndModal(ID_OK)
 
     # noinspection PyUnusedLocal
     def _onClose(self, event: CommandEvent):
         """
         """
-        self.EndModal(CANCEL)
+        self.EndModal(ID_CANCEL)
 
     def _indicateEmptyTextCtrl(self, name: TextCtrl):
 
