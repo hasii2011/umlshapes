@@ -21,7 +21,7 @@ class DlgEditText(BaseEditDialog):
     Sample use:
         with DlgEditText(parent=self._frame, eventEngine=self._eventEngine, text=text) as dlg:
 
-            if dlg.ShowModal() == OK:
+            if dlg.ShowModal() == ID_OK:
                 return f'Retrieved data: {text.content=}'
             else:
                 return f'Canceled'

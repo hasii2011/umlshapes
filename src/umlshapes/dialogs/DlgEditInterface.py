@@ -11,8 +11,8 @@ from umlmodel.Interface import Interface
 from umlmodel.Interface import Interfaces
 from umlmodel.Interface import InterfacesDict
 from umlmodel.ModelTypes import ClassName
-from wx import OK
-from wx import CANCEL
+from wx import ID_CANCEL
+from wx import ID_OK
 from wx import CB_DROPDOWN
 from wx import CB_SORT
 from wx import EVT_COMBOBOX
@@ -173,13 +173,13 @@ class DlgEditInterface(DlgEditClassCommon):
             self.logger.debug(f'Using new interface. {self._modelInterface.name=} {self._modelInterface.id=}')
 
         self._lollipopInterface.modelInterface = self._modelInterface
-        self.SetReturnCode(OK)
-        self.EndModal(OK)
+        self.SetReturnCode(ID_OK)
+        self.EndModal(ID_OK)
 
     # noinspection PyUnusedLocal
     def _onCancel(self, event: CommandEvent):
-        self.SetReturnCode(CANCEL)
-        self.EndModal(CANCEL)
+        self.SetReturnCode(ID_CANCEL)
+        self.EndModal(ID_CANCEL)
 
     def _toInterfaceNames(self, interfaces: Interfaces) -> List[str]:
 

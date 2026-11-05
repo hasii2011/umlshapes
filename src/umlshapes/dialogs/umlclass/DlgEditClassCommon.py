@@ -12,7 +12,7 @@ from umlmodel.Class import Class
 from umlmodel.Interface import Interface
 from umlmodel.Method import Method
 from umlmodel.enumerations.Stereotype import Stereotype
-from wx import OK
+from wx import ID_OK
 from wx import CommandEvent
 
 from wx.lib.sized_controls import SizedPanel
@@ -148,7 +148,7 @@ class DlgEditClassCommon(BaseEditDialog):
             _event:
         """
         with DlgEditDescription(self, model=self._modeInterfaceCopy) as dlg:
-            if dlg.ShowModal() == OK:
+            if dlg.ShowModal() == ID_OK:
                 # self._eventEngine.sendEvent(EventType.UMLDiagramModified)
                 self._modeInterfaceCopy.description = dlg.description
             else:
@@ -183,7 +183,7 @@ class DlgEditClassCommon(BaseEditDialog):
         answer: CallbackAnswer = CallbackAnswer()
 
         with DlgEditMethod(parent=self, method=method, editInterface=self._editInterface) as dlg:
-            if dlg.ShowModal() == OK:
+            if dlg.ShowModal() == ID_OK:
                 answer.item = str(method)
                 answer.valid = True
             else:
@@ -237,7 +237,7 @@ class DlgEditClassCommon(BaseEditDialog):
         stereotype: Stereotype = cast(Class, self._modeInterfaceCopy).stereotype
 
         with DlgEditStereotype(parent=self._parent, stereotype=stereotype) as dlg:
-            if dlg.ShowModal() == OK:
+            if dlg.ShowModal() == ID_OK:
                 cast(Class, self._modeInterfaceCopy).stereotype = dlg.value
 
     def _indicateFrameModified(self):

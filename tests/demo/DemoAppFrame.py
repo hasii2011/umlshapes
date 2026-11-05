@@ -8,6 +8,7 @@ from logging import getLogger
 from pathlib import Path
 
 from wx import OK
+from wx import ID_OK
 from wx import ID_CUT
 from wx import ID_COPY
 from wx import ID_EXIT
@@ -572,7 +573,7 @@ class DemoAppFrame(SizedFrame):
         # Update with our generated one
         interfaces.append(interface)
         with DlgEditInterface(parent=requestingFrame, lollipopInterface=umlLollipopInterface, umlPubSubEngine=pubsubEngine, interfaces=interfaces) as dlg:
-            if dlg.ShowModal() == OK:
+            if dlg.ShowModal() == ID_OK:
                 requestingFrame.refresh()
 
     def _updateApplicationStatusListener(self, message: str):
@@ -591,7 +592,7 @@ class DemoAppFrame(SizedFrame):
     def _onUmlShapePreferences(self, _event: CommandEvent):
 
         with DlgUmlShapesPreferences(parent=self) as dlg:
-            if dlg.ShowModal() == OK:
+            if dlg.ShowModal() == ID_OK:
                 self.logger.info(f'Pressed Ok')
 
     def _onFrameDisplayedChanged(self, _event: BookCtrlEvent):

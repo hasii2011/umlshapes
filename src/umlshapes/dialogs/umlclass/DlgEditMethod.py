@@ -10,7 +10,7 @@ from wx import EVT_BUTTON
 from wx import EVT_TEXT
 from wx import ID_ANY
 
-from wx import OK
+from wx import ID_OK
 from wx import RA_SPECIFY_ROWS
 
 from wx import Colour
@@ -162,7 +162,7 @@ class DlgEditMethod(BaseEditDialog):
 
         answer:        CallbackAnswer = CallbackAnswer()
         with DlgEditParameter(parent=self, parameterToEdit=parameter) as dlg:
-            if dlg.ShowModal() == OK:
+            if dlg.ShowModal() == ID_OK:
                 answer.valid = True
                 answer.item  = str(parameter)
             else:
@@ -205,14 +205,14 @@ class DlgEditMethod(BaseEditDialog):
     def _onModifiers(self, event: CommandEvent):
 
         with DlgEditMethodModifiers(parent=self, modifiers=self._methodCopy.modifiers) as dlg:
-            if dlg.ShowModal() == OK:
+            if dlg.ShowModal() == ID_OK:
                 self._methodCopy.modifiers = dlg.modifiers
 
     # noinspection PyUnusedLocal
     def _onMethodCode(self, event: CommandEvent):
         sourceCode: SourceCode = self._methodCopy.sourceCode
         with DlgEditCode(parent=self, wxID=ID_ANY, sourceCode=sourceCode) as dlg:
-            if dlg.ShowModal() == OK:
+            if dlg.ShowModal() == ID_OK:
                 self.logger.debug(f'Answered Ok')
                 self._methodCopy.sourceCode = dlg.sourceCode
             else:

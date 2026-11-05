@@ -10,7 +10,7 @@ from wx import FONTSTYLE_ITALIC
 from wx import FONTSTYLE_NORMAL
 from wx import FONTWEIGHT_BOLD
 from wx import FONTWEIGHT_NORMAL
-from wx import OK
+from wx import ID_OK
 from wx import PENSTYLE_SOLID
 
 from wx import DC
@@ -105,7 +105,7 @@ class UmlTextEventHandler(UmlBaseEventHandler):
         umlFrame:  ClassDiagramFrame  = umlText.GetCanvas()
 
         with DlgEditText(parent=umlFrame, text=text, ) as dlg:
-            if dlg.ShowModal() == OK:
+            if dlg.ShowModal() == ID_OK:
                 umlFrame.refresh()
 
         umlText.selected = False

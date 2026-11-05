@@ -34,7 +34,7 @@ class DlgEditLink (SizedDialog):
 
     Usage:
         with DlgEditLink(parent, link) as dlg:
-            if dlg.ShowModal() == OK:
+            if dlg.ShowModal() == ID_OK:
                 link = dlg.value
 
     The input model ink is only updated on Ok;  Else if the dialog is
@@ -71,6 +71,7 @@ class DlgEditLink (SizedDialog):
 
         buttonContainer: Sizer = self.CreateStdDialogButtonSizer(OK | CANCEL)
         self.SetButtonSizer(buttonContainer)
+        self.SetEscapeId(ID_CANCEL)
         # btnOk.SetDefault()
 
         self._setValues(link.name, link.sourceCardinality, link.destinationCardinality)
@@ -123,15 +124,15 @@ class DlgEditLink (SizedDialog):
         Args:
             event:
         """
-        self.SetReturnCode(OK)
-        self.EndModal(OK)
+        self.SetReturnCode(ID_OK)
+        self.EndModal(ID_OK)
 
     # noinspection PyUnusedLocal
     def _onCmdCancel(self, event: CommandEvent):
         """
         """
-        self.SetReturnCode(CANCEL)
-        self.EndModal(CANCEL)
+        self.SetReturnCode(ID_CANCEL)
+        self.EndModal(ID_CANCEL)
 
     def _setValues(self, relationship: str, sourceCardinality: str, destinationCardinality: str):
         """

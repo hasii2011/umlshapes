@@ -7,7 +7,7 @@ from unittest import TestSuite
 from unittest import defaultTestLoader
 from unittest import main as unitTestMain
 
-from wx import CANCEL
+from wx import ID_CANCEL
 from wx import ID_OK
 
 from codeallyadvanced.ui.UnitTestBaseW import UnitTestBaseW
@@ -361,7 +361,7 @@ class TestSDInstanceNameResizing(UnitTestBaseW):
         initialWidth: int = umlSDInstance.instanceWidth
 
         mockDlg: MagicMock = MagicMock()
-        mockDlg.ShowModal.return_value = CANCEL
+        mockDlg.ShowModal.return_value = ID_CANCEL
         mockDlg.instanceName = LONG_NAME
         mockDlg.__enter__.return_value = mockDlg
 

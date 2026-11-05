@@ -62,6 +62,7 @@ class DlgEditCode(SizedDialog):
         self._txtCtrl.SetMinSize(newSize)
 
         self.SetButtonSizer(self.CreateStdDialogButtonSizer(OK | CANCEL))
+        self.SetEscapeId(ID_CANCEL)
 
         self.Fit()
         self.SetMinSize(self.GetSize())
@@ -83,12 +84,12 @@ class DlgEditCode(SizedDialog):
         """
         """
         self._sourceCode = SourceCode(self._displayableSourceCode.split(osLineSep))
-        self.SetReturnCode(OK)       # TODO Fix this;  should be OK
-        self.EndModal(OK)
+        self.SetReturnCode(ID_OK)
+        self.EndModal(ID_OK)
 
     # noinspection PyUnusedLocal
     def __onClose(self, event: CommandEvent):
         """
         """
-        self.SetReturnCode(CANCEL)      # This is correct
+        self.SetReturnCode(ID_CANCEL)
         self.EndModal(ID_CANCEL)

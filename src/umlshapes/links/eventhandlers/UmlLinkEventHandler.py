@@ -9,7 +9,7 @@ from logging import getLogger
 from copy import deepcopy
 
 from wx import DC
-from wx import OK
+from wx import ID_OK
 from wx import Menu
 from wx import EVT_MENU
 from wx import MenuItem
@@ -98,7 +98,7 @@ class UmlLinkEventHandler(UmlBaseEventHandler):
         if self._isLinkEditable(linkType=originalLink.linkType):
 
             with DlgEditLink(parent=umlFrame, link=linkCopy) as dlg:
-                if dlg.ShowModal() == OK:
+                if dlg.ShowModal() == ID_OK:
                     self.logger.info(f'{linkCopy=}')
                     linkCopy = dlg.value
                     if linkCopy != originalLink:

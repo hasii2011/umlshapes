@@ -6,9 +6,9 @@ from typing import cast
 from logging import Logger
 from logging import getLogger
 
-from wx import CANCEL
+from wx import ID_CANCEL
 from wx import EVT_TEXT
-from wx import OK
+from wx import ID_OK
 
 from wx import CommandEvent
 from wx import Size
@@ -163,7 +163,7 @@ class DlgEditClass(DlgEditClassCommon):
         field:  Field          = Field(name='FieldName')
         answer: CallbackAnswer = CallbackAnswer()
         with DlgEditField(parent=self, fieldToEdit=field) as dlg:
-            if dlg.ShowModal() == OK:
+            if dlg.ShowModal() == ID_OK:
                 answer.item  = str(field)
                 answer.valid = True
                 self._modeInterfaceCopy.fields.append(field)
@@ -176,7 +176,7 @@ class DlgEditClass(DlgEditClassCommon):
         field:  Field          = self._modeInterfaceCopy.fields[selection]
         answer: CallbackAnswer = CallbackAnswer()
         with DlgEditField(parent=self, fieldToEdit=field) as dlg:
-            if dlg.ShowModal() == OK:
+            if dlg.ShowModal() == ID_OK:
                 answer.item  = str(field)
                 answer.valid = True
             else:
@@ -251,13 +251,13 @@ class DlgEditClass(DlgEditClassCommon):
         # if self._oldClassName != self._class.name:
         #     self._eventEngine.sendEvent(EventType.ClassNameChanged, oldClassName=self._oldClassName, newClassName=self._class.name)
 
-        self.SetReturnCode(OK)
-        self.EndModal(OK)
+        self.SetReturnCode(ID_OK)
+        self.EndModal(ID_OK)
 
     # noinspection PyUnusedLocal
     def _onCancel(self, event: CommandEvent):
-        self.SetReturnCode(CANCEL)
-        self.EndModal(CANCEL)
+        self.SetReturnCode(ID_CANCEL)
+        self.EndModal(ID_CANCEL)
 
     def _getAssociatedUmlClass(self, modelClass: Class) -> 'UmlClass':
         """

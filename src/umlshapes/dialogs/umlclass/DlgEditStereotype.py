@@ -27,7 +27,7 @@ class DlgEditStereotype(BaseEditDialog):
     """
     Usage:
             with DlgEditStereotype(parent=parent, eventEngine=eventEngine, stereotype=model.stereotype) as dlg:
-                if dlg.ShowModal() == OK:
+                if dlg.ShowModal() == ID_OK:
                     self._model.stereotype = dlg.value
     """
 
@@ -46,6 +46,7 @@ class DlgEditStereotype(BaseEditDialog):
         self._stereoTypeSelector.SetSizerProps(proportion=1, expand=True)
 
         self.SetButtonSizer(self.CreateStdDialogButtonSizer(OK | CANCEL))
+        self.SetEscapeId(ID_CANCEL)
 
         self._setSelected(stereotype=stereotype)
         self.Fit()

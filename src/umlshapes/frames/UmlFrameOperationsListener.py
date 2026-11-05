@@ -13,6 +13,7 @@ from functools import singledispatch
 
 from wx import ID_OK
 from wx import OK
+from wx import ID_OK
 from wx import ICON_ERROR
 
 from wx import MessageDialog
@@ -263,7 +264,7 @@ class UmlFrameOperationsListener:
         umlFrame = self._umlFrame
 
         with DlgEditNote(umlFrame, note=modelNote) as dlg:
-            if dlg.ShowModal() == OK:
+            if dlg.ShowModal() == ID_OK:
                 umlFrame.refresh()
                 umlFrame.frameModified = True
 
@@ -280,7 +281,7 @@ class UmlFrameOperationsListener:
         umlFrame = self._umlFrame
 
         with DlgEditText(umlFrame, text=modelText) as dlg:
-            if dlg.ShowModal() == OK:
+            if dlg.ShowModal() == ID_OK:
                 umlFrame.refresh()
                 umlFrame.frameModified = True
 

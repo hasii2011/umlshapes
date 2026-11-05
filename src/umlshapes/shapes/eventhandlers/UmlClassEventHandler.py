@@ -4,7 +4,7 @@ from typing import cast
 from logging import Logger
 from logging import getLogger
 
-from wx import OK
+from wx import ID_OK
 
 from umlshapes.lib.ogl import ShapeEvtHandler
 
@@ -86,5 +86,5 @@ class UmlClassEventHandler(UmlBaseEventHandler):
 
         eventEngine: IUmlPubSubEngine = umlFrame.umlPubSubEngine
         with DlgEditClass(parent=umlFrame, modelClass=modelClass, umlPubSubEngine=eventEngine) as dlg:
-            if dlg.ShowModal() == OK:
+            if dlg.ShowModal() == ID_OK:
                 umlFrame.refresh()

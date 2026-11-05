@@ -3,7 +3,7 @@ from logging import Logger
 from logging import getLogger
 
 from wx import DC
-from wx import OK
+from wx import ID_OK
 
 from umlmodel.Note import Note
 
@@ -37,7 +37,7 @@ class UmlNoteEventHandler(UmlBaseEventHandler):
         umlFrame:  UmlFrame  = umlNote.GetCanvas()
 
         with DlgEditNote(parent=umlFrame, note=modelNote, ) as dlg:
-            if dlg.ShowModal() == OK:
+            if dlg.ShowModal() == ID_OK:
                 umlFrame.refresh()
                 umlFrame.frameModified = True
 

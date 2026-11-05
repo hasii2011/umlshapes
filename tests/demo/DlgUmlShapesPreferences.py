@@ -64,6 +64,7 @@ class DlgUmlShapesPreferences(SizedDialog):
         buttSizer: StdDialogButtonSizer = self.CreateStdDialogButtonSizer(OK | CANCEL)
 
         self.SetButtonSizer(buttSizer)
+        self.SetEscapeId(ID_CANCEL)
         self.Bind(EVT_BUTTON, self._onOk,    id=ID_OK)
         self.Bind(EVT_BUTTON, self._onClose, id=ID_CANCEL)
         self.Bind(EVT_CLOSE,  self._onClose)
@@ -72,13 +73,13 @@ class DlgUmlShapesPreferences(SizedDialog):
     def _onOk(self, _event: CommandEvent):
         """
         """
-        self.EndModal(OK)
+        self.EndModal(ID_OK)
 
     # noinspection PyUnusedLocal
     def _onClose(self, _event: CommandEvent):
         """
         """
         if self.IsModal():
-            self.EndModal(CANCEL)
+            self.EndModal(ID_CANCEL)
         else:
             self.Destroy()
