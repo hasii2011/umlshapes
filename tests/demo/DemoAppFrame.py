@@ -292,7 +292,6 @@ class DemoAppFrame(SizedFrame):
         self.Bind(EVT_MENU, self._onSDMessageTypeSelected, id=Identifiers.ID_SD_MSG_LOST)
         self.Bind(EVT_MENU, self._onSDMessageTypeSelected, id=Identifiers.ID_SD_MSG_FOUND)
 
-    # noinspection PyUnusedLocal
     def _onDemoShapeBoundaries(self, event: CommandEvent):
 
         from umlshapes.ShapeTypes import UmlShapes
@@ -330,8 +329,8 @@ class DemoAppFrame(SizedFrame):
     def _onDemoSDMessageCreation(self, event: CommandEvent):
 
         if event.IsChecked():
-            diagramFrame: SequenceDiagramFrame = cast(SequenceDiagramFrame, self._currentFrame)
-            if isinstance(diagramFrame, SequenceDiagramFrame):
+            currentFrame: UmlFrame = self._currentFrame
+            if isinstance(currentFrame, SequenceDiagramFrame):
                 self._sdMessageHandler.enableMessageCreation = True
             else:
                 msgDlg: MessageDialog = MessageDialog(
@@ -373,7 +372,6 @@ class DemoAppFrame(SizedFrame):
         shapeCreator:        ShapeCreator        = self._shapeCreator
         linkCreator: LinkCreator = self._linkCreator
 
-        # noinspection PyUnreachableCode
         match menuId:
             case Identifiers.ID_DISPLAY_UML_CLASS:
                 shapeCreator.displayUndoableUmlClass(diagramFrame=self._currentFrame)

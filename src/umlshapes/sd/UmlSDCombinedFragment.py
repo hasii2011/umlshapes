@@ -1,7 +1,6 @@
 
 from typing import Optional
 from typing import TYPE_CHECKING
-from typing import cast
 
 from logging import Logger
 from logging import getLogger
@@ -49,7 +48,7 @@ class UmlSDCombinedFragment(ControlPointMixin, IdentifierMixin, RectangleShape, 
 
     def __init__(
         self,
-        operator: SDFragmentOperator = SDFragmentOperator.ALT,
+        operator: SDFragmentOperator              = SDFragmentOperator.ALT,
         operands: Optional[SDInteractionOperands] = None,
         x: float = 0.0,
         y: float = 0.0,

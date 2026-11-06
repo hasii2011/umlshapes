@@ -6,10 +6,12 @@ from typing import cast
 from logging import Logger
 from logging import getLogger
 
+from wx import ID_OK
 from wx import MOD_CMD
 from wx import ClientDC
 
 from umlshapes.UmlBaseEventHandler import UmlBaseEventHandler
+from umlshapes.dialogs.DlgEditCombinedFragment import DlgEditCombinedFragment
 from umlshapes.frames.UmlFrame import UmlFrame
 
 from umlshapes.lib.ogl import ControlPoint
@@ -58,18 +60,14 @@ class UmlSDCombinedFragmentEventHandler(UmlBaseEventHandler):
             umlSDCombinedFragment: The combined fragment shape being managed.
             previousEventHandler:  The previous event handler in the chain.
         """
-
         super().__init__(previousEventHandler=previousEventHandler, shape=umlSDCombinedFragment)
-
         self.logger: Logger = getLogger(__name__)
-
         self._umlSDCombinedFragment: UmlSDCombinedFragment = umlSDCombinedFragment
         self._preferences:           UmlPreferences        = UmlPreferences()
         self._layoutEngine:          SDLayoutEngine        = SDLayoutEngine()
 
-        self._dragStartX: Optional[int] = None
-        self._dragStartY: Optional[int] = None
-
+        self._dragStartX:        Optional[int]   = None
+        self._dragStartY:        Optional[int]   = None
         self._initialFragmentX: Optional[float] = None
         self._initialFragmentY: Optional[float] = None
 
@@ -81,8 +79,7 @@ class UmlSDCombinedFragmentEventHandler(UmlBaseEventHandler):
 
     def OnLeftClick(self, x: int, y: int, keys: int = 0, attachment: int = 0):
         """
-        Overrides UmlBaseEventHandler.OnLeftClick to handle left-click on the
-        combined fragment and toggle its selection state.
+        Handle left-click on the combined fragment to toggle selection state.
 
         Args:
             x: Click X position.
@@ -99,10 +96,11 @@ class UmlSDCombinedFragmentEventHandler(UmlBaseEventHandler):
         umlFrame.PrepareDC(dc)
 
         isCurrentlySelected: bool = fragment.Selected()
+        newSelectionState: bool = not isCurrentlySelected
+
         if keys != MOD_CMD:
             self._unSelectAllShapesOnCanvas(fragment, umlFrame, dc)
 
-        newSelectionState: bool = not isCurrentlySelected
         fragment.Select(newSelectionState, dc)
 
         if newSelectionState:
@@ -113,6 +111,39 @@ class UmlSDCombinedFragmentEventHandler(UmlBaseEventHandler):
             )
 
         umlFrame.refresh()
+
+    def OnLeftDoubleClick(self, x: int, y: int, keys: int = 0, attachment: int = 0):
+        """
+        Overrides UmlBaseEventHandler.OnLeftDoubleClick to open the combined fragment edit dialog.
+
+        Args:
+            x: Click X position.
+            y: Click Y position.
+            keys: Modifier keys bitmask.
+            attachment: Attachment point identifier.
+        """
+        super().OnLeftDoubleClick(x=x, y=y, keys=keys, attachment=attachment)
+
+        fragment: UmlSDCombinedFragment = self._umlSDCombinedFragment
+        umlFrame: UmlFrame             = fragment.umlFrame
+
+        if umlFrame.HasCapture():
+            umlFrame.ReleaseMouse()
+
+        try:
+            with DlgEditCombinedFragment(
+                parent=umlFrame,
+                operator=fragment.operator,
+                operands=fragment.operands
+            ) as dlg:
+                if dlg.ShowModal() == ID_OK:
+                    fragment.operator = dlg.operator
+                    fragment.operands = dlg.operands
+                    self._indicateFrameModified()
+                    umlFrame.refresh()
+        finally:
+            if umlFrame.HasCapture():
+                umlFrame.ReleaseMouse()
 
     def OnBeginDragLeft(self, x: int, y: int, keys: int = 0, attachment: int = 0):
         """
@@ -149,16 +180,13 @@ class UmlSDCombinedFragmentEventHandler(UmlBaseEventHandler):
         self._handleTopLeftShapeDrag(
             umlShape=cast('UmlShapeGenre', fragment),
             umlFrame=umlFrame,
-            x=round(fragment.GetX()),
-            y=round(fragment.GetY())
+            x=round(self._initialFragmentX),
+            y=round(self._initialFragmentY)
         )
-
-        super().OnBeginDragLeft(x, y, keys, attachment)
 
     def OnDragLeft(self, draw: bool, x: int, y: int, keys: int = 0, attachment: int = 0):
         """
-        Overrides UmlBaseEventHandler.OnDragLeft to move the fragment during drag,
-        snapping its vertical position to discrete time steps and broadcasting
+        Handle interactive dragging with vertical time step snapping and propagate
         the snapped movement delta to other selected shapes.
 
         Args:
@@ -230,6 +258,9 @@ class UmlSDCombinedFragmentEventHandler(UmlBaseEventHandler):
         fragment.moveMaster = False
 
         umlFrame: UmlFrame = fragment.umlFrame
+        if umlFrame.HasCapture():
+            umlFrame.ReleaseMouse()
+
         shapesMovedCommand: ShapesMovedCommand = ShapesMovedCommand(
             umlFrame=umlFrame,
             movedShapes=umlFrame.movedShapes,
@@ -288,29 +319,30 @@ class UmlSDCombinedFragmentEventHandler(UmlBaseEventHandler):
         if self._initialBottom is None:
             return
 
-        handleIndex: int = self._activeHandleIndex
+        minWidth: float = float(MIN_FRAGMENT_WIDTH)
+        minHeight: float = float(MIN_FRAGMENT_HEIGHT)
+
         newLeft: float = self._initialLeft
         newRight: float = self._initialRight
         newTop: float = self._initialTop
         newBottom: float = self._initialBottom
 
-        # Handle horizontal sizing
+        handleIndex: int = self._activeHandleIndex
+        headerBottomY: int = self._getHeaderBottomY()
+
         if handleIndex == HANDLE_TOP_LEFT or handleIndex == HANDLE_MIDDLE_LEFT or handleIndex == HANDLE_BOTTOM_LEFT:
-            maxLeft: float = self._initialRight - MIN_FRAGMENT_WIDTH
-            if x > maxLeft:
+            maxLeft: float = self._initialRight - minWidth
+            if float(x) > maxLeft:
                 newLeft = maxLeft
             else:
                 newLeft = float(x)
-        elif handleIndex == HANDLE_TOP_RIGHT or handleIndex == HANDLE_MIDDLE_RIGHT or handleIndex == HANDLE_BOTTOM_RIGHT:
-            minRight: float = self._initialLeft + MIN_FRAGMENT_WIDTH
-            if x < minRight:
+
+        if handleIndex == HANDLE_TOP_RIGHT or handleIndex == HANDLE_MIDDLE_RIGHT or handleIndex == HANDLE_BOTTOM_RIGHT:
+            minRight: float = self._initialLeft + minWidth
+            if float(x) < minRight:
                 newRight = minRight
             else:
                 newRight = float(x)
-
-        # Handle vertical sizing snapped to time steps
-        headerBottomY: int = self._getHeaderBottomY()
-        minHeight: int = max(MIN_FRAGMENT_HEIGHT, self._layoutEngine.parameters.timeStepHeight)
 
         if handleIndex == HANDLE_TOP_LEFT or handleIndex == HANDLE_TOP_MIDDLE or handleIndex == HANDLE_TOP_RIGHT:
             snappedTop: int = self._layoutEngine.computeNearestTimeStepY(
@@ -364,6 +396,12 @@ class UmlSDCombinedFragmentEventHandler(UmlBaseEventHandler):
         self._initialRight = None
         self._initialTop = None
         self._initialBottom = None
+
+        fragment: UmlSDCombinedFragment = self._umlSDCombinedFragment
+        umlFrame: Optional[UmlFrame] = cast(Optional[UmlFrame], fragment.GetCanvas())
+        if umlFrame is not None:
+            if umlFrame.HasCapture():
+                umlFrame.ReleaseMouse()
 
     def _getHeaderBottomY(self) -> int:
         """

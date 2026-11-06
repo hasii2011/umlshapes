@@ -1,12 +1,16 @@
 
-from typing import cast
+from typing import List
 
 from unittest import TestSuite
 from unittest import defaultTestLoader
 from unittest import main as unitTestMain
+from unittest.mock import MagicMock
+from unittest.mock import patch
 
 from wx import Bitmap
 from wx import ClientDC
+from wx import ID_CANCEL
+from wx import ID_OK
 from wx import MemoryDC
 
 from codeallyadvanced.ui.UnitTestBaseW import UnitTestBaseW
@@ -319,15 +323,12 @@ class TestSDCombinedFragment(UnitTestBaseW):
         self._diagramFrame.umlDiagram.AddShape(fragment)
         fragment.umlFrame = self._diagramFrame
 
-        eventHandler: UmlSDCombinedFragmentEventHandler = cast(
-            UmlSDCombinedFragmentEventHandler,
-            fragment.GetEventHandler()
-        )
+        eventHandler: UmlSDCombinedFragmentEventHandler = fragment.GetEventHandler()
         self.assertIsInstance(eventHandler, UmlSDCombinedFragmentEventHandler)
 
         selectedShapes: list[object] = []
 
-        def selectionListener(umlShape: object, **kwargs):
+        def selectionListener(umlShape: object):
             selectedShapes.append(umlShape)
 
         self._umlPubSubEngine.subscribe(
@@ -363,10 +364,7 @@ class TestSDCombinedFragment(UnitTestBaseW):
         self._diagramFrame.umlDiagram.AddShape(fragment)
         fragment.umlFrame = self._diagramFrame
 
-        eventHandler: UmlSDCombinedFragmentEventHandler = cast(
-            UmlSDCombinedFragmentEventHandler,
-            fragment.GetEventHandler()
-        )
+        eventHandler: UmlSDCombinedFragmentEventHandler = fragment.GetEventHandler()
 
         eventHandler.OnBeginDragLeft(x=DRAG_START_X, y=DRAG_START_Y)
         self.assertTrue(fragment.Selected())
@@ -404,10 +402,8 @@ class TestSDCombinedFragment(UnitTestBaseW):
         controlPoints: list[ControlPoint] = fragment.getControlPoints()
         bottomHandle:  ControlPoint       = controlPoints[HANDLE_BOTTOM_MIDDLE]
 
-        eventHandler: UmlSDCombinedFragmentEventHandler = cast(
-            UmlSDCombinedFragmentEventHandler,
-            fragment.GetEventHandler()
-        )
+        eventHandler: UmlSDCombinedFragmentEventHandler = fragment.GetEventHandler()
+
 
         eventHandler.OnSizingBeginDragLeft(pt=bottomHandle, x=200, y=210)
 
@@ -448,10 +444,7 @@ class TestSDCombinedFragment(UnitTestBaseW):
         controlPoints: list[ControlPoint] = fragment.getControlPoints()
         topHandle:     ControlPoint       = controlPoints[HANDLE_TOP_MIDDLE]
 
-        eventHandler: UmlSDCombinedFragmentEventHandler = cast(
-            UmlSDCombinedFragmentEventHandler,
-            fragment.GetEventHandler()
-        )
+        eventHandler: UmlSDCombinedFragmentEventHandler = fragment.GetEventHandler()
 
         eventHandler.OnSizingBeginDragLeft(pt=topHandle, x=200, y=90)
 
@@ -488,10 +481,7 @@ class TestSDCombinedFragment(UnitTestBaseW):
         controlPoints: list[ControlPoint] = fragment.getControlPoints()
         rightHandle:   ControlPoint       = controlPoints[HANDLE_MIDDLE_RIGHT]
 
-        eventHandler: UmlSDCombinedFragmentEventHandler = cast(
-            UmlSDCombinedFragmentEventHandler,
-            fragment.GetEventHandler()
-        )
+        eventHandler: UmlSDCombinedFragmentEventHandler = fragment.GetEventHandler()
 
         # Drag right handle leftwards towards minimum width
         eventHandler.OnSizingBeginDragLeft(pt=rightHandle, x=SIZING_CLAMP_START_X, y=SIZING_CLAMP_START_Y)
@@ -499,6 +489,158 @@ class TestSDCombinedFragment(UnitTestBaseW):
         eventHandler.OnSizingEndDragLeft(pt=rightHandle, x=SIZING_CLAMP_TARGET_X, y=SIZING_CLAMP_TARGET_Y)
 
         self.assertGreaterEqual(fragment.GetWidth(), MIN_FRAGMENT_WIDTH)
+
+    def testOnLeftDoubleClickUpdatesOperatorAndOperandsOnIdOk(self):
+        """
+        Verify that UmlSDCombinedFragmentEventHandler.OnLeftDoubleClick
+        updates operator and operands and marks frame modified when dialog ends with ID_OK.
+        """
+        fragment: UmlSDCombinedFragment = UmlSDCombinedFragment(
+            operator=SDFragmentOperator.ALT,
+            operands=SDInteractionOperands([
+                SDInteractionOperand(guard='x > 0', startTimeStep=1, endTimeStep=2)
+            ])
+        )
+        self._diagramFrame.umlDiagram.AddShape(fragment)
+        fragment.umlFrame = self._diagramFrame
+
+        eventHandler: UmlSDCombinedFragmentEventHandler = fragment.GetEventHandler()
+
+        newOperands: SDInteractionOperands = SDInteractionOperands([
+            SDInteractionOperand(guard='y > 10', startTimeStep=1, endTimeStep=2),
+            SDInteractionOperand(guard='else', startTimeStep=2, endTimeStep=3)
+        ])
+
+        mockDlg: MagicMock = MagicMock()
+        mockDlg.ShowModal.return_value = ID_OK
+        mockDlg.operator = SDFragmentOperator.LOOP
+        mockDlg.operands = newOperands
+        mockDlg.__enter__.return_value = mockDlg
+        mockDlg.__exit__.return_value = None
+
+        modifiedMessages: List[str] = []
+
+        def frameModifiedListener(modifiedFrameId: str):
+            modifiedMessages.append(modifiedFrameId)
+
+        self._umlPubSubEngine.subscribe(
+            messageType=UmlMessageType.FRAME_MODIFIED,
+            frameId=self._diagramFrame.id,
+            listener=frameModifiedListener
+        )
+
+        with patch('umlshapes.sd.eventhandlers.UmlSDCombinedFragmentEventHandler.DlgEditCombinedFragment', return_value=mockDlg):
+            eventHandler.OnLeftDoubleClick(x=100, y=100)
+            self.assertEqual(fragment.operator, SDFragmentOperator.LOOP)
+            self.assertEqual(len(fragment.operands), 2)
+            self.assertEqual(fragment.operands[0].guard, 'y > 10')
+            self.assertEqual(fragment.operands[1].guard, 'else')
+            self.assertEqual(len(modifiedMessages), 1)
+
+    def testOnLeftDoubleClickDoesNotUpdateOnCancel(self):
+        """
+        Verify that UmlSDCombinedFragmentEventHandler.OnLeftDoubleClick
+        does not modify fragment operator or operands when dialog ends with ID_CANCEL.
+        """
+        initialOperands: SDInteractionOperands = SDInteractionOperands([
+            SDInteractionOperand(guard='x > 0', startTimeStep=1, endTimeStep=2)
+        ])
+        fragment: UmlSDCombinedFragment = UmlSDCombinedFragment(
+            operator=SDFragmentOperator.ALT,
+            operands=initialOperands
+        )
+        self._diagramFrame.umlDiagram.AddShape(fragment)
+        fragment.umlFrame = self._diagramFrame
+
+        eventHandler: UmlSDCombinedFragmentEventHandler = fragment.GetEventHandler()
+
+        mockDlg: MagicMock = MagicMock()
+        mockDlg.ShowModal.return_value = ID_CANCEL
+        mockDlg.__enter__.return_value = mockDlg
+        mockDlg.__exit__.return_value = None
+
+        modifiedMessages: List[str] = []
+
+        def frameModifiedListener(modifiedFrameId: str):
+            modifiedMessages.append(modifiedFrameId)
+
+        self._umlPubSubEngine.subscribe(
+            messageType=UmlMessageType.FRAME_MODIFIED,
+            frameId=self._diagramFrame.id,
+            listener=frameModifiedListener
+        )
+
+        with patch('umlshapes.sd.eventhandlers.UmlSDCombinedFragmentEventHandler.DlgEditCombinedFragment', return_value=mockDlg):
+            eventHandler.OnLeftDoubleClick(x=100, y=100)
+            self.assertEqual(fragment.operator, SDFragmentOperator.ALT)
+            self.assertEqual(len(fragment.operands), 1)
+            self.assertEqual(fragment.operands[0].guard, 'x > 0')
+            self.assertEqual(len(modifiedMessages), 0)
+
+    def testMouseCaptureReleasedOnDoubleClick(self):
+        """
+        Verify that UmlSDCombinedFragmentEventHandler.OnLeftDoubleClick releases
+        any active mouse capture on the frame both before and after the modal dialog.
+        """
+        fragment: UmlSDCombinedFragment = UmlSDCombinedFragment(
+            operator=SDFragmentOperator.ALT,
+            operands=SDInteractionOperands([])
+        )
+        self._diagramFrame.umlDiagram.AddShape(fragment)
+        fragment.umlFrame = self._diagramFrame
+
+        eventHandler: UmlSDCombinedFragmentEventHandler = fragment.GetEventHandler()
+
+        mockDlg: MagicMock = MagicMock()
+        mockDlg.ShowModal.return_value = ID_CANCEL
+        mockDlg.__enter__.return_value = mockDlg
+        mockDlg.__exit__.return_value = None
+
+        with patch.object(self._diagramFrame, 'HasCapture', side_effect=[True, False, True, False]):
+            with patch.object(self._diagramFrame, 'ReleaseMouse') as mockReleaseMouse:
+                with patch('umlshapes.sd.eventhandlers.UmlSDCombinedFragmentEventHandler.DlgEditCombinedFragment', return_value=mockDlg):
+                    eventHandler.OnLeftDoubleClick(x=100, y=100)
+                    self.assertEqual(mockReleaseMouse.call_count, 2)
+
+    def testMouseCaptureReleasedOnEndDragLeft(self):
+        """
+        Verify that UmlSDCombinedFragmentEventHandler.OnEndDragLeft releases
+        mouse capture if active on the frame.
+        """
+        fragment: UmlSDCombinedFragment = UmlSDCombinedFragment()
+        self._diagramFrame.umlDiagram.AddShape(fragment)
+        fragment.umlFrame = self._diagramFrame
+
+        eventHandler: UmlSDCombinedFragmentEventHandler = fragment.GetEventHandler()
+        eventHandler._dragStartX = 100
+        eventHandler._dragStartY = 100
+        eventHandler._initialFragmentX = 100.0
+        eventHandler._initialFragmentY = 100.0
+
+        with patch.object(self._diagramFrame, 'HasCapture', return_value=True):
+            with patch.object(self._diagramFrame, 'ReleaseMouse') as mockReleaseMouse:
+                eventHandler.OnEndDragLeft(x=120, y=120)
+                mockReleaseMouse.assert_called_once()
+
+    def testMouseCaptureReleasedOnSizingEndDragLeft(self):
+        """
+        Verify that UmlSDCombinedFragmentEventHandler.OnSizingEndDragLeft releases
+        mouse capture if active on the frame.
+        """
+        fragment: UmlSDCombinedFragment = UmlSDCombinedFragment()
+        self._diagramFrame.umlDiagram.AddShape(fragment)
+        fragment.umlFrame = self._diagramFrame
+
+        fragment.MakeControlPoints()
+        eventHandler: UmlSDCombinedFragmentEventHandler = fragment.GetEventHandler()
+        controlPoints: list[ControlPoint] = fragment.getControlPoints()
+        self.assertGreater(len(controlPoints), 0)
+        targetHandle: ControlPoint = controlPoints[0]
+
+        with patch.object(self._diagramFrame, 'HasCapture', return_value=True):
+            with patch.object(self._diagramFrame, 'ReleaseMouse') as mockReleaseMouse:
+                eventHandler.OnSizingEndDragLeft(pt=targetHandle, x=150, y=150)
+                mockReleaseMouse.assert_called_once()
 
     def _createSDInstance(self, name: str, x: int, y: int = INSTANCE_DEFAULT_Y) -> UmlSDInstance:
         sdInstanceModel: SDInstance = SDInstance()
