@@ -8,7 +8,7 @@ from wx import CURSOR_DEFAULT
 
 from wx import Cursor
 
-from umlshapes.lib.ogl import ShapeEvtHandler
+from wx.lib.ogl import ShapeEvtHandler
 
 from umlshapes.utils.ProximityUtils import ProximityUtils
 

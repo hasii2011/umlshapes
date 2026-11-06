@@ -14,9 +14,9 @@ from umlshapes.pubsubengine.UmlMessageType import UmlMessageType
 
 from umlshapes.frames.SequenceDiagramFrame import SequenceDiagramFrame
 
-from umlshapes.lib.ogl import OGLInitialize
-from umlshapes.lib.ogl import Shape
-from umlshapes.lib.ogl import ShapeEvtHandler
+from wx.lib.ogl import OGLInitialize
+from wx.lib.ogl import Shape
+from wx.lib.ogl import ShapeEvtHandler
 
 from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 from umlshapes.pubsubengine.UmlPubSubEngine import UmlPubSubEngine

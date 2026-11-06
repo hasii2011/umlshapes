@@ -13,8 +13,8 @@ from umlmodel.Note import Note
 from umlmodel.SDInstance import SDInstance
 from umlmodel.SDMessage import SDMessage
 
-from umlshapes.lib.ogl import ControlPoint
-from umlshapes.lib.ogl import OGLInitialize
+from wx.lib.ogl import ControlPoint
+from wx.lib.ogl import OGLInitialize
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine

@@ -3,10 +3,10 @@ from typing import List
 
 from enum import Enum
 
-from umlshapes.lib.ogl import FORMAT_CENTRE_HORIZ
-from umlshapes.lib.ogl import FORMAT_CENTRE_VERT
-from umlshapes.lib.ogl import FORMAT_NONE
-from umlshapes.lib.ogl import FORMAT_SIZE_TO_CONTENTS
+from wx.lib.ogl import FORMAT_CENTRE_HORIZ
+from wx.lib.ogl import FORMAT_CENTRE_VERT
+from wx.lib.ogl import FORMAT_NONE
+from wx.lib.ogl import FORMAT_SIZE_TO_CONTENTS
 
 
 class UmlAssociationLabelFormat(Enum):

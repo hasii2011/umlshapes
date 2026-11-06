@@ -4,9 +4,9 @@ from unittest import main as unitTestMain
 
 from codeallyadvanced.ui.UnitTestBaseW import UnitTestBaseW
 
-from umlshapes.lib.ogl import OGLInitialize
+from wx.lib.ogl import OGLInitialize
 
-from umlshapes.lib.ogl import Shape
+from wx.lib.ogl import Shape
 
 from umlshapes.mixins.TopLeftMixin import Rectangle
 from umlshapes.mixins.TopLeftMixin import TopLeftMixin

@@ -12,8 +12,8 @@ from wx import Point
 from wx import Size
 from wx import TRANSPARENT_BRUSH
 
-from umlshapes.lib.ogl import ControlPoint
-from umlshapes.lib.ogl import RectangleShape
+from wx.lib.ogl import ControlPoint
+from wx.lib.ogl import RectangleShape
 
 from umlshapes.mixins.ControlPointMixin import ControlPointMixin
 from umlshapes.mixins.IdentifierMixin import IdentifierMixin
@@ -132,7 +132,7 @@ class UmlSDCombinedFragment(ControlPointMixin, IdentifierMixin, RectangleShape, 
     def umlFrame(self, frame: 'SequenceDiagramFrame'):
         self.SetCanvas(frame)
         if frame is not None:
-            from umlshapes.lib.ogl import ShapeEvtHandler
+            from wx.lib.ogl import ShapeEvtHandler
             from umlshapes.sd.eventhandlers.UmlSDCombinedFragmentEventHandler import UmlSDCombinedFragmentEventHandler
 
             currentHandler: ShapeEvtHandler = self.GetEventHandler()

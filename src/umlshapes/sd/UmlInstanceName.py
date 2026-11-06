@@ -13,7 +13,7 @@ from umlshapes.preferences.UmlPreferences import UmlPreferences
 
 from umlshapes.utils.ResourceUtils import ResourceUtils
 
-from umlshapes.lib.ogl import RectangleShape
+from wx.lib.ogl import RectangleShape
 from umlshapes.mixins.TopLeftMixin import TopLeftMixin
 
 from umlshapes.types.UmlDimensions import UmlDimensions

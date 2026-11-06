@@ -4,7 +4,7 @@ from typing import cast
 from logging import Logger
 from logging import getLogger
 
-from umlshapes.lib.ogl import ShapeEvtHandler
+from wx.lib.ogl import ShapeEvtHandler
 
 from umlshapes.types.DeltaXY import DeltaXY
 

@@ -14,8 +14,8 @@ from umlshapes.UmlBaseEventHandler import UmlBaseEventHandler
 from umlshapes.dialogs.DlgEditCombinedFragment import DlgEditCombinedFragment
 from umlshapes.frames.UmlFrame import UmlFrame
 
-from umlshapes.lib.ogl import ControlPoint
-from umlshapes.lib.ogl import ShapeEvtHandler
+from wx.lib.ogl import ControlPoint
+from wx.lib.ogl import ShapeEvtHandler
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 from umlshapes.pubsubengine.UmlMessageType import UmlMessageType

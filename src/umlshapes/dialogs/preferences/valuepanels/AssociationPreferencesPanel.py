@@ -24,9 +24,9 @@ from codeallyadvanced.ui.widgets.DimensionsControl import DimensionsParameters
 
 from umlshapes.dialogs.preferences.BasePreferencesPanel import BasePreferencesPanel
 
-from umlshapes.lib.ogl import FORMAT_CENTRE_HORIZ
-from umlshapes.lib.ogl import FORMAT_CENTRE_VERT
-from umlshapes.lib.ogl import FORMAT_SIZE_TO_CONTENTS
+from wx.lib.ogl import FORMAT_CENTRE_HORIZ
+from wx.lib.ogl import FORMAT_CENTRE_VERT
+from wx.lib.ogl import FORMAT_SIZE_TO_CONTENTS
 from umlshapes.links.UmlAssociationLabelFormat import UmlAssociationLabelFormat
 
 from umlshapes.types.UmlDimensions import UmlDimensions

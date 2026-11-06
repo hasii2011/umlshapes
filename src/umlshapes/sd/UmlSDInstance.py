@@ -5,18 +5,23 @@ from typing import TYPE_CHECKING
 from logging import Logger
 from logging import getLogger
 
+from wx import BLACK
 from wx import ClientDC
+from wx import PENSTYLE_DOT
+from wx import Pen
+from wx import TRANSPARENT_BRUSH
 
 from umlmodel.SDInstance import SDInstance
 
-from umlshapes.lib.ogl import CompositeShape
-from umlshapes.lib.ogl import Constraint
-from umlshapes.lib.ogl import ControlPoint
-from umlshapes.lib.ogl import CONSTRAINT_ALIGNED_TOP
-from umlshapes.lib.ogl import CONSTRAINT_BELOW
-from umlshapes.lib.ogl import CONSTRAINT_CENTRED_HORIZONTALLY
-from umlshapes.lib.ogl import CONTROL_POINT_HORIZONTAL
-from umlshapes.lib.ogl import CONTROL_POINT_VERTICAL
+from wx.lib.ogl import CompositeShape
+from wx.lib.ogl import Constraint
+from wx.lib.ogl import ControlPoint
+from wx.lib.ogl import CONSTRAINT_ALIGNED_TOP
+from wx.lib.ogl import CONSTRAINT_BELOW
+from wx.lib.ogl import CONSTRAINT_CENTRED_HORIZONTALLY
+from wx.lib.ogl import CONTROL_POINT_HORIZONTAL
+from wx.lib.ogl import CONTROL_POINT_VERTICAL
+from wx.lib.ogl import OGLRBLF
 
 from umlshapes.utils.ResourceUtils import ResourceUtils
 
@@ -106,6 +111,11 @@ class UmlSDInstance(ControlPointMixin, IdentifierMixin, CompositeShape, TopLeftM
         self._constrainingShape: SDInstanceConstrainer = constrainingShape
         self._instanceName:      UmlInstanceName       = instanceName
         self._umlSDLifeLine:     UmlSDLifeLine         = sdLifeLine
+
+        self._objectStartX: float = 0.0
+        self._objectStartY: float = 0.0
+        self._shapeStartX:  float = 0.0
+        self._shapeStartY:  float = 0.0
 
         sdLifeLine.umlSDInstance = self
 
@@ -400,6 +410,63 @@ class UmlSDInstance(ControlPointMixin, IdentifierMixin, CompositeShape, TopLeftM
 
     def DeleteControlPoints(self, dc = None):
         super().DeleteControlPoints(dc)
+
+    def OnBeginDragLeft(self, x: int, y: int, keys: int = 0, attachment: int = 0):
+        """
+        Overrides CompositeShape.OnBeginDragLeft to record the initial cursor and
+        shape center positions when live composite dragging is enabled.
+
+        Args:
+            x:          Cursor X coordinate
+            y:          Cursor Y coordinate
+            keys:       Modifier keys mask
+            attachment: Attachment point index
+        """
+        self._objectStartX = float(x)
+        self._objectStartY = float(y)
+
+        if self._preferences.enableCompositeShapeLiveDragging is True:
+            self._shapeStartX = self.GetX()
+            self._shapeStartY = self.GetY()
+
+        super().OnBeginDragLeft(x, y, keys, attachment)
+
+    def OnDragLeft(self, draw: bool, x: int, y: int, keys: int = 0, attachment: int = 0):
+        """
+        Overrides CompositeShape.OnDragLeft to compute the outline position relative
+        to the initial shape center when live composite dragging is enabled.
+
+        Args:
+            draw:       Whether to draw the outline
+            x:          Cursor X coordinate
+            y:          Cursor Y coordinate
+            keys:       Modifier keys mask
+            attachment: Attachment point index
+        """
+        if self._preferences.enableCompositeShapeLiveDragging is True:
+            snappedX: float
+            snappedY: float
+            snappedX, snappedY = self._canvas.Snap(x, y)
+            offsetX: float = snappedX - self._objectStartX
+            offsetY: float = snappedY - self._objectStartY
+
+            dc: ClientDC = ClientDC(self.GetCanvas())
+            self.GetCanvas().PrepareDC(dc)
+            dc.SetLogicalFunction(OGLRBLF)
+
+            dottedPen: Pen = Pen(BLACK, 1, PENSTYLE_DOT)
+            dc.SetPen(dottedPen)
+            dc.SetBrush(TRANSPARENT_BRUSH)
+
+            self.GetEventHandler().OnDrawOutline(
+                dc,
+                round(self._shapeStartX + offsetX),
+                round(self._shapeStartY + offsetY),
+                round(self.GetWidth()),
+                round(self.GetHeight())
+            )
+        else:
+            super().OnDragLeft(draw, x, y, keys, attachment)
 
     def _setEventHandlers(self, instanceName: UmlInstanceName, umlSDLifeLine: UmlSDLifeLine):
         """

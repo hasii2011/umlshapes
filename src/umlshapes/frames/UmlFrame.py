@@ -28,8 +28,8 @@ from wx import KeyEvent
 from wx import Window
 from wx import CommandProcessor
 
-from umlshapes.lib.ogl import Shape
-from umlshapes.lib.ogl import ShapeCanvas
+from wx.lib.ogl import Shape
+from wx.lib.ogl import ShapeCanvas
 
 from umlshapes.frames.ShapeSelector import ShapeSelector
 from umlshapes.frames.DiagramFrame import DiagramFrame

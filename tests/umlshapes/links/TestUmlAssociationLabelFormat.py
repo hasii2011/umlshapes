@@ -4,10 +4,10 @@ from unittest import main as unitTestMain
 
 from codeallybasic.UnitTestBase import UnitTestBase
 
-from umlshapes.lib.ogl import FORMAT_CENTRE_HORIZ
-from umlshapes.lib.ogl import FORMAT_CENTRE_VERT
-from umlshapes.lib.ogl import FORMAT_NONE
-from umlshapes.lib.ogl import FORMAT_SIZE_TO_CONTENTS
+from wx.lib.ogl import FORMAT_CENTRE_HORIZ
+from wx.lib.ogl import FORMAT_CENTRE_VERT
+from wx.lib.ogl import FORMAT_NONE
+from wx.lib.ogl import FORMAT_SIZE_TO_CONTENTS
 
 from umlshapes.links.UmlAssociationLabelFormat import UmlAssociationLabelFormat
 

@@ -13,9 +13,9 @@ from wx import MOD_CMD
 from wx import ClientDC
 from wx import Window
 
-from umlshapes.lib.ogl import Shape
-from umlshapes.lib.ogl import ShapeCanvas
-from umlshapes.lib.ogl import ShapeEvtHandler
+from wx.lib.ogl import Shape
+from wx.lib.ogl import ShapeCanvas
+from wx.lib.ogl import ShapeEvtHandler
 
 from umlshapes.pubsubengine.UmlMessageType import UmlMessageType
 from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
@@ -230,12 +230,36 @@ class UmlBaseEventHandler(ShapeEvtHandler):
         """
         from umlshapes.ShapeTypes import UmlShapeGenre
 
-        shape: Shape  = self.GetShape()
-        shape.Move(dc=dc, x=x, y=y, display=True)
+        shape: Shape = self.GetShape()
+        shape.Move(dc=dc, x=round(x), y=round(y), display=True)
 
         umlShape: UmlShapeGenre = cast(UmlShapeGenre, shape)
-        umlShape.size = UmlDimensions(width=w, height=h)
+        umlShape.size = UmlDimensions(width=round(w), height=round(h))
         umlShape.umlFrame.refresh()
+
+    def OnEndSize(self, w: int, h: int):
+        """
+        Overrides ShapeEvtHandler.OnEndSize to ensure shape coordinates and
+        dimensions remain integer values after interactive OGL resizing.
+
+        Args:
+            w: New width
+            h: New height
+        """
+        from umlshapes.mixins.TopLeftMixin import TopLeftMixin
+        from umlshapes.ShapeTypes import UmlShapeGenre
+
+        roundedWidth:  int = round(w)
+        roundedHeight: int = round(h)
+        super().OnEndSize(roundedWidth, roundedHeight)
+
+        shape: Optional[Shape] = self.GetShape()
+        if shape is not None:
+            shape.SetX(round(shape.GetX()))
+            shape.SetY(round(shape.GetY()))
+            umlShape: UmlShapeGenre = cast(UmlShapeGenre, shape)
+            if isinstance(umlShape, TopLeftMixin):
+                umlShape.size = UmlDimensions(width=roundedWidth, height=roundedHeight)
 
     def _handleTopLeftShapeDrag(self, umlShape: 'UmlShapeGenre', umlFrame: 'UmlFrame', x: int, y: int):
         """

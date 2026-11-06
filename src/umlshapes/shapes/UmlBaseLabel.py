@@ -10,8 +10,8 @@ from wx import MemoryDC
 from wx import ScreenDC
 from wx import TRANSPARENT_BRUSH
 
-from umlshapes.lib.ogl import Shape
-from umlshapes.lib.ogl import TextShape
+from wx.lib.ogl import Shape
+from wx.lib.ogl import TextShape
 
 from umlshapes.mixins.ControlPointMixin import ControlPointMixin
 from umlshapes.mixins.IdentifierMixin import IdentifierMixin

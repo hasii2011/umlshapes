@@ -1,7 +1,7 @@
 
 from umlshapes.utils.IDUtil import IDUtil
 
-from umlshapes.lib.ogl import Shape
+from wx.lib.ogl import Shape
 
 class InvalidOperationError(Exception):
     pass

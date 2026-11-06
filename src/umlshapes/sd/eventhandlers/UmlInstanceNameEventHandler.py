@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 from logging import Logger
 from logging import getLogger
 
-from umlshapes.lib.ogl import ShapeEvtHandler
+from wx.lib.ogl import ShapeEvtHandler
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
 if TYPE_CHECKING:

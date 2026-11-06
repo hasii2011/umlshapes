@@ -31,7 +31,7 @@ from wx import SystemSettings
 
 from wx import Window
 
-from umlshapes.lib.ogl import ShapeCanvas
+from wx.lib.ogl import ShapeCanvas
 
 from umlshapes.utils.IDUtil import IDUtil
 

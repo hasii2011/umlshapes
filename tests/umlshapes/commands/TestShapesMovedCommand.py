@@ -13,7 +13,7 @@ from umlshapes.frames.ShapeMoveInfo import InitialPositions
 from umlshapes.frames.ShapeMoveInfo import MovedShapes
 from umlshapes.frames.ShapeMoveInfo import ShapeId
 from umlshapes.frames.ShapeMoveInfo import ShapeMoveInfo
-from umlshapes.lib.ogl import OGLInitialize
+from wx.lib.ogl import OGLInitialize
 from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 from umlshapes.pubsubengine.UmlPubSubEngine import UmlPubSubEngine
 from umlshapes.shapes.UmlClass import UmlClass

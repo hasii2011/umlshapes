@@ -8,7 +8,7 @@ from logging import getLogger
 from wx import DC
 from wx import TRANSPARENT_BRUSH
 
-from umlshapes.lib.ogl import RectangleShape
+from wx.lib.ogl import RectangleShape
 
 from umlshapes.mixins.TopLeftMixin import TopLeftMixin
 from umlshapes.types.UmlPosition import UmlPosition

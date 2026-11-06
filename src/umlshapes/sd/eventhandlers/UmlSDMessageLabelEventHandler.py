@@ -8,8 +8,8 @@ from logging import getLogger
 
 from wx import ClientDC
 
-from umlshapes.lib.ogl import ControlPoint
-from umlshapes.lib.ogl import ShapeEvtHandler
+from wx.lib.ogl import ControlPoint
+from wx.lib.ogl import ShapeEvtHandler
 
 from umlshapes.UmlBaseEventHandler import UmlBaseEventHandler
 from umlshapes.frames.UmlFrame import UmlFrame

@@ -5,7 +5,7 @@ from logging import getLogger
 from wx import ClientDC
 from wx import PlatformInfo
 
-from umlshapes.lib.ogl import ShapeEvtHandler
+from wx.lib.ogl import ShapeEvtHandler
 
 
 class MyEvtHandler(ShapeEvtHandler):

@@ -14,7 +14,7 @@ from umlshapes.commands.CreateLinkCommand import CreateLinkCommand
 from umlshapes.commands.CreateUmlClassCommand import CreateUmlClassCommand
 from umlshapes.commands.CreateUmlNoteCommand import CreateUmlNoteCommand
 from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
-from umlshapes.lib.ogl import OGLInitialize
+from wx.lib.ogl import OGLInitialize
 from umlshapes.links.UmlNoteLink import UmlNoteLink
 
 from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine

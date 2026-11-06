@@ -6,8 +6,8 @@ from logging import getLogger
 
 from wx import WHITE_BRUSH
 
-from umlshapes.lib.ogl import ControlPoint
-from umlshapes.lib.ogl import Shape
+from wx.lib.ogl import ControlPoint
+from wx.lib.ogl import Shape
 
 from umlshapes.utils.ResourceUtils import ResourceUtils
 

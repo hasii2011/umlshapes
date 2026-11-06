@@ -7,7 +7,7 @@ from wx import ID_OK
 
 from umlmodel.Note import Note
 
-from umlshapes.lib.ogl import ShapeEvtHandler
+from wx.lib.ogl import ShapeEvtHandler
 
 from umlshapes.shapes.UmlNote import UmlNote
 

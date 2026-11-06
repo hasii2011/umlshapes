@@ -9,7 +9,7 @@ import platform
 from wx import App
 
 from tests.demo.Versions import Versions
-from umlshapes.lib.ogl import OGLInitialize
+from wx.lib.ogl import OGLInitialize
 
 from codeallybasic.UnitTestBase import UnitTestBase
 

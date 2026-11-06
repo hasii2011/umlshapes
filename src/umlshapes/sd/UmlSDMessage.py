@@ -19,16 +19,16 @@ from wx import BLACK_BRUSH
 from wx import RED_BRUSH
 from wx import BRUSHSTYLE_TRANSPARENT
 
-from umlshapes.lib.ogl import OP_ALL
-from umlshapes.lib.ogl import ArrowHead
-from umlshapes.lib.ogl import ARROW_ARROW
-from umlshapes.lib.ogl import ARROW_POSITION_END
-from umlshapes.lib.ogl import ARROW_POSITION_START
+from wx.lib.ogl import OP_ALL
+from wx.lib.ogl import ArrowHead
+from wx.lib.ogl import ARROW_ARROW
+from wx.lib.ogl import ARROW_POSITION_END
+from wx.lib.ogl import ARROW_POSITION_START
 
-from umlshapes.lib.ogl import LineShape
-from umlshapes.lib.ogl import ControlPoint
-from umlshapes.lib.ogl import GetArrowPoints
-from umlshapes.lib.ogl import GetPointOnLine
+from wx.lib.ogl import LineShape
+from wx.lib.ogl import ControlPoint
+from wx.lib.ogl import GetArrowPoints
+from wx.lib.ogl import GetPointOnLine
 
 from umlmodel.SDMessage import SDMessage
 
@@ -36,9 +36,11 @@ from umlshapes.utils.ResourceUtils import ResourceUtils
 
 from umlshapes.UmlDiagram import UmlDiagram
 
-from umlshapes.mixins.PubSubMixin import PubSubMixin
-from umlshapes.mixins.IdentifierMixin import IdentifierMixin
 from umlshapes.mixins.ControlPointMixin import ControlPointMixin
+from umlshapes.mixins.IdentifierMixin import IdentifierMixin
+from umlshapes.mixins.LinePointMixin import LineControlPoints
+from umlshapes.mixins.LinePointMixin import LinePointMixin
+from umlshapes.mixins.PubSubMixin import PubSubMixin
 
 from umlshapes.preferences.Defaults import DEFAULT_LOST_FOUND_CIRCLE_RADIUS
 from umlshapes.preferences.Defaults import DEFAULT_LOST_FOUND_MESSAGE_LENGTH
@@ -62,10 +64,7 @@ if TYPE_CHECKING:
     from umlshapes.sd.UmlSDLifeLine import UmlSDLifeLine
 
 
-LineControlPoints = NewType('LineControlPoints', List[Point])
-
-
-class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
+class UmlSDMessage(ControlPointMixin, LinePointMixin, LineShape, IdentifierMixin, PubSubMixin):
 
     def __init__(self, sdMessage: SDMessage, messageType: SDMessageType = SDMessageType.SYNCHRONOUS):
 
@@ -76,6 +75,7 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
 
         IdentifierMixin.__init__(self)
         LineShape.__init__(self)
+        LinePointMixin.__init__(self, lineShape=self)
         PubSubMixin.__init__(self)
 
         self._sdMessage:   SDMessage     = sdMessage
@@ -109,7 +109,7 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
 
         self._initialised: bool = False
 
-        self._lineControlPoints: LineControlPoints = LineControlPoints(cast(List[Point], self._lineControlPoints))
+        self._lineControlPoints: LineControlPoints = LineControlPoints(self._lineControlPoints)
         self._execution:         UmlSDExecution    = cast(UmlSDExecution, None)     # noqa
         self._loopWidth:         int               = self._preferences.reflexiveMessageWidth
         self._messageLabel:      UmlSDMessageLabel = self._initMessageLabel()
@@ -192,10 +192,11 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
         Args:
             pos: Target position with the new y coordinate.
         """
-        span: int = self._toY - self._fromY
+        span:     int = self._toY - self._fromY
         newFromY: int = pos.y
-        newToY: int = newFromY + span
+        newToY:   int = newFromY + span
         umlFrame: 'SequenceDiagramFrame' = self.umlFrame
+
         if umlFrame is not None:
             dc: ClientDC = ClientDC(umlFrame)
             umlFrame.PrepareDC(dc)
@@ -312,8 +313,8 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
         """
         from umlshapes.sd.UmlSDLifeLine import UmlSDLifeLine
 
-        destLifeLine:  Optional[UmlSDLifeLine] = cast(Optional[UmlSDLifeLine], self.GetTo())
-        startLifeLine: Optional[UmlSDLifeLine] = cast(Optional[UmlSDLifeLine], self.GetFrom())
+        destLifeLine:  Optional[UmlSDLifeLine] = self.GetTo()
+        startLifeLine: Optional[UmlSDLifeLine] = self.GetFrom()
 
         shouldGrow: bool = False
         if startLifeLine is not None and neededHeight > startLifeLine.size.height:
@@ -584,8 +585,8 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
 
         from umlshapes.sd.UmlSDLifeLine import UmlSDLifeLine
 
-        fromLifeLine: UmlSDLifeLine = cast(UmlSDLifeLine, self.GetFrom())
-        toLifeLine:   UmlSDLifeLine = cast(UmlSDLifeLine, self.GetTo())
+        fromLifeLine: UmlSDLifeLine = self.GetFrom()
+        toLifeLine:   UmlSDLifeLine = self.GetTo()
 
         fromExecution: Optional['UmlSDExecution'] = fromLifeLine.getExecutionAtY(fromY)
 
@@ -641,8 +642,8 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
         self._ensureLineControlPoints()
         from umlshapes.sd.UmlSDLifeLine import UmlSDLifeLine
 
-        fromLifeLine: UmlSDLifeLine = cast(UmlSDLifeLine, self.GetFrom())
-        fromY: int = self._computeAbsoluteY(umlSDLifeLine=fromLifeLine, relativeY=self._relativeFromY)
+        fromLifeLine: UmlSDLifeLine = self.GetFrom()
+        fromY:        int           = self._computeAbsoluteY(umlSDLifeLine=fromLifeLine, relativeY=self._relativeFromY)
 
         currentStartX: int = self.lineControlPoints[0].x
         currentEndX:   int = self.lineControlPoints[-1].x
@@ -676,8 +677,8 @@ class UmlSDMessage(ControlPointMixin, LineShape, IdentifierMixin, PubSubMixin):
         self._ensureLineControlPoints()
         from umlshapes.sd.UmlSDLifeLine import UmlSDLifeLine
 
-        toLifeLine: UmlSDLifeLine = cast(UmlSDLifeLine, self.GetTo())
-        toY: int = self._computeAbsoluteY(umlSDLifeLine=toLifeLine, relativeY=self._relativeToY)
+        toLifeLine: UmlSDLifeLine = self.GetTo()
+        toY:        int           = self._computeAbsoluteY(umlSDLifeLine=toLifeLine, relativeY=self._relativeToY)
 
         currentStartX: int = self.lineControlPoints[0].x
         currentEndX:   int = self.lineControlPoints[-1].x

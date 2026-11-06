@@ -7,7 +7,7 @@ from umlmodel.Class import Class
 from umlmodel.Link import Link
 from umlmodel.Note import Note
 
-from umlshapes.lib.ogl import OGLInitialize
+from wx.lib.ogl import OGLInitialize
 from umlshapes.links.UmlLink import UmlLink
 from umlshapes.mixins.IdentifierMixin import InvalidOperationError
 

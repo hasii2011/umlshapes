@@ -11,8 +11,8 @@ from wx import MemoryDC
 from umlmodel.SDExecution import SDExecution
 from umlmodel.SDMessage import SDMessage
 
-from umlshapes.lib.ogl import CONTROL_POINT_VERTICAL
-from umlshapes.lib.ogl import RectangleShape
+from wx.lib.ogl import CONTROL_POINT_VERTICAL
+from wx.lib.ogl import RectangleShape
 
 from umlshapes.utils.ResourceUtils import ResourceUtils
 
@@ -26,7 +26,7 @@ from umlshapes.sd.SDLayoutEngine import SDLayoutEngine
 from umlshapes.shapes.UmlControlPoint import UmlControlPoint
 
 if TYPE_CHECKING:
-    from umlshapes.lib.ogl import ControlPoint
+    from wx.lib.ogl import ControlPoint
     from umlshapes.frames.UmlFrame import UmlFrame
     from umlshapes.sd.UmlSDLifeLine import UmlSDLifeLine
 

@@ -25,8 +25,8 @@ from wx import NewIdRef as wxNewIdRef
 
 from umlmodel.Text import Text
 
-from umlshapes.lib.ogl import ShapeCanvas
-from umlshapes.lib.ogl import ShapeEvtHandler
+from wx.lib.ogl import ShapeCanvas
+from wx.lib.ogl import ShapeEvtHandler
 
 from umlshapes.dialogs.DlgEditText import DlgEditText
 

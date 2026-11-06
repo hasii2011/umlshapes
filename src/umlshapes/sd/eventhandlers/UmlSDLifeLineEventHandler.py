@@ -6,7 +6,7 @@ from logging import getLogger
 
 from dataclasses import dataclass
 
-from umlshapes.lib.ogl import ShapeEvtHandler
+from wx.lib.ogl import ShapeEvtHandler
 
 from umlshapes.frames.UmlFrame import UmlFrame
 

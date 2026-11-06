@@ -10,7 +10,7 @@ from wx import ClientDC
 
 from umlmodel.SDInstance import SDInstance
 
-from umlshapes.lib.ogl import RectangleShape
+from wx.lib.ogl import RectangleShape
 
 from umlshapes.utils.ResourceUtils import ResourceUtils
 

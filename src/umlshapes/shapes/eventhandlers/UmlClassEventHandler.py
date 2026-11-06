@@ -6,7 +6,7 @@ from logging import getLogger
 
 from wx import ID_OK
 
-from umlshapes.lib.ogl import ShapeEvtHandler
+from wx.lib.ogl import ShapeEvtHandler
 
 from umlmodel.Class import Class
 

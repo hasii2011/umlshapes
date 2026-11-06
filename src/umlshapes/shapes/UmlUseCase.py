@@ -5,7 +5,7 @@ from logging import getLogger
 from umlmodel.UseCase import UseCase
 from wx import MemoryDC
 
-from umlshapes.lib.ogl import EllipseShape
+from wx.lib.ogl import EllipseShape
 
 from umlshapes.utils.ResourceUtils import ResourceUtils
 

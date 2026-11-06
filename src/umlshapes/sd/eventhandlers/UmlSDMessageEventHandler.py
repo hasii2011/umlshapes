@@ -16,8 +16,8 @@ from wx import ID_OK
 from wx import CURSOR_DEFAULT
 from wx import Cursor
 
-from umlshapes.lib.ogl import ControlPoint
-from umlshapes.lib.ogl import ShapeEvtHandler
+from wx.lib.ogl import ControlPoint
+from wx.lib.ogl import ShapeEvtHandler
 
 from umlmodel.SDMessage import SDMessage
 

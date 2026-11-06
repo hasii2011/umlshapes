@@ -54,7 +54,7 @@ def testNote():
     # Show Note
     click(250, 250, button=LEFT)
     # Click Ok
-    click(660, 500, button=LEFT)
+    click(815, 655, button=LEFT)
     # Select Note
     click(200, 220, button=LEFT)
     dragTo(935, 180, duration=DRAG_DURATION, button=LEFT)
@@ -64,7 +64,7 @@ def testText():
     # Show Text
     click(220, 220, button=LEFT)
     # Click Ok
-    click(666, 500, button=LEFT)
+    click(820, 655, button=LEFT)
     # Select Text
     click(185, 220, button=LEFT)
     dragTo(940, 280, duration=DRAG_DURATION, button=LEFT)
@@ -74,7 +74,7 @@ def testClass():
     # Show Class
     click(235, 200, button=LEFT)
     # Click Ok
-    click(984, 681, button=LEFT)
+    click(750, 625, button=LEFT)
     click(200, 230, button=LEFT)
     dragTo(645, 550, duration=DRAG_DURATION, button=LEFT)
 

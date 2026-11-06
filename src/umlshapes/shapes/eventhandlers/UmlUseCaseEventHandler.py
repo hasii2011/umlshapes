@@ -6,7 +6,7 @@ from wx import ID_OK
 
 from umlmodel.UseCase import UseCase
 
-from umlshapes.lib.ogl import ShapeEvtHandler
+from wx.lib.ogl import ShapeEvtHandler
 
 from umlshapes.UmlBaseEventHandler import UmlBaseEventHandler
 

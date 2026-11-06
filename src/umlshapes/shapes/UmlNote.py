@@ -8,9 +8,9 @@ from wx import Brush
 from wx import Colour
 from wx import MemoryDC
 
-from umlshapes.lib.ogl import FORMAT_CENTRE_HORIZ
-from umlshapes.lib.ogl import FORMAT_CENTRE_VERT
-from umlshapes.lib.ogl import RectangleShape
+from wx.lib.ogl import FORMAT_CENTRE_HORIZ
+from wx.lib.ogl import FORMAT_CENTRE_VERT
+from wx.lib.ogl import RectangleShape
 
 from umlmodel.Note import Note
 

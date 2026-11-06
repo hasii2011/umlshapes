@@ -18,7 +18,7 @@ from wx import Size
 from umlmodel.Interface import Interface
 
 from umlshapes.utils.ResourceUtils import ResourceUtils
-from umlshapes.lib.ogl import Shape
+from wx.lib.ogl import Shape
 
 from umlshapes.mixins.IDMixin import IDMixin
 

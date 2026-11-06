@@ -27,7 +27,7 @@ from umlshapes.dialogs.DlgEditSDMessage import DlgEditSDMessage
 from umlshapes.dialogs.DlgEditSDMessage import Message
 from umlshapes.dialogs.DlgEditSDMessage import MessageList
 from umlshapes.frames.SequenceDiagramFrame import SequenceDiagramFrame
-from umlshapes.lib.ogl import OGLInitialize
+from wx.lib.ogl import OGLInitialize
 from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 from umlshapes.pubsubengine.UmlPubSubEngine import UmlPubSubEngine
 from umlshapes.sd.SDMessageType import SDMessageType

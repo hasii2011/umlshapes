@@ -5,7 +5,7 @@ from unittest import main as unitTestMain
 from codeallyadvanced.ui.UnitTestBaseW import UnitTestBaseW
 from umlmodel.Actor import Actor
 
-from umlshapes.lib.ogl import OGLInitialize# from umlshapes.mixins.IDMixin import InvalidOperationError
+from wx.lib.ogl import OGLInitialize# from umlshapes.mixins.IDMixin import InvalidOperationError
 
 from umlshapes.shapes.UmlActor import UmlActor
 

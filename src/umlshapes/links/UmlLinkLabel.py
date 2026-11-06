@@ -6,7 +6,7 @@ from typing import cast
 from logging import Logger
 from logging import getLogger
 
-from umlshapes.lib.ogl import Shape
+from wx.lib.ogl import Shape
 
 from umlshapes.links.LabelType import LabelType
 from umlshapes.preferences.UmlPreferences import UmlPreferences

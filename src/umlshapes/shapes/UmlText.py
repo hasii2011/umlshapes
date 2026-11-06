@@ -18,8 +18,8 @@ from wx import Menu
 
 from umlmodel.Text import Text
 
-from umlshapes.lib.ogl import Shape
-from umlshapes.lib.ogl import TextShape
+from wx.lib.ogl import Shape
+from wx.lib.ogl import TextShape
 
 from umlshapes.mixins.IdentifierMixin import IdentifierMixin
 from umlshapes.preferences.UmlPreferences import UmlPreferences

@@ -9,7 +9,6 @@ from pyautogui import click
 
 DEMO_RUNNING_INDICATOR: Path = Path('/tmp/DemoRunning.txt')
 
-# noinspection SpellCheckingInspection
 GOLDEN_IMAGE_PACKAGE:   str = str('tests.uitests.goldenImages')
 
 LEFT:          str   = 'left'

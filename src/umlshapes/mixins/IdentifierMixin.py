@@ -57,3 +57,6 @@ class IdentifierMixin:
 
     def _isSameId(self, other) -> bool:
         return self.id == other.id
+
+    def __str__(self) -> str:
+        return f'IdentifierMixin: id={self._identifier} moveMaster: {self._moveMaster}'

@@ -5,7 +5,7 @@ from typing import NewType
 
 from dataclasses import dataclass
 
-from umlshapes.lib.ogl import Shape
+from wx.lib.ogl import Shape
 
 from umlshapes.ShapeTypes import UmlShapeGenre
 

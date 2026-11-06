@@ -19,12 +19,12 @@ from wx import CommandEvent
 
 from wx import NewIdRef as wxNewIdRef
 
-from umlshapes.lib.ogl import LineShape
+from wx.lib.ogl import LineShape
 
 from umlmodel.Link import Link
 from umlmodel.enumerations.LinkType import LinkType
 
-from umlshapes.lib.ogl import ShapeEvtHandler
+from wx.lib.ogl import ShapeEvtHandler
 
 from umlshapes.utils.ProximityUtils import ProximityUtils
 from umlshapes.dialogs.DlgEditLink import DlgEditLink

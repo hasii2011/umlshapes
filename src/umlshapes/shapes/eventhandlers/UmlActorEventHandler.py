@@ -6,7 +6,7 @@ from wx import ID_OK
 
 from umlmodel.Actor import Actor
 
-from umlshapes.lib.ogl import ShapeEvtHandler
+from wx.lib.ogl import ShapeEvtHandler
 
 from umlshapes.dialogs.DlgEditActor import DlgEditActor
 from umlshapes.frames.UmlFrame import UmlFrame

@@ -13,10 +13,10 @@ from wx import MemoryDC
 
 from umlmodel.Link import Link
 
-from umlshapes.lib.ogl import FORMAT_SIZE_TO_CONTENTS
+from wx.lib.ogl import FORMAT_SIZE_TO_CONTENTS
 
-from umlshapes.lib.ogl import LineShape
-from umlshapes.lib.ogl import Shape
+from wx.lib.ogl import LineShape
+from wx.lib.ogl import Shape
 
 from umlshapes.UmlDiagram import UmlDiagram
 from umlshapes.utils.ResourceUtils import ResourceUtils
@@ -28,6 +28,7 @@ from umlshapes.links.UmlLinkLabel import UmlLinkLabel
 from umlshapes.links.eventhandlers.UmlLinkLabelEventHandler import UmlLinkLabelEventHandler
 
 from umlshapes.mixins.IdentifierMixin import IdentifierMixin
+from umlshapes.mixins.LinePointMixin import LinePointMixin
 from umlshapes.mixins.PubSubMixin import PubSubMixin
 from umlshapes.pubsubengine.UmlMessageType import UmlMessageType
 
@@ -49,16 +50,17 @@ if TYPE_CHECKING:
     from umlshapes.ShapeTypes import LinkableUmlShape
 
 
-class UmlLink(IdentifierMixin, LineShape, PubSubMixin):
+class UmlLink(IdentifierMixin, LinePointMixin, LineShape, PubSubMixin):
     """
     Notice that the IdentifierMixin is placed before any Shape mixin.
     See Python left to right method resolution order (MRO)
 
-    Some links may need the pubsub mixin so put it at the lowest level
+    Some links may need the pub/sub mixin so put it at the lowest level
     """
     def __init__(self, link: Link):
 
         LineShape.__init__(self)
+        LinePointMixin.__init__(self, lineShape=self)
         IdentifierMixin.__init__(self)
         PubSubMixin.__init__(self)
 
@@ -128,7 +130,7 @@ class UmlLink(IdentifierMixin, LineShape, PubSubMixin):
         umlPositions: UmlPositions = UmlPositions([])
 
         for cp in self._controlPoints:
-            lineControlPoint: UmlLineControlPoint = cast(UmlLineControlPoint, cp)
+            lineControlPoint: UmlLineControlPoint = cp
             point: Point = lineControlPoint.point
 
             umlPosition: UmlPosition = UmlPosition(x=point.x, y=point.y)

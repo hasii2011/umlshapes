@@ -22,7 +22,7 @@ from umlmodel.enumerations.DisplayMethods import DisplayMethods
 from umlmodel.enumerations.DisplayParameters import DisplayParameters
 from umlmodel.enumerations.Stereotype import Stereotype
 
-from umlshapes.lib.ogl import RectangleShape
+from wx.lib.ogl import RectangleShape
 
 from umlshapes.links.UmlLink import UmlLink
 

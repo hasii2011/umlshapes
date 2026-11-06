@@ -9,7 +9,7 @@ from wx import MemoryDC
 
 from umlmodel.Link import Link
 
-from umlshapes.lib.ogl import LineShape
+from wx.lib.ogl import LineShape
 
 from umlshapes.utils.ResourceUtils import ResourceUtils
 

@@ -4,7 +4,7 @@ from logging import getLogger
 
 from os import linesep as osLineSep
 
-from umlshapes.lib.ogl import ARROW_ARROW
+from wx.lib.ogl import ARROW_ARROW
 
 from umlmodel.Link import Link
 

@@ -13,8 +13,8 @@ from wx import ID_OK
 from codeallyadvanced.ui.UnitTestBaseW import UnitTestBaseW
 from umlmodel.SDInstance import SDInstance
 
-from umlshapes.lib.ogl import ControlPoint
-from umlshapes.lib.ogl import OGLInitialize
+from wx.lib.ogl import ControlPoint
+from wx.lib.ogl import OGLInitialize
 
 from umlshapes.preferences.Defaults import MIN_INSTANCE_WIDTH
 from umlshapes.preferences.UmlPreferences import UmlPreferences

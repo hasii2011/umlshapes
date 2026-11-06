@@ -1,13 +1,13 @@
 
 from typing import TYPE_CHECKING
 
-from umlshapes.lib.ogl import CONTROL_POINT_DIAGONAL
-from umlshapes.lib.ogl import CONTROL_POINT_HORIZONTAL
-from umlshapes.lib.ogl import CONTROL_POINT_VERTICAL
+from wx.lib.ogl import CONTROL_POINT_DIAGONAL
+from wx.lib.ogl import CONTROL_POINT_HORIZONTAL
+from wx.lib.ogl import CONTROL_POINT_VERTICAL
 
-from umlshapes.lib.ogl import CircleShape
-from umlshapes.lib.ogl import EllipseShape
-from umlshapes.lib.ogl import Shape
+from wx.lib.ogl import CircleShape
+from wx.lib.ogl import EllipseShape
+from wx.lib.ogl import Shape
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 

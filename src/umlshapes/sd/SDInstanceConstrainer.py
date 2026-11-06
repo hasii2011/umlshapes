@@ -11,7 +11,7 @@ from wx import Pen
 from wx import Brush
 from wx import MemoryDC
 
-from umlshapes.lib.ogl import RectangleShape
+from wx.lib.ogl import RectangleShape
 
 from umlshapes.mixins.TopLeftMixin import TopLeftMixin
 
