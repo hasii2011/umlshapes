@@ -106,7 +106,9 @@ class UmlFrame(DiagramFrame):
         self._currentReportInterval: int  = self._preferences.trackMouseInterval
         self._frameModified:         bool = False
         self._shapesMoving:          bool = False
+        self._rubberBanding:         bool = False
         self._movedShapes:           MovedShapes = MovedShapes({})
+        self._selector:              ShapeSelector = ShapeSelector(width=0, height=0)
 
         # TODO this needs to move to each type of frame
         self._umlFrameOperationsListener: UmlFrameOperationsListener = UmlFrameOperationsListener(
@@ -215,7 +217,7 @@ class UmlFrame(DiagramFrame):
         shapes:  Iterable = diagram.GetShapeList()
 
         for shape in shapes:
-            umlShape: Shape     = cast(Shape, shape)
+            umlShape: Shape     = shape
             canvas: ShapeCanvas = umlShape.GetCanvas()
             dc:     ClientDC    = ClientDC(canvas)
             canvas.PrepareDC(dc)
@@ -271,9 +273,9 @@ class UmlFrame(DiagramFrame):
         """
         self.ufLogger.debug(f'{draw=} - x,y=({x},{y}) - {keys=}')
 
-        if self._selector is None:
+        if self._rubberBanding is False:
             self._beginSelect(x=x, y=y)
-        elif draw is True:
+        elif draw:
             self._updateSelector(x=x, y=y)
 
     def OnEndDragLeft(self, x: int, y: int, keys: int = 0) -> bool:
@@ -291,21 +293,26 @@ class UmlFrame(DiagramFrame):
         from umlshapes.links.UmlLink import UmlLink
         from umlshapes.sd.UmlSDMessage import UmlSDMessage
 
-        if self._selector is None:
+        if self._rubberBanding is False:
             return True
 
         self._updateSelector(x=x, y=y)
         self.Unbind(EVT_MOTION, handler=self._onSelectorMove)
         self.umlDiagram.RemoveShape(self._selector)
+        self._selector.Show(False)
+        self._rubberBanding = False
 
         selectedRoots: list[Shape] = []
 
         for s in list(self.umlDiagram.shapes):
+
             if self._ignoreShape(shapeToCheck=s) is False and s is not self._selector:
                 if isinstance(s, (UmlLink, UmlSDMessage)):
+
                     umlLink: UmlLink | UmlSDMessage = s
                     x1, y1, x2, y2 = umlLink.GetEnds()
                     umlLine: UmlLine = UmlLine(start=UmlPoint(x=x1, y=y1), end=UmlPoint(x=x2, y=y2))
+
                     if CoordinateUtils.isLineWhollyContainedByRectangle(boundingRectangle=self._selector.rectangle, umlLine=umlLine):
                         if umlLink not in selectedRoots:
                             selectedRoots.append(umlLink)
@@ -322,7 +329,6 @@ class UmlFrame(DiagramFrame):
             target.Select(True)
 
         self.refresh()
-        self._selector = cast(ShapeSelector, None)  # noqa
 
         return True
 
@@ -339,7 +345,7 @@ class UmlFrame(DiagramFrame):
 
         return dc
 
-    # noinspection PyUnusedLocal
+
     @deprecated(version='2.0.0', reason='Use the .redrawShapes')
     def wiggleShape(self, _shape):
         self.redrawShapes()
@@ -479,19 +485,17 @@ class UmlFrame(DiagramFrame):
 
         Returns:
         """
-        selector: ShapeSelector = ShapeSelector(width=0, height=0)     # RectangleShape(x, y, 0, 0)
-        selector.position = UmlPosition(x, y)
-        selector.originalPosition = selector.position
+        self._rubberBanding = True
+        self._selector.position = UmlPosition(x, y)
+        self._selector.originalPosition = self._selector.position
 
-        selector.moving = True
-        selector.diagramFrame = self
+        self._selector.moving = True
+        self._selector.diagramFrame = self
 
         diagram: UmlDiagram = self.umlDiagram
-        diagram.AddShape(selector)
+        diagram.AddShape(self._selector)
 
-        selector.Show(True)
-
-        self._selector = selector
+        self._selector.Show(True)
 
         self.Bind(EVT_MOTION, self._onSelectorMove)
 
@@ -502,9 +506,8 @@ class UmlFrame(DiagramFrame):
         Args:
             event: The mouse event
         """
-        if self._selector is not None:
-            eventPosition: UmlPosition = self._getEventPosition(event)
-            self._updateSelector(x=eventPosition.x, y=eventPosition.y)
+        eventPosition: UmlPosition = self._getEventPosition(event)
+        self._updateSelector(x=eventPosition.x, y=eventPosition.y)
 
     def _updateSelector(self, x: int, y: int):
         """
@@ -515,19 +518,18 @@ class UmlFrame(DiagramFrame):
             x: Current mouse x-coordinate
             y: Current mouse y-coordinate
         """
-        if self._selector is not None:
-            x0: int = self._selector.originalPosition.x
-            y0: int = self._selector.originalPosition.y
+        x0: int = self._selector.originalPosition.x
+        y0: int = self._selector.originalPosition.y
 
-            left: int = min(x0, x)
-            top: int = min(y0, y)
-            width: int = abs(x - x0)
-            height: int = abs(y - y0)
+        left:   int = min(x0, x)
+        top:    int = min(y0, y)
+        width:  int = abs(x - x0)
+        height: int = abs(y - y0)
 
-            self._selector.size = UmlDimensions(width=width, height=height)
-            self._selector.position = UmlPosition(x=left, y=top)
+        self._selector.size = UmlDimensions(width=width, height=height)
+        self._selector.position = UmlPosition(x=left, y=top)
 
-            self.refresh()
+        self.refresh()
 
     def _getEventPosition(self, event: MouseEvent) -> UmlPosition:
         """
@@ -564,12 +566,12 @@ class UmlFrame(DiagramFrame):
         return ignore
 
     def _toggleSpline(self):
-        from umlshapes.ShapeTypes import UmlLinkGenre
+        from umlshapes.links.UmlLink import UmlLink
 
         selectedShapes = self.selectedShapes
 
         for shape in selectedShapes:
-            if isinstance(shape, UmlLinkGenre):
+            if isinstance(shape, UmlLink):
                 shape.spline = (not shape.spline)
         self.refresh()
 

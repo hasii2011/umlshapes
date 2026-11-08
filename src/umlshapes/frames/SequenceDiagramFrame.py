@@ -1,7 +1,6 @@
 
 from typing import Optional
 from typing import TYPE_CHECKING
-from typing import cast
 
 from logging import Logger
 from logging import getLogger
@@ -67,10 +66,10 @@ class SequenceDiagramFrame(UmlFrame):
         if self._shapesMoving is False:
             for s in shapes:
                 if (
-                    isinstance(s, TopLeftMixin)
-                    and not isinstance(s, (UmlLink, UmlBaseLabel, UmlSDExecution))
+                    isinstance(s, TopLeftMixin) and not isinstance(s, (UmlLink, UmlBaseLabel, UmlSDExecution))
                 ):
-                    self.markShapeAsMoved(umlShape=s)
+                    u: UmlShapeGenre = s
+                    self.markShapeAsMoved(umlShape=u)
                 elif isinstance(s, UmlSDMessage):
                     self.markShapeAsMoved(umlShape=s)
             self._shapesMoving = True
@@ -133,9 +132,9 @@ class SequenceDiagramFrame(UmlFrame):
         newFromY: int = umlSDMessage.fromY + deltaY
         newToY:   int = umlSDMessage.toY + deltaY
 
-        referenceLifeLine: Optional[UmlSDLifeLine] = cast(Optional[UmlSDLifeLine], umlSDMessage.GetFrom())
+        referenceLifeLine: Optional[UmlSDLifeLine] = umlSDMessage.GetFrom()
         if referenceLifeLine is None:
-            referenceLifeLine = cast(Optional[UmlSDLifeLine], umlSDMessage.GetTo())
+            referenceLifeLine = umlSDMessage.GetTo()
 
         if referenceLifeLine is not None:
             headerBottomY: int = referenceLifeLine.rectangle.top

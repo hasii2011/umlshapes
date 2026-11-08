@@ -1,7 +1,6 @@
 
 from typing import cast
 from typing import NewType
-from typing import Optional
 from typing import TYPE_CHECKING
 
 from logging import Logger
@@ -34,8 +33,6 @@ from wx import Window
 from wx.lib.ogl import ShapeCanvas
 
 from umlshapes.utils.IDUtil import IDUtil
-
-from umlshapes.frames.ShapeSelector import ShapeSelector
 
 from umlshapes.types.UmlColor import UmlColor
 from umlshapes.types.UmlPenStyle import UmlPenStyle
@@ -103,8 +100,6 @@ class DiagramFrame(ShapeCanvas):
         # The ShapeCanvas ID is an integer;  use our own
         self._id: FrameId = FrameId(IDUtil.getID())
 
-        self._selector: Optional[ShapeSelector] = None
-
     @property
     def umlDiagram(self) -> 'UmlDiagram':
         return self.GetDiagram()
@@ -158,7 +153,7 @@ class DiagramFrame(ShapeCanvas):
         """
         Redraw the screen using the background.
         """
-        self.Redraw(cast(DC, None))
+        self.Redraw(cast(DC, None))     # noqa
 
     def setInfinite(self, infinite: bool = False):
         """
