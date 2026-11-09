@@ -75,7 +75,8 @@ class UmlLinkEventHandler(UmlBaseEventHandler):
 
         super().__init__(shape=umlLink, previousEventHandler=previousEventHandler)
 
-        self._contextMenu:    Menu           = self._createContextMenu()
+        self._contextMenu:        Menu        = self._createContextMenu()
+        self._popupClickPosition: UmlPosition = UmlPosition(x=0, y=0)
 
     def OnLeftDoubleClick(self, x: int, y: int, keys: int = 0, attachment: int = 0):
         """
@@ -136,9 +137,8 @@ class UmlLinkEventHandler(UmlBaseEventHandler):
             straightenItem.Enable(enable=True)
 
         self._contextMenu.Unbind(EVT_MENU)
-        clickPosition: UmlPosition = UmlPosition(x=x, y=y)
-        # I hate lambdas -- Humberto
-        self._contextMenu.Bind(EVT_MENU, lambda evt, data=clickPosition: self._onMenuItemSelected(evt, clickPosition))
+        self._popupClickPosition = UmlPosition(x=x, y=y)
+        self._contextMenu.Bind(EVT_MENU, self._onContextMenuSelect)
 
         frame: UmlFrame = self._getFrame()
         frame.PopupMenu(self._contextMenu, x, y)
@@ -172,6 +172,15 @@ class UmlLinkEventHandler(UmlBaseEventHandler):
         menu.Append(MENU_OPTIMIZE_LINE_ID, 'Optimize Line', 'Adjust so link length is minimized')
 
         return menu
+
+    def _onContextMenuSelect(self, event: CommandEvent):
+        """
+        Handle context menu item selections.
+
+        Args:
+            event: The menu command event
+        """
+        self._onMenuItemSelected(event=event, clickPoint=self._popupClickPosition)
 
     def _onMenuItemSelected(self, event: CommandEvent, clickPoint: UmlPosition):
 

@@ -15,7 +15,6 @@ from umlshapes.types.DeltaXY import DeltaXY
 from umlshapes.types.UmlDimensions import UmlDimensions
 
 if TYPE_CHECKING:
-    from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
     from umlshapes.links.UmlLink import UmlLink
 
 
@@ -42,14 +41,6 @@ class UmlLinkLabel(UmlBaseLabel):
         self.logger: Logger = getLogger(__name__)
         self._linkDelta: DeltaXY = DeltaXY()
         self._labelType: LabelType = labelType
-
-    @property
-    def umlFrame(self) -> 'ClassDiagramFrame':
-        return self.GetCanvas()
-
-    @umlFrame.setter
-    def umlFrame(self, frame: 'ClassDiagramFrame'):
-        self.SetCanvas(frame)
 
     @property
     def parent(self) -> 'UmlLink':

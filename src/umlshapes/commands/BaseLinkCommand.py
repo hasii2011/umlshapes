@@ -24,6 +24,7 @@ from umlshapes.types.UmlPosition import UmlPositions
 from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 
 if TYPE_CHECKING:
+    from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
     from umlshapes.ShapeTypes import UmlLinkGenre
     from umlshapes.ShapeTypes import UmlShapeGenre
     from umlshapes.shapes.UmlClass import UmlClass
@@ -64,7 +65,6 @@ class BaseLinkCommand(Command):
             linkControlPositions:       Intermediate bends on the link
         """
         from umlshapes.ShapeTypes import UmlShapeGenre
-        from umlshapes.frames.UmlFrame import UmlFrame
 
         self.logger: Logger = getLogger(__name__)
 
@@ -97,7 +97,7 @@ class BaseLinkCommand(Command):
         """
         The ending shape of the link.
         """
-        self._umlFrame:            UmlFrame      = cast(UmlFrame, None)         # noqa
+        self._umlFrame:            'ClassDiagramFrame' = cast('ClassDiagramFrame', None)  # noqa
         """
         The canvas/frame where the link resides.
         """

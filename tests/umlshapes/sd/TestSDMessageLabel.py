@@ -56,7 +56,7 @@ class SpyParentMessageHandler(ShapeEvtHandler):
 
 class TestSDMessageLabel(UnitTestBaseW):
     """
-    Unit tests for Sequence Diagram Message Label pub-sub engine wiring and event delegation.
+    Unit tests for Sequence Diagram Message Label pub/sub engine wiring and event delegation.
     """
 
     @classmethod

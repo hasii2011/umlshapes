@@ -1,6 +1,7 @@
 
 from typing import Union
 from typing import cast
+from typing import Any
 from typing import Dict
 from typing import Tuple
 from typing import NewType
@@ -23,6 +24,7 @@ from umlshapes.commands.CreateLinkCommand import CreateLinkCommand
 from umlshapes.pubsubengine.UmlPubSubEngine import UmlPubSubEngine
 
 from umlshapes.frames.UmlFrame import UmlFrame
+from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
 
 from umlshapes.preferences.UmlPreferences import UmlPreferences
 
@@ -203,7 +205,7 @@ class LinkCreator:
         modelClass: Class     = self._createSimpleModelClass(classCounter=self._classCounter)
         umlClass:   UmlClass  = UmlClass(modelClass=modelClass, size=UmlDimensions(100, 50))
 
-        umlNote.umlFrame  = diagramFrame
+        umlNote.umlFrame  = cast(Any, diagramFrame)
         diagramFrame.umlDiagram.AddShape(umlNote)
         umlNote.Show(True)
         self._associateClassEventHandler(umlClass=umlClass)
@@ -347,7 +349,7 @@ class LinkCreator:
         diagram: UmlDiagram = diagramFrame.umlDiagram
 
         umlClass.position = umlPosition
-        umlClass.umlFrame = diagramFrame
+        umlClass.umlFrame = cast(ClassDiagramFrame, diagramFrame)
 
         diagram.AddShape(umlClass)
         umlClass.Show(show=True)

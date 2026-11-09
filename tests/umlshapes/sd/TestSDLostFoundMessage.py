@@ -181,7 +181,7 @@ class TestSDLostFoundMessage(UnitTestBaseW):
             fromY=MESSAGE_START_Y_1
         )
         initialFromY: int = lostMessage.fromY
-        eventHandler: UmlSDMessageEventHandler = cast(UmlSDMessageEventHandler, lostMessage.GetEventHandler())
+        eventHandler: UmlSDMessageEventHandler = lostMessage.GetEventHandler()
 
         self._simulateVerticalDrag(eventHandler=eventHandler, startX=INSTANCE_1_X, startY=initialFromY, deltaY=MESSAGE_DRAG_DELTA)
 
@@ -202,7 +202,7 @@ class TestSDLostFoundMessage(UnitTestBaseW):
         if associatedExecution is not None:
             self.assertEqual(initialToY, associatedExecution.startY)
 
-        eventHandler: UmlSDMessageEventHandler = cast(UmlSDMessageEventHandler, foundMessage.GetEventHandler())
+        eventHandler: UmlSDMessageEventHandler = foundMessage.GetEventHandler()
         self._simulateVerticalDrag(eventHandler=eventHandler, startX=INSTANCE_2_X, startY=initialToY, deltaY=MESSAGE_DRAG_DELTA)
 
         expectedY: int = initialToY + self._preferences.timeStepHeight
@@ -225,7 +225,7 @@ class TestSDLostFoundMessage(UnitTestBaseW):
         self.assertEqual(2, len(controlPoints))
         toControlPoint: ControlPoint = controlPoints[1]
 
-        eventHandler: UmlSDMessageEventHandler = cast(UmlSDMessageEventHandler, lostMessage.GetEventHandler())
+        eventHandler: UmlSDMessageEventHandler = lostMessage.GetEventHandler()
         targetNewX: int = lifeLineX + 150
 
         eventHandler.OnSizingBeginDragLeft(pt=toControlPoint, x=toControlPoint.GetX(), y=toControlPoint.GetY())
@@ -285,7 +285,7 @@ class TestSDLostFoundMessage(UnitTestBaseW):
             destX=lifeLineX + DEFAULT_LOST_FOUND_MESSAGE_LENGTH
         )
         self.assertFalse(lostMessage.Selected())
-        eventHandler: UmlSDMessageEventHandler = cast(UmlSDMessageEventHandler, lostMessage.GetEventHandler())
+        eventHandler: UmlSDMessageEventHandler = lostMessage.GetEventHandler()
 
         initialFreeX: int = lostMessage.lineControlPoints[-1].x
         targetFreeX:  int = initialFreeX + 60
@@ -306,7 +306,7 @@ class TestSDLostFoundMessage(UnitTestBaseW):
             sourceX=lifeLineX - DEFAULT_LOST_FOUND_MESSAGE_LENGTH
         )
         self.assertFalse(foundMessage.Selected())
-        eventHandler: UmlSDMessageEventHandler = cast(UmlSDMessageEventHandler, foundMessage.GetEventHandler())
+        eventHandler: UmlSDMessageEventHandler = foundMessage.GetEventHandler()
 
         initialFreeX: int = foundMessage.lineControlPoints[0].x
         targetFreeX:  int = initialFreeX - 50
@@ -326,7 +326,7 @@ class TestSDLostFoundMessage(UnitTestBaseW):
             fromY=MESSAGE_START_Y_1,
             destX=lifeLineX + DEFAULT_LOST_FOUND_MESSAGE_LENGTH
         )
-        eventHandler: UmlSDMessageEventHandler = cast(UmlSDMessageEventHandler, lostMessage.GetEventHandler())
+        eventHandler: UmlSDMessageEventHandler = lostMessage.GetEventHandler()
 
         initialFreeX: int = lostMessage.lineControlPoints[-1].x
         stretchedFreeX: int = initialFreeX + 70
@@ -361,7 +361,7 @@ class TestSDLostFoundMessage(UnitTestBaseW):
             toY=MESSAGE_START_Y_1,
             sourceX=lifeLineX - DEFAULT_LOST_FOUND_MESSAGE_LENGTH
         )
-        eventHandler: UmlSDMessageEventHandler = cast(UmlSDMessageEventHandler, foundMessage.GetEventHandler())
+        eventHandler: UmlSDMessageEventHandler = foundMessage.GetEventHandler()
 
         initialFreeX: int = foundMessage.lineControlPoints[0].x
         stretchedFreeX: int = initialFreeX - 60
@@ -407,7 +407,7 @@ class TestSDLostFoundMessage(UnitTestBaseW):
             toY=MESSAGE_START_Y_1
         )
 
-        lostHandler: UmlSDMessageEventHandler = cast(UmlSDMessageEventHandler, lostMessage.GetEventHandler())
+        lostHandler: UmlSDMessageEventHandler = lostMessage.GetEventHandler()
         self._simulateVerticalDrag(
             eventHandler=lostHandler,
             startX=INSTANCE_1_X,
@@ -418,7 +418,7 @@ class TestSDLostFoundMessage(UnitTestBaseW):
         self.assertEqual(EXTENDED_LIFELINE_LENGTH, inst1.getLifeLineLength())
         self.assertEqual(EXTENDED_LIFELINE_LENGTH, inst2.getLifeLineLength())
 
-        foundHandler: UmlSDMessageEventHandler = cast(UmlSDMessageEventHandler, foundMessage.GetEventHandler())
+        foundHandler: UmlSDMessageEventHandler = foundMessage.GetEventHandler()
         self._simulateVerticalDrag(
             eventHandler=foundHandler,
             startX=INSTANCE_2_X,
@@ -438,7 +438,7 @@ class TestSDLostFoundMessage(UnitTestBaseW):
             destLifeLine=inst2.umlSDLifeLine,
             toY=MESSAGE_START_Y_1
         )
-        foundHandler: UmlSDMessageEventHandler = cast(UmlSDMessageEventHandler, foundMessage.GetEventHandler())
+        foundHandler: UmlSDMessageEventHandler = foundMessage.GetEventHandler()
         self._simulateVerticalDrag(
             eventHandler=foundHandler,
             startX=INSTANCE_2_X,

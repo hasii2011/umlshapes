@@ -21,6 +21,7 @@ from umlshapes.types.UmlPosition import UmlPosition
 from umlshapes.types.UmlPosition import UmlPositions
 
 if TYPE_CHECKING:
+    from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
     from umlshapes.ShapeTypes import UmlShapeGenre
     from umlshapes.ShapeTypes import UmlLinkGenre
 
@@ -65,7 +66,7 @@ class CreateLinkCommand(BaseLinkCommand):
         self._destinationUmlShape = destinationShape
 
         self._linkType = linkType
-        self._umlFrame = umlFrame
+        self._umlFrame = cast('ClassDiagramFrame', umlFrame)
 
         if linkType == LinkType.ASSOCIATION or linkType == LinkType.AGGREGATION or linkType == LinkType.COMPOSITION:
             self._modelLink = self._createAssociationModelLink(linkType=linkType)

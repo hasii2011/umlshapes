@@ -380,7 +380,6 @@ class OglApp(App):
         self._frame.SetAutoLayout(True)
         self._frame.Show(True)
 
-    # noinspection PyAttributeOutsideInit
     def OnInit(self):
 
         return True

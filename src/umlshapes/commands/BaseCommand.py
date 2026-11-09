@@ -1,5 +1,7 @@
 
 from typing import TYPE_CHECKING
+from typing import cast
+from typing import TypeAlias
 
 from logging import Logger
 from logging import getLogger
@@ -18,7 +20,13 @@ from umlshapes.UmlBaseEventHandler import UmlBaseEventHandler
 
 if TYPE_CHECKING:
     from umlshapes.frames.UmlFrame import UmlFrame
+    from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
+    from umlshapes.frames.UseCaseDiagramFrame import UseCaseDiagramFrame
+    from umlshapes.frames.SequenceDiagramFrame import SequenceDiagramFrame
     from umlshapes.ShapeTypes import UmlShapeGenre
+
+    DiagramFrameGenre: TypeAlias = ClassDiagramFrame | UseCaseDiagramFrame | SequenceDiagramFrame
+
 
 class BaseCommand(Command):
 
@@ -59,7 +67,7 @@ class BaseCommand(Command):
 
         self._umlFrame.umlDiagram.AddShape(umlShape)
         umlShape.position = self._umlPosition
-        umlShape.umlFrame = self._umlFrame
+        umlShape.umlFrame = cast('DiagramFrameGenre', self._umlFrame)
         umlShape.Show(True)
 
         self._umlFrame.Refresh()

@@ -1,6 +1,6 @@
+
 from unittest import main as unitTestMain
 
-from wx import OK
 from wx import ID_OK
 from wx import CommandEvent
 from wx import EVT_BUTTON

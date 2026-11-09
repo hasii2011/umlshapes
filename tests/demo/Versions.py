@@ -16,9 +16,6 @@ from codeallybasic.SingletonV3 import SingletonV3
 from umlmodel import __version__ as dataModelVersion
 from umlshapes import __version__ as __umlShapesVersion__
 
-# noinspection PyPackageRequirements
-
-
 PackageName    = NewType('PackageName', str)
 PackageVersion = NewType('PackageVersion', str)
 

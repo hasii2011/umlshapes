@@ -1,6 +1,7 @@
 
-from typing import Optional
+from typing import Dict
 from typing import cast
+from typing import Optional
 
 from logging import Logger
 from logging import getLogger
@@ -36,6 +37,14 @@ DEFAULT_RETURN_MESSAGE_NAME:       str = 'returnMessage()'
 DEFAULT_LOST_MESSAGE_NAME:         str = 'lostMessage()'
 DEFAULT_FOUND_MESSAGE_NAME:        str = 'foundMessage()'
 
+DEFAULT_MESSAGE_NAMES: Dict[SDMessageType, str] = {
+    SDMessageType.SYNCHRONOUS:  DEFAULT_SYNCHRONOUS_MESSAGE_NAME,
+    SDMessageType.ASYNCHRONOUS: DEFAULT_ASYNCHRONOUS_MESSAGE_NAME,
+    SDMessageType.RETURN:       DEFAULT_RETURN_MESSAGE_NAME,
+    SDMessageType.LOST:         DEFAULT_LOST_MESSAGE_NAME,
+    SDMessageType.FOUND:        DEFAULT_FOUND_MESSAGE_NAME,
+}
+
 
 class SDMessageCreationHandler:
     def __init__(self, sequenceDiagramFrame: SequenceDiagramFrame, umlPubSubEngine: IUmlPubSubEngine):
@@ -43,7 +52,7 @@ class SDMessageCreationHandler:
 
         Args:
             sequenceDiagramFrame:  The sequence diagram frame we are handling
-            umlPubSubEngine:       The pub sub engine where we can respond to message and send messages
+            umlPubSubEngine:       The pub/sub engine where we can respond to message and send messages
 
         """
         self.logger: Logger = getLogger(__name__)
@@ -198,7 +207,6 @@ class SDMessageCreationHandler:
                     message='Click on destination lifeline'
                 )
 
-    # noinspection PyUnusedLocal
     def _frameLeftClicked(self, frame: SequenceDiagramFrame, umlPosition: UmlPosition):
         """
         Handle frame background clicks during interactive message creation.
@@ -639,15 +647,6 @@ class SDMessageCreationHandler:
         """
         if isReflexiveMessage:
             return DEFAULT_REFLEXIVE_MESSAGE_NAME
-        elif self._messageType == SDMessageType.SYNCHRONOUS:
-            return DEFAULT_SYNCHRONOUS_MESSAGE_NAME
-        elif self._messageType == SDMessageType.ASYNCHRONOUS:
-            return DEFAULT_ASYNCHRONOUS_MESSAGE_NAME
-        elif self._messageType == SDMessageType.RETURN:
-            return DEFAULT_RETURN_MESSAGE_NAME
-        elif self._messageType == SDMessageType.LOST:
-            return DEFAULT_LOST_MESSAGE_NAME
-        elif self._messageType == SDMessageType.FOUND:
-            return DEFAULT_FOUND_MESSAGE_NAME
-        else:
-            return DEFAULT_SYNCHRONOUS_MESSAGE_NAME
+
+        assert self._messageType in DEFAULT_MESSAGE_NAMES, f'Unhandled SDMessageType: {self._messageType}'
+        return DEFAULT_MESSAGE_NAMES[self._messageType]

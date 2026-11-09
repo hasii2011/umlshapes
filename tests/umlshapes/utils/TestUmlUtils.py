@@ -14,8 +14,6 @@ from umlshapes.utils.ShapeRelationshipUtils import ShapeRelationshipUtils
 from umlshapes.mixins.TopLeftMixin import Rectangle
 
 from umlshapes.types.Common import AttachmentSide
-from umlshapes.types.UmlLine import UmlLine
-from umlshapes.types.UmlPosition import UmlPoint
 from umlshapes.types.UmlPosition import UmlPosition
 from umlshapes.types.UmlPosition import UmlPositions
 
@@ -116,7 +114,7 @@ class TestUmlUtils(UnitTestBase):
         )
         expectedClosest: UmlPosition = UmlPosition(20, 63)
         actualClosest:   UmlPosition = ProximityUtils.closestPoint(referencePosition=UmlPosition(0, 238), umlPositions=umlPositions)
-        self.assertEqual(expectedClosest, actualClosest, 'Numpy computation failed')
+        self.assertEqual(expectedClosest, actualClosest, 'NumPy computation failed')
 
     def testLineCentumTopFixToMin(self):
         umlPosition: UmlPosition = UmlPosition(x=RECTANGLE_LEFT + 20, y=RECTANGLE_TOP)

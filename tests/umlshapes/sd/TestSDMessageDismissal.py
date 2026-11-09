@@ -1,6 +1,5 @@
 
 from typing import Optional
-from typing import cast
 
 from unittest import TestSuite
 from unittest import defaultTestLoader
@@ -8,7 +7,6 @@ from unittest import main as unitTestMain
 from unittest.mock import MagicMock
 from unittest.mock import patch
 
-from wx import Button
 from wx import CommandEvent
 from wx import EVT_TEXT_ENTER
 from wx import ID_CANCEL

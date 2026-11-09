@@ -35,7 +35,6 @@ class UmlLineControlPointType(Enum):
     TO_ENDPOINT   = 'EndPoint To'
     LINE_POINT    = 'Line Point'
 
-    # noinspection PyTypeChecker
     @classmethod
     def toWxType(cls, umlLineControlPointType: 'UmlLineControlPointType') -> int:
 
@@ -84,6 +83,7 @@ class UmlLineControlPoint(LineControlPoint):
 
     @property
     def point(self) -> Point:
+        assert self._point is not None
         return self._point
 
     @property
