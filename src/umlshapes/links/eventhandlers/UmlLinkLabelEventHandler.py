@@ -1,6 +1,4 @@
 
-from typing import cast
-
 from logging import Logger
 from logging import getLogger
 
@@ -54,7 +52,7 @@ class UmlLinkLabelEventHandler(UmlBaseEventHandler):
         """
         super().OnMovePost(dc, x, y, old_x, old_y, display)
 
-        umlLinkLabel: UmlLinkLabel     = cast(UmlLinkLabel, self.GetShape())
+        umlLinkLabel: UmlLinkLabel     = self.GetShape()
         umlLink:      PositionReporter = umlLinkLabel.parent
 
         self._debugPrint(f'label type: {umlLinkLabel.labelType} xy=({x},{y})')

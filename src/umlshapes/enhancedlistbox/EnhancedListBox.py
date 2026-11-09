@@ -50,12 +50,12 @@ class EnhancedListBox(SizedPanel):
 
         self.logger: Logger = getLogger(__name__)
 
-        self._itemList:  ListBox = cast(ListBox, None)
-        self._btnAdd:    Button  = cast(Button, None)
-        self._btnEdit:   Button  = cast(Button, None)
-        self._btnRemove: Button  = cast(Button, None)
-        self._btnUp:     Button  = cast(Button, None)
-        self._btnDown:   Button  = cast(Button, None)
+        self._itemList:  ListBox = cast(ListBox, None)      # noqa
+        self._btnAdd:    Button  = cast(Button, None)       # noqa
+        self._btnEdit:   Button  = cast(Button, None)       # noqa
+        self._btnRemove: Button  = cast(Button, None)       # noqa
+        self._btnUp:     Button  = cast(Button, None)       # noqa
+        self._btnDown:   Button  = cast(Button, None)       # noqa
 
         self._layoutListBox(title=title)
         self._layoutButtonPanel()
@@ -97,48 +97,42 @@ class EnhancedListBox(SizedPanel):
         self.Bind(EVT_BUTTON,  self._onUp,                  self._btnUp)
         self.Bind(EVT_BUTTON,  self._onDown,                self._btnDown)
 
-    # noinspection PyUnusedLocal
-    def _onListSelectionChange(self, event):
+    def _onListSelectionChange(self, _event: CommandEvent):
         """
         Called when the end-user clicks on the item list.
         """
         self._fixButtons()
         self.logger.debug('Fix the buttons')
 
-    # noinspection PyUnusedLocal
-    def _onListDoubleClick(self, event: CommandEvent):
+    def _onListDoubleClick(self, _event: CommandEvent):
         """
-        Called when the end-user double clicks on the item list.
+        Called when the end-user does a double click on the item list.
         """
         self.logger.debug(f'Invoke the edit eventHandler')
-        self._onEdit(event)
+        self._onEdit(_event)
 
-    # noinspection PyUnusedLocal
-    def _onAdd(self, event: CommandEvent):
+    def _onAdd(self, _event: CommandEvent):
         self.logger.debug(f'Invoke the add eventHandler')
 
         answer: CallbackAnswer = self._callbacks.addCallback()
         if answer.valid is True:
             self._itemList.Append(answer.item)
 
-    # noinspection PyUnusedLocal
-    def _onEdit(self, event: CommandEvent):
+    def _onEdit(self, _event: CommandEvent):
         self.logger.debug(f'Invoke the edit eventHandler')
         selection: int = self._itemList.GetSelection()
         answer: CallbackAnswer = self._callbacks.editCallback(selection)
         if answer.valid:
             self._itemList.SetString(selection, answer.item)
 
-    # noinspection PyUnusedLocal
-    def _onRemove(self, event: CommandEvent):
+    def _onRemove(self, _event: CommandEvent):
         self.logger.debug(f'Remove from list and invoke the remove eventHandler')
         selection: int = self._itemList.GetSelection()
         self._callbacks.removeCallback(selection)
         self._itemList.Delete(selection)
         self._fixButtons()
 
-    # noinspection PyUnusedLocal
-    def _onUp(self, event: CommandEvent):
+    def _onUp(self, _event: CommandEvent):
         self.logger.debug(f'Invoke the up eventHandler, then move item up in list ')
         selection:      int            = self._itemList.GetSelection()
         upCallbackData: UpCallbackData = self._callbacks.upCallback(selection)
@@ -149,8 +143,7 @@ class EnhancedListBox(SizedPanel):
 
         self._fixButtons()
 
-    # noinspection PyUnusedLocal
-    def _onDown(self, event: CommandEvent):
+    def _onDown(self, _event: CommandEvent):
         self.logger.debug(f'Invoke the down eventHandler, then move item down in list')
         selection:        int              = self._itemList.GetSelection()
         downCallbackData: DownCallbackData = self._callbacks.downCallback(selection)

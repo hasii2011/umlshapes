@@ -1,4 +1,5 @@
 
+from typing import cast
 from typing import Optional
 from typing import TYPE_CHECKING
 
@@ -71,7 +72,8 @@ class SequenceDiagramFrame(UmlFrame):
                     u: UmlShapeGenre = s
                     self.markShapeAsMoved(umlShape=u)
                 elif isinstance(s, UmlSDMessage):
-                    self.markShapeAsMoved(umlShape=s)
+                    uSDMessage: UmlShapeGenre = cast(UmlShapeGenre, s)
+                    self.markShapeAsMoved(umlShape=uSDMessage)
             self._shapesMoving = True
 
         dc: ClientDC = ClientDC(self)

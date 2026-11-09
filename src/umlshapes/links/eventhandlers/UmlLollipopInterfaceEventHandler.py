@@ -19,7 +19,7 @@ from umlshapes.UmlBaseEventHandler import UmlBaseEventHandler
 
 class UmlLollipopInterfaceEventHandler(UmlBaseEventHandler):
     """
-    Exists to popup the edit dialog
+    Exists to pop up the edit dialog
     """
 
     def __init__(self, lollipopInterface: UmlLollipopInterface):

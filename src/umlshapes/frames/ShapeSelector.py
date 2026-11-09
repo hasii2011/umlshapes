@@ -31,7 +31,7 @@ class ShapeSelector(RectangleShape, TopLeftMixin):
         TopLeftMixin.__init__(self, umlShape=self, width=width, height=height)
 
         self._moving:           bool        = False
-        self._originalPosition: UmlPosition = cast(UmlPosition, None)
+        self._originalPosition: UmlPosition = cast(UmlPosition, None)   # noqa
 
         self.SetCentreResize(False)
         self.SetBrush(TRANSPARENT_BRUSH)

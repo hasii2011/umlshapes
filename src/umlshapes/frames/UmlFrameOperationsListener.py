@@ -2,6 +2,7 @@
 from typing import List
 from typing import cast
 from typing import NewType
+from typing import Sequence
 from typing import TYPE_CHECKING
 
 from logging import Logger
@@ -11,7 +12,6 @@ from copy import deepcopy
 
 from functools import singledispatch
 
-from wx import ID_OK
 from wx import OK
 from wx import ID_OK
 from wx import ICON_ERROR
@@ -51,6 +51,7 @@ from umlshapes.types.DeltaXY import DeltaXY
 from umlshapes.types.UmlPosition import UmlPosition
 
 if TYPE_CHECKING:
+    from wx.lib.ogl import Shape
     from umlshapes.frames.UmlFrame import UmlFrame
     from umlshapes.ShapeTypes import UmlShapes
     from umlshapes.ShapeTypes import UmlShapeGenre
@@ -307,10 +308,14 @@ class UmlFrameOperationsListener:
                 umlFrame.refresh()
                 umlFrame.frameModified = True
 
-    def _cutShapes(self, selectedShapes: 'UmlShapes'):
+    def _cutShapes(self, selectedShapes: Sequence['Shape']):
 
-        from umlshapes.ShapeTypes import UmlShapeGenre
-        from umlshapes.ShapeTypes import UmlLinkGenre
+        from umlshapes.links.UmlAggregation import UmlAggregation
+        from umlshapes.links.UmlAssociation import UmlAssociation
+        from umlshapes.links.UmlComposition import UmlComposition
+        from umlshapes.links.UmlInheritance import UmlInheritance
+        from umlshapes.links.UmlInterface import UmlInterface
+        from umlshapes.links.UmlNoteLink import UmlNoteLink
 
         from umlshapes.shapes.UmlClass import UmlClass
         from umlshapes.shapes.UmlNote import UmlNote
@@ -367,14 +372,16 @@ class UmlFrameOperationsListener:
 
         self._copyToInternalClipboard(selectedShapes=selectedShapes)  # In case we want to paste them back
 
+        from wx.lib.ogl import Shape
+
         from umlshapes.commands.DeleteSDMessageCommand import DeleteSDMessageCommand
         from umlshapes.sd.UmlSDMessage import UmlSDMessage
         from umlshapes.sd.UmlSDMessageLabel import UmlSDMessageLabel
 
         for shape in selectedShapes:
-            if isinstance(shape, UmlShapeGenre):
+            if isinstance(shape, (UmlActor, UmlClass, UmlNote, UmlText, UmlUseCase)):
                 self._umlFrame.commandProcessor.Submit(createCutCommand(shape))
-            elif isinstance(shape, UmlLinkGenre):
+            elif isinstance(shape, (UmlInheritance, UmlInterface, UmlAssociation, UmlComposition, UmlAggregation, UmlNoteLink)):
                 deleteLinkCommand: DeleteLinkCommand = DeleteLinkCommand(partialName='Delete-', umlLink=shape, umlPubSubEngine=self._umlPubSubEngine)
                 self._umlFrame.commandProcessor.Submit(deleteLinkCommand)
             elif isinstance(shape, UmlSDMessage):
@@ -385,22 +392,23 @@ class UmlFrameOperationsListener:
                 )
                 self._umlFrame.commandProcessor.Submit(deleteSDMessageCommand)
             elif isinstance(shape, UmlSDMessageLabel):
-                if shape.parent is not None and isinstance(shape.parent, UmlSDMessage):
+                parentShape: Shape | None = shape.parent
+                if isinstance(parentShape, UmlSDMessage):
                     deleteSDMessageCommand = DeleteSDMessageCommand(
                         partialName='Delete-',
-                        umlSDMessage=shape.parent,
+                        umlSDMessage=parentShape,
                         umlPubSubEngine=self._umlPubSubEngine
                     )
                     self._umlFrame.commandProcessor.Submit(deleteSDMessageCommand)
             else:
-                assert False, f'Now do I delete this: {shape=}'
+                assert False, f'Now do I delete this: shape={type(shape).__name__}'
         self._umlFrame.frameModified = True
 
         self._umlPubSubEngine.sendMessage(messageType=UmlMessageType.UPDATE_APPLICATION_STATUS,
                                           frameId=self._umlFrame.id,
                                           message=f'Cut {len(self._clipboard)} shapes')
 
-    def _copyToInternalClipboard(self, selectedShapes: 'UmlShapes'):
+    def _copyToInternalClipboard(self, selectedShapes: Sequence['Shape']):
         """
         Makes a copy of the selected shape's data model and puts in our
         internal clipboard
@@ -441,7 +449,7 @@ class UmlFrameOperationsListener:
                 sdMessage: SDMessage = deepcopy(umlShape.sdMessage)
                 self._clipboard.append(sdMessage)
             else:
-                self.logger.warning(f'Unhandled copy of shape {type(umlShape)}')
+                self.logger.warning(f'Unhandled copy of shape {type(umlShape).__name__}')
 
             if linkedObject is not None:
                 linkedObject.id = IDUtil.getID()

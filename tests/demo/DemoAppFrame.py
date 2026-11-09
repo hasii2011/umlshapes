@@ -33,6 +33,7 @@ from wx import BookCtrlEvent
 from wx import MenuItem
 from wx import MessageDialog
 from wx import Point
+from wx import CloseEvent
 
 from wx.lib.sized_controls import SizedFrame
 from wx.lib.sized_controls import SizedPanel
@@ -164,17 +165,15 @@ class DemoAppFrame(SizedFrame):
         self._subscribeFrameToRelevantFrameTopics(frameId=self._diagramFrame3.id)
 
         self.Bind(EVT_NOTEBOOK_PAGE_CHANGED, self._onFrameDisplayedChanged)
-        self.Bind(EVT_CLOSE,    self.Close)
+        self.Bind(EVT_CLOSE,                  self._onClose)
 
         self._setTestItems()
 
-    def Close(self, force: bool = False) -> bool:
+    def _onClose(self, _event: CloseEvent):
         iAmRunningPath: Path = Path(DEMO_RUNNING_INDICATOR)
         iAmRunningPath.unlink(missing_ok=True)
 
         self.Destroy()
-
-        return True
 
     def _createApplicationMenuBar(self):
 
