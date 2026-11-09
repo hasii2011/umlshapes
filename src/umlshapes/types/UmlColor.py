@@ -41,11 +41,12 @@ class UmlColor(Enum):
     def toWxColor(colorEnum: 'UmlColor') -> Colour:
         cdb: ColourDatabase = ColourDatabase()
 
-        cdb.AddColour(UmlColor.ALICE_BLUE.value, Colour(240, 248, 255))
-        cdb.AddColour(UmlColor.GAINSBORO.value, Colour(218, 218, 218))
-        cdb.AddColour(UmlColor.LIGHT_YELLOW.value, Colour(255, 255, 224))
-        cdb.AddColour(UmlColor.MINT_CREAM.value, Colour(245, 255, 250))
-        cdb.AddColour(UmlColor.AF_BLUE.value, Colour(0, 48, 143))
+        # ColourDatabase.Find() strips spaces when searching, whereas AddColour() does not.
+        cdb.AddColour(UmlColor.ALICE_BLUE.value.replace(' ', ''),   Colour(240, 248, 255))
+        cdb.AddColour(UmlColor.GAINSBORO.value.replace(' ', ''),    Colour(218, 218, 218))
+        cdb.AddColour(UmlColor.LIGHT_YELLOW.value.replace(' ', ''), Colour(255, 255, 224))
+        cdb.AddColour(UmlColor.MINT_CREAM.value.replace(' ', ''),   Colour(245, 255, 250))
+        cdb.AddColour(UmlColor.AF_BLUE.value.replace(' ', ''),      Colour(0, 48, 143))
 
         c: Colour = cdb.Find(colorEnum.value)
         if not c.IsOk():

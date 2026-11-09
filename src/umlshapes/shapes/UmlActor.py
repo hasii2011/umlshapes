@@ -119,6 +119,9 @@ class UmlActor(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
 
         self.AddLine(line=umlAssociation, other=umlUseCase)
 
+        umlAssociation.createAssociationLabels()
+        umlAssociation.smartPlaceLabels()
+
     # This is dangerous, accessing internal stuff
     # noinspection PyProtectedMember
     # noinspection SpellCheckingInspection

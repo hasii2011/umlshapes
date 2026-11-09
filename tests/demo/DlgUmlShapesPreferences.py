@@ -69,13 +69,11 @@ class DlgUmlShapesPreferences(SizedDialog):
         self.Bind(EVT_BUTTON, self._onClose, id=ID_CANCEL)
         self.Bind(EVT_CLOSE,  self._onClose)
 
-    # noinspection PyUnusedLocal
     def _onOk(self, _event: CommandEvent):
         """
         """
         self.EndModal(ID_OK)
 
-    # noinspection PyUnusedLocal
     def _onClose(self, _event: CommandEvent):
         """
         """

@@ -40,6 +40,15 @@ INITIAL_TO_Y:       int = 140
 INSTANCE_DEFAULT_X: int = 100
 INSTANCE_DEFAULT_Y: int = 50
 
+# Constants avoid repeated literals and prevent PyCharm's mock.patch.object
+# string-literal inspector from flagging wx/protected method names as
+# unresolved references.
+HAS_CAPTURE_METHOD:             str = 'HasCapture'
+RELEASE_MOUSE_METHOD:           str = 'ReleaseMouse'
+END_MODAL_METHOD:               str = 'EndModal'
+SHOW_MODAL_METHOD:              str = 'ShowModal'
+INDICATE_FRAME_MODIFIED_METHOD: str = '_indicateFrameModified'
+
 
 class TestSDMessageDismissal(UnitTestBaseW):
     """
@@ -76,12 +85,12 @@ class TestSDMessageDismissal(UnitTestBaseW):
             baseDlg._layoutStandardOkCancelButtonSizer()
             self.assertEqual(baseDlg.GetEscapeId(), ID_CANCEL)
 
-            with patch.object(baseDlg, 'EndModal') as mockEndModal:
+            with patch.object(baseDlg, END_MODAL_METHOD) as mockEndModal:
                 dummyEvent: CommandEvent = CommandEvent()
                 baseDlg._onOk(dummyEvent)
                 mockEndModal.assert_called_once_with(ID_OK)
 
-            with patch.object(baseDlg, 'EndModal') as mockEndModal:
+            with patch.object(baseDlg, END_MODAL_METHOD) as mockEndModal:
                 dummyEvent = CommandEvent()
                 baseDlg._onClose(dummyEvent)
                 mockEndModal.assert_called_once_with(ID_CANCEL)
@@ -91,9 +100,9 @@ class TestSDMessageDismissal(UnitTestBaseW):
         Verify that BaseEditDialog.ShowModal releases parent mouse capture before entering modal loop.
         """
         with BaseEditDialog(parent=self._listeningWindow, title='TestBaseDlg') as baseDlg:
-            with patch.object(self._listeningWindow, 'HasCapture', return_value=True):
-                with patch.object(self._listeningWindow, 'ReleaseMouse') as mockReleaseMouse:
-                    with patch.object(SizedDialog, 'ShowModal', return_value=ID_OK):
+            with patch.object(self._listeningWindow, HAS_CAPTURE_METHOD, return_value=True):
+                with patch.object(self._listeningWindow, RELEASE_MOUSE_METHOD) as mockReleaseMouse:
+                    with patch.object(SizedDialog, SHOW_MODAL_METHOD, return_value=ID_OK):
                         returnCode: int = baseDlg.ShowModal()
                         self.assertEqual(returnCode, ID_OK)
                         mockReleaseMouse.assert_called_once()
@@ -121,7 +130,7 @@ class TestSDMessageDismissal(UnitTestBaseW):
             evt: CommandEvent = CommandEvent(EVT_TEXT_ENTER.typeId, dlg._cb.GetId())
             evt.SetString('enteredText')
 
-            with patch.object(dlg, 'EndModal') as mockEndModal:
+            with patch.object(dlg, END_MODAL_METHOD) as mockEndModal:
                 dlg.EvtTextEnter(evt)
                 mockEndModal.assert_called_once_with(ID_OK)
 
@@ -132,8 +141,8 @@ class TestSDMessageDismissal(UnitTestBaseW):
         umlSDMessage: UmlSDMessage             = self._createReflexiveMessage(lifeLine=self._lifeLine)
         eventHandler: UmlSDMessageEventHandler = self._attachEventHandler(umlSDMessage=umlSDMessage)
 
-        with patch.object(self._diagramFrame, 'HasCapture', return_value=True):
-            with patch.object(self._diagramFrame, 'ReleaseMouse') as mockReleaseMouse:
+        with patch.object(self._diagramFrame, HAS_CAPTURE_METHOD, return_value=True):
+            with patch.object(self._diagramFrame, RELEASE_MOUSE_METHOD) as mockReleaseMouse:
                 super(UmlSDMessageEventHandler, eventHandler).OnLeftDoubleClick(x=125, y=115)
                 mockReleaseMouse.assert_called_once()
 
@@ -153,7 +162,7 @@ class TestSDMessageDismissal(UnitTestBaseW):
         mockDlg.__exit__.return_value = None
 
         with patch('umlshapes.sd.eventhandlers.UmlSDMessageEventHandler.DlgEditSDMessage', return_value=mockDlg):
-            with patch.object(eventHandler, '_indicateFrameModified') as mockIndicateModified:
+            with patch.object(eventHandler, INDICATE_FRAME_MODIFIED_METHOD) as mockIndicateModified:
                 eventHandler.OnLeftDoubleClick(x=125, y=115)
                 self.assertEqual(umlSDMessage.sdMessage.message, 'updatedViaIdOk')
                 self.assertEqual(umlSDMessage.messageLabel.label, 'updatedViaIdOk')
@@ -173,7 +182,7 @@ class TestSDMessageDismissal(UnitTestBaseW):
         mockDlg.__exit__.return_value = None
 
         with patch('umlshapes.sd.eventhandlers.UmlSDMessageEventHandler.DlgEditSDMessage', return_value=mockDlg):
-            with patch.object(eventHandler, '_indicateFrameModified') as mockIndicateModified:
+            with patch.object(eventHandler, INDICATE_FRAME_MODIFIED_METHOD) as mockIndicateModified:
                 eventHandler.OnLeftDoubleClick(x=125, y=115)
                 self.assertEqual(umlSDMessage.sdMessage.message, 'reflexiveCall')
                 mockIndicateModified.assert_not_called()

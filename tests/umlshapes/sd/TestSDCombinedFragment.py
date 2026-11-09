@@ -109,6 +109,12 @@ SIZING_CLAMP_START_Y: int = 150
 SIZING_CLAMP_TARGET_X: int = 120
 SIZING_CLAMP_TARGET_Y: int = 150
 
+# Constants avoid repeated literals and prevent PyCharm's mock.patch.object
+# string-literal inspector from flagging wx/setUp-initialized frame methods
+# as unresolved references on self._diagramFrame.
+HAS_CAPTURE_METHOD:   str = 'HasCapture'
+RELEASE_MOUSE_METHOD: str = 'ReleaseMouse'
+
 
 class TestSDCombinedFragment(UnitTestBaseW):
     """
@@ -596,8 +602,8 @@ class TestSDCombinedFragment(UnitTestBaseW):
         mockDlg.__enter__.return_value = mockDlg
         mockDlg.__exit__.return_value = None
 
-        with patch.object(self._diagramFrame, 'HasCapture', side_effect=[True, False, True, False]):
-            with patch.object(self._diagramFrame, 'ReleaseMouse') as mockReleaseMouse:
+        with patch.object(self._diagramFrame, HAS_CAPTURE_METHOD, side_effect=[True, False, True, False]):
+            with patch.object(self._diagramFrame, RELEASE_MOUSE_METHOD) as mockReleaseMouse:
                 with patch('umlshapes.sd.eventhandlers.UmlSDCombinedFragmentEventHandler.DlgEditCombinedFragment', return_value=mockDlg):
                     eventHandler.OnLeftDoubleClick(x=100, y=100)
                     self.assertEqual(mockReleaseMouse.call_count, 2)
@@ -617,8 +623,8 @@ class TestSDCombinedFragment(UnitTestBaseW):
         eventHandler._initialFragmentX = 100.0
         eventHandler._initialFragmentY = 100.0
 
-        with patch.object(self._diagramFrame, 'HasCapture', return_value=True):
-            with patch.object(self._diagramFrame, 'ReleaseMouse') as mockReleaseMouse:
+        with patch.object(self._diagramFrame, HAS_CAPTURE_METHOD, return_value=True):
+            with patch.object(self._diagramFrame, RELEASE_MOUSE_METHOD) as mockReleaseMouse:
                 eventHandler.OnEndDragLeft(x=120, y=120)
                 mockReleaseMouse.assert_called_once()
 
@@ -637,8 +643,8 @@ class TestSDCombinedFragment(UnitTestBaseW):
         self.assertGreater(len(controlPoints), 0)
         targetHandle: ControlPoint = controlPoints[0]
 
-        with patch.object(self._diagramFrame, 'HasCapture', return_value=True):
-            with patch.object(self._diagramFrame, 'ReleaseMouse') as mockReleaseMouse:
+        with patch.object(self._diagramFrame, HAS_CAPTURE_METHOD, return_value=True):
+            with patch.object(self._diagramFrame, RELEASE_MOUSE_METHOD) as mockReleaseMouse:
                 eventHandler.OnSizingEndDragLeft(pt=targetHandle, x=150, y=150)
                 mockReleaseMouse.assert_called_once()
 

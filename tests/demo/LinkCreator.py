@@ -1,7 +1,6 @@
 
 from typing import Union
 from typing import cast
-from typing import Any
 from typing import Dict
 from typing import Tuple
 from typing import NewType
@@ -39,6 +38,8 @@ from umlshapes.links.eventhandlers.UmlNoteLinkEventHandler import UmlNoteLinkEve
 
 from umlshapes.shapes.UmlClass import UmlClass
 from umlshapes.shapes.UmlNote import UmlNote
+from umlshapes.shapes.UmlActor import UmlActor
+from umlshapes.shapes.UmlUseCase import UmlUseCase
 
 from umlshapes.shapes.eventhandlers.UmlClassEventHandler import UmlClassEventHandler
 from umlshapes.shapes.eventhandlers.UmlNoteEventHandler import UmlNoteEventHandler
@@ -49,6 +50,7 @@ from umlshapes.types.UmlDimensions import UmlDimensions
 
 from tests.demo.DemoCommon import Identifiers
 from tests.demo.DemoCommon import ID_REFERENCE
+from tests.demo.ShapeCreator import ShapeCreator
 
 INITIAL_X:   int = 100
 INITIAL_Y:   int = 100
@@ -83,6 +85,7 @@ class LinkCreator:
     def __init__(self, umlPubSubEngine: UmlPubSubEngine):
 
         self._umlPubSubEngine: UmlPubSubEngine   = umlPubSubEngine
+        self._shapeCreator:    ShapeCreator     = ShapeCreator(umlPubSubEngine=self._umlPubSubEngine)
 
         self.logger:           Logger         = getLogger(__name__)
         self._preferences:     UmlPreferences = UmlPreferences()
@@ -205,7 +208,7 @@ class LinkCreator:
         modelClass: Class     = self._createSimpleModelClass(classCounter=self._classCounter)
         umlClass:   UmlClass  = UmlClass(modelClass=modelClass, size=UmlDimensions(100, 50))
 
-        umlNote.umlFrame  = cast(Any, diagramFrame)
+        umlNote.umlFrame  = cast(ClassDiagramFrame, diagramFrame)
         diagramFrame.umlDiagram.AddShape(umlNote)
         umlNote.Show(True)
         self._associateClassEventHandler(umlClass=umlClass)
@@ -217,6 +220,23 @@ class LinkCreator:
             sourceShape=umlNote,
             destinationShape=umlClass,
             linkType=LinkType.NOTELINK,
+            umlPubSubEngine=self._umlPubSubEngine
+        )
+        diagramFrame.commandProcessor.Submit(command=createLinkCommand, storeIt=True)
+
+    def displayActorUseCaseLink(self, diagramFrame: UmlFrame):
+        actorPosition:   UmlPosition = UmlPosition(x=150, y=200)
+        useCasePosition: UmlPosition = UmlPosition(x=450, y=200)
+
+        umlActor:   UmlActor   = self._shapeCreator.displayUndoableUmlActor(diagramFrame=diagramFrame, umlPosition=actorPosition)
+        umlUseCase: UmlUseCase = self._shapeCreator.displayUndoableUmlUseCase(diagramFrame=diagramFrame, umlPosition=useCasePosition)
+
+        createLinkCommand: CreateLinkCommand = CreateLinkCommand(
+            umlFrame=diagramFrame,
+            partialName=f'{LinkType.ASSOCIATION}',
+            sourceShape=umlActor,
+            destinationShape=umlUseCase,
+            linkType=LinkType.ASSOCIATION,
             umlPubSubEngine=self._umlPubSubEngine
         )
         diagramFrame.commandProcessor.Submit(command=createLinkCommand, storeIt=True)

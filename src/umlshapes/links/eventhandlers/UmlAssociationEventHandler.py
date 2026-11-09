@@ -41,8 +41,8 @@ class UmlAssociationEventHandler(UmlLinkEventHandler):
 
         umlLink: UmlAssociation = self.GetShape()
 
-        sourceCardinality:      UmlLinkLabel = umlLink.sourceCardinality
-        destinationCardinality: UmlLinkLabel = umlLink.destinationCardinality
+        sourceCardinality:      UmlLinkLabel | None = umlLink.sourceCardinality
+        destinationCardinality: UmlLinkLabel | None = umlLink.destinationCardinality
 
         if sourceCardinality is not None:
             srcCardX, srcCardY = umlLink.GetLabelPosition(SOURCE_CARDINALITY_IDX)

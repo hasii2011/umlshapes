@@ -14,11 +14,17 @@ from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 
 from umlshapes.shapes.UmlNote import UmlNote
 from umlshapes.shapes.UmlClass import UmlClass
+from umlshapes.shapes.UmlActor import UmlActor
+from umlshapes.shapes.UmlUseCase import UmlUseCase
 
 from umlshapes.types.UmlPosition import NO_POSITION
 from umlshapes.types.UmlPosition import NO_POSITIONS
 from umlshapes.types.UmlPosition import UmlPosition
 from umlshapes.types.UmlPosition import UmlPositions
+
+DEFAULT_SOURCE_CARDINALITY:      str = 'src Card'
+DEFAULT_DESTINATION_CARDINALITY: str = 'dst Card'
+NO_CARDINALITY:                  str = ''
 
 if TYPE_CHECKING:
     from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
@@ -121,11 +127,16 @@ class CreateLinkCommand(BaseLinkCommand):
         name: str = f'{self._preferences.defaultAssociationName}-{CreateLinkCommand.LinkCounter}'
         modelLink: Link = Link(name=name, linkType=linkType)
 
-        modelLink.sourceCardinality      = 'src Card'
-        modelLink.destinationCardinality = 'dst Card'
+        modelLink.sourceCardinality      = DEFAULT_SOURCE_CARDINALITY
+        modelLink.destinationCardinality = DEFAULT_DESTINATION_CARDINALITY
         if isinstance(self._sourceUmlShape, UmlClass) and isinstance(self._destinationUmlShape, UmlClass):
             modelLink.source      = self._sourceUmlShape.modelClass
             modelLink.destination = self._destinationUmlShape.modelClass
+        elif isinstance(self._sourceUmlShape, UmlActor) and isinstance(self._destinationUmlShape, UmlUseCase):
+            modelLink.source                 = self._sourceUmlShape.modelActor
+            modelLink.destination            = self._destinationUmlShape.modelUseCase
+            modelLink.sourceCardinality      = NO_CARDINALITY
+            modelLink.destinationCardinality = NO_CARDINALITY
 
         CreateLinkCommand.LinkCounter += 1
         return modelLink

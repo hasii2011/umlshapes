@@ -2,7 +2,6 @@
 from typing import List
 from typing import NewType
 from typing import Tuple
-from typing import cast
 
 from logging import Logger
 from logging import getLogger
@@ -62,11 +61,11 @@ class UmlAssociation(UmlLink):
 
         self.associationLogger: Logger = getLogger(__name__)
 
-        self._sourceCardinality:      UmlLinkLabel = cast(UmlLinkLabel, None)
-        self._destinationCardinality: UmlLinkLabel = cast(UmlLinkLabel, None)
+        self._sourceCardinality:      UmlLinkLabel | None = None
+        self._destinationCardinality: UmlLinkLabel | None = None
 
     @property
-    def associationName(self) -> UmlLinkLabel:
+    def associationName(self) -> UmlLinkLabel | None:
         """
         Syntactic sugar around link name
 
@@ -75,23 +74,23 @@ class UmlAssociation(UmlLink):
         return self._linkName
 
     @associationName.setter
-    def associationName(self, newValue: UmlLinkLabel):
+    def associationName(self, newValue: UmlLinkLabel | None):
         self._linkName = newValue
 
     @property
-    def sourceCardinality(self) -> UmlLinkLabel:
+    def sourceCardinality(self) -> UmlLinkLabel | None:
         return self._sourceCardinality
 
     @sourceCardinality.setter
-    def sourceCardinality(self, newValue: UmlLinkLabel):
+    def sourceCardinality(self, newValue: UmlLinkLabel | None):
         self._sourceCardinality = newValue
 
     @property
-    def destinationCardinality(self) -> UmlLinkLabel:
+    def destinationCardinality(self) -> UmlLinkLabel | None:
         return self._destinationCardinality
 
     @destinationCardinality.setter
-    def destinationCardinality(self, newValue: UmlLinkLabel):
+    def destinationCardinality(self, newValue: UmlLinkLabel | None):
         self._destinationCardinality = newValue
 
     @property
@@ -107,7 +106,7 @@ class UmlAssociation(UmlLink):
 
         for cp in self.GetLineControlPoints():
 
-            pt: Point = cast(Point, cp)
+            pt: Point = cp
             sp: SegmentPoint = SegmentPoint((pt.x, pt.y))
             segments.append(sp)
 
@@ -115,9 +114,11 @@ class UmlAssociation(UmlLink):
 
     def createAssociationLabels(self):
 
-        self._linkName               = self._createLinkName()
-        self._sourceCardinality      = self._createSourceCardinality()
-        self._destinationCardinality = self._createDestinationCardinality()
+        self._linkName = self._createLinkName()
+        if len(self.modelLink.sourceCardinality) > 0:
+            self._sourceCardinality = self._createSourceCardinality()
+        if len(self.modelLink.destinationCardinality) > 0:
+            self._destinationCardinality = self._createDestinationCardinality()
 
     def smartPlaceLabels(self):
         """
@@ -134,10 +135,15 @@ class UmlAssociation(UmlLink):
 
         result: RelativeRectangleResult = ShapeAnalysisUtils.computeRelativeRectanglePosition(rectangle1=rectangle1, rectangle2=rectangle2)
 
+        destinationCardinality: UmlLinkLabel | None = self.destinationCardinality
+        sourceCardinality:      UmlLinkLabel | None = self.sourceCardinality
+
         if result.leftMostTopMostShape == LeftTopRectangleIndicator.RECTANGLE_1 and result.isOtherToBottom is True:
-            self._repositionUmlLinkLabel(umlLinkLabel=self.destinationCardinality)
+            if destinationCardinality is not None:
+                self._repositionUmlLinkLabel(umlLinkLabel=destinationCardinality)
         elif result.leftMostTopMostShape == LeftTopRectangleIndicator.RECTANGLE_2 and result.isOtherToBottom is True:
-            self._repositionUmlLinkLabel(umlLinkLabel=self.sourceCardinality)
+            if sourceCardinality is not None:
+                self._repositionUmlLinkLabel(umlLinkLabel=sourceCardinality)
 
     def OnDraw(self, dc: MemoryDC):
 
@@ -209,6 +215,7 @@ class UmlAssociation(UmlLink):
 
         else:
             dc.SetBrush(WHITE_BRUSH)
+        # noinspection PyTypeChecker
         dc.DrawPolygon(points)
         dc.SetBrush(WHITE_BRUSH)
 

@@ -24,7 +24,9 @@ from wx.lib.embeddedimage import PyEmbeddedImage
 from wx.lib.sized_controls import SizedDialog
 from wx.lib.sized_controls import SizedPanel
 
+from umlmodel.Actor import Actor
 from umlmodel.Link import Link
+from umlmodel.UseCase import UseCase
 from umlmodel.enumerations.LinkType import LinkType
 
 
@@ -57,17 +59,19 @@ class DlgEditLink (SizedDialog):
         gridPanel.SetSizerProps(expand=True, proportion=1)
 
         #  labels
-        StaticText(gridPanel, label="Source Cardinality").SetSizerProps(halign="left")
-        StaticText(gridPanel, label="Relationship").SetSizerProps(halign="center")
-        StaticText(gridPanel, label="Destination Cardinality").SetSizerProps(halign="right")
+        self._sourceCardinalityLabel: StaticText = StaticText(gridPanel, label='Source Cardinality')
+        self._sourceCardinalityLabel.SetSizerProps(halign='left')
+        StaticText(gridPanel, label='Relationship').SetSizerProps(halign='center')
+        self._destinationCardinalityLabel: StaticText = StaticText(gridPanel, label='Destination Cardinality')
+        self._destinationCardinalityLabel.SetSizerProps(halign='right')
         #  text
-        self._sourceCardinality:      TextCtrl = TextCtrl(gridPanel, value="", size=Size(120, -1))
-        self._relationship:           TextCtrl = TextCtrl(gridPanel, value="", size=Size(120, -1))
-        self._destinationCardinality: TextCtrl = TextCtrl(gridPanel, value="", size=Size(120, -1))
+        self._sourceCardinality:      TextCtrl = TextCtrl(gridPanel, value='', size=Size(120, -1))
+        self._relationship:           TextCtrl = TextCtrl(gridPanel, value='', size=Size(120, -1))
+        self._destinationCardinality: TextCtrl = TextCtrl(gridPanel, value='', size=Size(120, -1))
 
-        self._sourceCardinality.SetSizerProps(halign="left")
-        self._relationship.SetSizerProps(halign="center")
-        self._destinationCardinality.SetSizerProps(halign="right")
+        self._sourceCardinality.SetSizerProps(halign='left')
+        self._relationship.SetSizerProps(halign='center')
+        self._destinationCardinality.SetSizerProps(halign='right')
 
         buttonContainer: Sizer = self.CreateStdDialogButtonSizer(OK | CANCEL)
         self.SetButtonSizer(buttonContainer)
@@ -75,6 +79,7 @@ class DlgEditLink (SizedDialog):
         # btnOk.SetDefault()
 
         self._setValues(link.name, link.sourceCardinality, link.destinationCardinality)
+        self._configureCardinalityControls()
 
         #  button events
         self.Bind(EVT_BUTTON, self._onCmdOk,     id=ID_OK)
@@ -89,8 +94,9 @@ class DlgEditLink (SizedDialog):
     def value(self) -> Link:
         self._modelLink.name = self._relationship.GetValue()
 
-        self._modelLink.sourceCardinality      = self._sourceCardinality.GetValue()
-        self._modelLink.destinationCardinality = self._destinationCardinality.GetValue()
+        if self._hasCardinality():
+            self._modelLink.sourceCardinality      = self._sourceCardinality.GetValue()
+            self._modelLink.destinationCardinality = self._destinationCardinality.GetValue()
 
         return self._modelLink
 
@@ -116,19 +122,17 @@ class DlgEditLink (SizedDialog):
 
         return linkImage
 
-    # noinspection PyUnusedLocal
-    def _onCmdOk(self, event: CommandEvent):
+    def _onCmdOk(self, _event: CommandEvent):
         """
         Handle click "Ok" button
 
         Args:
-            event:
+            _event:
         """
         self.SetReturnCode(ID_OK)
         self.EndModal(ID_OK)
 
-    # noinspection PyUnusedLocal
-    def _onCmdCancel(self, event: CommandEvent):
+    def _onCmdCancel(self, _event: CommandEvent):
         """
         """
         self.SetReturnCode(ID_CANCEL)
@@ -146,3 +150,23 @@ class DlgEditLink (SizedDialog):
 
         self._sourceCardinality.SetValue(sourceCardinality)
         self._destinationCardinality.SetValue(destinationCardinality)
+
+    def _hasCardinality(self) -> bool:
+        """
+        Determines whether the edited link supports source and destination cardinality.
+
+        Returns:  `False` when linking an Actor to a UseCase, otherwise `True`
+        """
+        if isinstance(self._modelLink.source, Actor) and isinstance(self._modelLink.destination, UseCase):
+            return False
+        return True
+
+    def _configureCardinalityControls(self):
+        """
+        Disables the cardinality labels and text controls when the link does not use cardinality.
+        """
+        if not self._hasCardinality():
+            self._sourceCardinalityLabel.Disable()
+            self._destinationCardinalityLabel.Disable()
+            self._sourceCardinality.Disable()
+            self._destinationCardinality.Disable()

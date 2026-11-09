@@ -7,20 +7,27 @@ from unittest import main as unitTestMain
 
 from codeallyadvanced.ui.UnitTestBaseW import UnitTestBaseW
 from umlmodel.Class import Class
+from umlmodel.Actor import Actor
+from umlmodel.UseCase import UseCase
 from umlmodel.Note import Note
 from umlmodel.enumerations.LinkType import LinkType
 
 from umlshapes.commands.CreateLinkCommand import CreateLinkCommand
+from umlshapes.commands.CreateLinkCommand import NO_CARDINALITY
 from umlshapes.commands.CreateUmlClassCommand import CreateUmlClassCommand
 from umlshapes.commands.CreateUmlNoteCommand import CreateUmlNoteCommand
 from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
+from umlshapes.frames.UseCaseDiagramFrame import UseCaseDiagramFrame
 from wx.lib.ogl import OGLInitialize
 from umlshapes.links.UmlNoteLink import UmlNoteLink
+from umlshapes.links.UmlAssociation import UmlAssociation
 
 from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 from umlshapes.pubsubengine.UmlPubSubEngine import UmlPubSubEngine
 from umlshapes.shapes.UmlClass import UmlClass
 from umlshapes.shapes.UmlNote import UmlNote
+from umlshapes.shapes.UmlActor import UmlActor
+from umlshapes.shapes.UmlUseCase import UmlUseCase
 
 from umlshapes.types.UmlPosition import UmlPosition
 
@@ -91,6 +98,54 @@ class TestCreateUmlLinkCommand(UnitTestBaseW):
 
         self.assertIsNotNone(modelNote)
         self.assertIsNotNone(modelClass)
+
+    def testActorToUseCaseLink(self):
+        """
+        Actor to Use Case association should NOT have cardinality labels.
+        """
+        useCaseDiagramFrame: UseCaseDiagramFrame = UseCaseDiagramFrame(
+            parent=self._listeningWindow,
+            umlPubSubEngine=self._umlPubSubEngine
+        )
+
+        modelActor:   Actor      = Actor(actorName='Customer')
+        modelUseCase: UseCase    = UseCase(name='Checkout')
+        umlActor:     UmlActor   = UmlActor(actor=modelActor)
+        umlUseCase:   UmlUseCase = UmlUseCase(useCase=modelUseCase)
+
+        umlActor.position   = UmlPosition(x=100, y=100)
+        umlUseCase.position = UmlPosition(x=300, y=100)
+        umlActor.umlFrame   = useCaseDiagramFrame
+        umlUseCase.umlFrame = useCaseDiagramFrame
+
+        useCaseDiagramFrame.umlDiagram.AddShape(umlActor)
+        useCaseDiagramFrame.umlDiagram.AddShape(umlUseCase)
+        umlActor.Show(show=True)
+        umlUseCase.Show(show=True)
+
+        createUmlLinkCommand: CreateLinkCommand = CreateLinkCommand(
+            umlFrame=useCaseDiagramFrame,
+            partialName=f'ActorUseCaseLink-{self.timeStamp}',
+            linkType=LinkType.ASSOCIATION,
+            sourceShape=umlActor,
+            destinationShape=umlUseCase,
+            umlPubSubEngine=self._umlPubSubEngine
+        )
+        createUmlLinkCommand._createLink()
+        umlAssociation: UmlAssociation = cast(UmlAssociation, createUmlLinkCommand.umlLink)
+
+        self.assertIs(umlAssociation.sourceShape, umlActor)
+        self.assertIs(umlAssociation.destinationShape, umlUseCase)
+
+        self.assertEqual(NO_CARDINALITY, umlAssociation.modelLink.sourceCardinality)
+        self.assertEqual(NO_CARDINALITY, umlAssociation.modelLink.destinationCardinality)
+
+        self.assertIsNone(umlAssociation.sourceCardinality)
+        self.assertIsNone(umlAssociation.destinationCardinality)
+        self.assertIsNotNone(umlAssociation.associationName)
+
+        createUmlLinkCommand.Undo()
+        self.assertNotIn(umlAssociation, useCaseDiagramFrame.umlDiagram.shapes)
 
     def testInterfaceLink(self):
 

@@ -16,7 +16,7 @@ class BasicUtils:
         """
         Updates one of the following lists in a LinkedObject data model
 
-        ._parents   for Inheritance and Interface links (modelClass.addParent()
+        ._parents   for Inheritance and Interface links (modelClass.addParent())
         ._links     for all other link types (modelClass.addLink())
 
         Note:  Abuses the fact that objects are passed by reference.

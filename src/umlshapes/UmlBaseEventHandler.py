@@ -55,7 +55,7 @@ class UmlBaseEventHandler(ShapeEvtHandler):
 
     @property
     def umlPubSubEngine(self) -> IUmlPubSubEngine:
-        assert self._umlPubSubEngine is not None, 'Developer error: pub sub engine not set'
+        assert self._umlPubSubEngine is not None, 'Developer error: pub/sub engine not set'
         return self._umlPubSubEngine
 
     @umlPubSubEngine.setter
@@ -106,7 +106,7 @@ class UmlBaseEventHandler(ShapeEvtHandler):
 
         from umlshapes.frames.UmlFrame import UmlFrame
 
-        umlShape: UmlShapeGenre = cast(UmlShapeGenre, self.GetShape())
+        umlShape: UmlShapeGenre = self.GetShape()
         umlFrame: UmlFrame      = self._extractFrame()
 
         if isinstance(umlShape, TopLeftMixin) and not isinstance(umlShape, UmlBaseLabel):
@@ -133,7 +133,7 @@ class UmlBaseEventHandler(ShapeEvtHandler):
 
         from umlshapes.frames.UmlFrame import UmlFrame
 
-        umlShape: UmlShapeGenre = cast(UmlShapeGenre, self.GetShape())
+        umlShape: UmlShapeGenre = self.GetShape()
         umlFrame: UmlFrame      = self._extractFrame()
 
         if isinstance(umlShape, TopLeftMixin) and not isinstance(umlShape, UmlBaseLabel):
@@ -160,7 +160,7 @@ class UmlBaseEventHandler(ShapeEvtHandler):
         from umlshapes.commands.ShapesMovedCommand import ShapesMovedCommand
 
         self._previousPosition = NO_POSITION
-        umlShape: UmlShapeGenre = cast(UmlShapeGenre, self.GetShape())
+        umlShape: UmlShapeGenre = self.GetShape()
         self._baseLogger.debug(f'{umlShape.id} - {umlShape.moveMaster}')
         umlShape.moveMaster = False
 
@@ -359,7 +359,7 @@ class UmlBaseEventHandler(ShapeEvtHandler):
         """
         from umlshapes.ShapeTypes import UmlShapeGenre
 
-        umlShape: UmlShapeGenre = cast(UmlShapeGenre, self.GetShape())
+        umlShape: UmlShapeGenre = self.GetShape()
 
         return umlShape.umlFrame
 

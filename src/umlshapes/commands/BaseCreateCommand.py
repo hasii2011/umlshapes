@@ -78,6 +78,10 @@ class BaseCreateCommand(Command, metaclass=AbstractBaseCommandMeta):
 
         return dt.microsecond
 
+    @property
+    def shape(self) -> UmlShapeGenre:
+        return self._shape
+
     def Do(self) -> bool:
         self._placeShapeOnFrame()
         return True

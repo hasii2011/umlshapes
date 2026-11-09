@@ -219,8 +219,9 @@ class DemoAppFrame(SizedFrame):
         viewMenu.Append(id=Identifiers.ID_DISPLAY_UML_AGGREGATION, item='UML Aggregation', helpString='Display a aggregation Link')
         viewMenu.Append(id=Identifiers.ID_DISPLAY_UML_COMPOSITION, item='UML Composition', helpString='Display a composition Link')
         viewMenu.Append(id=Identifiers.ID_DISPLAY_UML_INHERITANCE, item='UML Inheritance', helpString='Display an Inheritance Link')
-        viewMenu.Append(id=Identifiers.ID_DISPLAY_UML_ASSOCIATION, item='Uml Association', helpString='Display Bare Association')
-        viewMenu.Append(id=Identifiers.ID_DISPLAY_UML_NOTE_LINK,   item='Uml Note Link',   helpString='Display a note link')
+        viewMenu.Append(id=Identifiers.ID_DISPLAY_UML_ASSOCIATION,    item='Uml Association',         helpString='Display Bare Association')
+        viewMenu.Append(id=Identifiers.ID_DISPLAY_UML_NOTE_LINK,      item='Uml Note Link',           helpString='Display a note link')
+        viewMenu.Append(id=Identifiers.ID_DISPLAY_UML_ACTOR_USE_CASE, item='Actor to Use Case Link', helpString='Display Link between Actor and Use Case')
         viewMenu.Append(id=Identifiers.ID_DISPLAY_UML_CLASS,       item='Uml Class',          helpString='Display an Uml Class')
         viewMenu.Append(id=Identifiers.ID_DISPLAY_UML_TEXT,        item='Uml Text',           helpString='Display Uml Text')
         viewMenu.Append(id=Identifiers.ID_DISPLAY_UML_NOTE,        item='Uml Note',           helpString='Display Uml Note')
@@ -265,6 +266,7 @@ class DemoAppFrame(SizedFrame):
         self.Bind(EVT_MENU, self._onDisplayElement, id=Identifiers.ID_DISPLAY_UML_AGGREGATION)
         self.Bind(EVT_MENU, self._onDisplayElement, id=Identifiers.ID_DISPLAY_UML_INTERFACE)
         self.Bind(EVT_MENU, self._onDisplayElement, id=Identifiers.ID_DISPLAY_UML_NOTE_LINK)
+        self.Bind(EVT_MENU, self._onDisplayElement, id=Identifiers.ID_DISPLAY_UML_ACTOR_USE_CASE)
         self.Bind(EVT_MENU, self._onDisplayElement, id=Identifiers.ID_DISPLAY_ORTHOGONAL_LINK)
         self.Bind(EVT_MENU, self._onDisplayElement, id=Identifiers.ID_DISPLAY_SEQUENCE_DIAGRAM)
         self.Bind(EVT_MENU, self._onDisplayElement, id=Identifiers.ID_DEMO_COMBINED_FRAGMENTS)
@@ -397,6 +399,8 @@ class DemoAppFrame(SizedFrame):
 
             case Identifiers.ID_DISPLAY_UML_NOTE_LINK:
                 linkCreator.displayNoteLink(diagramFrame=self._currentFrame)
+            case Identifiers.ID_DISPLAY_UML_ACTOR_USE_CASE:
+                linkCreator.displayActorUseCaseLink(diagramFrame=self._currentFrame)
 
             case Identifiers.ID_DISPLAY_UML_INHERITANCE:
                 linkCreator.displayUmlInheritance(diagramFrame=self._currentFrame)

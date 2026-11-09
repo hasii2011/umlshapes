@@ -152,8 +152,8 @@ class UmlLinkEventHandler(UmlBaseEventHandler):
         """
         super().OnMoveLink(dc=dc, moveControlPoints=moveControlPoints)
 
-        umlLink:         UmlAssociation = self.GetShape()
-        associationName: UmlLinkLabel   = umlLink.linkName
+        umlLink:         UmlAssociation      = self.GetShape()
+        associationName: UmlLinkLabel | None = umlLink.linkName
         #
         if associationName is not None and associationName.labelType == LabelType.ASSOCIATION_NAME:
             labelX, labelY = umlLink.GetLabelPosition(NAME_IDX)
@@ -220,9 +220,16 @@ class UmlLinkEventHandler(UmlBaseEventHandler):
 
     def _updateAssociationLabels(self, umlLink: 'UmlAssociation', modelLink: Link):
 
-        umlLink.sourceCardinality.label      = modelLink.sourceCardinality
-        umlLink.destinationCardinality.label = modelLink.destinationCardinality
-        umlLink.associationName.label        = modelLink.name
+        sourceCardinality:      UmlLinkLabel | None = umlLink.sourceCardinality
+        destinationCardinality: UmlLinkLabel | None = umlLink.destinationCardinality
+        associationName:        UmlLinkLabel | None = umlLink.associationName
+
+        if sourceCardinality is not None:
+            sourceCardinality.label = modelLink.sourceCardinality
+        if destinationCardinality is not None:
+            destinationCardinality.label = modelLink.destinationCardinality
+        if associationName is not None:
+            associationName.label = modelLink.name
 
     def _isLinkEditable(self, linkType: LinkType) -> bool:
         """

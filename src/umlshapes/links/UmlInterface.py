@@ -60,7 +60,6 @@ class UmlInterface(UmlLink):
 
         if self._linkName is None:
             self._linkName = self._createLinkName()
-            self._setupLinkText(umlAssociationLabel=self._linkName)
 
         if self.Selected() is True:
             self.SetPen(ResourceUtils.redDashedPen())

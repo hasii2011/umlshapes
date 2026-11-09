@@ -134,15 +134,23 @@ class BaseLinkCommand(Command):
 
         """
         from umlshapes.links.UmlAssociation import UmlAssociation
+        from umlshapes.links.UmlLinkLabel import UmlLinkLabel
         from umlshapes.UmlDiagram import UmlDiagram
 
         if isinstance(self._umlLink, UmlAssociation):
             umlAssociation: UmlAssociation = self._umlLink
             umlDiagram: UmlDiagram = self._umlFrame.umlDiagram
 
-            umlDiagram.RemoveShape(umlAssociation.associationName)
-            umlDiagram.RemoveShape(umlAssociation.sourceCardinality)
-            umlDiagram.RemoveShape(umlAssociation.destinationCardinality)
+            associationName:        UmlLinkLabel | None = umlAssociation.associationName
+            sourceCardinality:      UmlLinkLabel | None = umlAssociation.sourceCardinality
+            destinationCardinality: UmlLinkLabel | None = umlAssociation.destinationCardinality
+
+            if associationName is not None:
+                umlDiagram.RemoveShape(associationName)
+            if sourceCardinality is not None:
+                umlDiagram.RemoveShape(sourceCardinality)
+            if destinationCardinality is not None:
+                umlDiagram.RemoveShape(destinationCardinality)
 
         self._umlLink.selected = False  # To remove handles
         self._umlLink.Delete()

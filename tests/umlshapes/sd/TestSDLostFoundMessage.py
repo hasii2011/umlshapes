@@ -1,5 +1,4 @@
 
-from typing import cast
 from typing import Optional
 
 from unittest import TestSuite

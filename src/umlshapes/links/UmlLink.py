@@ -1,6 +1,5 @@
 
 from typing import Tuple
-from typing import cast
 from typing import TYPE_CHECKING
 
 from logging import Logger
@@ -67,8 +66,8 @@ class UmlLink(IdentifierMixin, LinePointMixin, LineShape, PubSubMixin):
         self.linkLogger:   Logger         = getLogger(__name__)
         self._preferences: UmlPreferences = UmlPreferences()
 
-        self._link:     Link         = link
-        self._linkName: UmlLinkLabel = cast(UmlLinkLabel, None)     # noqa
+        self._link:     Link                = link
+        self._linkName: UmlLinkLabel | None = None
 
         self.SetFormatMode(mode=FORMAT_SIZE_TO_CONTENTS)
         self.SetDraggable(True, recursive=True)
@@ -106,11 +105,11 @@ class UmlLink(IdentifierMixin, LinePointMixin, LineShape, PubSubMixin):
         self._link = link
 
     @property
-    def linkName(self) -> UmlLinkLabel:
+    def linkName(self) -> UmlLinkLabel | None:
         return self._linkName
 
     @linkName.setter
-    def linkName(self, linkName: UmlLinkLabel):
+    def linkName(self, linkName: UmlLinkLabel | None):
         self._linkName = linkName
 
     @property
@@ -221,7 +220,6 @@ class UmlLink(IdentifierMixin, LinePointMixin, LineShape, PubSubMixin):
 
         if self._linkName is None:
             self._linkName = self._createLinkName()
-            self._setupLinkText(umlAssociationLabel=self._linkName)
 
         if self.Selected() is True:
             self.SetPen(ResourceUtils.redSolidPen())
