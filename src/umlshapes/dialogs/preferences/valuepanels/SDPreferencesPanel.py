@@ -371,9 +371,9 @@ class SDPreferencesPanel(BasePreferencesPanel):
         Iterate across all top-level windows and re-fit instances on any open SequenceDiagramFrame.
         """
         from wx import GetTopLevelWindows
-        from wx import Window
+        from wx import WindowList
 
-        topWindows: list[Window] = GetTopLevelWindows()
+        topWindows: WindowList = GetTopLevelWindows()
         for window in topWindows:
             self._reFitInstancesInWindow(window=window)
 

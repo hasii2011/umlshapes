@@ -45,9 +45,9 @@ class DlgEditSDMessage(BaseEditDialog):
 
         # Ensure the current message is in the list and avoid duplicates
         currentMessage: str = sdMessage.message
-        choices: list[Message] = list(messages)
+        choices: list[str] = list(messages)
         if currentMessage not in choices:
-            choices.append(Message(currentMessage))
+            choices.append(currentMessage)
 
         # This combobox is created with a preset list of values.
         self._cb: ComboBox = ComboBox(

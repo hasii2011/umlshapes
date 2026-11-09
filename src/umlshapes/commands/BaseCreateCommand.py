@@ -5,7 +5,6 @@ from typing import cast
 from logging import Logger
 from logging import getLogger
 
-from abc import ABCMeta
 from abc import abstractmethod
 
 from datetime import datetime
@@ -13,6 +12,8 @@ from datetime import datetime
 from wx import Command
 
 from umlmodel.LinkedObject import LinkedObject
+
+from umlshapes.commands.AbstractBaseCommandMeta import AbstractBaseCommandMeta
 
 from umlshapes.ShapeTypes import UmlShapeGenre
 from umlshapes.UmlBaseEventHandler import UmlBaseEventHandler
@@ -36,13 +37,6 @@ from umlshapes.shapes.eventhandlers.UmlUseCaseEventHandler import UmlUseCaseEven
 
 from umlshapes.types.UmlPosition import UmlPosition
 
-class MyMetaCommand(ABCMeta, type(Command)):        # type: ignore
-    """
-    I have no idea why this works:
-    https://stackoverflow.com/questions/66591752/metaclass-conflict-when-trying-to-create-a-python-abstract-class-that-also-subcl
-    """
-    pass
-
 
 HANDLER_MAP: Dict[type[UmlShapeGenre], type[UmlBaseEventHandler]] = {
     UmlClass:   UmlClassEventHandler,
@@ -61,7 +55,7 @@ ATTRIBUTE_NAME_MAP: Dict[type[UmlShapeGenre], str] = {
 
 
 # noinspection PyAbstractClass
-class BaseCreateCommand(Command, metaclass=MyMetaCommand):
+class BaseCreateCommand(Command, metaclass=AbstractBaseCommandMeta):
     """
     Used no-inspection because PyCharm seems to think this class is not abstract
     """
