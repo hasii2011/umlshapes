@@ -4,6 +4,7 @@ from logging import getLogger
 from wx import App
 from wx import MemoryDC
 from wx import ScreenDC
+from wx import Size
 
 from umlmodel.SDInstance import SDInstance
 
@@ -63,7 +64,8 @@ class UmlInstanceName(RectangleShape, TopLeftMixin):
         else:
             screenDc: ScreenDC = ScreenDC()
             screenDc.SetFont(ResourceUtils.defaultFont())
-            textWidth, _ = screenDc.GetTextExtent(text)
+            textExtent: Size = screenDc.GetTextExtent(text)
+            textWidth = textExtent.width
 
         paddedWidth: int = textWidth + DEFAULT_INSTANCE_HORIZONTAL_PADDING
         if paddedWidth < MIN_INSTANCE_WIDTH:

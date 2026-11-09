@@ -10,6 +10,7 @@ from umlmodel.Actor import Actor
 from wx import DC
 from wx import MemoryDC
 from wx import RED
+from wx import Size
 
 from wx.lib.ogl import FORMAT_CENTRE_HORIZ
 from wx.lib.ogl import FORMAT_CENTRE_VERT
@@ -304,7 +305,8 @@ class UmlActor(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
             x:
         """
 
-        textWidth, textHeight = dc.GetTextExtent(self.modelActor.name)
+        nameExtent: Size = dc.GetTextExtent(self.modelActor.name)
+        textWidth: int = nameExtent.width
 
         y = round(centerY + NAME_Y_ADJUSTMENT * height - MARGIN - 0.1 * actorHeight)
 

@@ -56,7 +56,7 @@ class DemoClassDiagramFrame(ClassDiagramFrame):
         from wx import PaintDC
 
         dc = PaintDC(self)
-        w, h = self.GetSize()
+        w, h = self.getWidthAndHeight()
         mem: DC = self._createDC(w, h)
         mem.SetBackground(Brush(self.GetBackgroundColour()))
         mem.Clear()

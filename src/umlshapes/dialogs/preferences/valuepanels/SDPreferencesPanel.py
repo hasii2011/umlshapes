@@ -177,10 +177,9 @@ class SDPreferencesPanel(BasePreferencesPanel):
         """
         maxTextWidth: int = 0
         for choiceText in choices:
-            textWidth: int
-            textWidth, _ = choiceControl.GetTextExtent(choiceText)
-            if textWidth > maxTextWidth:
-                maxTextWidth = textWidth
+            textExtent: Size = choiceControl.GetTextExtent(choiceText)
+            if textExtent.width > maxTextWidth:
+                maxTextWidth = textExtent.width
 
         minWidth: int = maxTextWidth + POPUP_BUTTON_CHROME_PADDING
         return minWidth

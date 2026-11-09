@@ -9,6 +9,7 @@ from wx import Font
 from wx import MemoryDC
 from wx import ScreenDC
 from wx import TRANSPARENT_BRUSH
+from wx import Size
 
 from wx.lib.ogl import Shape
 from wx.lib.ogl import TextShape
@@ -184,11 +185,9 @@ class UmlBaseLabel(ControlPointMixin, TextShape, TopLeftMixin, PubSubMixin, Iden
         screenDc: ScreenDC = ScreenDC()
         screenDc.SetFont(font)
 
-        textWidth:  int
-        textHeight: int
-        textWidth, textHeight = screenDc.GetTextExtent(text)
+        textExtent: Size = screenDc.GetTextExtent(text)
 
-        return UmlDimensions(width=textWidth, height=textHeight)
+        return UmlDimensions(width=textExtent.width, height=textExtent.height)
 
     def _computeSizeForText(self, text: str, font: Font) -> UmlDimensions:
         """

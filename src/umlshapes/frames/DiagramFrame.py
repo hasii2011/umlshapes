@@ -14,6 +14,7 @@ from wx import SUNKEN_BORDER
 from wx import PenStyle
 
 from wx import Point
+from wx import Size
 from wx import MouseEvent
 from wx import Bitmap
 from wx import Brush
@@ -93,7 +94,7 @@ class DiagramFrame(ShapeCanvas):
 
         self._setAppropriateSetBackground()
 
-        w, h = self.GetSize()
+        w, h = self.getWidthAndHeight()
         self._workingBitmap: Bitmap = Bitmap(w, h)   # double buffering
 
         self._isInfinite: bool    = False    # Indicates if the frame is infinite
@@ -117,8 +118,29 @@ class DiagramFrame(ShapeCanvas):
         """
         return self._id
 
+    def getWidthAndHeight(self) -> tuple[int, int]:
+        """
+        Retrieves the window size as an integer (width, height) tuple.
+        """
+        frameSize: Size = self.GetSize()
+        return frameSize.width, frameSize.height
+
+    def getVirtualWidthAndHeight(self) -> tuple[int, int]:
+        """
+        Retrieves the virtual window size as an integer (width, height) tuple.
+        """
+        virtualSize: Size = self.GetVirtualSize()
+        return virtualSize.width, virtualSize.height
+
+    def getClientWidthAndHeight(self) -> tuple[int, int]:
+        """
+        Retrieves the client window size as an integer (width, height) tuple.
+        """
+        clientSize: Size = self.GetClientSize()
+        return clientSize.width, clientSize.height
+
     def refresh(self):
-        w, h = self.GetSize()
+        w, h = self.getWidthAndHeight()
         x, y = self.CalcUnscrolledPosition(0, 0)
 
         dc: DC = self._createDC(w, h)
@@ -170,8 +192,8 @@ class DiagramFrame(ShapeCanvas):
         # noinspection PySimplifyBooleanCheck
         if infinite is True:
             # place all the shapes in an area centered on the infinite work area
-            vWidth, vHeight = self.GetVirtualSize()
-            cWidth, cHeight = self.GetClientSize()
+            vWidth, vHeight = self.getVirtualWidthAndHeight()
+            cWidth, cHeight = self.getClientWidthAndHeight()
             # get the number of pixels per scroll unit
             xUnit, yUnit = self.GetScrollPixelsPerUnit()
 
@@ -195,7 +217,7 @@ class DiagramFrame(ShapeCanvas):
             event:
         """
         dc = PaintDC(self)
-        w, h = self.GetSize()
+        w, h = self.getWidthAndHeight()
         mem = self._createDC(w, h)
         mem.SetBackground(Brush(self.GetBackgroundColour()))
         mem.Clear()

@@ -26,6 +26,7 @@ from wx import ClientDC
 from wx import MouseEvent
 from wx import KeyEvent
 from wx import Window
+from wx import Point
 from wx import CommandProcessor
 
 from wx.lib.ogl import Shape
@@ -243,8 +244,8 @@ class UmlFrame(DiagramFrame):
 
         if self._preferences.trackMouse:
             if self._currentReportInterval == 0:
-                x, y = self.CalcUnscrolledPosition(mouseEvent.GetPosition())
-                self.ufLogger.info(f'({x},{y})')
+                unscrolledPos: Point = self.CalcUnscrolledPosition(mouseEvent.GetPosition())
+                self.ufLogger.info(f'({unscrolledPos.x},{unscrolledPos.y})')
                 self._currentReportInterval = self._preferences.trackMouseInterval
             else:
                 self._currentReportInterval -= 1
@@ -340,8 +341,8 @@ class UmlFrame(DiagramFrame):
         self.commandProcessor.ClearCommands()
 
     def createDC(self) -> DC:
-        w, h = self.GetSize()
-        dc   = self._createDC(w=w, h=h)
+        w, h = self.getWidthAndHeight()
+        dc: DC = self._createDC(w=w, h=h)
 
         return dc
 
