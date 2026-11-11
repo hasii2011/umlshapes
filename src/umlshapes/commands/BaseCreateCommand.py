@@ -117,8 +117,11 @@ class BaseCreateCommand(Command, metaclass=AbstractBaseCommandMeta):
         """
         self.logger.debug(f'{umlFrame=}')
 
-        umlShape.position = umlPosition
         umlDiagram: UmlDiagram = umlFrame.umlDiagram
+        snappedX:   int
+        snappedY:   int
+        snappedX, snappedY = umlDiagram.Snap(x=umlPosition.x, y=umlPosition.y)
+        umlShape.position = UmlPosition(x=snappedX, y=snappedY)
         umlDiagram.AddShape(umlShape)
 
         umlShape.Show(show=True)

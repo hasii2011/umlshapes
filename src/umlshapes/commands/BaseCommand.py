@@ -19,6 +19,7 @@ from umlshapes.types.UmlPosition import UmlPosition
 from umlshapes.UmlBaseEventHandler import UmlBaseEventHandler
 
 if TYPE_CHECKING:
+    from umlshapes.UmlDiagram import UmlDiagram
     from umlshapes.frames.UmlFrame import UmlFrame
     from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
     from umlshapes.frames.UseCaseDiagramFrame import UseCaseDiagramFrame
@@ -65,8 +66,12 @@ class BaseCommand(Command):
 
     def _setupUmlShape(self, umlShape: 'UmlShapeGenre'):
 
-        self._umlFrame.umlDiagram.AddShape(umlShape)
-        umlShape.position = self._umlPosition
+        umlDiagram: UmlDiagram = self._umlFrame.umlDiagram
+        umlDiagram.AddShape(umlShape)
+        snappedX:   int
+        snappedY:   int
+        snappedX, snappedY = umlDiagram.Snap(x=self._umlPosition.x, y=self._umlPosition.y)
+        umlShape.position = UmlPosition(x=snappedX, y=snappedY)
         umlShape.umlFrame = cast('DiagramFrameGenre', self._umlFrame)
         umlShape.Show(True)
 

@@ -54,7 +54,8 @@ class UmlDiagram(Diagram):
 
     def Snap(self, x: int, y: int) -> Tuple[int, int]:
         """
-        Snap coordinates to the nearest grid point using integer rounding.
+        Overrides Diagram.Snap to snap coordinates to the nearest grid point
+        using integer rounding.
 
         Args:
             x: Input X coordinate
@@ -64,7 +65,7 @@ class UmlDiagram(Diagram):
             Snapped (x, y) integer coordinates
         """
         if self._snapToGrid:
-            snappedX: int = round(self._gridSpacing * round(x / self._gridSpacing + 0.5))
-            snappedY: int = round(self._gridSpacing * round(y / self._gridSpacing + 0.5))
+            snappedX: int = round(self._gridSpacing * round(x / self._gridSpacing))
+            snappedY: int = round(self._gridSpacing * round(y / self._gridSpacing))
             return snappedX, snappedY
         return round(x), round(y)
