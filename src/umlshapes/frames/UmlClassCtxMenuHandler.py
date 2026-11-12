@@ -49,7 +49,8 @@ class UmlClassCtxMenuHandler:
             autoSizeMenuItem.Enable(True)
             arrangeLinksMenuItem.Enable(True)
 
-        self._frame.PopupMenu(self._contextMenu, x, y)
+        scrolledX, scrolledY = self._frame.CalcScrolledPosition(x, y)
+        self._frame.PopupMenu(self._contextMenu, scrolledX, scrolledY)
 
     def _createContextMenu(self):
 

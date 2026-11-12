@@ -141,7 +141,8 @@ class UmlLinkEventHandler(UmlBaseEventHandler):
         self._contextMenu.Bind(EVT_MENU, self._onContextMenuSelect)
 
         frame: UmlFrame = self._getFrame()
-        frame.PopupMenu(self._contextMenu, x, y)
+        scrolledX, scrolledY = frame.CalcScrolledPosition(x, y)
+        frame.PopupMenu(self._contextMenu, scrolledX, scrolledY)
 
     def OnMoveLink(self, dc: DC, moveControlPoints: bool = True):
         """

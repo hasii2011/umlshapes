@@ -87,7 +87,8 @@ class UmlClassMenuHandler:
         self.logger.debug(f'UmlClassMenuHandler - x,y: {x},{y}')
 
         frame: UmlFrame = self._umlClass.umlFrame
-        frame.PopupMenu(self._contextMenu, x, y)
+        scrolledX, scrolledY = frame.CalcScrolledPosition(x, y)
+        frame.PopupMenu(self._contextMenu, scrolledX, scrolledY)
 
     def _createContextMenu(self):
 

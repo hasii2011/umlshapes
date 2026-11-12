@@ -92,8 +92,8 @@ class UmlTextEventHandler(UmlBaseEventHandler):
             self._menu = self._createMenu()
 
         canvas: ShapeCanvas = self.umlText.GetCanvas()
-
-        canvas.PopupMenu(self._menu, x, y)
+        scrolledX, scrolledY = canvas.CalcScrolledPosition(x, y)
+        canvas.PopupMenu(self._menu, scrolledX, scrolledY)
 
     def OnLeftDoubleClick(self, x: int, y: int, keys: int = 0, attachment: int = 0):
 

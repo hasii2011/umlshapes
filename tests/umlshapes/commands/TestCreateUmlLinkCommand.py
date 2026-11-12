@@ -4,12 +4,14 @@ from typing import cast
 
 from unittest import TestSuite
 from unittest import main as unitTestMain
+from unittest.mock import patch
 
 from codeallyadvanced.ui.UnitTestBaseW import UnitTestBaseW
 from umlmodel.Class import Class
 from umlmodel.Actor import Actor
 from umlmodel.UseCase import UseCase
 from umlmodel.Note import Note
+from umlmodel.Text import Text
 from umlmodel.enumerations.LinkType import LinkType
 
 from umlshapes.commands.CreateLinkCommand import CreateLinkCommand
@@ -17,19 +19,27 @@ from umlshapes.commands.CreateLinkCommand import NO_CARDINALITY
 from umlshapes.commands.CreateUmlClassCommand import CreateUmlClassCommand
 from umlshapes.commands.CreateUmlNoteCommand import CreateUmlNoteCommand
 from umlshapes.frames.ClassDiagramFrame import ClassDiagramFrame
+from umlshapes.frames.UmlClassCtxMenuHandler import UmlClassCtxMenuHandler
 from umlshapes.frames.UseCaseDiagramFrame import UseCaseDiagramFrame
 from wx.lib.ogl import OGLInitialize
 from umlshapes.links.UmlNoteLink import UmlNoteLink
 from umlshapes.links.UmlAssociation import UmlAssociation
+from umlshapes.links.eventhandlers.UmlLinkEventHandler import UmlLinkEventHandler
 
 from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 from umlshapes.pubsubengine.UmlPubSubEngine import UmlPubSubEngine
 from umlshapes.shapes.UmlClass import UmlClass
+from umlshapes.shapes.UmlClassMenuHandler import UmlClassMenuHandler
 from umlshapes.shapes.UmlNote import UmlNote
 from umlshapes.shapes.UmlActor import UmlActor
+from umlshapes.shapes.UmlText import UmlText
 from umlshapes.shapes.UmlUseCase import UmlUseCase
+from umlshapes.shapes.eventhandlers.UmlTextEventHandler import UmlTextEventHandler
 
 from umlshapes.types.UmlPosition import UmlPosition
+
+POPUP_MENU_METHOD:             str = 'PopupMenu'
+CALC_SCROLLED_POSITION_METHOD: str = 'CalcScrolledPosition'
 
 
 class TestCreateUmlLinkCommand(UnitTestBaseW):
@@ -150,6 +160,63 @@ class TestCreateUmlLinkCommand(UnitTestBaseW):
     def testInterfaceLink(self):
 
         pass
+
+    def testContextMenusUseScrolledPosition(self):
+        """
+        Verify UmlClassMenuHandler, UmlClassCtxMenuHandler, UmlTextEventHandler,
+        and UmlLinkEventHandler convert unscrolled OGL click coordinates via
+        CalcScrolledPosition before calling PopupMenu.
+        """
+        unscrolledX: int = 1200
+        unscrolledY: int = 950
+        scrolledX:   int = 200
+        scrolledY:   int = 150
+
+        umlClass: UmlClass = UmlClass(modelClass=Class(name='MenuTestClass'))
+        umlClass.umlFrame = self._classDiagramFrame
+        self._classDiagramFrame.umlDiagram.AddShape(umlClass)
+
+        classMenuHandler: UmlClassMenuHandler = UmlClassMenuHandler(
+            umlClass=umlClass,
+            umlPubSubEngine=self._umlPubSubEngine
+        )
+        ctxMenuHandler: UmlClassCtxMenuHandler = UmlClassCtxMenuHandler(frame=self._classDiagramFrame)
+
+        umlText: UmlText = UmlText(text=Text())
+        umlText.umlFrame = self._classDiagramFrame
+        self._classDiagramFrame.umlDiagram.AddShape(umlText)
+        textEventHandler: UmlTextEventHandler = UmlTextEventHandler(previousEventHandler=umlText.GetEventHandler())
+        textEventHandler.SetShape(umlText)
+
+        destClass: UmlClass = UmlClass(modelClass=Class(name='DestClass'))
+        destClass.umlFrame = self._classDiagramFrame
+        self._classDiagramFrame.umlDiagram.AddShape(destClass)
+        createLinkCommand: CreateLinkCommand = CreateLinkCommand(
+            umlFrame=self._classDiagramFrame,
+            partialName=f'MenuLink-{self.timeStamp}',
+            linkType=LinkType.INHERITANCE,
+            sourceShape=umlClass,
+            destinationShape=destClass,
+            umlPubSubEngine=self._umlPubSubEngine
+        )
+        createLinkCommand._createLink()
+        linkEventHandler: UmlLinkEventHandler = cast(UmlLinkEventHandler, createLinkCommand.umlLink.GetEventHandler())
+
+        with patch.object(self._classDiagramFrame, CALC_SCROLLED_POSITION_METHOD, return_value=(scrolledX, scrolledY)) as mockCalcScrolled:
+            with patch.object(self._classDiagramFrame, POPUP_MENU_METHOD) as mockPopupMenu:
+                classMenuHandler.popupMenu(x=unscrolledX, y=unscrolledY)
+                mockCalcScrolled.assert_called_with(unscrolledX, unscrolledY)
+                mockPopupMenu.assert_called_with(classMenuHandler._contextMenu, scrolledX, scrolledY)
+
+                ctxMenuHandler.popupMenu(x=unscrolledX, y=unscrolledY)
+                mockPopupMenu.assert_called_with(ctxMenuHandler._contextMenu, scrolledX, scrolledY)
+
+                textEventHandler.OnRightClick(x=unscrolledX, y=unscrolledY)
+                mockPopupMenu.assert_called_with(textEventHandler._menu, scrolledX, scrolledY)
+
+                linkEventHandler.OnRightClick(x=unscrolledX, y=unscrolledY)
+                mockPopupMenu.assert_called_with(linkEventHandler._contextMenu, scrolledX, scrolledY)
+                self.assertEqual(linkEventHandler._popupClickPosition, UmlPosition(x=unscrolledX, y=unscrolledY))
 
 
 def suite() -> TestSuite:
