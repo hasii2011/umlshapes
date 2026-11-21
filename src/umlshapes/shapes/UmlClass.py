@@ -504,13 +504,15 @@ class UmlClass(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
         Convenience method
 
         Args:
-            dc:
+            dc:     Device context
+            leftX:  Left X coordinate
+            leftY:  Left Y coordinate
         """
 
-        w: int = self.GetWidth()
-        h: int = self.GetHeight()
-        x: int = leftX
-        y: int = leftY
+        w: int = round(self.GetWidth())
+        h: int = round(self.GetHeight())
+        x: int = round(leftX)
+        y: int = round(leftY)
 
         dc.SetClippingRegion(x, y, w, h)
 

@@ -1,4 +1,5 @@
 
+from typing import List
 from typing import TYPE_CHECKING
 
 from logging import Logger
@@ -36,6 +37,8 @@ from umlshapes.frames.SequenceDiagramFrame import SequenceDiagramFrame
 if TYPE_CHECKING:
     from umlshapes.ShapeTypes import UmlLinks
 
+MARGIN: int = 10
+
 
 class UmlNote(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin):
     """
@@ -47,9 +50,7 @@ class UmlNote(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin):
 
     """
 
-    MARGIN: int = 10
-
-    def __init__(self, note: Note | None = None, size: UmlDimensions = None):
+    def __init__(self, note: Note | None = None, size: UmlDimensions | None = None):
         """
 
         Args:
@@ -130,37 +131,41 @@ class UmlNote(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin):
         if self.Selected() is True:
             DrawingUtils.drawSelectedRectangle(dc=dc, shape=self)
 
-        w:     int = self.GetWidth()
-        h:     int = self.GetHeight()
-        baseX: int = self.GetX() - (w // 2)
-        baseY: int = self.GetY() - (h // 2)
+        w:     int = round(self.GetWidth())
+        h:     int = round(self.GetHeight())
+        baseX: int = round(self.GetX()) - (w // 2)
+        baseY: int = round(self.GetY()) - (h // 2)
 
         self._drawNoteNotch(dc, w=w, baseX=baseX, baseY=baseY)
 
         try:
-            noteContent = self.modelNote.content
-            lines = DrawingUtils.lineSplitter(noteContent, dc, w - 2 * UmlNote.MARGIN)
+            noteContent: str       = self.modelNote.content
+            lines:       List[str] = DrawingUtils.lineSplitter(noteContent, dc, w - 2 * MARGIN)
         except (ValueError, Exception) as e:
-            self.logger.error(f"Unable to display note - {e}")
+            self.logger.error(f'Unable to display note - {e}')
             return
 
-        x = baseX + UmlNote.MARGIN
-        y = baseY + UmlNote.MARGIN
+        x: int = baseX + MARGIN
+        y: int = baseY + MARGIN
 
-        for line in range(len(lines)):
-            dc.DrawText(lines[line], x, y + line * (dc.GetCharHeight() + 5))
+        lineIndex: int
+        for lineIndex in range(len(lines)):
+            dc.DrawText(lines[lineIndex], x, y + lineIndex * (dc.GetCharHeight() + 5))
 
     def _drawNoteNotch(self, dc: MemoryDC, w: int, baseX: int, baseY: int):
         """
         Need the notch
         Args:
-            dc:
+            dc:     Device context
+            w:      Note width
+            baseX:  Base X coordinate
+            baseY:  Base Y coordinate
         """
 
-        x1:    int = baseX + w - UmlNote.MARGIN
-        y1:    int = baseY
-        x2:    int = baseX + w
-        y2:    int = baseY + UmlNote.MARGIN
+        x1: int = baseX + w - MARGIN
+        y1: int = baseY
+        x2: int = baseX + w
+        y2: int = baseY + MARGIN
 
         # self.logger.info(f'Position: ({baseX},{baseY})  {w=} {x1=} {y1=} {x2=} {y2=}')
         dc.DrawLine(x1, y1, x2, y2)
@@ -169,15 +174,16 @@ class UmlNote(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin):
         return self.modelNote.name == other.modelNote.name
 
     def __str__(self) -> str:
+
         modelNote: Note = self._modelNote
-        if modelNote is None:
-            return f'Anonymous Note'
+        if len(modelNote.content) == 0:
+            return 'Anonymous Note'
         else:
             return f'{modelNote.content}'
 
     def __repr__(self):
 
-        return f'UmlNote - umlId: `{self.id}` modelId: {self.modelNote.id}'
+        return f'UmlNote: `{self.id}` modelId: {self.modelNote.id}'
 
     def __eq__(self, other) -> bool:
 

@@ -103,9 +103,10 @@ class UmlSdInstanceEventHandler(UmlBaseEventHandler):
             keys:
             attachment:
         """
-        from umlshapes.ShapeTypes import UmlShapeGenre
-        from umlshapes.commands.ShapesMovedCommand import ShapesMovedCommand
-        from umlshapes.frames.ShapeMoveInfo import InitialPositions
+        from umlshapes.ShapeTypes import MoveableUmlShape
+        from umlshapes.commands.shapemove.ShapesMovedCommand import ShapesMovedCommand
+        from umlshapes.commands.shapemove.ShapeMoveInfo import MovedLinks
+        from umlshapes.commands.shapemove.ShapeMoveInfo import MovedShapes
         from umlshapes.frames.UmlFrame import UmlFrame
 
         lockedY: int
@@ -116,7 +117,7 @@ class UmlSdInstanceEventHandler(UmlBaseEventHandler):
 
         if self._preferences.enableCompositeShapeLiveDragging is True:
             self._previousPosition = NO_POSITION
-            umlShape: UmlShapeGenre = cast(UmlShapeGenre, self.GetShape())
+            umlShape: MoveableUmlShape = cast(MoveableUmlShape, self.GetShape())
             umlShape.moveMaster = False
 
             umlFrame: UmlFrame = umlShape.umlFrame
@@ -125,13 +126,13 @@ class UmlSdInstanceEventHandler(UmlBaseEventHandler):
 
             shapesMovedCommand: ShapesMovedCommand = ShapesMovedCommand(
                 umlFrame=umlFrame,
-                movedShapes=umlFrame.movedShapes,
-                initialPositions=self._initialPositions
+                movedShapes=self._movedShapes,
+                movedLinks=self._movedLinks
             )
             umlFrame.commandProcessor.Submit(command=shapesMovedCommand, storeIt=True)
-            self._debugDumpMovedShapes(umlFrame)
-            umlFrame.clearMovedShapes()
-            self._initialPositions = InitialPositions({})
+            self._debugDumpMovedShapes()
+            self._movedShapes = MovedShapes({})
+            self._movedLinks = MovedLinks({})
             umlFrame.refresh()
         else:
             super().OnEndDragLeft(x, lockedY, keys, attachment)

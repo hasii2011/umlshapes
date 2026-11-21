@@ -7,6 +7,7 @@ from logging import getLogger
 from umlmodel.Interface import Interface
 from umlmodel.Interface import Interfaces
 from umlmodel.ModelTypes import ClassName
+from wx import MouseEvent
 from wx import Window
 
 from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
@@ -15,13 +16,16 @@ from umlshapes.pubsubengine.UmlMessageType import UmlMessageType
 from umlshapes.frames.UmlClassCtxMenuHandler import UmlClassCtxMenuHandler
 from umlshapes.frames.UmlFrame import UmlFrame
 
+from umlshapes.utils.CoordinateUtils import CoordinateUtils
 from umlshapes.utils.ProximityUtils import ProximityUtils
 
 from umlshapes.shapes.UmlClass import UmlClass
 
+from umlshapes.types.UmlPosition import UmlPoint
 from umlshapes.types.UmlPosition import UmlPosition
 
 NO_CLASS: UmlClass = cast(UmlClass, None)       # noqa
+
 
 class ClassDiagramFrame(UmlFrame):
 
@@ -45,15 +49,6 @@ class ClassDiagramFrame(UmlFrame):
                                         frameId=self.id,
                                         listener=self._onRequestLollipopLocation)
 
-    @property
-    def requestingLollipopLocation(self) -> bool:
-        """
-        Cheater property for the class event handler
-
-        Returns: the mode we are in
-        """
-        return self._requestingLollipopLocation
-
     def getDefinedInterfaces(self) -> Interfaces:
         """
         This will not only look for lollipop interfaces but will find UmlInterfaces.
@@ -67,22 +62,22 @@ class ClassDiagramFrame(UmlFrame):
         from umlshapes.links.UmlInterface import UmlInterface
         from umlshapes.links.UmlLollipopInterface import UmlLollipopInterface
 
-        umlShapes:  UmlShapes      = self.umlShapes
+        umlShapes:  UmlShapes  = self.umlShapes
         interfaces: Interfaces = Interfaces([])
 
         for umlShape in umlShapes:
 
             if isinstance(umlShape, UmlLollipopInterface):
                 lollipopInterface: UmlLollipopInterface = umlShape
-                interface:     Interface = lollipopInterface.modelInterface
+                interface:         Interface            = lollipopInterface.modelInterface
 
                 if interface.name != '' or len(interface.name) > 0:
                     if interface not in interfaces:
                         interfaces.append(interface)
             elif isinstance(umlShape, UmlInterface):
-                umlInterface: UmlInterface = umlShape
-                interfaceClass: UmlClass = umlInterface.interfaceClass
-                implementor:    UmlClass = umlInterface.implementingClass
+                umlInterface:   UmlInterface = umlShape
+                interfaceClass: UmlClass     = umlInterface.interfaceClass
+                implementor:    UmlClass     = umlInterface.implementingClass
                 #
                 # Convert to mode interface
                 #
@@ -93,23 +88,48 @@ class ClassDiagramFrame(UmlFrame):
 
         return interfaces
 
-    def OnLeftClick(self, x, y, keys=0):
+    def OnMouseEvent(self, mouseEvent: MouseEvent):
+        """
+        Overrides UmlFrame.OnMouseEvent to intercept left-click placement when
+        requesting a lollipop interface location, creating the lollipop only if
+        the click lands inside or on the border of the requesting UmlClass.
 
+        Args:
+            mouseEvent: The incoming mouse event.
+        """
         if self._requestingLollipopLocation:
-            self.ufLogger.debug(f'Request location: x,y=({x},{y}) {self._requestingUmlClass=}')
-            nearestPoint: UmlPosition = ProximityUtils.getNearestPointOnRectangle(x=x, y=y, rectangle=self._requestingUmlClass.rectangle)
-            self.ucdLogger.debug(f'Nearest point: {nearestPoint}')
+            if mouseEvent.LeftDown():
+                return
+            if mouseEvent.LeftUp():
+                x: int
+                y: int
+                x, y = self._convertEventCoordinates(mouseEvent)
+                assert self._requestingUmlClass is not None, 'I need something to attach to'
+                clickPoint: UmlPoint = UmlPoint(x=x, y=y)
+                if CoordinateUtils.isPointInsideRectangle(
+                    point=clickPoint,
+                    rectangle=self._requestingUmlClass.rectangle
+                ) is True:
+                    self.ufLogger.debug(f'Request location: x,y=({x},{y}) {self._requestingUmlClass=}')
+                    nearestPoint: UmlPosition = ProximityUtils.getNearestPointOnRectangle(
+                        x=x,
+                        y=y,
+                        rectangle=self._requestingUmlClass.rectangle
+                    )
+                    self.ucdLogger.debug(f'Nearest point: {nearestPoint}')
 
-            assert self._requestingUmlClass is not None, 'I need something to attach to'
-            self._requestCreationOfLollipopInterface(
-                requestingUmlClass=self._requestingUmlClass,
-                perimeterPoint=nearestPoint
-            )
-            self.umlPubSubEngine.sendMessage(UmlMessageType.UPDATE_APPLICATION_STATUS,
-                                             frameId=self.id,
-                                             message='')
-        else:
-            super().OnLeftClick(x=x, y=y, keys=keys)
+                    self._requestCreationOfLollipopInterface(
+                        requestingUmlClass=self._requestingUmlClass,
+                        perimeterPoint=nearestPoint
+                    )
+                    self.umlPubSubEngine.sendMessage(
+                        UmlMessageType.UPDATE_APPLICATION_STATUS,
+                        frameId=self.id,
+                        message=''
+                    )
+                return
+
+        super().OnMouseEvent(mouseEvent)
 
     def OnRightClick(self, x: int, y: int, keys: int = 0):
         self.ucdLogger.debug('Ouch, you right-clicked me !!')

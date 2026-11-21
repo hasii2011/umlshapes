@@ -21,6 +21,7 @@ from wx import ID_ANY
 from wx import TE_PROCESS_ENTER
 from wx import EVT_TEXT
 
+from wx import Colour
 from wx import CommandEvent
 from wx import Size
 from wx import ComboBox
@@ -66,7 +67,8 @@ class DlgEditInterface(DlgEditClassCommon):
 
         self.logger: Logger = DlgEditInterface.clsLogger
 
-        self._interfaceNameControl: ComboBox = cast(ComboBox, None)
+        self._interfaceNameControl:        ComboBox = cast(ComboBox, None)
+        self._normalNameBackgroundColour: Colour   = cast(Colour, None)
 
         sizedPanel: SizedPanel = self.GetContentsPane()
 
@@ -76,8 +78,6 @@ class DlgEditInterface(DlgEditClassCommon):
 
         self._fillMethodList()
         self.SetSize(Size(width=-1, height=300))
-
-        self._modeInterfaceCopy: Interface = cast(Interface, None)
 
     @property
     def interface(self) -> Interface:
@@ -96,11 +96,13 @@ class DlgEditInterface(DlgEditClassCommon):
                                 choices=interfaceNames,
                                 style=CB_DROPDOWN | TE_PROCESS_ENTER | CB_SORT
                                 )
+        self._normalNameBackgroundColour = cb.BackgroundColour
         if self.editMode is True:
             if len(self._modelInterfaceCopy.name) > 0:
                 cb.SetValue(self._modelInterfaceCopy.name)
         else:
             cb.SetValue('')
+            self._modeInterfaceCopy.name = ''
 
         self._interfaceNameControl = cb
 
@@ -129,16 +131,21 @@ class DlgEditInterface(DlgEditClassCommon):
         selectedInterface: Interface = self._interfacesDict[selectedInterfaceName]
         self.logger.debug(f'Selection Changed {selectedInterface.name=} {selectedInterface.id=}')
 
-        self._modeInterfaceCopy = selectedInterface
+        self._modeInterfaceCopy = deepcopy(selectedInterface)
         self._fillMethodList()
+        self._indicateNonEmptyTextCtrl(name=self._interfaceNameControl, normalBackgroundColor=self._normalNameBackgroundColour)
 
         event.Skip(True)
 
     def _interfaceNameEnterKeyPressed(self, event: CommandEvent):
 
-        newInterfaceName: str = event.GetString()
+        newInterfaceName: str = event.GetString().strip()
         self.logger.info(f'_interfaceNameEnterKeyPressed: {newInterfaceName=}')
         self._modeInterfaceCopy.name = newInterfaceName
+        if newInterfaceName == '':
+            self._indicateEmptyTextCtrl(name=self._interfaceNameControl)
+        else:
+            self._indicateNonEmptyTextCtrl(name=self._interfaceNameControl, normalBackgroundColor=self._normalNameBackgroundColour)
         event.Skip(False)
 
     # Capture events every time a user hits a key in the text entry field.
@@ -147,6 +154,10 @@ class DlgEditInterface(DlgEditClassCommon):
         updatedInterfaceName: str = event.GetString()
         self.logger.debug(f'_interfaceNameCharacterEntered: {updatedInterfaceName=}')
         self._modeInterfaceCopy.name = updatedInterfaceName
+        if updatedInterfaceName.strip() == '':
+            self._indicateEmptyTextCtrl(name=self._interfaceNameControl)
+        else:
+            self._indicateNonEmptyTextCtrl(name=self._interfaceNameControl, normalBackgroundColor=self._normalNameBackgroundColour)
         event.Skip()
 
     # noinspection PyUnusedLocal
@@ -156,13 +167,21 @@ class DlgEditInterface(DlgEditClassCommon):
         Args:
             event:
         """
-        selectedInterfaceName: str            = self._modeInterfaceCopy.name
-        interfacesDict:        InterfacesDict = self._interfacesDict
+        selectedInterfaceName: str = self._interfaceNameControl.GetValue().strip()
+        if selectedInterfaceName == '':
+            self._indicateEmptyTextCtrl(name=self._interfaceNameControl)
+            self._interfaceNameControl.SetFocus()
+            return
+
+        self._modeInterfaceCopy.name = selectedInterfaceName
+        interfacesDict: InterfacesDict = self._interfacesDict
         if selectedInterfaceName in interfacesDict.keys():
 
             existingInterface: Interface = interfacesDict[selectedInterfaceName]
             self._modelInterface = existingInterface
             self._modelInterface.addImplementor(self._implementor)
+            self._modelInterface.methods     = self._modeInterfaceCopy.methods
+            self._modelInterface.description = self._modeInterfaceCopy.description
             self.logger.debug(f'Using existing interface. {self._modelInterface.name=} {self._modelInterface.id=} {self._modelInterface.implementors}')
         else:
             # Get common stuff from base class
@@ -170,6 +189,8 @@ class DlgEditInterface(DlgEditClassCommon):
             self._modelInterface.name        = self._modeInterfaceCopy.name
             self._modelInterface.methods     = self._modeInterfaceCopy.methods
             self._modelInterface.description = self._modeInterfaceCopy.description
+            if self._implementor not in self._modelInterface.implementors:
+                self._modelInterface.addImplementor(self._implementor)
             self.logger.debug(f'Using new interface. {self._modelInterface.name=} {self._modelInterface.id=}')
 
         self._lollipopInterface.modelInterface = self._modelInterface

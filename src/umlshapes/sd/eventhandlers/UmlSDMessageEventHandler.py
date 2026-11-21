@@ -1,9 +1,5 @@
 
 from typing import cast
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from umlshapes.ShapeTypes import UmlShapeGenre
 from dataclasses import dataclass
 from typing import Optional
 
@@ -98,6 +94,8 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
             keys:
             attachment:
         """
+        from umlshapes.commands.shapemove.ShapeMoveRecorder import ShapeMoveRecorder
+
         if not self._umlSDMessage.Selected():
             umlFrame: UmlFrame = self._umlSDMessage.umlFrame
             dc: ClientDC = ClientDC(umlFrame)
@@ -134,8 +132,14 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
 
         if not isDirectEndpointDrag:
             self._umlSDMessage.moveMaster = True
-            self._saveSelectedShapesInitialPositions()
-            self._umlSDMessage.umlFrame.markShapeAsMoved(umlShape=cast('UmlShapeGenre', self._umlSDMessage))
+            self._movedShapes = ShapeMoveRecorder.recordInitialShapePositions(
+                umlShapes=self._umlSDMessage.umlFrame.selectedShapes,
+                masterShape=self._umlSDMessage
+            )
+            self._movedLinks = ShapeMoveRecorder.recordInitialLinkPositions(
+                umlShapes=self._umlSDMessage.umlFrame.selectedShapes,
+                masterShape=self._umlSDMessage
+            )
 
         super().OnBeginDragLeft(x, y, keys, attachment)
 
@@ -223,19 +227,20 @@ class UmlSDMessageEventHandler(UmlBaseEventHandler):
         self._dragContext = None
 
         umlFrame: UmlFrame = self._umlSDMessage.umlFrame
-        from umlshapes.commands.ShapesMovedCommand import ShapesMovedCommand
-        from umlshapes.frames.ShapeMoveInfo import InitialPositions
+        from umlshapes.commands.shapemove.ShapesMovedCommand import ShapesMovedCommand
+        from umlshapes.commands.shapemove.ShapeMoveInfo import MovedLinks
+        from umlshapes.commands.shapemove.ShapeMoveInfo import MovedShapes
 
-        if len(self._initialPositions) > 0:
+        if len(self._movedShapes) > 0:
             shapesMovedCommand: ShapesMovedCommand = ShapesMovedCommand(
                 umlFrame=umlFrame,
-                movedShapes=umlFrame.movedShapes,
-                initialPositions=self._initialPositions
+                movedShapes=self._movedShapes,
+                movedLinks=self._movedLinks
             )
             umlFrame.commandProcessor.Submit(command=shapesMovedCommand, storeIt=True)
-            self._debugDumpMovedShapes(umlFrame)
-            umlFrame.clearMovedShapes()
-            self._initialPositions = InitialPositions({})
+            self._debugDumpMovedShapes()
+            self._movedShapes = MovedShapes({})
+            self._movedLinks = MovedLinks({})
             umlFrame.refresh()
 
         super(UmlBaseEventHandler, self).OnEndDragLeft(x, y, keys, attachment)

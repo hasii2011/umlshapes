@@ -1,4 +1,6 @@
 
+from typing import List
+from typing import Optional
 from typing import Tuple
 from typing import TYPE_CHECKING
 
@@ -41,6 +43,7 @@ from umlshapes.preferences.UmlPreferences import UmlPreferences
 from umlshapes.types.Common import TAB
 from umlshapes.types.Common import EndPositions
 from umlshapes.types.Common import NAME_IDX
+from umlshapes.types.DeltaXY import DeltaXY
 from umlshapes.types.UmlPosition import UmlPosition
 from umlshapes.types.UmlPosition import UmlPositions
 
@@ -202,6 +205,67 @@ class UmlLink(IdentifierMixin, LinePointMixin, LineShape, PubSubMixin):
         """
         self.InsertLineControlPoint(point=Point(x=umlPosition.x, y=umlPosition.y))
 
+    def moveByDelta(self, deltaXY: DeltaXY):
+        """
+        Translate all line control points (endpoints and intermediate bends),
+        control point handles, and attached link labels by deltaXY so the link
+        geometry remains intact when both connected shapes move together.
+
+        Args:
+            deltaXY: The (deltaX, deltaY) translation offset.
+        """
+        lineControlPoints: Optional[List[Point]] = self.GetLineControlPoints()
+        if lineControlPoints is not None:
+            for point in lineControlPoints:
+                point.x = round(point.x + deltaXY.deltaX)
+                point.y = round(point.y + deltaXY.deltaY)
+
+            if len(lineControlPoints) >= 2:
+                firstPoint: Point = lineControlPoints[0]
+                lastPoint:  Point = lineControlPoints[-1]
+                self._xpos = (firstPoint.x + lastPoint.x) // 2
+                self._ypos = (firstPoint.y + lastPoint.y) // 2
+
+            if self._controlPoints:
+                for idx in range(min(len(self._controlPoints), len(lineControlPoints))):
+                    lineControlPoint: UmlLineControlPoint = self._controlPoints[idx]
+                    lineControlPoint.point = lineControlPoints[idx]
+
+        self.ResetControlPoints()
+
+        for child in self._children:
+            if isinstance(child, UmlLinkLabel):
+                child.position = UmlPosition(
+                    x=child.position.x + deltaXY.deltaX,
+                    y=child.position.y + deltaXY.deltaY
+                )
+
+    def areBothEndsMovingTogether(self) -> bool:
+        """
+        Determine whether both the source and destination shapes of this link
+        are currently moving together as part of an active multi-shape drag.
+
+        Returns:
+            True if both connected shapes are part of an active drag operation.
+        """
+        sourceShape:      LinkableUmlShape = self.sourceShape
+        destinationShape: LinkableUmlShape = self.destinationShape
+
+        sourceMoving: bool = sourceShape.selected or sourceShape.moveMaster
+        destMoving:   bool = destinationShape.selected or destinationShape.moveMaster
+        if not (sourceMoving and destMoving):
+            return False
+
+        if sourceShape.moveMaster or destinationShape.moveMaster:
+            return True
+
+        umlFrame: UmlFrame = self.umlFrame
+        for shape in umlFrame.selectedShapes:
+            if getattr(shape, 'moveMaster', False) is True:
+                return True
+
+        return False
+
     def optimizeLink(self):
         """
             Optimize the link, to minimize the link length
@@ -283,7 +347,7 @@ class UmlLink(IdentifierMixin, LinePointMixin, LineShape, PubSubMixin):
             y=point.y,
         )
 
-        control._point = point
+        control.point = point
         self._setupLineControlPoint(umlLineControlPoint=control)
 
     def _setupLineControlPoint(self, umlLineControlPoint: UmlLineControlPoint):

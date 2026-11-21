@@ -52,9 +52,6 @@ from umlshapes.types.UmlPosition import UmlPosition
 from umlshapes.types.UmlDimensions import UmlDimensions
 
 if TYPE_CHECKING:
-    from umlshapes.frames.ShapeMoveInfo import ShapeId
-    from umlshapes.frames.ShapeMoveInfo import MovedShapes
-
     from umlshapes.ShapeTypes import UmlShapes
     from umlshapes.ShapeTypes import UmlShapeGenre
 
@@ -70,12 +67,14 @@ BOUNDARY_LEFT_MARGIN:   int = 5
 BOUNDARY_TOP_MARGIN:    int = 5
 BOUNDARY_BOTTOM_MARGIN: int = 5
 
+
 @dataclass
 class Ltrb:
     left:   int = 0
     top:    int = 0
     right:  int = 0
     bottom: int = 0
+
 
 class UmlFrame(DiagramFrame):
 
@@ -88,8 +87,6 @@ class UmlFrame(DiagramFrame):
     KEY_CODE_LOWER_CASE_S: int = ord('s')
 
     def __init__(self, parent: Window, umlPubSubEngine: IUmlPubSubEngine):
-
-        from umlshapes.frames.ShapeMoveInfo import MovedShapes
 
         self.ufLogger:         Logger           = getLogger(__name__)
         self._preferences:     UmlPreferences   = UmlPreferences()
@@ -106,9 +103,7 @@ class UmlFrame(DiagramFrame):
         self.setInfinite(True)
         self._currentReportInterval: int  = self._preferences.trackMouseInterval
         self._frameModified:         bool = False
-        self._shapesMoving:          bool = False
         self._rubberBanding:         bool = False
-        self._movedShapes:           MovedShapes = MovedShapes({})
         self._selector:              ShapeSelector = ShapeSelector(width=0, height=0)
 
         # TODO this needs to move to each type of frame
@@ -117,14 +112,6 @@ class UmlFrame(DiagramFrame):
             umlPubSubEngine=self._umlPubSubEngine
         )
         self.Bind(EVT_CHAR, self._onProcessKeystrokes)
-
-    @property
-    def movedShapes(self) -> 'MovedShapes':
-        return self._movedShapes
-
-    @property
-    def shapesMoving(self) -> bool:
-        return self._shapesMoving
 
     @property
     def frameModified(self) -> bool:
@@ -346,7 +333,6 @@ class UmlFrame(DiagramFrame):
 
         return dc
 
-
     @deprecated(version='2.0.0', reason='Use the .redrawShapes')
     def wiggleShape(self, _shape):
         self.redrawShapes()
@@ -361,26 +347,24 @@ class UmlFrame(DiagramFrame):
 
     def moveSelectedShapes(self, deltaXY: DeltaXY):
         """
-        The move master is sending the message;  We don't need to move it
+        The move master is sending the message; We don't need to move it.
 
         Args:
-            deltaXY:  The difference between the current position and the new position
+            deltaXY: The difference between the current position and the new position.
         """
         from umlshapes.links.UmlLink import UmlLink
         from umlshapes.ShapeTypes import UmlShapeGenre
+        from umlshapes.ShapeTypes import UmlShapes
         from umlshapes.shapes.UmlBaseLabel import UmlBaseLabel
 
         self.ufLogger.debug(f'{deltaXY=}')
-        shapes = self.selectedShapes
+        if deltaXY.deltaX == 0 and deltaXY.deltaY == 0:
+            return
 
-        if self._shapesMoving is False:         # noqa
-            from umlshapes.links.UmlLink import UmlLink
-            from umlshapes.shapes.UmlBaseLabel import UmlBaseLabel
-
-            for s in shapes:
-                if not isinstance(s, (UmlLink, UmlBaseLabel)):
-                    self.markShapeAsMoved(umlShape=s)
-            self._shapesMoving = True
+        shapes:          UmlShapes     = self.selectedShapes
+        translatedLinks: list[UmlLink] = []
+        dc:              ClientDC      = ClientDC(self)
+        self.PrepareDC(dc)
 
         for s in shapes:
             umlShape: UmlShapeGenre = cast(UmlShapeGenre, s)
@@ -388,44 +372,22 @@ class UmlFrame(DiagramFrame):
                 # move master moves himself
                 if umlShape.moveMaster is False:    # noqa
                     #
-                    # But we change the positions visa the move delta
+                    # But we change the positions via the move delta
                     # to get smooth scrolling
                     umlShape.position = UmlPosition(
                         x=umlShape.position.x + deltaXY.deltaX,
                         y=umlShape.position.y + deltaXY.deltaY
                     )
+                    umlShape.ResetControlPoints()
 
-                dc: ClientDC = ClientDC(umlShape.umlFrame)
-                umlShape.umlFrame.PrepareDC(dc)
-                umlShape.MoveLinks(dc)
-
-    def markShapeAsMoved(self, umlShape: 'UmlShapeGenre'):
-        """
-
-        Args:
-            umlShape:
-
-        """
-        from umlshapes.frames.ShapeMoveInfo import ShapeMoveInfo
-        from umlshapes.frames.ShapeMoveInfo import ShapeId
-
-        shapeId: ShapeId  = ShapeId(umlShape.id)
-        self.ufLogger.debug(f'{shapeId=}')
-        if shapeId not in self._movedShapes:
-            self._movedShapes[shapeId] = ShapeMoveInfo(
-                umlShape=umlShape,
-                originalPosition=umlShape.position
-            )
-
-    def clearMovedShapes(self):
-        """
-        We are no longer moving
-
-        """
-        from umlshapes.frames.ShapeMoveInfo import MovedShapes
-
-        self._movedShapes  = MovedShapes({})
-        self._shapesMoving = False
+                for attachedLine in umlShape.GetLines():
+                    if isinstance(attachedLine, UmlLink):
+                        if attachedLine.areBothEndsMovingTogether() is True:
+                            if attachedLine not in translatedLinks:
+                                attachedLine.moveByDelta(deltaXY=deltaXY)
+                                translatedLinks.append(attachedLine)
+                        else:
+                            attachedLine.GetEventHandler().OnMoveLink(dc)
 
     def moveShapeToFront(self, shape: Shape):
         """

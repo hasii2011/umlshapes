@@ -27,6 +27,7 @@ from umlshapes.types.UmlDimensions import UmlDimensions
 
 
 if TYPE_CHECKING:
+    from umlshapes.ShapeTypes import MoveableUmlShape
     from umlshapes.ShapeTypes import UmlShapeGenre
     from umlshapes.frames.UmlFrame import UmlFrame
 
@@ -42,7 +43,8 @@ class UmlBaseEventHandler(ShapeEvtHandler):
             previousEventHandler:
             shape:
         """
-        from umlshapes.frames.ShapeMoveInfo import InitialPositions
+        from umlshapes.commands.shapemove.ShapeMoveInfo import MovedLinks
+        from umlshapes.commands.shapemove.ShapeMoveInfo import MovedShapes
 
         self._baseLogger: Logger = getLogger(__name__)
 
@@ -54,7 +56,8 @@ class UmlBaseEventHandler(ShapeEvtHandler):
         self._dragStartShapePosition:   UmlPosition                = NO_POSITION
         self._snappedTopLeftPosition:   UmlPosition                = NO_POSITION
 
-        self._initialPositions:         InitialPositions           = InitialPositions({})
+        self._movedShapes:              MovedShapes                = MovedShapes({})
+        self._movedLinks:               MovedLinks                 = MovedLinks({})
 
     @property
     def umlPubSubEngine(self) -> IUmlPubSubEngine:
@@ -115,6 +118,12 @@ class UmlBaseEventHandler(ShapeEvtHandler):
         if isinstance(umlShape, TopLeftMixin) and not isinstance(umlShape, UmlBaseLabel):
             self._dragStartMousePosition = UmlPosition(x=x, y=y)
             self._dragStartShapePosition = umlShape.position
+            self._handleTopLeftShapeDrag(
+                umlShape=umlShape,
+                umlFrame=umlFrame,
+                x=self._dragStartShapePosition.x,
+                y=self._dragStartShapePosition.y
+            )
             snappedX: int
             snappedY: int
             snappedX, snappedY = umlFrame.umlDiagram.Snap(
@@ -152,6 +161,12 @@ class UmlBaseEventHandler(ShapeEvtHandler):
             if self._dragStartMousePosition is NO_POSITION:
                 self._dragStartMousePosition = UmlPosition(x=x, y=y)
                 self._dragStartShapePosition = umlShape.position
+                self._handleTopLeftShapeDrag(
+                    umlShape=umlShape,
+                    umlFrame=umlFrame,
+                    x=self._dragStartShapePosition.x,
+                    y=self._dragStartShapePosition.y
+                )
 
             candidateX: int = self._dragStartShapePosition.x + (x - self._dragStartMousePosition.x)
             candidateY: int = self._dragStartShapePosition.y + (y - self._dragStartMousePosition.y)
@@ -176,12 +191,13 @@ class UmlBaseEventHandler(ShapeEvtHandler):
 
         """
         from umlshapes.frames.UmlFrame import UmlFrame
-        from umlshapes.frames.ShapeMoveInfo import InitialPositions
+        from umlshapes.commands.shapemove.ShapeMoveInfo import MovedLinks
+        from umlshapes.commands.shapemove.ShapeMoveInfo import MovedShapes
         from umlshapes.mixins.TopLeftMixin import TopLeftMixin
         from umlshapes.shapes.UmlBaseLabel import UmlBaseLabel
 
         from umlshapes.ShapeTypes import UmlShapeGenre
-        from umlshapes.commands.ShapesMovedCommand import ShapesMovedCommand
+        from umlshapes.commands.shapemove.ShapesMovedCommand import ShapesMovedCommand
 
         umlShape: UmlShapeGenre = self.GetShape()
         umlFrame: UmlFrame      = umlShape.umlFrame
@@ -218,17 +234,14 @@ class UmlBaseEventHandler(ShapeEvtHandler):
 
         shapesMovedCommand: ShapesMovedCommand = ShapesMovedCommand(
             umlFrame=umlFrame,
-            movedShapes=umlFrame.movedShapes,
-            initialPositions=self._initialPositions
+            movedShapes=self._movedShapes,
+            movedLinks=self._movedLinks
         )
         umlFrame.commandProcessor.Submit(command=shapesMovedCommand, storeIt=True)
-        self._baseLogger.debug(f'Pre clear {umlFrame.shapesMoving=}')
 
-        self._debugDumpMovedShapes(umlFrame)
-        umlFrame.clearMovedShapes()
-        self._initialPositions = InitialPositions({})
-
-        self._baseLogger.debug(f'Post clear {umlFrame.shapesMoving=}')
+        self._debugDumpMovedShapes()
+        self._movedShapes = MovedShapes({})
+        self._movedLinks = MovedLinks({})
 
     def OnLeftClick(self, x: int, y: int, keys=0, attachment=0):
         """
@@ -319,7 +332,7 @@ class UmlBaseEventHandler(ShapeEvtHandler):
             if isinstance(umlShape, TopLeftMixin):
                 umlShape.size = UmlDimensions(width=roundedWidth, height=roundedHeight)
 
-    def _handleTopLeftShapeDrag(self, umlShape: 'UmlShapeGenre', umlFrame: 'UmlFrame', x: int, y: int):
+    def _handleTopLeftShapeDrag(self, umlShape: 'MoveableUmlShape', umlFrame: 'UmlFrame', x: int, y: int):
         """
         Track initial positions on the first drag event and publish movement deltas
         on subsequent drag events for shapes that inherit from TopLeftMixin.
@@ -330,7 +343,7 @@ class UmlBaseEventHandler(ShapeEvtHandler):
             x:        New cursor X coordinate
             y:        New cursor Y coordinate
         """
-        from umlshapes.frames.ShapeMoveInfo import ShapeId
+        from umlshapes.commands.shapemove.ShapeMoveRecorder import ShapeMoveRecorder
 
         #
         # Only the move master moves himself
@@ -340,15 +353,16 @@ class UmlBaseEventHandler(ShapeEvtHandler):
         if self._previousPosition is NO_POSITION:
             self._previousPosition = UmlPosition(x=x, y=y)
             umlShape.moveMaster = True
-            self._saveSelectedShapesInitialPositions()
+            self._movedShapes = ShapeMoveRecorder.recordInitialShapePositions(
+                umlShapes=umlFrame.selectedShapes,
+                masterShape=umlShape
+            )
+            self._movedLinks = ShapeMoveRecorder.recordInitialLinkPositions(
+                umlShapes=umlFrame.selectedShapes,
+                masterShape=umlShape
+            )
 
-            umlFrame.markShapeAsMoved(umlShape=umlShape)
-            #
-            # Save the master shape position, in case he is not selected
-            #
-            self._initialPositions[ShapeId(umlShape.id)] = umlShape.position
-
-            self._baseLogger.info(f'Initial Position Count: {len(self._initialPositions)}')
+            self._baseLogger.info(f'Initial Position Count: {len(self._movedShapes)}')
 
             self.umlPubSubEngine.sendMessage(messageType=UmlMessageType.FRAME_MODIFIED, frameId=umlShape.umlFrame.id, modifiedFrameId=umlShape.umlFrame.id)
         else:
@@ -384,30 +398,6 @@ class UmlBaseEventHandler(ShapeEvtHandler):
 
                 canvas.Refresh(False)
 
-    def _saveSelectedShapesInitialPositions(self):
-        """
-        Save initial positions of selected shapes so when the drag ends we can
-        inject them into the `ShapesMovedCommand`
-        """
-        from umlshapes.frames.ShapeMoveInfo import ShapeId
-
-        from umlshapes.mixins.TopLeftMixin import TopLeftMixin
-        from umlshapes.ShapeTypes import UmlShapeGenre
-        from umlshapes.frames.UmlFrame import UmlFrame
-        from umlshapes.shapes.UmlBaseLabel import UmlBaseLabel
-
-        umlFrame: UmlFrame = self._extractFrame()
-
-        shapes = umlFrame.selectedShapes
-        from umlshapes.sd.UmlSDMessage import UmlSDMessage
-        for s in shapes:
-            if isinstance(s, UmlSDMessage):
-                self._initialPositions[ShapeId(s.id)] = s.position
-            else:
-                umlShape: UmlShapeGenre = cast(UmlShapeGenre, s)
-                if isinstance(umlShape, TopLeftMixin) and not isinstance(umlShape, UmlBaseLabel):
-                    self._initialPositions[ShapeId(umlShape.id)] = umlShape.position
-
     def _extractFrame(self) -> 'UmlFrame':
         """
         Convenience method so I can isolate this deep coupling
@@ -434,7 +424,7 @@ class UmlBaseEventHandler(ShapeEvtHandler):
 
         return umlFrame
 
-    def _debugDumpMovedShapes(self, umlFrame):
+    def _debugDumpMovedShapes(self):
         """
         TODO: Change to DEBUG or put in a flag in the preferences
 
@@ -442,11 +432,10 @@ class UmlBaseEventHandler(ShapeEvtHandler):
         from os import linesep
 
         if self._baseLogger.isEnabledFor(DEBUG):
-            self._baseLogger.debug(f'----------- Start -----------')
-            self._baseLogger.debug(f'Pre clear {umlFrame.shapesMoving=}')
+            self._baseLogger.debug('----------- Start -----------')
             debugLines: str = ''
-            for umlId, shapeMovedInfo in umlFrame.movedShapes.items():
+            for umlId, shapeMovedInfo in self._movedShapes.items():
                 debugLines = f'{debugLines}{linesep}{shapeMovedInfo=}'
 
             self._baseLogger.debug(debugLines)
-            self._baseLogger.debug(f'----------- End -----------')
+            self._baseLogger.debug('----------- End -----------')

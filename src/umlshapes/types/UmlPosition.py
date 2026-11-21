@@ -57,5 +57,5 @@ class UmlPosition(UmlPoint):
 
 UmlPositions = NewType('UmlPositions', List[UmlPosition])
 
-NO_POSITION  = cast(UmlPosition, None)
-NO_POSITIONS = cast(UmlPositions, None)
+NO_POSITION  = cast(UmlPosition, None)      # noqa
+NO_POSITIONS = cast(UmlPositions, None)     # noqa

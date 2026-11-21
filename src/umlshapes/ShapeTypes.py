@@ -16,6 +16,10 @@ from umlshapes.links.UmlAssociation import UmlAssociation
 from umlshapes.links.UmlComposition import UmlComposition
 from umlshapes.links.UmlInheritance import UmlInheritance
 
+from umlshapes.sd.UmlSDCombinedFragment import UmlSDCombinedFragment
+from umlshapes.sd.UmlSDInstance import UmlSDInstance
+from umlshapes.sd.UmlSDMessage import UmlSDMessage
+
 from umlshapes.shapes.UmlActor import UmlActor
 from umlshapes.shapes.UmlClass import UmlClass
 from umlshapes.shapes.UmlNote import UmlNote
@@ -36,8 +40,9 @@ def linkableUmlShapesFactory() -> LinkableUmlShapes:
 
 UmlShape = UmlActor | UmlClass | UmlNote | UmlText | UmlUseCase
 
-UmlShapeGenre = UmlActor | UmlClass | UmlNote | UmlText | UmlUseCase
-UmlLinkGenre  = UmlInheritance | UmlInterface | UmlAssociation | UmlComposition | UmlAggregation | UmlNoteLink
+UmlShapeGenre    = UmlActor | UmlClass | UmlNote | UmlText | UmlUseCase
+MoveableUmlShape = UmlShapeGenre | UmlSDInstance | UmlSDCombinedFragment | UmlSDMessage
+UmlLinkGenre     = UmlInheritance | UmlInterface | UmlAssociation | UmlComposition | UmlAggregation | UmlNoteLink
 
 
 UmlAssociationGenre = UmlAssociation | UmlComposition | UmlAggregation

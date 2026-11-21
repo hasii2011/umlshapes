@@ -86,6 +86,10 @@ class UmlLineControlPoint(LineControlPoint):
         assert self._point is not None
         return self._point
 
+    @point.setter
+    def point(self, newPoint: Point):
+        self._point = newPoint
+
     @property
     def umlLineControlPointType(self) -> UmlLineControlPointType:
         """

@@ -198,11 +198,11 @@ class UmlActor(ControlPointMixin, IdentifierMixin, RectangleShape, TopLeftMixin)
         # x: int = self.GetX()
         # y: int = self.GetY()
 
-        leftX: int = x - (width // 2)
-        topY:  int = y - (height // 2)
+        leftX: int = round(x - (width // 2))
+        topY:  int = round(y - (height // 2))
 
         # drawing is restricted in the specified region of the device
-        dc.SetClippingRegion(leftX, topY, width, height)
+        dc.SetClippingRegion(leftX, topY, round(width), round(height))
         if self.Selected() is True:
             DrawingUtils.drawSelectedRectangle(dc=dc, shape=self)
 

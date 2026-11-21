@@ -23,6 +23,7 @@ from wx import OK
 
 from wx import CommandEvent
 from wx import ColourDatabase
+from wx import ComboBox
 from wx import StdDialogButtonSizer
 from wx import TextCtrl
 from wx import Window
@@ -117,10 +118,12 @@ class BaseEditDialog(SizedDialog):
         """
         self.EndModal(ID_CANCEL)
 
-    def _indicateEmptyTextCtrl(self, name: TextCtrl):
+    def _indicateEmptyTextCtrl(self, name: TextCtrl | ComboBox):
 
         self.baseDlgLogger.warning(f'Name is empty!!')
         name.BackgroundColour = ColourDatabase().Find('Red')
+        name.Refresh()
 
-    def _indicateNonEmptyTextCtrl(self, name: TextCtrl, normalBackgroundColor: Colour):
+    def _indicateNonEmptyTextCtrl(self, name: TextCtrl | ComboBox, normalBackgroundColor: Colour):
         name.BackgroundColour = normalBackgroundColor
+        name.Refresh()

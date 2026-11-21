@@ -576,6 +576,34 @@ class DemoAppFrame(SizedFrame):
         with DlgEditInterface(parent=requestingFrame, lollipopInterface=umlLollipopInterface, umlPubSubEngine=pubsubEngine, interfaces=interfaces) as dlg:
             if dlg.ShowModal() == ID_OK:
                 requestingFrame.refresh()
+            else:
+                self._cancelLollipopCreation(
+                    requestingFrame=requestingFrame,
+                    umlLollipopInterface=umlLollipopInterface,
+                    interface=interface,
+                    interfaces=interfaces
+                )
+
+    def _cancelLollipopCreation(self,
+                                requestingFrame: ClassDiagramFrame,
+                                umlLollipopInterface: UmlLollipopInterface,
+                                interface: Interface,
+                                interfaces: Interfaces):
+        """
+        Removes the candidate lollipop shape and associated interface when creation is cancelled.
+
+        Args:
+            requestingFrame:      The active class diagram frame.
+            umlLollipopInterface: The candidate lollipop shape to remove.
+            interface:            The generated interface model object to remove.
+            interfaces:           The interfaces collection to clean up.
+        """
+        diagram: UmlDiagram = requestingFrame.umlDiagram
+        diagram.RemoveShape(umlLollipopInterface)
+        if interface in interfaces:
+            interfaces.remove(interface)
+
+        requestingFrame.refresh()
 
     def _updateApplicationStatusListener(self, message: str):
         self.SetStatusText(text=message)

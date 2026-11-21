@@ -37,9 +37,11 @@ class UmlAssociationEventHandler(UmlLinkEventHandler):
 
     def OnMoveLink(self, dc: DC, moveControlPoints: bool = True):
 
-        super().OnMoveLink(dc=dc, moveControlPoints=moveControlPoints)
-
         umlLink: UmlAssociation = self.GetShape()
+        if umlLink.areBothEndsMovingTogether() is True:
+            return
+
+        super().OnMoveLink(dc=dc, moveControlPoints=moveControlPoints)
 
         sourceCardinality:      UmlLinkLabel | None = umlLink.sourceCardinality
         destinationCardinality: UmlLinkLabel | None = umlLink.destinationCardinality

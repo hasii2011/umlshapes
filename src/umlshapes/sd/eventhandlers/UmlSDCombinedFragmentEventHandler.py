@@ -25,7 +25,6 @@ from umlshapes.sd.UmlSDCombinedFragment import UmlSDCombinedFragment
 from umlshapes.types.UmlPosition import NO_POSITION
 
 if TYPE_CHECKING:
-    from umlshapes.ShapeTypes import UmlShapeGenre
     from umlshapes.sd.UmlSDInstance import UmlSDInstance
 
 MIN_FRAGMENT_WIDTH: int = 100
@@ -178,7 +177,7 @@ class UmlSDCombinedFragmentEventHandler(UmlBaseEventHandler):
             umlFrame.refresh()
 
         self._handleTopLeftShapeDrag(
-            umlShape=cast('UmlShapeGenre', fragment),
+            umlShape=fragment,
             umlFrame=umlFrame,
             x=round(self._initialFragmentX),
             y=round(self._initialFragmentY)
@@ -226,7 +225,7 @@ class UmlSDCombinedFragmentEventHandler(UmlBaseEventHandler):
 
         umlFrame: UmlFrame = fragment.umlFrame
         self._handleTopLeftShapeDrag(
-            umlShape=cast('UmlShapeGenre', fragment),
+            umlShape=fragment,
             umlFrame=umlFrame,
             x=round(newCenterX),
             y=round(newCenterY)
@@ -244,8 +243,9 @@ class UmlSDCombinedFragmentEventHandler(UmlBaseEventHandler):
             keys: Modifier keys bitmask.
             attachment: Attachment point identifier.
         """
-        from umlshapes.commands.ShapesMovedCommand import ShapesMovedCommand
-        from umlshapes.frames.ShapeMoveInfo import InitialPositions
+        from umlshapes.commands.shapemove.ShapesMovedCommand import ShapesMovedCommand
+        from umlshapes.commands.shapemove.ShapeMoveInfo import MovedLinks
+        from umlshapes.commands.shapemove.ShapeMoveInfo import MovedShapes
 
         self.OnDragLeft(draw=False, x=x, y=y, keys=keys, attachment=attachment)
         self._dragStartX = None
@@ -263,12 +263,12 @@ class UmlSDCombinedFragmentEventHandler(UmlBaseEventHandler):
 
         shapesMovedCommand: ShapesMovedCommand = ShapesMovedCommand(
             umlFrame=umlFrame,
-            movedShapes=umlFrame.movedShapes,
-            initialPositions=self._initialPositions
+            movedShapes=self._movedShapes,
+            movedLinks=self._movedLinks
         )
         umlFrame.commandProcessor.Submit(command=shapesMovedCommand, storeIt=True)
-        umlFrame.clearMovedShapes()
-        self._initialPositions = InitialPositions({})
+        self._movedShapes = MovedShapes({})
+        self._movedLinks = MovedLinks({})
 
     def OnSizingBeginDragLeft(self, pt: ControlPoint, x: int, y: int, keys: int = 0, attachment: int = 0):
         """

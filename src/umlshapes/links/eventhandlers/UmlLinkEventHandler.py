@@ -151,9 +151,12 @@ class UmlLinkEventHandler(UmlBaseEventHandler):
             dc:
             moveControlPoints:
         """
+        umlLink: UmlLink = self.GetShape()
+        if umlLink.areBothEndsMovingTogether() is True:
+            return
+
         super().OnMoveLink(dc=dc, moveControlPoints=moveControlPoints)
 
-        umlLink:         UmlAssociation      = self.GetShape()
         associationName: UmlLinkLabel | None = umlLink.linkName
         #
         if associationName is not None and associationName.labelType == LabelType.ASSOCIATION_NAME:

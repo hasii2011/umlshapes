@@ -64,18 +64,6 @@ class SequenceDiagramFrame(UmlFrame):
         self.logger.debug(f'{deltaXY=}')
         shapes = self.selectedShapes
 
-        if self._shapesMoving is False:
-            for s in shapes:
-                if (
-                    isinstance(s, TopLeftMixin) and not isinstance(s, (UmlLink, UmlBaseLabel, UmlSDExecution))
-                ):
-                    u: UmlShapeGenre = s
-                    self.markShapeAsMoved(umlShape=u)
-                elif isinstance(s, UmlSDMessage):
-                    uSDMessage: UmlShapeGenre = cast(UmlShapeGenre, s)
-                    self.markShapeAsMoved(umlShape=uSDMessage)
-            self._shapesMoving = True
-
         dc: ClientDC = ClientDC(self)
         self.PrepareDC(dc)
         layoutEngine: SDLayoutEngine = SDLayoutEngine()
