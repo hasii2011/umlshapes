@@ -12,6 +12,9 @@ from wx import Size
 from wx import Window
 from wx import SpinCtrlDouble
 from wx import SpinDoubleEvent
+from wx import CheckBox
+from wx import CommandEvent
+from wx import EVT_CHECKBOX
 
 from wx.lib.sized_controls import SizedPanel
 from wx.lib.sized_controls import SizedStaticBox
@@ -114,6 +117,7 @@ class LollipopPreferencesPanel(BasePreferencesPanel):
         self._hitAreaInflationRate: NamedSpinCtrl = NO_SPIN_CTRL
 
         self._horizontalOffset: SpinCtrlDouble = cast(SpinCtrlDouble, None)     # noqa
+        self._showPlacementDialog: CheckBox    = cast(CheckBox, None)           # noqa
 
         super().__init__(parent)
 
@@ -133,6 +137,7 @@ class LollipopPreferencesPanel(BasePreferencesPanel):
         self._hitAreaInflationRate = NamedSpinCtrl(parent=parent, description=HitAreaInflationRate)
 
         self._layoutHorizontalOffset(parent)
+        self._layoutPlacementDialogCheckbox(parent)
 
     def _layoutHorizontalOffset(self, parent: SizedPanel):
 
@@ -146,6 +151,12 @@ class LollipopPreferencesPanel(BasePreferencesPanel):
 
         self._horizontalOffset = horizontalOffSet
 
+    def _layoutPlacementDialogCheckbox(self, parent: SizedPanel):
+
+        checkBox: CheckBox = CheckBox(parent=parent, label='Show Placement Help Dialog')
+        checkBox.SetToolTip('Show placement instructions dialog when creating a lollipop interface')
+        self._showPlacementDialog = checkBox
+
     def _setControlValues(self):
         """
         For the NameSpinCtrl that control takes care of handling the
@@ -158,11 +169,18 @@ class LollipopPreferencesPanel(BasePreferencesPanel):
         self._hitAreaInflationRate.value  = self._preferences.hitAreaInflationRate
 
         self._horizontalOffset.SetValue(self._preferences.horizontalOffset)
+        self._showPlacementDialog.SetValue(self._preferences.showLollipopPlacementDialog)
 
     def _bindControls(self, parent: SizedPanel):
         parent.Bind(EVT_SPINCTRLDOUBLE, self._onHorizontalOffSetChanged, self._horizontalOffset)
+        parent.Bind(EVT_CHECKBOX, self._onShowPlacementDialogChanged, self._showPlacementDialog)
 
     def _onHorizontalOffSetChanged(self, event: SpinDoubleEvent):
 
         newValue: float = event.GetValue()
         self._preferences.horizontalOffset = newValue
+
+    def _onShowPlacementDialogChanged(self, event: CommandEvent):
+
+        newValue: bool = event.IsChecked()
+        self._preferences.showLollipopPlacementDialog = newValue

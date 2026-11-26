@@ -86,6 +86,7 @@ class UmlPreferences:
     interfaceNameIndent: int
     hitAreaInflationRate: int
     horizontalOffset: float
+    showLollipopPlacementDialog: bool
     debugDiagramFrame: bool
     debugBasicShape: bool
     classDiagramFromCtxMenu: bool

@@ -166,11 +166,12 @@ ASSOCIATION_PREFERENCES: ValueDescriptions = ValueDescriptions(
 
 LOLLIPOP_PREFERENCES: ValueDescriptions = ValueDescriptions(
     {
-        KeyName('lollipopLineLength'):   ValueDescription(defaultValue='90',  deserializer=SecureConversions.secureInteger),
-        KeyName('lollipopCircleRadius'): ValueDescription(defaultValue='4',   deserializer=SecureConversions.secureInteger),
-        KeyName('interfaceNameIndent'):  ValueDescription(defaultValue='10',  deserializer=SecureConversions.secureInteger),
-        KeyName('hitAreaInflationRate'): ValueDescription(defaultValue='2',   deserializer=SecureConversions.secureInteger),
-        KeyName('horizontalOffset'):     ValueDescription(defaultValue='0.5', deserializer=SecureConversions.secureFloat),
+        KeyName('lollipopLineLength'):         ValueDescription(defaultValue='90',    deserializer=SecureConversions.secureInteger),
+        KeyName('lollipopCircleRadius'):       ValueDescription(defaultValue='4',     deserializer=SecureConversions.secureInteger),
+        KeyName('interfaceNameIndent'):        ValueDescription(defaultValue='10',    deserializer=SecureConversions.secureInteger),
+        KeyName('hitAreaInflationRate'):       ValueDescription(defaultValue='2',     deserializer=SecureConversions.secureInteger),
+        KeyName('horizontalOffset'):           ValueDescription(defaultValue='0.5',   deserializer=SecureConversions.secureFloat),
+        KeyName('showLollipopPlacementDialog'): ValueDescription(defaultValue='True',  deserializer=SecureConversions.secureBoolean),
     }
 )
 DEBUG_PREFERENCES: ValueDescriptions = ValueDescriptions(

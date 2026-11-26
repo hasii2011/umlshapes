@@ -13,6 +13,8 @@ from wx import Window
 from umlshapes.pubsubengine.IUmlPubSubEngine import IUmlPubSubEngine
 from umlshapes.pubsubengine.UmlMessageType import UmlMessageType
 
+from umlshapes.dialogs.DlgDisplayLollipopPlacementMsg import DlgDisplayLollipopPlacementMsg
+from umlshapes.dialogs.DlgDisplayLollipopPlacementMsg import LOLLIPOP_PLACEMENT_MESSAGE
 from umlshapes.frames.UmlClassCtxMenuHandler import UmlClassCtxMenuHandler
 from umlshapes.frames.UmlFrame import UmlFrame
 
@@ -146,7 +148,22 @@ class ClassDiagramFrame(UmlFrame):
 
         self.umlPubSubEngine.sendMessage(UmlMessageType.UPDATE_APPLICATION_STATUS,
                                          frameId=self.id,
-                                         message='Click on the UML Class edge where you want to place the interface')
+                                         message=LOLLIPOP_PLACEMENT_MESSAGE)
+
+        if self._preferences.showLollipopPlacementDialog is True:
+            self._showLollipopPlacementDialog()
+
+    def _showLollipopPlacementDialog(self):
+        """
+        Displays instructions on placing the lollipop interface.
+        If the user unchecks 'Show this dialog next time', updates the preference to False.
+        """
+        placementDialog: DlgDisplayLollipopPlacementMsg = DlgDisplayLollipopPlacementMsg(
+            parent=self,
+            preferences=self._preferences
+        )
+        with placementDialog:
+            placementDialog.ShowModal()
 
     def _requestCreationOfLollipopInterface(self, requestingUmlClass: UmlClass, perimeterPoint: UmlPosition):
         """
@@ -155,12 +172,12 @@ class ClassDiagramFrame(UmlFrame):
             perimeterPoint:
         """
         self._umlPubSubEngine.sendMessage(UmlMessageType.CREATE_LOLLIPOP,
-                                          frameId=self.id,
-                                          requestingFrame=self,
-                                          requestingUmlClass=requestingUmlClass,
-                                          interfaces=self.getDefinedInterfaces(),
-                                          perimeterPoint=perimeterPoint,
-                                          )
+                                           frameId=self.id,
+                                           requestingFrame=self,
+                                           requestingUmlClass=requestingUmlClass,
+                                           interfaces=self.getDefinedInterfaces(),
+                                           perimeterPoint=perimeterPoint,
+                                           )
         #
         # cleanup
         #
